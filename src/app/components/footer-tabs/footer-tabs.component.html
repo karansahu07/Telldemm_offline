@@ -1,0 +1,37 @@
+<ion-tab-bar slot="bottom">
+  <!-- <button (click)="navigateTohomescreen()" [class.active]="isActive(['/home-screen'])">
+    <div class="icon-bg" [class.active]="isActive(['/home-screen'])">
+      <img src="assets/images/whatsapp-new-chat.svg" class="footericons" alt="Chat" />
+    </div>
+    <p class="tabtext">Chat</p>
+  </button> -->
+
+  <button (click)="navigateTohomescreen()" [class.active]="isActive(['/home-screen'])">
+    <div class="icon-bg" [class.active]="isActive(['/home-screen'])">
+      <img src="assets/images/whatsapp-new-chat.svg" class="footericons" alt="Chat" />
+      <ion-badge *ngIf="totalUnreadCount > 0" class="unread-badge">{{ totalUnreadCount }}</ion-badge>
+    </div>
+    <p class="tabtext">Chat</p>
+  </button>
+
+  <button (click)="navigateTocallingscreen()" [class.active]="isActive(['/status-screen'])">
+    <div class="icon-bg" [class.active]="isActive(['/status-screen'])">
+      <img src="assets/images/icon2.svg" class="footericons" alt="Updates" />
+    </div>
+    <p class="tabtext">Updates</p>
+  </button>
+
+  <button (click)="navigateTocommunityscreen()" [class.active]="isActive(['/community-screen'])">
+    <div class="icon-bg" [class.active]="isActive(['/community-screen'])">
+      <img src="assets/images/contact.svg" class="footericons" alt="community" />
+    </div>
+    <p class="tabtext">Communities</p>
+  </button>
+
+  <button (click)="navigateTocallsscreen()" [class.active]="isActive(['/calls-screen'])">
+    <div class="icon-bg" [class.active]="isActive(['/calls-screen'])">
+      <img src="assets/images/call.svg" class="footericons" alt="Calls" />
+    </div>
+    <p class="tabtext">Calls</p>
+  </button>
+</ion-tab-bar>

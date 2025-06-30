@@ -1,0 +1,87 @@
+/*
+ * App Global CSS
+ * ----------------------------------------------------------------------------
+ * Put style rules here that you want to apply globally. These styles are for
+ * the entire app and not just one component. Additionally, this file can be
+ * used as an entry point to import other CSS/Sass files to be included in the
+ * output CSS.
+ * For more information on global stylesheets, visit the documentation:
+ * https://ionicframework.com/docs/layout/global-stylesheets
+ */
+
+/* Core CSS required for Ionic components to work properly */
+@import "@ionic/angular/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import "@ionic/angular/css/display.css";
+
+/* Optional CSS utils that can be commented out */
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+
+/**
+ * Ionic Dark Mode
+ * -----------------------------------------------------
+ * For more info, please see:
+ * https://ionicframework.com/docs/theming/dark-mode
+ */
+
+/* @import "@ionic/angular/css/palettes/dark.always.css"; */
+/* @import "@ionic/angular/css/palettes/dark.class.css"; */
+@import "@ionic/angular/css/palettes/dark.system.css";
+
+@font-face {
+    font-family: Montserrat-bold;
+    src: url('./assets/fonts/Montserrat-Bold.eot') format('eot'),
+        url('./assets/fonts/Montserrat-Bold.woff2') format('woff2'),
+        url('./assets/fonts/Montserrat-Bold.woff') format('woff'),
+        url('./assets/fonts/Montserrat-Bold.ttf') format('ttf'),
+        url('./assets/fonts/Montserrat-Bold.otf') format('otf');
+}
+
+@font-face {
+    font-family: Montserrat-Medium;
+    src: url('./assets/fonts/Montserrat-Medium.eot') format('eot'),
+        url('./assets/fonts/Montserrat-Medium.woff2') format('woff2'),
+        url('./assets/fonts/Montserrat-Medium.woff') format('woff'),
+        url('./assets/fonts/Montserrat-Medium.ttf') format('ttf'),
+        url('./assets/fonts/Montserrat-Medium.otf') format('otf');
+}
+
+@font-face {
+    font-family: Montserrat-SemiBold;
+    src: url('./assets/fonts/Montserrat-SemiBold.eot') format('eot'),
+        url('./assets/fonts/Montserrat-SemiBold.woff2') format('woff2'),
+        url('./assets/fonts/Montserrat-SemiBold.woff') format('woff'),
+        url('./assets/fonts/Montserrat-SemiBold.ttf') format('ttf'),
+        url('./assets/fonts/Montserrat-SemiBold.otf') format('otf');
+}
+
+@font-face {
+    font-family: Montserrat-Regular;
+    src: url('./assets/fonts/Montserrat-Regular.eot') format('eot'),
+        url('./assets/fonts/Montserrat-Regular.woff2') format('woff2'),
+        url('./assets/fonts/Montserrat-Regular.woff') format('woff'),
+        url('./assets/fonts/Montserrat-Regular.ttf') format('ttf'),
+        url('./assets/fonts/Montserrat-Regular.otf') format('otf');
+}
+
+@font-face {
+    font-family: OpenSans-SemiBold;
+    src: url('./assets/fonts/OpenSans-SemiBold.eot') format('eot'),
+        url('./assets/fonts/OpenSans-SemiBold.woff2') format('woff2'),
+        url('./assets/fonts/OpenSans-SemiBold.woff') format('woff'),
+        url('./assets/fonts/OpenSans-SemiBold.ttf') format('ttf'),
+        url('./assets/fonts/OpenSans-SemiBold.otf') format('otf');
+}
+
+
+// ion-toolbar {
+//   padding-top: env(safe-area-inset-top);
+// }

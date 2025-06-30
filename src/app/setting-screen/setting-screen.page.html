@@ -1,0 +1,132 @@
+<ion-header [translucent]="true">
+  <ion-toolbar style="display: flex; flex-direction: column; align-items: stretch; --background: white;">
+    <ion-buttons slot="start" style="color: black; width: 8%; margin-top: 15px;">
+      <ion-back-button defaultHref="/home-screen"></ion-back-button>
+    </ion-buttons>
+
+    <div style="display: flex;padding-top: 30px;">
+      <ion-title>
+        <h2 style="color:#FF1414;font-family: Montserrat-bold;font-size:20px">Settings</h2>
+      </ion-title>
+
+      <ion-buttons slot="end" style="display: flex;margin-right: 10px;">
+        <ion-button fill="clear">
+          <img src="assets/images/qr-code.svg" style="width: 24px; height: 24px;" />
+        </ion-button>
+        <ion-button fill="clear">
+          <img src="assets/images/camera.svg" style="width: 24px; height: 24px;" />
+        </ion-button>
+        <ion-button fill="clear" (click)="presentPopover($event)">
+          <img src="assets/images/dots (1).svg" style="width: 24px; height: 24px;" />
+        </ion-button>
+      </ion-buttons>
+    </div>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" style="--background: white;">
+  <div style="padding: 5%;">
+    <div style="display: flex;align-items: center;justify-content: space-between;">
+      <div style="display: flex;align-items: center;gap: 15px;">
+        <img src="assets/images/user.jfif" alt="user_image" style="width: 65px; height: 65px;border-radius: 50px">
+        <div>
+          <p style="color: black;font-family: 'Montserrat-bold';font-size: 20px;margin: 0;">Madhav Kaushik</p>
+          <p style="color: black;font-family: Montserrat, Medium;font-size: 14px;margin: 0;">Hey there! I am using
+            tellde..</p>
+        </div>
+      </div>
+      <div>
+        <img src="assets/images/barcode-scan.svg" alt="barcode-scan-img">
+      </div>
+    </div>
+
+    <div style="display: flex;align-items: center;gap: 15px;padding: 20px 0px 0px 5px;">
+      <img src="assets/images/account.svg" alt="barcode-scan-img">
+      <div>
+        <p style="color: black;font-family: 'Montserrat, SemiBold';font-size: 18px;margin: 0;">Meta Verifiedk</p>
+        <p style="color: black;font-family: Montserrat, Medium;font-size: 14px;margin: 0;">Show that your profile is verified</p>
+      </div>
+    </div>
+
+    <div style="display: flex;align-items: center;gap: 15px;    padding: 20px 0px 0px 5px;">
+      <img src="assets/images/account.svg" alt="barcode-scan-img">
+      <div>
+        <p style="color: black;font-family: 'Montserrat, SemiBold';font-size: 18px;margin: 0;">Account</p>
+        <p style="color: black;font-family: Montserrat, Medium;font-size: 14px;margin: 0;">Security notification, change number</p>
+      </div>
+    </div>
+
+    <div style="display: flex;align-items: center;gap: 15px;    padding: 20px 0px 0px 5px;">
+      <img src="assets/images/key.svg" alt="barcode-scan-img">
+      <div>
+        <p style="color: black;font-family: 'Montserrat, SemiBold';font-size: 18px;margin: 0;">Privacy</p>
+        <p style="color: black;font-family: Montserrat, Medium;font-size: 14px;margin: 0;">Block contact, disappearing messages</p>
+      </div>
+    </div>
+
+    <div style="display: flex;align-items: center;gap: 15px;padding: 20px 0px 0px 5px;">
+      <img src="assets/images/avatar.svg" alt="barcode-scan-img">
+      <div>
+        <p style="color: black;font-family: 'Montserrat, SemiBold';font-size: 18px;margin: 0;">Avatar</p>
+        <p style="color: black;font-family: Montserrat, Medium;font-size: 14px;margin: 0;">Create, edit, profile photo</p>
+      </div>
+    </div>
+
+    <div style="display: flex;align-items: center;gap: 15px;padding: 20px 0px 0px 5px;">
+      <img src="assets/images/heart.svg" alt="barcode-scan-img">
+      <div>
+        <p style="color: black;font-family: 'Montserrat, SemiBold';font-size: 18px;margin: 0;">Favourites</p>
+        <p style="color: black;font-family: Montserrat, Medium;font-size: 14px;margin: 0;">Add, recorder, remove</p>
+      </div>
+    </div>
+
+    <div style="display: flex;align-items: center;gap: 15px;padding: 20px 0px 0px 5px;">
+      <img src="assets/images/msg.svg" alt="barcode-scan-img">
+      <div>
+        <p style="color: black;font-family: 'Montserrat, SemiBold';font-size: 18px;margin: 0;">Chats</p>
+        <p style="color: black;font-family: Montserrat, Medium;font-size: 14px;margin: 0;">Theme, wallpapers, chat histroy</p>
+      </div>
+    </div>
+
+    <div style="display: flex;align-items: center;gap: 15px;padding: 20px 0px 0px 5px;">
+      <img src="assets/images/notification.svg" alt="barcode-scan-img">
+      <div>
+        <p style="color: black;font-family: 'Montserrat, SemiBold';font-size: 18px;margin: 0;">Notification</p>
+        <p style="color: black;font-family: Montserrat, Medium;font-size: 14px;margin: 0;">Message, group & call tones</p>
+      </div>
+    </div>
+
+    <div style="display: flex;align-items: center;gap: 15px;padding: 20px 0px 0px 5px;">
+      <img src="assets/images/storage.svg" alt="barcode-scan-img">
+      <div>
+        <p style="color: black;font-family: 'Montserrat, SemiBold';font-size: 18px;margin: 0;">Storage and data</p>
+        <p style="color: black;font-family: Montserrat, Medium;font-size: 14px;margin: 0;">Network usage, auto-download</p>
+      </div>
+    </div>
+
+    <div style="display: flex;align-items: center;gap: 15px;padding: 20px 0px 0px 5px;">
+      <img src="assets/images/web.svg" alt="barcode-scan-img">
+      <div>
+        <p style="color: black;font-family: 'Montserrat, SemiBold';font-size: 18px;margin: 0;">App language</p>
+        <p style="color: black;font-family: Montserrat, Medium;font-size: 14px;margin: 0;">English (device's language)</p>
+      </div>
+    </div>
+
+    <div style="display: flex;align-items: center;gap: 15px;padding: 20px 0px 0px 5px;">
+      <img src="assets/images/help.svg" alt="barcode-scan-img">
+      <div>
+        <p style="color: black;font-family: 'Montserrat, SemiBold';font-size: 18px;margin: 0;">Help</p>
+        <p style="color: black;font-family: Montserrat, Medium;font-size: 14px;margin: 0;">Help center, contact us, privacy policy</p>
+      </div>
+    </div>
+
+    <div style="display: flex;align-items: center;gap: 15px;padding: 20px 0px 0px 5px;">
+      <img src="assets/images/invite.svg" alt="barcode-scan-img">
+      <div>
+        <p style="color: black;font-family: 'Montserrat, SemiBold';font-size: 18px;margin: 0;">Invite a contact</p>
+      </div>
+    </div>
+
+  </div>
+</ion-content>

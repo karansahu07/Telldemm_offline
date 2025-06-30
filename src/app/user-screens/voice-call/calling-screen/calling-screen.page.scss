@@ -1,0 +1,137 @@
+// ion-content {
+//   --background: none;
+//   background-image: url('/assets/images/cal_screen_image.svg');
+//   background-size: auto;
+//   background-position: center;
+//   background-repeat: no-repeat;
+//   background-size: cover;
+// }
+
+// .main-icon-image {
+//   display: flex;
+//   height: 100vh;
+//   flex-direction: column;
+//   justify-content: space-around;
+// }
+
+// .main-header {
+//   text-align: center;
+//   margin: 0;
+// }
+
+// .madhav {
+//   margin: 0;
+//   font-size: 20px;
+//   font-weight: bold;
+//   color: black;
+// }
+
+// .main-img {
+//   text-align: center;
+// }
+
+// .icons-main {
+//   display: flex;
+//   justify-content: space-evenly;
+// }
+
+// .main-img img {
+//   width: 150px;
+//   height: 150px;
+//   border-radius: 50%;
+//   object-fit: cover;
+// }
+
+// .encrypted {
+//   margin: 0;
+//   font-size: 16px;
+//   color: gray;
+// }
+
+// .icons {
+//   background-color: #444343;
+//   width: 55px;
+//   height: 55px;
+//   border-radius: 50px;
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+// }
+
+// .video-icon {
+//   color: #a9a6a6;
+// }
+
+// .call-icon {
+//   background-color: red;
+// }
+
+ion-content {
+  --background: none;
+  background-image: url('/assets/images/cal_screen_image.svg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.main-icon-image {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100vh;
+  padding: 30px 20px;
+  padding-top: 50px;
+}
+
+.main-header {
+  text-align: center;
+}
+
+.madhav {
+  margin: 0;
+  font-size: 20px;
+  font-weight: bold;
+  color: black;
+}
+
+.encrypted {
+  margin: 0;
+  font-size: 16px;
+  color: gray;
+}
+
+.main-img {
+  text-align: center;
+}
+
+.main-img img {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.icons-main {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding-bottom: 20px;
+}
+
+.icons {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  background-color: #444343;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.video-icon {
+  color: #a9a6a6;
+}
+
+.call-icon {
+  background-color: red;
+}

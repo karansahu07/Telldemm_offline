@@ -1,0 +1,231 @@
+.tooler {
+  padding-top: 30px;
+  font-family: Montserrat-bold !important;
+  box-shadow: none;
+}
+.info-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  border: 1.5px solid #ccc;
+  border-radius: 16px;
+  margin: 20px;
+  padding: 16px 20px;
+  background-color: white;
+  color: #000;
+  font-family: "Montserrat", sans-serif;
+}
+
+.info-icon {
+  width: 36px;
+  height: 36px;
+  margin-top: 6px;
+}
+
+.info-text h3 {
+  font-size: 17px;
+  margin: 0 0 6px;
+  font-weight: 600;
+}
+
+.info-text p {
+  font-size: 15px;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.highlight {
+  color: red;
+  font-weight: 600;
+}
+.light-theme {
+  --background: #ffffff;
+  color: #000;
+}
+
+.new-community,
+.community-card,
+.view-all {
+  --background: #ffffff;
+  padding: 5px 7px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.new-community h2,
+.view-all h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.community-card h2 {
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.announcement {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  font-size: 14px;
+  color: #555;
+}
+
+.icon-red {
+  color: #555;
+  font-size: 16px;
+}
+
+.icon-green {
+  color: red;
+  font-size: 20px;
+}
+
+.dot-green {
+  color: red;
+  font-size: 10px;
+  margin-left: 6px;
+}
+
+.timestamp {
+  font-size: 12px;
+  color: #888;
+}
+
+.right-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.tool {
+  margin-left: 20px;
+  margin-right: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 34px;
+  padding: 10px;
+}
+.tools {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.tools p {
+  color: black;
+  margin: 0px;
+  font-family: Montserrat-medium;
+}
+.tools:hover {
+  background-color: #ffcccc;
+  border-radius: 8px;
+}
+.msg-count {
+  position: absolute;
+  top: 6px;
+  left: 42px;
+  background-color: red;
+  color: white;
+  font-size: 10px;
+  padding: 2px 5px;
+  border-radius: 10px;
+  font-weight: bold;
+}
+.avatar-container {
+  position: relative;
+  width: 44px; /* match the avatar size */
+  height: 44px;
+}
+
+ion-avatar {
+  width: 44px;
+  height: 44px;
+}
+
+.add-icon {
+  position: absolute;
+  bottom: 8px;
+  color: red;
+  font-size: 16px;
+  background: white;
+  border-radius: 50%;
+  z-index: 10;
+  left: 45px;
+}
+.item {
+  margin-left: 2px;
+}
+.community-card {
+  --color: black;
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+
+  border-radius: 12px;
+  margin: 10px;
+}
+
+.community-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.announcement-line {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.icon-red {
+  font-size: 16px;
+  color: black;
+}
+
+.right-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-left: auto;
+  font-size: 12px;
+}
+
+.timestamp {
+  color: #ccc;
+  margin-bottom: 4px;
+}
+
+.dot-green {
+  color: red;
+  font-size: 10px;
+}
+.view-all-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: 16px;
+  --background: transparent;
+}
+
+.view-all-icon {
+  font-size: 16px;
+  color: #888;
+}
+
+.view-all-text {
+  font-size: 14px;
+  color: black;
+}
+.toolbar-tool {
+  --background: white;
+  padding: 15px 15px 15px 15px;
+}

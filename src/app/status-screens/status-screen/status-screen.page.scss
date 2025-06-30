@@ -1,0 +1,240 @@
+ion-content {
+  --background: white;
+}
+
+.telldemm {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  --background: white;
+}
+
+.main-header {
+  display: flex;
+  padding-top: 30px;
+}
+
+.header-name {
+  // color: #ff1414;
+  font-family: Montserrat-bold;
+  font-size: 20px;
+}
+
+.header-icons {
+  display: flex;
+  margin-right: 10px;
+}
+
+.header-img {
+  width: 24px;
+  height: 24px;
+}
+
+.Your {
+  font-family: OpenSans-SemiBold;
+  font-weight: 600;
+  font-size: 20px;
+  color: #000000;
+  margin-left: 16px;
+}
+
+.slider {
+  margin-left: 16px;
+}
+
+.slider-swip {
+  width: 70px !important;
+  flex-shrink: 0;
+}
+
+.main-black {
+  display: flex;
+  margin-left: 16px;
+  justify-content: space-between;
+}
+
+.image-wrapper {
+  position: relative;
+  width: 120px;
+  height: auto;
+}
+
+.Ellipse {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 30%;
+  height: auto;
+  pointer-events: none;
+}
+
+.image-wrapperss {
+  position: relative;
+  width: 75px;
+  height: 106px;
+  background: #444343;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 6px;
+}
+
+.Ellipseee {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 50%;
+  height: auto;
+  pointer-events: none;
+}
+
+.plusimg {
+  position: absolute;
+  top: 25px;
+  left: 28px;
+  right: 0;
+  width: 22%;
+}
+
+.Add-status {
+  margin: 0;
+  font-size: 11px;
+  font-family: Montserrat-SemiBold;
+  color: white;
+}
+
+.Status {
+  font-family: OpenSans-SemiBold;
+  font-weight: 600;
+  font-size: 20px;
+  color: #000000;
+  margin-left: 16px;
+  margin-bottom: 0px;
+}
+
+.Explore {
+  font-size: 14px;
+  font-family: OpenSans-SemiBold;
+  color: #ff1414;
+  margin-right: 15px;
+  margin-bottom: 0px;
+  display: flex;
+  align-items: center;
+}
+
+.rotate {
+  transform: rotate(90deg);
+  transition: transform 0.3s ease;
+}
+
+.channels-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.channels {
+  color: #444343;
+  margin: 0px 0px 0px 16px;
+  font-size: 20px;
+  font-family: OpenSans-SemiBold;
+}
+
+ion-list {
+  background: white;
+  padding-left: 5px;
+  padding-right: 8px;
+}
+
+ion-item {
+  --padding-start: 10px;
+  --inner-padding-end: 10px;
+  --background: white;
+  --color: black;
+}
+
+ion-item {
+  --inner-border-width: 0px;
+  --border-style: none;
+  --border-width: 0;
+}
+
+.chat-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: OpenSans-SemiBold;
+}
+
+.chat-meta .time {
+  font-size: 12px;
+  color: #999;
+  margin: 0px;
+}
+
+.chat-message {
+  color: #000000;
+  display: flex;
+  align-items: center;
+  font-size: 17px;
+  font-family: Montserrat-Regular;
+}
+
+.chat-India {
+  color: #000000;
+  display: flex;
+  align-items: center;
+  font-size: 17px;
+  font-family: Montserrat-Regular;
+}
+
+.followers {
+  font-family: OpenSans-SemiBold;
+  font-size: 12px;
+  color: #444343;
+}
+
+.chat-meta button {
+  color: #ffffff;
+  background: #2b2b2b;
+  font-family: OpenSans-SemiBold;
+  font-size: 12px;
+  padding: 13px 25px 13px 25px;
+  border-radius: 7px;
+}
+
+ion-badge {
+  font-size: 10px;
+  border-radius: 10px;
+  height: 18px;
+  width: 18px;
+  color: white;
+  background: #ff1414;
+}
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 0px;
+  padding: 10px;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+.main-black {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+.slider {
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+swiper-container {
+  width: 100%;
+  display: block;
+}
+
+.slider-swip {
+  min-width: 75px;
+}
