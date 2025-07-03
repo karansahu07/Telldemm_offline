@@ -1276,7 +1276,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
   }
 
  getAllUsers() {
-  const currentSenderId = this.senderUserId; // Already user_id
+  const currentSenderId = this.senderUserId;
   console.log("dfjsdjidgf",currentSenderId)
   if (!currentSenderId) return;
 
@@ -1284,6 +1284,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     users.forEach(user => {
       const receiverId = user.user_id.toString();
       const receiver_phone = user.phone_number.toString();
+      const receiver_name = user.name.toString();
       console.log("receiver phone", receiver_phone);
 
       if (receiverId !== currentSenderId) {
@@ -1308,8 +1309,10 @@ export class HomeScreenPage implements OnInit, OnDestroy {
 
         // Listen to messages in this room
         this.firebaseChatService.listenForMessages(roomId).subscribe(async (messages) => {
+          // console.log("messahes jdfdhjk",messages);
           if (messages.length > 0) {
             const lastMsg = messages[messages.length - 1];
+            // console.log(lastMsg);
 
             try {
               const decryptedText = await this.encryptionService.decrypt(lastMsg.text);
@@ -1318,7 +1321,11 @@ export class HomeScreenPage implements OnInit, OnDestroy {
               chat.message = '[Encrypted]';
             }
 
-            chat.time = lastMsg.timestamp?.split(', ')[1] || '';
+            // chat.time = lastMsg.timestamp?.split(', ')[1] || '';
+            if (lastMsg.timestamp) {
+  chat.time = this.formatTimestamp(lastMsg.timestamp);
+}
+            console.log("kktime dkefjg",chat.time);
           }
         });
 
@@ -1370,7 +1377,10 @@ export class HomeScreenPage implements OnInit, OnDestroy {
             groupChat.message = '[Encrypted]';
           }
 
-          groupChat.time = lastMsg.timestamp?.split(', ')[1] || '';
+          // groupChat.time = lastMsg.timestamp?.split(', ')[1] || '';
+          if (lastMsg.timestamp) {
+  groupChat.time = this.formatTimestamp(lastMsg.timestamp);
+}
         }
       });
 
@@ -1385,6 +1395,34 @@ export class HomeScreenPage implements OnInit, OnDestroy {
       this.unreadSubs.push(sub);
     }
   }
+
+  // this function shows time and date on chat
+  formatTimestamp(timestamp: string): string {
+  const date = new Date(timestamp);
+  const now = new Date();
+
+  const isToday = date.toDateString() === now.toDateString();
+
+  const yesterday = new Date();
+  yesterday.setDate(now.getDate() - 1);
+  const isYesterday = date.toDateString() === yesterday.toDateString();
+
+  if (isToday) {
+    return date.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    }); // e.g., "11:45 AM"
+  } else if (isYesterday) {
+    return 'Yesterday';
+  } else if (date.getFullYear() === now.getFullYear()) {
+    return date.toLocaleDateString([], { day: 'numeric', month: 'short' }); // e.g., "Jul 1"
+  } else {
+    return date.toLocaleDateString(); // e.g., "01/07/2024"
+  }
+}
+
+
 
   get filteredChats() {
     let filtered = this.chatList;
@@ -1420,6 +1458,8 @@ export class HomeScreenPage implements OnInit, OnDestroy {
   openChat(chat: any) {
     const receiverId = chat.receiver_Id;
     const receiver_phone = chat.receiver_phone;
+    const receiver_name = chat.name;
+    localStorage.setItem('receiver_name', receiver_name);
     if (chat.group) {
       this.router.navigate(['/chatting-screen'], {
         queryParams: { receiverId, isGroup: true }

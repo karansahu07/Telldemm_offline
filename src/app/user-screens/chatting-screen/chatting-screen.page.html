@@ -583,9 +583,13 @@
         <ion-avatar slot="start">
           <img src="assets/images/user.jfif" alt="User Avatar" onError="this.src='assets/images/default-avatar.png'" />
         </ion-avatar>
-        <ion-label style="width: auto; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-            <h2 style="margin: 0; font-size: 16px;">{{ chatType === 'group' ? groupName : receiver_phone }}</h2>
-        </ion-label>
+       <ion-label 
+  (click)="goToProfile()" 
+  style="width: auto; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;">
+  <h2 style="margin: 0; font-size: 16px;">
+    {{ chatType === 'group' ? groupName : receiver_phone }}
+  </h2>
+</ion-label>
       </ion-item>
     </ion-buttons>
 

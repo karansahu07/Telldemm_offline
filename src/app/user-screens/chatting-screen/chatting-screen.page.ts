@@ -2328,34 +2328,52 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   hasMoreMessages = true;
   chatType: 'private' | 'group' = 'private';
   groupName = '';
+  isGroup: any;
 
   async ngOnInit() {
-    Keyboard.setScroll({ isDisabled: false });
-    await this.initKeyboardListeners();
+  // Enable proper keyboard scrolling
+  Keyboard.setScroll({ isDisabled: false });
+  await this.initKeyboardListeners();
 
-    this.senderId = localStorage.getItem('userId') || '';
-    this.sender_phone = localStorage.getItem('phone_number') || '';
-    this.receiver_phone = localStorage.getItem('receiver_phone') || '';
-    const rawId = this.route.snapshot.queryParamMap.get('receiverId') || '';
-    const chatTypeParam = this.route.snapshot.queryParamMap.get('isGroup');
+  // Load sender (current user) details
+  this.senderId = localStorage.getItem('userId') || '';
+  this.sender_phone = localStorage.getItem('phone_number') || '';
 
-    this.chatType = chatTypeParam === 'true' ? 'group' : 'private';
+  // Get query parameters
+  const rawId = this.route.snapshot.queryParamMap.get('receiverId') || '';
+  const chatTypeParam = this.route.snapshot.queryParamMap.get('isGroup');
+  const phoneFromQuery = this.route.snapshot.queryParamMap.get('receiver_phone');
 
-    if (this.chatType === 'group') {
-      this.roomId = decodeURIComponent(rawId);
-      await this.fetchGroupName(this.roomId);
-    } else {
-      this.receiverId = decodeURIComponent(rawId);
-      this.roomId = this.getRoomId(this.senderId, this.receiverId);
-    }
+  // Determine chat type
+  this.chatType = chatTypeParam === 'true' ? 'group' : 'private';
 
-    await this.chatService.resetUnreadCount(this.roomId, this.senderId);
-    await this.markMessagesAsRead();
+  if (this.chatType === 'group') {
+    // Group chat
+    this.roomId = decodeURIComponent(rawId);
+    await this.fetchGroupName(this.roomId);
+  } else {
+    // Individual chat
+    this.receiverId = decodeURIComponent(rawId);
+    this.roomId = this.getRoomId(this.senderId, this.receiverId);
 
-    this.loadFromLocalStorage();
-    this.listenForMessages();
-    setTimeout(() => this.scrollToBottom(), 100);
+    // Use receiver_phone from query or fallback to localStorage
+    this.receiver_phone = phoneFromQuery || localStorage.getItem('receiver_phone') || '';
+    // Store for reuse when navigating to profile
+    localStorage.setItem('receiver_phone', this.receiver_phone);
   }
+
+  // Reset unread count and mark messages as read
+  await this.chatService.resetUnreadCount(this.roomId, this.senderId);
+  await this.markMessagesAsRead();
+
+  // Load and render messages
+  this.loadFromLocalStorage();
+  this.listenForMessages();
+
+  // Scroll to bottom after short delay
+  setTimeout(() => this.scrollToBottom(), 100);
+}
+
 
   private async markMessagesAsRead() {
     const lastMessage = this.messages[this.messages.length - 1];
@@ -2422,6 +2440,72 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       setTimeout(() => this.scrollToBottom(), 100);
     });
   }
+
+
+//   async listenForMessages() {
+//   this.messageSub = this.chatService.listenForMessages(this.roomId).subscribe(async (data) => {
+//     const decryptedMessages: Message[] = [];
+
+//     for (const msg of data) {
+//       const decryptedText = await this.encryptionService.decrypt(msg.text);
+//       decryptedMessages.push({ ...msg, text: decryptedText });
+
+//       // ✅ Mark as delivered if current user is the receiver and not already delivered
+//       if (
+//         msg.receiver_id === this.senderId &&
+//         !msg.delivered
+//       ) {
+//         this.chatService.markDelivered(this.roomId, msg.key);
+//       }
+//     }
+
+//     this.messages = decryptedMessages;
+//     this.groupedMessages = this.groupMessagesByDate(decryptedMessages);
+//     this.saveToLocalStorage();
+
+//     const last = decryptedMessages[decryptedMessages.length - 1];
+//     if (last) {
+//       localStorage.setItem(`lastMsg_${this.roomId}`, JSON.stringify({
+//         text: last.text,
+//         timestamp: last.timestamp
+//       }));
+//     }
+
+//     setTimeout(() => {
+//       this.scrollToBottom();
+//       this.observeVisibleMessages(); // 👁️ Call visibility tracking after messages rendered
+//     }, 100);
+//   });
+// }
+
+
+// observeVisibleMessages() {
+//   const allMessageElements = document.querySelectorAll('[data-msg-key]');
+
+//   allMessageElements.forEach((el: any) => {
+//     const msgKey = el.getAttribute('data-msg-key');
+//     const msgIndex = this.messages.findIndex(m => m.message_id === msgKey);
+//     if (msgIndex === -1) return;
+
+//     const msg = this.messages[msgIndex];
+
+//     if (!msg.read && msg.receiver_id === this.senderId) {
+//       const observer = new IntersectionObserver(entries => {
+//         entries.forEach(entry => {
+//           if (entry.isIntersecting) {
+//             // ✅ Mark as read when visible
+//             this.chatService.markRead(this.roomId, msgKey);
+//             observer.unobserve(entry.target); // stop observing
+//           }
+//         });
+//       }, {
+//         threshold: 1.0 // 100% visible
+//       });
+
+//       observer.observe(el);
+//     }
+//   });
+// }
 
   
 
@@ -2608,6 +2692,17 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   loadMessagesFromFirebase(isPagination = false) {}
+
+  goToProfile() {
+  // this.router.navigate(['/profile-screen']);
+      this.router.navigate(['/profile-screen'], {
+    queryParams: {
+      receiverId: this.receiverId,
+      receiver_phone: this.receiver_phone,
+      isGroup: this.isGroup
+    }
+  });
+}
 
   saveToLocalStorage() {
     localStorage.setItem(this.roomId, JSON.stringify(this.messages));

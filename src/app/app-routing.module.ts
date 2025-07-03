@@ -140,7 +140,12 @@ const routes: Routes = [
     path: 'community-screen',
     canActivate: [AuthGuard],  
     loadComponent: () => import('./community-screen/community.page').then(m => m.CommunityPage)
-  }
+  },
+  {
+    path: 'profile-screen',
+    canActivate: [AuthGuard],
+    loadComponent: () => import('./profile-screen/userabout.page').then(m => m.UseraboutPage)
+  },
 ];
 
 @NgModule({

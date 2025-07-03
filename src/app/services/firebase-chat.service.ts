@@ -340,14 +340,15 @@ export class FirebaseChatService {
     return membersObj ? Object.keys(membersObj) : [];
   }
 
-//   markDelivered(roomId: string, messageId: string): void {
-//   const db = getDatabase();
-//   const messageRef = ref(db, `chats/${roomId}/${messageId}/status`);
+ // 👇 Call when message arrives on receiver's device
+  markDelivered(roomId: string, messageKey: string) {
+    const messageRef = ref(this.db, `chats/${roomId}/${messageKey}`);
+    update(messageRef, { delivered: true });
+  }
 
-//   update(messageRef, {
-//     delivered: true
-//   }).catch(error => {
-//     console.error("Failed to mark delivered:", error);
-//   });
-// }
+  // 👇 Call only when message is visibly seen
+  markRead(roomId: string, messageKey: string) {
+    const messageRef = ref(this.db, `chats/${roomId}/${messageKey}`);
+    update(messageRef, { read: true });
+  }
 }
