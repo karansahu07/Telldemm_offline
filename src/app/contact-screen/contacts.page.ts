@@ -336,6 +336,503 @@
 // }
 
 
+// import { CommonModule } from '@angular/common';
+// import { Component, OnInit, ViewChild } from '@angular/core';
+// import { IonicModule, IonInput, PopoverController } from '@ionic/angular';
+// import { MenuPopoverComponent } from '../components/menu-popover/menu-popover.component';
+// import { ContactMenuComponent } from '../components/contact-menu/contact-menu.component';
+// import { ActionSheetController } from '@ionic/angular';
+// import { Router } from '@angular/router';
+// import { FormsModule } from '@angular/forms';
+// import { ApiService } from '../services/api/api.service';
+// import { FirebaseChatService } from '../services/firebase-chat.service';
+
+// @Component({
+//   selector: 'app-contacts',
+//   templateUrl: './contacts.page.html',
+//   styleUrls: ['./contacts.page.scss'],
+//   standalone: true,
+//   imports: [IonicModule, CommonModule, FormsModule],
+// })
+// export class ContactsPage implements OnInit {
+//   @ViewChild('searchInput', { static: false }) searchInput!: IonInput;
+
+//   allUsers: any[] = [];
+//   filteredContacts: any[] = [];
+
+//   showSearchBar = false;
+//   searchTerm: string = '';
+//   keyboardType: 'text' | 'tel' = 'text';
+
+//   creatingGroup = false;
+//   newGroupName: string = '';
+
+//   constructor(
+//     private router: Router,
+//     private popoverControl: PopoverController,
+//     private actionSheetCtrl: ActionSheetController,
+//     private service: ApiService,
+//     private firebaseChatService: FirebaseChatService
+//   ) {}
+
+//   ngOnInit() {
+//     this.loadAllUsers();
+//   }
+
+//   loadAllUsers() {
+//     const currentUserPhone = localStorage.getItem('phone_number');
+//     this.allUsers = [];
+
+//     this.service.getAllUsers().subscribe((users: any[]) => {
+//       users.forEach(user => {
+//         if (user.phone_number !== currentUserPhone) {
+//           this.service.getUserProfilebyId(user.user_id.toString()).subscribe((profile: any) => {
+//             const receiverId = profile.phone_number;
+//             const contact = {
+//               ...user,
+//               name: profile.name || user.phone_number,
+//               message: profile.bio || '',
+//               image: 'assets/images/user.jfif',
+//               receiver_Id: receiverId,
+//               selected: false,
+//             };
+//             this.allUsers.push(contact);
+//             this.filteredContacts = [...this.allUsers];
+//           });
+//         }
+//       });
+//     });
+//   }
+
+//   startGroupCreation() {
+//     this.creatingGroup = true;
+//   }
+
+//   async createGroup() {
+//     const selectedUsers = this.allUsers.filter(user => user.selected);
+//     const memberIds = selectedUsers.map(u => u.user_id);
+//     const currentUser = localStorage.getItem('userId');
+
+//     if (currentUser) memberIds.push(currentUser);
+//     console.log("sdsd", memberIds);
+//     const groupId = `group_${Date.now()}`;
+
+//     if (!this.newGroupName.trim()) {
+//       alert('Group name is required');
+//       return;
+//     }
+
+//     await this.firebaseChatService.createGroup(groupId, this.newGroupName, memberIds);
+//     this.creatingGroup = false;
+//     this.newGroupName = '';
+//     this.allUsers.forEach(u => (u.selected = false));
+//     alert('Group created successfully');
+//   }
+
+  
+//   focusSearchBar() {
+//     this.showSearchBar = true;
+//     setTimeout(() => {
+//       if (this.searchInput) {
+//         this.searchInput.setFocus();
+//       } else {
+//         console.warn('searchInput is undefined!');
+//       }
+//     }, 300);
+//   }
+
+  
+//   toggleSearch() {
+//     this.showSearchBar = !this.showSearchBar;
+//     if (!this.showSearchBar) {
+//       this.searchTerm = '';
+//       this.keyboardType = 'text';
+//       this.filterContacts();
+//     }
+//   }
+
+  
+//   toggleKeyboardType() {
+//     this.keyboardType = this.keyboardType === 'text' ? 'tel' : 'text';
+//     setTimeout(() => {
+//       if (this.searchInput) {
+//         this.searchInput.setFocus();
+//       }
+//     }, 300);
+//   }
+
+//   async presentPopover(ev: any) {
+//     const popover = await this.popoverControl.create({
+//       component: MenuPopoverComponent,
+//       event: ev,
+//       translucent: true,
+//     });
+//     await popover.present();
+//   }
+
+//   async presentContactMenu(ev: any) {
+//     const popover = await this.popoverControl.create({
+//       component: ContactMenuComponent,
+//       event: ev,
+//       translucent: true,
+//     });
+//     await popover.present();
+//     const { data } = await popover.onDidDismiss();
+//     console.log('Selected Contact Menu Option:', data);
+//   }
+
+//   filterContacts() {
+//     const term = this.searchTerm.toLowerCase();
+//     this.filteredContacts = this.allUsers.filter(
+//       contact =>
+//         contact.name?.toLowerCase().includes(term) ||
+//         contact.message?.toLowerCase().includes(term)
+//     );
+//   }
+// }
+
+
+
+// import { CommonModule } from '@angular/common';
+// import { Component, OnInit, ViewChild } from '@angular/core';
+// import { IonicModule, IonInput, PopoverController } from '@ionic/angular';
+// import { MenuPopoverComponent } from '../components/menu-popover/menu-popover.component';
+// import { ContactMenuComponent } from '../components/contact-menu/contact-menu.component';
+// import { ActionSheetController } from '@ionic/angular';
+// import { Router } from '@angular/router';
+// import { FormsModule } from '@angular/forms';
+// import { FirebaseChatService } from '../services/firebase-chat.service';
+// import { ContactSyncService } from '../services/contact-sync.service'; // ✅ NEW
+
+// @Component({
+//   selector: 'app-contacts',
+//   templateUrl: './contacts.page.html',
+//   styleUrls: ['./contacts.page.scss'],
+//   standalone: true,
+//   imports: [IonicModule, CommonModule, FormsModule],
+// })
+// export class ContactsPage implements OnInit {
+//   @ViewChild('searchInput', { static: false }) searchInput!: IonInput;
+
+//   allUsers: any[] = [];
+//   filteredContacts: any[] = [];
+
+//   showSearchBar = false;
+//   searchTerm: string = '';
+//   keyboardType: 'text' | 'tel' = 'text';
+
+//   creatingGroup = false;
+//   newGroupName: string = '';
+
+//   constructor(
+//     private router: Router,
+//     private popoverControl: PopoverController,
+//     private actionSheetCtrl: ActionSheetController,
+//     private firebaseChatService: FirebaseChatService,
+//     private contactSyncService: ContactSyncService // ✅ NEW
+//   ) {}
+
+//   ngOnInit() {
+//     this.loadDeviceMatchedContacts(); // ✅ NEW FUNCTION
+//     // this.loadDeviceMatchedContacts();
+//   }
+
+//   /**
+//    * ✅ Load only contacts who are also registered users on your backend
+//    */
+//   // async loadDeviceMatchedContacts() {
+//   //   const currentUserPhone = localStorage.getItem('phone_number');
+//   //   this.allUsers = [];
+
+//   //   try {
+//   //     const deviceNumbers = await this.contactSyncService.getPhoneNumbers();
+
+//   //     this.contactSyncService.matchContacts(deviceNumbers).subscribe((matchedUsers: any[]) => {
+//   //       matchedUsers.forEach((user) => {
+//   //         if (user.phone_number !== currentUserPhone) {
+//   //           const contact = {
+//   //             ...user,
+//   //             name: user.name || user.phone_number,
+//   //             message: user.bio || '',
+//   //             image: 'assets/images/user.jfif',
+//   //             receiver_Id: user.phone_number,
+//   //             selected: false,
+//   //           };
+//   //           this.allUsers.push(contact);
+//   //         }
+//   //       });
+
+//   //       this.filteredContacts = [...this.allUsers];
+//   //     });
+//   //   } catch (err) {
+//   //     console.error('Error loading contacts:', err);
+//   //   }
+//   // }
+
+//   async loadDeviceMatchedContacts() {
+//   const currentUserPhone = localStorage.getItem('phone_number');
+//   this.allUsers = [];
+
+//   try {
+//     const matchedUsers = await this.contactSyncService.getMatchedContacts();
+
+//     matchedUsers.forEach((user) => {
+//       if (user.phone_number !== currentUserPhone) {
+//         const contact = {
+//           ...user,
+//           name: user.name || user.phone_number,
+//           message: user.bio || '',
+//           image: 'assets/images/user.jfif',
+//           receiver_Id: user.phone_number,
+//           selected: false,
+//         };
+//         this.allUsers.push(contact);
+//       }
+//     });
+
+//     this.filteredContacts = [...this.allUsers];
+//   } catch (err) {
+//     console.error('Error matching contacts:', err);
+//   }
+// }
+
+
+//   startGroupCreation() {
+//     this.creatingGroup = true;
+//   }
+
+//   async createGroup() {
+//     const selectedUsers = this.allUsers.filter(user => user.selected);
+//     const memberIds = selectedUsers.map(u => u.user_id);
+//     const currentUser = localStorage.getItem('userId');
+
+//     if (currentUser) memberIds.push(currentUser);
+//     const groupId = `group_${Date.now()}`;
+
+//     if (!this.newGroupName.trim()) {
+//       alert('Group name is required');
+//       return;
+//     }
+
+//     await this.firebaseChatService.createGroup(groupId, this.newGroupName, memberIds);
+//     this.creatingGroup = false;
+//     this.newGroupName = '';
+//     this.allUsers.forEach(u => (u.selected = false));
+//     alert('Group created successfully');
+//   }
+
+//   focusSearchBar() {
+//     this.showSearchBar = true;
+//     setTimeout(() => {
+//       if (this.searchInput) {
+//         this.searchInput.setFocus();
+//       }
+//     }, 300);
+//   }
+
+//   toggleSearch() {
+//     this.showSearchBar = !this.showSearchBar;
+//     if (!this.showSearchBar) {
+//       this.searchTerm = '';
+//       this.keyboardType = 'text';
+//       this.filterContacts();
+//     }
+//   }
+
+//   toggleKeyboardType() {
+//     this.keyboardType = this.keyboardType === 'text' ? 'tel' : 'text';
+//     setTimeout(() => {
+//       if (this.searchInput) {
+//         this.searchInput.setFocus();
+//       }
+//     }, 300);
+//   }
+
+//   async presentPopover(ev: any) {
+//     const popover = await this.popoverControl.create({
+//       component: MenuPopoverComponent,
+//       event: ev,
+//       translucent: true,
+//     });
+//     await popover.present();
+//   }
+
+//   async presentContactMenu(ev: any) {
+//     const popover = await this.popoverControl.create({
+//       component: ContactMenuComponent,
+//       event: ev,
+//       translucent: true,
+//     });
+//     await popover.present();
+//     const { data } = await popover.onDidDismiss();
+//     console.log('Selected Contact Menu Option:', data);
+//   }
+
+//   filterContacts() {
+//     const term = this.searchTerm.toLowerCase();
+//     this.filteredContacts = this.allUsers.filter(
+//       contact =>
+//         contact.name?.toLowerCase().includes(term) ||
+//         contact.message?.toLowerCase().includes(term)
+//     );
+//   }
+// }
+
+
+
+// import { CommonModule } from '@angular/common';
+// import { Component, OnInit, ViewChild } from '@angular/core';
+// import { IonicModule, IonInput, PopoverController } from '@ionic/angular';
+// import { MenuPopoverComponent } from '../components/menu-popover/menu-popover.component';
+// import { ContactMenuComponent } from '../components/contact-menu/contact-menu.component';
+// import { ActionSheetController } from '@ionic/angular';
+// import { Router } from '@angular/router';
+// import { FormsModule } from '@angular/forms';
+// import { FirebaseChatService } from '../services/firebase-chat.service';
+// import { ContactSyncService } from '../services/contact-sync.service'; // ✅
+
+// @Component({
+//   selector: 'app-contacts',
+//   templateUrl: './contacts.page.html',
+//   styleUrls: ['./contacts.page.scss'],
+//   standalone: true,
+//   imports: [IonicModule, CommonModule, FormsModule],
+// })
+// export class ContactsPage implements OnInit {
+//   @ViewChild('searchInput', { static: false }) searchInput!: IonInput;
+
+//   allUsers: any[] = [];
+//   filteredContacts: any[] = [];
+
+//   showSearchBar = false;
+//   searchTerm: string = '';
+//   keyboardType: 'text' | 'tel' = 'text';
+
+//   creatingGroup = false;
+//   newGroupName: string = '';
+
+//   constructor(
+//     private router: Router,
+//     private popoverControl: PopoverController,
+//     private actionSheetCtrl: ActionSheetController,
+//     private firebaseChatService: FirebaseChatService,
+//     private contactSyncService: ContactSyncService
+//   ) {}
+
+//   ngOnInit() {
+//     this.loadDeviceMatchedContacts(); // ✅ Main logic
+//     this.contactSyncService.getDevicePhoneNumbers();
+//   }
+
+//   /**
+//    * ✅ Loads contacts from device that match backend users
+//    */
+//   async loadDeviceMatchedContacts() {
+//     const currentUserPhone = localStorage.getItem('phone_number');
+//     this.allUsers = [];
+
+//     try {
+//       const matchedUsers = await this.contactSyncService.getMatchedUsers();
+//       console.log("matched contacts", matchedUsers);
+
+//       matchedUsers.forEach((user) => {
+//         if (user.phone_number !== currentUserPhone) {
+//           this.allUsers.push({
+//             ...user,
+//             name: user.name || user.phone_number,
+//             message: user.bio || '',
+//             image: 'assets/images/user.jfif',
+//             receiver_Id: user.phone_number,
+//             selected: false,
+//           });
+//         }
+//       });
+
+//       this.filteredContacts = [...this.allUsers];
+//     } catch (err) {
+//       console.error('Error loading matched contacts:', err);
+//     }
+//   }
+
+//   startGroupCreation() {
+//     this.creatingGroup = true;
+//   }
+
+//   async createGroup() {
+//     const selectedUsers = this.allUsers.filter(user => user.selected);
+//     const memberIds = selectedUsers.map(u => u.user_id);
+//     const currentUser = localStorage.getItem('userId');
+
+//     if (currentUser) memberIds.push(currentUser);
+//     const groupId = `group_${Date.now()}`;
+
+//     if (!this.newGroupName.trim()) {
+//       alert('Group name is required');
+//       return;
+//     }
+
+//     await this.firebaseChatService.createGroup(groupId, this.newGroupName, memberIds);
+//     this.creatingGroup = false;
+//     this.newGroupName = '';
+//     this.allUsers.forEach(u => (u.selected = false));
+//     alert('Group created successfully');
+//   }
+
+//   focusSearchBar() {
+//     this.showSearchBar = true;
+//     setTimeout(() => {
+//       this.searchInput?.setFocus();
+//     }, 300);
+//   }
+
+//   toggleSearch() {
+//     this.showSearchBar = !this.showSearchBar;
+//     if (!this.showSearchBar) {
+//       this.searchTerm = '';
+//       this.keyboardType = 'text';
+//       this.filterContacts();
+//     }
+//   }
+
+//   toggleKeyboardType() {
+//     this.keyboardType = this.keyboardType === 'text' ? 'tel' : 'text';
+//     setTimeout(() => {
+//       this.searchInput?.setFocus();
+//     }, 300);
+//   }
+
+//   async presentPopover(ev: any) {
+//     const popover = await this.popoverControl.create({
+//       component: MenuPopoverComponent,
+//       event: ev,
+//       translucent: true,
+//     });
+//     await popover.present();
+//   }
+
+//   async presentContactMenu(ev: any) {
+//     const popover = await this.popoverControl.create({
+//       component: ContactMenuComponent,
+//       event: ev,
+//       translucent: true,
+//     });
+//     await popover.present();
+//     const { data } = await popover.onDidDismiss();
+//     console.log('Selected Contact Menu Option:', data);
+//   }
+
+//   filterContacts() {
+//     const term = this.searchTerm.toLowerCase();
+//     this.filteredContacts = this.allUsers.filter(
+//       contact =>
+//         contact.name?.toLowerCase().includes(term) ||
+//         contact.message?.toLowerCase().includes(term)
+//     );
+//   }
+// }
+
+
+
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { IonicModule, IonInput, PopoverController } from '@ionic/angular';
@@ -344,8 +841,8 @@ import { ContactMenuComponent } from '../components/contact-menu/contact-menu.co
 import { ActionSheetController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { ApiService } from '../services/api/api.service';
 import { FirebaseChatService } from '../services/firebase-chat.service';
+import { ContactSyncService } from '../services/contact-sync.service';
 
 @Component({
   selector: 'app-contacts',
@@ -367,41 +864,51 @@ export class ContactsPage implements OnInit {
   creatingGroup = false;
   newGroupName: string = '';
 
+  isLoading = true; // ✅ loader flag
+
   constructor(
     private router: Router,
     private popoverControl: PopoverController,
     private actionSheetCtrl: ActionSheetController,
-    private service: ApiService,
-    private firebaseChatService: FirebaseChatService
+    private firebaseChatService: FirebaseChatService,
+    private contactSyncService: ContactSyncService
   ) {}
 
   ngOnInit() {
-    this.loadAllUsers();
+    this.loadDeviceMatchedContacts();
   }
 
-  loadAllUsers() {
+  /**
+   * ✅ Loads contacts from device that match backend users
+   */
+  async loadDeviceMatchedContacts() {
     const currentUserPhone = localStorage.getItem('phone_number');
     this.allUsers = [];
+    this.isLoading = true; // show loader
 
-    this.service.getAllUsers().subscribe((users: any[]) => {
-      users.forEach(user => {
+    try {
+      const matchedUsers = await this.contactSyncService.getMatchedUsers();
+      console.log("matched contacts", matchedUsers);
+
+      matchedUsers.forEach((user) => {
         if (user.phone_number !== currentUserPhone) {
-          this.service.getUserProfilebyId(user.user_id.toString()).subscribe((profile: any) => {
-            const receiverId = profile.phone_number;
-            const contact = {
-              ...user,
-              name: profile.name || user.phone_number,
-              message: profile.bio || '',
-              image: 'assets/images/user.jfif',
-              receiver_Id: receiverId,
-              selected: false,
-            };
-            this.allUsers.push(contact);
-            this.filteredContacts = [...this.allUsers];
+          this.allUsers.push({
+            ...user,
+            name: user.name || user.phone_number,
+            message: user.bio || '',
+            image: 'assets/images/user.jfif',
+            receiver_Id: user.phone_number,
+            selected: false,
           });
         }
       });
-    });
+
+      this.filteredContacts = [...this.allUsers];
+    } catch (err) {
+      console.error('Error loading matched contacts:', err);
+    } finally {
+      this.isLoading = false; // hide loader
+    }
   }
 
   startGroupCreation() {
@@ -414,7 +921,6 @@ export class ContactsPage implements OnInit {
     const currentUser = localStorage.getItem('userId');
 
     if (currentUser) memberIds.push(currentUser);
-    console.log("sdsd", memberIds);
     const groupId = `group_${Date.now()}`;
 
     if (!this.newGroupName.trim()) {
@@ -429,19 +935,13 @@ export class ContactsPage implements OnInit {
     alert('Group created successfully');
   }
 
-  
   focusSearchBar() {
     this.showSearchBar = true;
     setTimeout(() => {
-      if (this.searchInput) {
-        this.searchInput.setFocus();
-      } else {
-        console.warn('searchInput is undefined!');
-      }
+      this.searchInput?.setFocus();
     }, 300);
   }
 
-  
   toggleSearch() {
     this.showSearchBar = !this.showSearchBar;
     if (!this.showSearchBar) {
@@ -451,13 +951,10 @@ export class ContactsPage implements OnInit {
     }
   }
 
-  
   toggleKeyboardType() {
     this.keyboardType = this.keyboardType === 'text' ? 'tel' : 'text';
     setTimeout(() => {
-      if (this.searchInput) {
-        this.searchInput.setFocus();
-      }
+      this.searchInput?.setFocus();
     }, 300);
   }
 

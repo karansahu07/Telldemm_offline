@@ -572,7 +572,7 @@
 
 
 
-<ion-header [translucent]="true">
+<!-- <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start" style="color: black; width: 8%; margin-top: 15px;">
       <ion-back-button defaultHref="/home-screen"></ion-back-button>
@@ -620,7 +620,7 @@
         [ngClass]="{ 'align-end': msg.sender_id === senderId, 'align-start': msg.sender_id !== senderId }"
         style="display: flex; flex-direction: column; margin: 5px 0;">
 
-        <div class="message-bubble" [ngClass]="msg.sender_id === senderId ? 'sender-message' : 'receiver-message'">
+        <div class="message-bubble"  [attr.data-msg-key]="msg.key" [ngClass]="msg.sender_id === senderId ? 'sender-message' : 'receiver-message'">
           <span *ngIf="chatType === 'group' && msg.sender_id !== senderId" style="font-size: 12px; color: #6c6c6c; margin-left: 5px;">
             {{ msg.sender_phone }}
           </span>
@@ -641,6 +641,126 @@
       <ion-textarea [(ngModel)]="messageText" placeholder="Message" auto-grow="true" (ionInput)="onInputChange()"
         (ionFocus)="onInputFocus()" (ionBlur)="onInputBlur()" (keyup.enter)="sendMessage()" class="message-input">
       </ion-textarea>
+      <ion-icon name="attach-outline" class="icon-right"></ion-icon>
+      <ion-icon name="camera-outline" class="icon-right"></ion-icon>
+    </ion-col>
+    <ion-col size="auto">
+      <ion-button *ngIf="!showSendButton" class="mic-button" shape="round">
+        <ion-icon slot="icon-only" name="mic"></ion-icon>
+      </ion-button>
+      <ion-button *ngIf="showSendButton" fill="clear" class="send-btn" shape="round" (click)="sendMessage()">
+        <ion-icon slot="icon-only" name="send"></ion-icon>
+      </ion-button>
+    </ion-col>
+  </ion-row>
+</div> -->
+
+
+
+
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start" style="color: black; width: 8%; margin-top: 15px;">
+      <ion-back-button defaultHref="/home-screen"></ion-back-button>
+    </ion-buttons>
+
+    <ion-buttons>
+      <ion-item lines="none" style="--padding-start: 0; --background: white; color: black; margin-top: 15px;" detail="false">
+        <ion-avatar slot="start">
+          <img src="assets/images/user.jfif" alt="User Avatar" onError="this.src='assets/images/default-avatar.png'" />
+        </ion-avatar>
+        <ion-label 
+          (click)="goToProfile()" 
+          style="width: auto; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;">
+          <h2 style="margin: 0; font-size: 16px;">
+            {{ chatType === 'group' ? groupName : receiver_name }}
+          </h2>
+        </ion-label>
+      </ion-item>
+    </ion-buttons>
+
+    <ion-buttons slot="end" style="margin-top: 15px;">
+      <ion-button style="color: black;">
+        <ion-icon name="videocam-outline" style="font-size: 35px;"></ion-icon>
+      </ion-button>
+      <ion-button (click)="goToCallingScreen()" style="color: black;">
+        <ion-icon name="call-outline" style="font-size: 28px;"></ion-icon>
+      </ion-button>
+      <ion-button style="color: black;">
+        <ion-icon name="ellipsis-vertical-outline" style="font-size: 28px;"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="chat-background" [fullscreen]="true" [scrollEvents]="true">
+  <div #scrollContainer class="chat-messages" style="padding: 0 10px 80px 10px ; overflow-y: auto; min-height: 100%;">
+    <ion-spinner name="dots" *ngIf="isLoadingMore" style="margin: 8px auto; display: block;"></ion-spinner>
+
+    <div *ngFor="let group of groupedMessages">
+      <div class="date-divider">
+        <div class="text-bg-white date-label">{{ group.date }}</div>
+      </div>
+
+      <div *ngFor="let msg of group.messages"
+        [ngClass]="{ 'align-end': msg.sender_id === senderId, 'align-start': msg.sender_id !== senderId }"
+        style="display: flex; flex-direction: column; margin: 5px 0;">
+
+        <div class="message-bubble" [attr.data-msg-key]="msg.key" [ngClass]="msg.sender_id === senderId ? 'sender-message' : 'receiver-message'">
+          <span *ngIf="chatType === 'group' && msg.sender_id !== senderId" style="font-size: 12px; color: #6c6c6c; margin-left: 5px;">
+            {{ msg.sender_phone }}
+          </span>
+
+          <p class="message-text">{{ msg.text }}</p>
+
+          <!-- ✅ Timestamp + Tick Status -->
+          <p class="time-stamp status-container">
+            {{ msg.time }}
+
+            <ng-container *ngIf="msg.sender_id === senderId">
+              <!-- Sent only -->
+              <ion-icon
+                *ngIf="!msg.delivered"
+                name="checkmark-outline"
+                class="status-icon sent"
+              ></ion-icon>
+
+              <!-- Delivered, not read -->
+              <ion-icon
+                *ngIf="msg.delivered && !msg.read"
+                name="checkmark-done-outline"
+                class="status-icon delivered"
+              ></ion-icon>
+
+              <!-- Read -->
+              <ion-icon
+                *ngIf="msg.delivered && msg.read"
+                name="checkmark-done-outline"
+                class="status-icon read"
+              ></ion-icon>
+            </ng-container>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>
+
+<!-- ✅ Message Input Footer -->
+<div class="footer-fixed">
+  <ion-row class="footer-row">
+    <ion-col class="message-input-container">
+      <ion-icon name="document-text-outline" class="icon-left"></ion-icon>
+      <ion-textarea
+        [(ngModel)]="messageText"
+        placeholder="Message"
+        auto-grow="true"
+        (ionInput)="onInputChange()"
+        (ionFocus)="onInputFocus()"
+        (ionBlur)="onInputBlur()"
+        (keyup.enter)="sendMessage()"
+        class="message-input"
+      ></ion-textarea>
       <ion-icon name="attach-outline" class="icon-right"></ion-icon>
       <ion-icon name="camera-outline" class="icon-right"></ion-icon>
     </ion-col>

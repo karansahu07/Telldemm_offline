@@ -1,5 +1,6 @@
 ion-header {
-    --box-shadow: none !important;
+    // --box-shadow: none !important;
+    box-shadow: none;
 }
 
 .back-icon {
@@ -17,8 +18,7 @@ ion-header {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    font-family: Montserrat;
-    margin-top: 21px;
+    margin-top: 10px;
 }
 
 .username {
@@ -146,6 +146,11 @@ ion-header {
     color: red;
     margin: 10px 15px 0px 0px;
 }
+.all-icon1 {
+    font-size: 26px;
+    color: red;
+    // margin: 10px 15px 0px 0px;
+}
 
 .jha {
     display: flex;
@@ -159,4 +164,112 @@ ion-header {
 .encrypted {
     font-size: 15px;
     color: gray;
+}
+
+
+
+.profile-container {
+    flex-direction: row;
+    gap: 10px;
+    padding: 10px 0px;
+    display: flex;
+    align-items: center;
+    transition: all 4ms ease-in-out;
+}
+
+.profile-name {
+    font-size: 18px;
+    font-weight: 500;
+    color: #222;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 28px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #d1d1d1;
+    transition: 0.4s;
+    border-radius: 30px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #fff;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background-color: red;
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(22px);
+}
+
+.profile-avatar {
+    width: 150px;
+    height: 150px;
+    margin: auto;
+    transition: all 0.3s ease-in-out;
+}
+
+.backbutton {
+    position: absolute;
+    top: 0;
+}
+
+.dotbutton {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+ion-label.profile-name {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+ion-header.scrolled ion-label.profile-name {
+    display: block;
+    opacity: 1;
+}
+
+ion-header.scrolled .profile-avatar {
+    width: 50px;
+    height: 50px;
+    margin: 0;
+}
+
+ion-header.scrolled {
+    background-color: white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+}
+
+ion-header.scrolled .backbutton,
+ion-header.scrolled .dotbutton {
+    position: unset;
 }

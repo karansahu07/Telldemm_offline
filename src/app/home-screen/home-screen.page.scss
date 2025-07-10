@@ -51,7 +51,8 @@ ion-content {
     font-size: 16px;
     background-color: white;
     background-image: url(https://cdn2.iconfinder.com/data/icons/ios-7-icons/50/search-24.png);
-    background-position: 10px 10px;
+    background-position: 10px 13px;
+    background-size: 20px 20px;
     background-repeat: no-repeat;
     padding: 8px 20px 8px 40px;
     color: black;
@@ -240,7 +241,7 @@ ion-fab {
   min-width: 20px;
   height: 20px;
   text-align: center;
-  padding: 0 6px;
+  padding: 4px 6px;
   border-radius: 12px;
 }
 
@@ -250,3 +251,4 @@ ion-fab {
   margin-right: 4px;
   vertical-align: middle;
 }
+

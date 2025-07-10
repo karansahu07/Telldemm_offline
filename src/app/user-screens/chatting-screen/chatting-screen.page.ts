@@ -2278,6 +2278,7 @@ import { getDatabase, ref, get } from 'firebase/database';
 import { v4 as uuidv4 } from 'uuid';
 
 interface Message{
+  key?: any;
   message_id : string;
   sender_id : string;
   sender_phone : string;
@@ -2329,6 +2330,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   chatType: 'private' | 'group' = 'private';
   groupName = '';
   isGroup: any;
+  receiver_name = '';
 
   async ngOnInit() {
   // Enable proper keyboard scrolling
@@ -2338,6 +2340,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   // Load sender (current user) details
   this.senderId = localStorage.getItem('userId') || '';
   this.sender_phone = localStorage.getItem('phone_number') || '';
+  this.receiver_name = localStorage.getItem('receiver_name') || '';
 
   // Get query parameters
   const rawId = this.route.snapshot.queryParamMap.get('receiverId') || '';
@@ -2415,178 +2418,72 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     return userA < userB ? `${userA}_${userB}` : `${userB}_${userA}`;
   }
 
+
   async listenForMessages() {
-    this.messageSub = this.chatService.listenForMessages(this.roomId).subscribe(async (data) => {
-      const decryptedMessages = [];
-      for (const msg of data) {
-        const decryptedText = await this.encryptionService.decrypt(msg.text);
-        decryptedMessages.push({ ...msg, text: decryptedText });
+  this.messageSub = this.chatService.listenForMessages(this.roomId).subscribe(async (data) => {
+    const decryptedMessages: Message[] = [];
+
+    for (const msg of data) {
+      const decryptedText = await this.encryptionService.decrypt(msg.text);
+      decryptedMessages.push({ ...msg, text: decryptedText });
+
+      // ✅ Mark as delivered if current user is the receiver and not already delivered
+      console.log(msg);
+      if (
+        msg.receiver_id === this.senderId && !msg.delivered
+      ) {
+        this.chatService.markDelivered(this.roomId, msg.key);
       }
+    }
 
-      console.log(decryptedMessages);    //check msg.key
-      this.messages = decryptedMessages;
-      this.groupedMessages = this.groupMessagesByDate(decryptedMessages);
-      this.saveToLocalStorage();
+    this.messages = decryptedMessages;
+    this.groupedMessages = this.groupMessagesByDate(decryptedMessages);
+    this.saveToLocalStorage();
 
-      const last = decryptedMessages[decryptedMessages.length - 1];
-      if (last) {
-        localStorage.setItem(`lastMsg_${this.roomId}`, JSON.stringify({
-          text: last.text,
-          timestamp: last.timestamp
-        }));
-      }
+    const last = decryptedMessages[decryptedMessages.length - 1];
+    if (last) {
+      localStorage.setItem(`lastMsg_${this.roomId}`, JSON.stringify({
+        text: last.text,
+        timestamp: last.timestamp
+      }));
+    }
 
-      this.markMessagesAsRead();
-      setTimeout(() => this.scrollToBottom(), 100);
-    });
-  }
-
-
-//   async listenForMessages() {
-//   this.messageSub = this.chatService.listenForMessages(this.roomId).subscribe(async (data) => {
-//     const decryptedMessages: Message[] = [];
-
-//     for (const msg of data) {
-//       const decryptedText = await this.encryptionService.decrypt(msg.text);
-//       decryptedMessages.push({ ...msg, text: decryptedText });
-
-//       // ✅ Mark as delivered if current user is the receiver and not already delivered
-//       if (
-//         msg.receiver_id === this.senderId &&
-//         !msg.delivered
-//       ) {
-//         this.chatService.markDelivered(this.roomId, msg.key);
-//       }
-//     }
-
-//     this.messages = decryptedMessages;
-//     this.groupedMessages = this.groupMessagesByDate(decryptedMessages);
-//     this.saveToLocalStorage();
-
-//     const last = decryptedMessages[decryptedMessages.length - 1];
-//     if (last) {
-//       localStorage.setItem(`lastMsg_${this.roomId}`, JSON.stringify({
-//         text: last.text,
-//         timestamp: last.timestamp
-//       }));
-//     }
-
-//     setTimeout(() => {
-//       this.scrollToBottom();
-//       this.observeVisibleMessages(); // 👁️ Call visibility tracking after messages rendered
-//     }, 100);
-//   });
-// }
+    setTimeout(() => {
+      this.scrollToBottom();
+      this.observeVisibleMessages(); // 👁️ Call visibility tracking after messages rendered
+    }, 100);
+  });
+}
 
 
-// observeVisibleMessages() {
-//   const allMessageElements = document.querySelectorAll('[data-msg-key]');
+observeVisibleMessages() {
+  const allMessageElements = document.querySelectorAll('[data-msg-key]');
 
-//   allMessageElements.forEach((el: any) => {
-//     const msgKey = el.getAttribute('data-msg-key');
-//     const msgIndex = this.messages.findIndex(m => m.message_id === msgKey);
-//     if (msgIndex === -1) return;
+  allMessageElements.forEach((el: any) => {
+    const msgKey = el.getAttribute('data-msg-key');
+    const msgIndex = this.messages.findIndex(m => m.key === msgKey);
+    if (msgIndex === -1) return;
 
-//     const msg = this.messages[msgIndex];
+    const msg = this.messages[msgIndex];
+    console.log(msg);
 
-//     if (!msg.read && msg.receiver_id === this.senderId) {
-//       const observer = new IntersectionObserver(entries => {
-//         entries.forEach(entry => {
-//           if (entry.isIntersecting) {
-//             // ✅ Mark as read when visible
-//             this.chatService.markRead(this.roomId, msgKey);
-//             observer.unobserve(entry.target); // stop observing
-//           }
-//         });
-//       }, {
-//         threshold: 1.0 // 100% visible
-//       });
+    if (!msg.read && msg.receiver_id === this.senderId) {
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            // ✅ Mark as read when visible
+            this.chatService.markRead(this.roomId, msgKey);
+            observer.unobserve(entry.target); // stop observing
+          }
+        });
+      }, {
+        threshold: 1.0
+      });
 
-//       observer.observe(el);
-//     }
-//   });
-// }
-
-  
-
-//   async listenForMessages() {
-//   this.messageSub = this.chatService.listenForMessages(this.roomId).subscribe(async (data) => {
-//     const decryptedMessages = [];
-
-//     for (const msg of data) {
-//       const decryptedText = await this.encryptionService.decrypt(msg.text);
-//       decryptedMessages.push({ ...msg, text: decryptedText });
-
-//       // 👇 Mark as delivered if current user is receiver and it's not delivered
-//       for (const msg of data) {
-//   const decryptedText = await this.encryptionService.decrypt(msg.text);
-//   decryptedMessages.push({ ...msg, text: decryptedText });
-
-//   if (
-//     msg.receiver_id === this.senderId &&
-//     !msg.status?.delivered
-//   ) {
-//     this.chatService.markDelivered(this.roomId, msg.key);
-//   }
-// }
-//     }
-
-//     console.log(decryptedMessages);
-//     this.messages = decryptedMessages;
-//     this.groupedMessages = this.groupMessagesByDate(decryptedMessages);
-//     this.saveToLocalStorage();
-
-//     const last = decryptedMessages[decryptedMessages.length - 1];
-//     if (last) {
-//       localStorage.setItem(`lastMsg_${this.roomId}`, JSON.stringify({
-//         text: last.text,
-//         timestamp: last.timestamp
-//       }));
-//     }
-
-//     this.markMessagesAsRead();
-//     setTimeout(() => this.scrollToBottom(), 100);
-//   });
-// }
-
-
-  // groupMessagesByDate(messages: any[]) {
-  //   const grouped: { [date: string]: any[] } = {};
-  //   const today = new Date();
-  //   const yesterday = new Date(today);
-  //   yesterday.setDate(today.getDate() - 1);
-
-  //   messages.forEach(msg => {
-  //     const datePart = msg.timestamp?.split(', ')[0];
-  //     const [dd, mm, yyyy] = datePart.split('/').map(Number);
-  //     const msgDate = new Date(yyyy, mm - 1, dd);
-
-  //     let label = datePart;
-  //     if (
-  //       msgDate.getDate() === today.getDate() &&
-  //       msgDate.getMonth() === today.getMonth() &&
-  //       msgDate.getFullYear() === today.getFullYear()
-  //     ) {
-  //       label = 'Today';
-  //     } else if (
-  //       msgDate.getDate() === yesterday.getDate() &&
-  //       msgDate.getMonth() === yesterday.getMonth() &&
-  //       msgDate.getFullYear() === yesterday.getFullYear()
-  //     ) {
-  //       label = 'Yesterday';
-  //     }
-
-  //     if (!grouped[label]) {
-  //       grouped[label] = [];
-  //     }
-  //     grouped[label].push(msg);
-  //   });
-
-  //   return Object.keys(grouped).map(date => ({
-  //     date,
-  //     messages: grouped[date]
-  //   }));
-  // }
+      observer.observe(el);
+    }
+  });
+}
 
   groupMessagesByDate(messages: Message[]) {
   const grouped: { [date: string]: any[] } = {};
@@ -2694,15 +2591,15 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   loadMessagesFromFirebase(isPagination = false) {}
 
   goToProfile() {
-  // this.router.navigate(['/profile-screen']);
-      this.router.navigate(['/profile-screen'], {
-    queryParams: {
-      receiverId: this.receiverId,
-      receiver_phone: this.receiver_phone,
-      isGroup: this.isGroup
-    }
-  });
+  const queryParams: any = {
+    receiverId: this.chatType === 'group' ? this.roomId : this.receiverId,
+    receiver_phone: this.receiver_phone,
+    isGroup: this.chatType === 'group'
+  };
+
+  this.router.navigate(['/profile-screen'], { queryParams });
 }
+
 
   saveToLocalStorage() {
     localStorage.setItem(this.roomId, JSON.stringify(this.messages));

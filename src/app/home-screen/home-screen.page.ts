@@ -1268,6 +1268,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.getAllUsers();
+    this.loadUserGroups(); // Optional group loading
     console.log("fdgmnkfmkmk:", this.currUserId);
   }
 
@@ -1275,75 +1276,80 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     this.unreadSubs.forEach(sub => sub.unsubscribe());
   }
 
- getAllUsers() {
-  const currentSenderId = this.senderUserId;
-  console.log("dfjsdjidgf",currentSenderId)
-  if (!currentSenderId) return;
+  getAllUsers() {
+    const currentSenderId = this.senderUserId;
+    console.log("dfjsdjidgf", currentSenderId)
+    if (!currentSenderId) return;
 
-  this.service.getAllUsers().subscribe((users: any[]) => {
-    users.forEach(user => {
-      const receiverId = user.user_id.toString();
-      const receiver_phone = user.phone_number.toString();
-      const receiver_name = user.name.toString();
-      console.log("receiver phone", receiver_phone);
+    this.service.getAllUsers().subscribe((users: any[]) => {
+      users.forEach(user => {
+        const receiverId = user.user_id.toString();
+        const receiver_phone = user.phone_number.toString();
+        const receiver_name = user.name.toString();
+        console.log("receiver phone", receiver_name);
 
-      if (receiverId !== currentSenderId) {
-        const roomId = this.getRoomId(currentSenderId, receiverId);
-        console.log("ROOM ID", roomId);
+        if (receiverId !== currentSenderId) {
+          const roomId = this.getRoomId(currentSenderId, receiverId);
+          console.log("ROOM ID", roomId);
 
-        const chat = {
-          ...user,
-          name: user.name,
-          receiver_Id: receiverId,
-          receiver_phone : receiver_phone,
-          group: false,
-          message: '',
-          time: '',
-          unreadCount: 0,
-          unread: false
-        };
+          const chat = {
+            ...user,
+            name: user.name,
+            receiver_Id: receiverId,
+            receiver_phone: receiver_phone,
+            group: false,
+            message: '',
+            time: '',
+            unreadCount: 0,
+            unread: false
+          };
 
-        console.log("chaat:", chat);
+          console.log("chaat:", chat);
 
-        this.chatList.push(chat);
+          this.chatList.push(chat);
 
-        // Listen to messages in this room
-        this.firebaseChatService.listenForMessages(roomId).subscribe(async (messages) => {
-          // console.log("messahes jdfdhjk",messages);
-          if (messages.length > 0) {
-            const lastMsg = messages[messages.length - 1];
-            // console.log(lastMsg);
+          // Listen to messages in this room
+          this.firebaseChatService.listenForMessages(roomId).subscribe(async (messages) => {
+            // console.log("messahes jdfdhjk",messages);
+            if (messages.length > 0) {
+              const lastMsg = messages[messages.length - 1];
+              // console.log(lastMsg);
 
-            try {
-              const decryptedText = await this.encryptionService.decrypt(lastMsg.text);
-              chat.message = decryptedText;
-            } catch (e) {
-              chat.message = '[Encrypted]';
+              if (
+                lastMsg.receiver_id === currentSenderId && !lastMsg.delivered
+              ) {
+                this.firebaseChatService.markDelivered(roomId, lastMsg.key);
+              }
+
+              try {
+                const decryptedText = await this.encryptionService.decrypt(lastMsg.text);
+                chat.message = decryptedText;
+              } catch (e) {
+                chat.message = '[Encrypted]';
+              }
+
+              // chat.time = lastMsg.timestamp?.split(', ')[1] || '';
+              if (lastMsg.timestamp) {
+                chat.time = this.formatTimestamp(lastMsg.timestamp);
+              }
+              console.log("kktime dkefjg", chat.time);
             }
-
-            // chat.time = lastMsg.timestamp?.split(', ')[1] || '';
-            if (lastMsg.timestamp) {
-  chat.time = this.formatTimestamp(lastMsg.timestamp);
-}
-            console.log("kktime dkefjg",chat.time);
-          }
-        });
-
-        // Listen to unread message count
-        const sub = this.firebaseChatService
-          .listenToUnreadCount(roomId, currentSenderId)
-          .subscribe((count: number) => {
-            chat.unreadCount = count;
-            chat.unread = count > 0;
           });
 
-        this.unreadSubs.push(sub);
-      }
-    });
+          // Listen to unread message count
+          const sub = this.firebaseChatService
+            .listenToUnreadCount(roomId, currentSenderId)
+            .subscribe((count: number) => {
+              chat.unreadCount = count;
+              chat.unread = count > 0;
+            });
 
-    this.loadUserGroups(); // Optional group loading
-  });
-}
+          this.unreadSubs.push(sub);
+        }
+      });
+
+    });
+  }
 
   async loadUserGroups() {
     const userid = this.senderUserId;
@@ -1379,8 +1385,8 @@ export class HomeScreenPage implements OnInit, OnDestroy {
 
           // groupChat.time = lastMsg.timestamp?.split(', ')[1] || '';
           if (lastMsg.timestamp) {
-  groupChat.time = this.formatTimestamp(lastMsg.timestamp);
-}
+            groupChat.time = this.formatTimestamp(lastMsg.timestamp);
+          }
         }
       });
 
@@ -1398,29 +1404,29 @@ export class HomeScreenPage implements OnInit, OnDestroy {
 
   // this function shows time and date on chat
   formatTimestamp(timestamp: string): string {
-  const date = new Date(timestamp);
-  const now = new Date();
+    const date = new Date(timestamp);
+    const now = new Date();
 
-  const isToday = date.toDateString() === now.toDateString();
+    const isToday = date.toDateString() === now.toDateString();
 
-  const yesterday = new Date();
-  yesterday.setDate(now.getDate() - 1);
-  const isYesterday = date.toDateString() === yesterday.toDateString();
+    const yesterday = new Date();
+    yesterday.setDate(now.getDate() - 1);
+    const isYesterday = date.toDateString() === yesterday.toDateString();
 
-  if (isToday) {
-    return date.toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    }); // e.g., "11:45 AM"
-  } else if (isYesterday) {
-    return 'Yesterday';
-  } else if (date.getFullYear() === now.getFullYear()) {
-    return date.toLocaleDateString([], { day: 'numeric', month: 'short' }); // e.g., "Jul 1"
-  } else {
-    return date.toLocaleDateString(); // e.g., "01/07/2024"
+    if (isToday) {
+      return date.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      }); // e.g., "11:45 AM"
+    } else if (isYesterday) {
+      return 'Yesterday';
+    } else if (date.getFullYear() === now.getFullYear()) {
+      return date.toLocaleDateString([], { day: 'numeric', month: 'short' }); // e.g., "Jul 1"
+    } else {
+      return date.toLocaleDateString(); // e.g., "01/07/2024"
+    }
   }
-}
 
 
 
@@ -1469,7 +1475,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
       // console.log("lkklkklkl", )
       localStorage.setItem('receiver_phone', receiver_phone);
       this.router.navigate(['/chatting-screen'], {
-        queryParams: { receiverId: cleanPhone , receiver_phone}
+        queryParams: { receiverId: cleanPhone, receiver_phone }
       });
     }
   }
@@ -1525,3 +1531,8 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     return a < b ? `${a}_${b}` : `${b}_${a}`;
   }
 }
+
+
+
+
+//uninstall npm uninstall cordova-plugin-firebasex npm uninstall @ionic-native/firebase-x and change package name

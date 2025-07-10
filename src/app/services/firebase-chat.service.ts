@@ -343,6 +343,7 @@ export class FirebaseChatService {
  // 👇 Call when message arrives on receiver's device
   markDelivered(roomId: string, messageKey: string) {
     const messageRef = ref(this.db, `chats/${roomId}/${messageKey}`);
+    // console.log("sdffsdd",messageRef);
     update(messageRef, { delivered: true });
   }
 
