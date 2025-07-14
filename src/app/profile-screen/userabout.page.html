@@ -242,9 +242,9 @@
 
     <div class="profile-container">
       <ion-avatar class="profile-avatar">
-        <img src="assets/images/cameraplus.png" alt="Profile Picture" />
+        <img src="assets/images/user.jfif" alt="Profile Picture" />
       </ion-avatar>
-      <ion-label class="profile-name"> {{ isGroup ? 'groupName' : receiver_name }}</ion-label>
+      <ion-label class="profile-name"> {{ isGroup ? groupName : receiver_name }}</ion-label>
     </div>
 
   </ion-toolbar>
@@ -258,7 +258,7 @@
     </ion-avatar> -->
 
     <ion-label class="username">
-      {{ isGroup ? 'groupName' : receiver_name }}
+      {{ isGroup ? groupName : receiver_name }}
     </ion-label>
 
     <ion-label class="usernumber">
@@ -289,13 +289,13 @@
       <ion-label>Video</ion-label>
     </div>
 
-    <div class="message-item" *ngIf="chatType === 'group'">
-      <ion-avatar class="centered-avatar">
-        <!-- <ion-icon name="chatbox-ellipses-outline" class="mess-icon"></ion-icon> -->
-         <ion-icon name="person-add-outline" class="all-icon1"></ion-icon>
-      </ion-avatar>
-      <ion-label>Add</ion-label>
-    </div>
+    <div class="message-item" *ngIf="chatType === 'group'" (click)="onAddMember()">
+  <ion-avatar class="centered-avatar">
+    <ion-icon name="person-add-outline" class="all-icon1"></ion-icon>
+  </ion-avatar>
+  <ion-label>Add</ion-label>
+</div>
+
 
   </div>
 
@@ -319,7 +319,7 @@
     <swiper-container [attr.slides-per-view]="4" [attr.space-between]="10" class="slider">
       <swiper-slide *ngFor="let item of [].constructor(15)" class="slider-swip">
         <div class="image-wrapper">
-          <img src="assets/images/chacha.jpeg" alt="Rectangle-img" />
+          <img src="assets/images/user.jfif" alt="Rectangle-img" />
         </div>
       </swiper-slide>
     </swiper-container>
@@ -409,7 +409,7 @@
     <ion-button fill="clear" slot="start" (click)="onAddMember()">
       <ion-icon name="person-add-outline" slot="start" class="all-icon1"></ion-icon>
     </ion-button>
-    <ion-label class="Encry">
+    <ion-label class="Encry" (click)="onAddMember()">
       Add Members
     </ion-label>
   </ion-item>
@@ -417,14 +417,24 @@
   
 
   <ion-item *ngFor="let member of groupMembers">
-    <ion-avatar slot="start">
-      <img [src]="member.avatar || 'assets/images/user.jfif'" />
-    </ion-avatar>
-    <ion-label>
-      <div class="Encry">{{ member.name }}</div>
-      <div class="encrypted">{{ member.phone }}</div>
-    </ion-label>
-  </ion-item>
+  <ion-avatar slot="start">
+    <img [src]="member.avatar || 'assets/images/user.jfif'" />
+  </ion-avatar>
+
+  <ion-label>
+    <div class="Encry">{{ member.name }}</div>
+    <div class="encrypted">{{ member.phone }}</div>
+  </ion-label>
+
+  <!-- Show 3-dot menu ONLY if it's NOT the current user -->
+  <ion-buttons slot="end" *ngIf="member.user_id !== currentUserId">
+    <ion-button fill="clear" (click)="openActionSheet(member)">
+      <ion-icon name="ellipsis-vertical"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+</ion-item>
+
+
 </ion-list>
 
   <!-- User Management Options (Common) -->

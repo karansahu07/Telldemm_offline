@@ -275,7 +275,7 @@
 <ion-content>
 
   <!-- Static Options -->
-  <ion-list class="list" lines="none" *ngIf="!creatingGroup && !isLoading">
+  <ion-list class="list" lines="none" *ngIf="!creatingGroup">
     <ion-item class="items" (click)="startGroupCreation()">
       <ion-avatar slot="start" class="green-icon">
         <ion-icon name="people-outline"></ion-icon>
@@ -325,7 +325,7 @@
   </div>
 
   <!-- 🔄 Skeleton Loader While Contacts Are Loading -->
-  <ng-container *ngIf="isLoading && !creatingGroup">
+  <!-- <ng-container *ngIf="!creatingGroup">
     <ion-list *ngFor="let i of [1,2,3,4,5]">
       <ion-item>
         <ion-avatar slot="start">
@@ -341,14 +341,14 @@
         </ion-label>
       </ion-item>
     </ion-list>
-  </ng-container>
+  </ng-container> -->
 
   <!-- ✅ Contacts List -->
-  <ion-list-header *ngIf="!creatingGroup && !isLoading && filteredContacts.length > 0">
+  <ion-list-header *ngIf="!creatingGroup && filteredContacts.length > 0">
     <ion-label>Contacts on Telldemm</ion-label>
   </ion-list-header>
 
-  <ion-list class="list2" lines="none" *ngIf="!creatingGroup && !isLoading && filteredContacts.length > 0">
+  <ion-list class="list2" lines="none" *ngIf="!creatingGroup && filteredContacts.length > 0">
     <ion-item *ngFor="let contact of filteredContacts">
       <ion-avatar slot="start">
         <img [src]="contact.image" />
@@ -361,7 +361,7 @@
   </ion-list>
 
   <!-- ❌ No Matches -->
-  <div *ngIf="!creatingGroup && !isLoading && filteredContacts.length === 0" class="no-contacts" style="text-align: center; margin-top: 2rem;">
+  <div *ngIf="!creatingGroup && filteredContacts.length === 0" class="no-contacts" style="text-align: center; margin-top: 2rem;">
     <ion-icon name="sad-outline" size="large" color="medium"></ion-icon>
     <p style="margin-top: 10px;">No matched contacts found.</p>
   </div>

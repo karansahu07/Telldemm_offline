@@ -335,7 +335,7 @@
 //   }
 // }
 
-
+//this is for demo on web
 // import { CommonModule } from '@angular/common';
 // import { Component, OnInit, ViewChild } from '@angular/core';
 // import { IonicModule, IonInput, PopoverController } from '@ionic/angular';
@@ -384,13 +384,14 @@
 //     this.allUsers = [];
 
 //     this.service.getAllUsers().subscribe((users: any[]) => {
+//       console.log(users);
 //       users.forEach(user => {
 //         if (user.phone_number !== currentUserPhone) {
 //           this.service.getUserProfilebyId(user.user_id.toString()).subscribe((profile: any) => {
 //             const receiverId = profile.phone_number;
 //             const contact = {
 //               ...user,
-//               name: profile.name || user.phone_number,
+//               name: user.name || user.phone_number,
 //               message: profile.bio || '',
 //               image: 'assets/images/user.jfif',
 //               receiver_Id: receiverId,
@@ -408,26 +409,110 @@
 //     this.creatingGroup = true;
 //   }
 
+//   // async createGroup() {
+//   //   const selectedUsers = this.allUsers.filter(user => user.selected);
+//   //   const memberIds = selectedUsers.map(u => u.user_id);
+//   //   const currentUser = localStorage.getItem('userId');
+
+//   //   if (currentUser) memberIds.push(currentUser);
+//   //   console.log("sdsd", memberIds);
+//   //   const groupId = `group_${Date.now()}`;
+
+//   //   if (!this.newGroupName.trim()) {
+//   //     alert('Group name is required');
+//   //     return;
+//   //   }
+
+//   //   await this.firebaseChatService.createGroup(groupId, this.newGroupName, memberIds);
+//   //   this.creatingGroup = false;
+//   //   this.newGroupName = '';
+//   //   this.allUsers.forEach(u => (u.selected = false));
+//   //   alert('Group created successfully');
+//   // }
+
+
 //   async createGroup() {
-//     const selectedUsers = this.allUsers.filter(user => user.selected);
-//     const memberIds = selectedUsers.map(u => u.user_id);
-//     const currentUser = localStorage.getItem('userId');
+//   const selectedUsers = this.allUsers.filter(user => user.selected);
+//   const currentUserId = localStorage.getItem('userId');
+//   const currentUserPhone = localStorage.getItem('phone_number');
+//   const currentUserName = localStorage.getItem('name') || currentUserPhone;
 
-//     if (currentUser) memberIds.push(currentUser);
-//     console.log("sdsd", memberIds);
-//     const groupId = `group_${Date.now()}`;
+//   const members = selectedUsers.map(u => ({
+//     user_id: u.user_id,
+//     name: u.name,
+//     phone_number: u.phone_number
+//   }));
 
-//     if (!this.newGroupName.trim()) {
-//       alert('Group name is required');
-//       return;
-//     }
-
-//     await this.firebaseChatService.createGroup(groupId, this.newGroupName, memberIds);
-//     this.creatingGroup = false;
-//     this.newGroupName = '';
-//     this.allUsers.forEach(u => (u.selected = false));
-//     alert('Group created successfully');
+//   // Add current user to the group
+//   if (currentUserId && currentUserPhone) {
+//     members.push({
+//       user_id: currentUserId,
+//       name: currentUserName,
+//       phone_number: currentUserPhone
+//     });
 //   }
+
+//   const groupId = `group_${Date.now()}`;
+//   if (!this.newGroupName.trim()) {
+//     alert('Group name is required');
+//     return;
+//   }
+
+//   await this.firebaseChatService.createGroup(groupId, this.newGroupName, members);
+//   this.creatingGroup = false;
+//   this.newGroupName = '';
+//   this.allUsers.forEach(u => (u.selected = false));
+//   alert('Group created successfully');
+// }
+
+  
+
+// //   async createGroup() {
+// //   const selectedUsers = this.allUsers.filter(user => user.selected);
+// //   const currentUserId = localStorage.getItem('userId');
+// //   const currentUserPhone = localStorage.getItem('phone_number');
+
+// //   const currentUserDetails = this.allUsers.find(u => u.phone_number === currentUserPhone);
+
+// //   if (!this.newGroupName.trim()) {
+// //     alert('Group name is required');
+// //     return;
+// //   }
+
+// //   const groupId = `group_${Date.now()}`;
+
+// //   // Build members object with user_id as keys
+// //   const membersObj: any = {};
+
+// //   selectedUsers.forEach(u => {
+// //     // console.log(u);
+// //     membersObj[u.user_id] = {
+// //       name: u.name,
+// //       phone: u.phone_number,
+// //       avatar: u.image || 'assets/images/default-avatar.png',
+// //     };
+// //   });
+
+// //   if (currentUserId && currentUserDetails) {
+// //     membersObj[currentUserId] = {
+// //       name: currentUserDetails.name,
+// //       phone: currentUserDetails.phone_number,
+// //       avatar: currentUserDetails.image || 'assets/images/default-avatar.png',
+// //     };
+// //   }
+
+// //   console.log("members",membersObj);
+
+// //   // Send group data to Firebase
+// //   await this.firebaseChatService.createGroup(groupId, this.newGroupName, membersObj);
+
+// //   // Reset UI
+// //   this.creatingGroup = false;
+// //   this.newGroupName = '';
+// //   this.allUsers.forEach(u => (u.selected = false));
+// //   alert('Group created successfully');
+// // }
+
 
   
 //   focusSearchBar() {
@@ -832,7 +917,7 @@
 // }
 
 
-
+//this is updated or final
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { IonicModule, IonInput, PopoverController } from '@ionic/angular';
@@ -915,25 +1000,39 @@ export class ContactsPage implements OnInit {
     this.creatingGroup = true;
   }
 
-  async createGroup() {
-    const selectedUsers = this.allUsers.filter(user => user.selected);
-    const memberIds = selectedUsers.map(u => u.user_id);
-    const currentUser = localStorage.getItem('userId');
+async createGroup() {
+  const selectedUsers = this.allUsers.filter(user => user.selected);
+  const currentUserId = localStorage.getItem('userId');
+  const currentUserPhone = localStorage.getItem('phone_number');
+  const currentUserName = localStorage.getItem('name') || currentUserPhone;
 
-    if (currentUser) memberIds.push(currentUser);
-    const groupId = `group_${Date.now()}`;
+  const members = selectedUsers.map(u => ({
+    user_id: u.user_id,
+    name: u.name,
+    phone_number: u.phone_number
+  }));
 
-    if (!this.newGroupName.trim()) {
-      alert('Group name is required');
-      return;
-    }
-
-    await this.firebaseChatService.createGroup(groupId, this.newGroupName, memberIds);
-    this.creatingGroup = false;
-    this.newGroupName = '';
-    this.allUsers.forEach(u => (u.selected = false));
-    alert('Group created successfully');
+  // Add current user to the group
+  if (currentUserId && currentUserPhone) {
+    members.push({
+      user_id: currentUserId,
+      name: currentUserName,
+      phone_number: currentUserPhone
+    });
   }
+
+  const groupId = `group_${Date.now()}`;
+  if (!this.newGroupName.trim()) {
+    alert('Group name is required');
+    return;
+  }
+
+  await this.firebaseChatService.createGroup(groupId, this.newGroupName, members);
+  this.creatingGroup = false;
+  this.newGroupName = '';
+  this.allUsers.forEach(u => (u.selected = false));
+  alert('Group created successfully');
+}
 
   focusSearchBar() {
     this.showSearchBar = true;

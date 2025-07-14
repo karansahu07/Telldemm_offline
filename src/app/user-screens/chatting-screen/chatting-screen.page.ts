@@ -2659,6 +2659,7 @@ observeVisibleMessages() {
     this.messageSub?.unsubscribe();
   }
 
+// ... keyboard adjustment methods (same as your existing implementation)
   private handleKeyboardShow(keyboardHeight: number) {
     const footer = document.querySelector('.footer-fixed') as HTMLElement;
     const chatMessages = document.querySelector('.chat-messages') as HTMLElement;
@@ -2682,8 +2683,8 @@ observeVisibleMessages() {
   }
 
   private setupFallbackKeyboardDetection() {
-    const initialViewportHeight = window.visualViewport?.height || window.innerHeight;
-    const initialChatPadding = 80;
+    let initialViewportHeight = window.visualViewport?.height || window.innerHeight;
+    let initialChatPadding = 80;
 
     const handleViewportChange = () => {
       const currentHeight = window.visualViewport?.height || window.innerHeight;
@@ -2697,7 +2698,7 @@ observeVisibleMessages() {
         if (footer) footer.style.bottom = `${heightDifference}px`;
         if (chatMessages) chatMessages.style.paddingBottom = `${heightDifference + initialChatPadding}px`;
         if (ionContent) ionContent.style.paddingBottom = `${heightDifference}px`;
-        setTimeout(() => this.scrollToBottom(), 350);
+        setTimeout(() => this.scrollToBottom(), 310);
       } else {
         if (footer) footer.style.bottom = '0px';
         if (chatMessages) chatMessages.style.paddingBottom = `${initialChatPadding}px`;

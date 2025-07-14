@@ -135,13 +135,14 @@ ion-content {
   position: fixed;
   display: flex;
   justify-content: center;
-  bottom: 20px;
+//   bottom: 20px;
   left: 0;
   width: 100%;
   padding: 0 16px;
   box-sizing: border-box;
   z-index: 10;
   background: white;
+  bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .btn {

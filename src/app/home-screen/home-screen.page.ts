@@ -1236,6 +1236,7 @@ import { ApiService } from '../services/api/api.service';
 import { FirebaseChatService } from '../services/firebase-chat.service';
 import { Subscription } from 'rxjs';
 import { EncryptionService } from '../services/encryption.service';
+import { Capacitor } from '@capacitor/core';
 
 @Component({
   selector: 'app-home-screen',
@@ -1286,7 +1287,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
         const receiverId = user.user_id.toString();
         const receiver_phone = user.phone_number.toString();
         const receiver_name = user.name.toString();
-        console.log("receiver phone", receiver_name);
+        console.log("receiver phone", receiver_phone);
 
         if (receiverId !== currentSenderId) {
           const roomId = this.getRoomId(currentSenderId, receiverId);
@@ -1352,57 +1353,127 @@ export class HomeScreenPage implements OnInit, OnDestroy {
   }
 
   async loadUserGroups() {
-    const userid = this.senderUserId;
-    console.log("check userphoene", userid)
-    if (!userid) return;
+  const userid = this.senderUserId;
+  if (!userid) return;
 
-    const groupIds = await this.firebaseChatService.getGroupsForUser(userid);
+  const groupIds = await this.firebaseChatService.getGroupsForUser(userid);
+  console.log('Groups for user:', groupIds);
 
-    for (const groupId of groupIds) {
-      const groupInfo = await this.firebaseChatService.getGroupInfo(groupId);
-      const groupChat = {
-        name: groupInfo.name,
-        receiver_Id: groupId,
-        group: true,
-        message: '',
-        time: '',
-        unread: false,
-        unreadCount: 0
-      };
+  for (const groupId of groupIds) {
+    const groupInfo = await this.firebaseChatService.getGroupInfo(groupId);
+    if (!groupInfo || !groupInfo.members || !groupInfo.members[userid]) continue;
 
-      this.chatList.push(groupChat);
+    const groupName = groupInfo.name || 'Unnamed Group';
 
-      this.firebaseChatService.listenForMessages(groupId).subscribe(async (messages) => {
-        if (messages.length > 0) {
-          const lastMsg = messages[messages.length - 1];
+    const groupChat = {
+      name: groupName,
+      receiver_Id: groupId,
+      group: true,
+      message: '',
+      time: '',
+      unread: false,
+      unreadCount: 0
+    };
 
-          try {
-            const decryptedText = await this.encryptionService.decrypt(lastMsg.text);
-            groupChat.message = decryptedText;
-          } catch (e) {
-            groupChat.message = '[Encrypted]';
-          }
+    this.chatList.push(groupChat);
 
-          // groupChat.time = lastMsg.timestamp?.split(', ')[1] || '';
-          if (lastMsg.timestamp) {
-            groupChat.time = this.formatTimestamp(lastMsg.timestamp);
-          }
+    // ✅ Listen for latest messages
+    this.firebaseChatService.listenForMessages(groupId).subscribe(async (messages) => {
+      if (messages.length > 0) {
+        const lastMsg = messages[messages.length - 1];
+
+        try {
+          const decryptedText = await this.encryptionService.decrypt(lastMsg.text);
+          groupChat.message = decryptedText;
+        } catch (e) {
+          groupChat.message = '[Encrypted]';
         }
+
+        if (lastMsg.timestamp) {
+          groupChat.time = this.formatTimestamp(lastMsg.timestamp);
+        }
+      }
+    });
+
+    // ✅ Listen for unread count
+    const sub = this.firebaseChatService
+      .listenToUnreadCount(groupId, userid)
+      .subscribe((count: number) => {
+        groupChat.unreadCount = count;
+        groupChat.unread = count > 0;
       });
 
-
-      const sub = this.firebaseChatService
-        .listenToUnreadCount(groupId, userid)
-        .subscribe((count: number) => {
-          groupChat.unreadCount = count;
-          groupChat.unread = count > 0;
-        });
-
-      this.unreadSubs.push(sub);
-    }
+    this.unreadSubs.push(sub);
   }
+}
 
-  // this function shows time and date on chat
+
+ 
+  
+//   async loadUserGroups() {
+
+//     // console.log("calling this function")
+//   const userId = this.senderUserId;
+//   if (!userId) return;
+
+//   // Step 1: Get group IDs the user belongs to
+//   const groupIds = await this.firebaseChatService.getGroupsForUser(userId);
+
+//   // Step 2: Loop over each group ID
+//   for (const groupId of groupIds) {
+//     const groupInfo = await this.firebaseChatService.getGroupInfo(groupId);
+
+//     console.log("group info", groupInfo)
+
+//     if (!groupInfo || !groupInfo.members || !groupInfo.members[userId]) continue;
+
+//     // Step 3: Create chat object
+//     const groupChat = {
+//       name: groupInfo.name || 'Unnamed Group',
+//       receiver_Id: groupId,
+//       group: true,
+//       message: '',
+//       time: '',
+//       unread: false,
+//       unreadCount: 0,
+//     };
+
+//     this.chatList.push(groupChat);
+
+//     // Step 4: Listen for new messages
+//     this.firebaseChatService.listenForMessages(groupId).subscribe(async (messages) => {
+//       if (messages.length > 0) {
+//         const lastMsg = messages[messages.length - 1];
+
+//         try {
+//           const decryptedText = await this.encryptionService.decrypt(lastMsg.text);
+//           groupChat.message = decryptedText;
+//         } catch (e) {
+//           groupChat.message = '[Encrypted]';
+//         }
+
+//         if (lastMsg.timestamp) {
+//           groupChat.time = this.formatTimestamp(lastMsg.timestamp);
+//         }
+//       }
+//     });
+
+//     // Step 5: Listen for unread count
+//     const sub = this.firebaseChatService
+//       .listenToUnreadCount(groupId, userId)
+//       .subscribe((count: number) => {
+//         groupChat.unreadCount = count;
+//         groupChat.unread = count > 0;
+//       });
+
+//     this.unreadSubs.push(sub);
+//   }
+// }
+
+
+
+
+    // this function shows time and date on chat
   formatTimestamp(timestamp: string): string {
     const date = new Date(timestamp);
     const now = new Date();
@@ -1506,26 +1577,68 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     }
   }
 
-  async scanBarcode() {
-    const status = await BarcodeScanner.checkPermission({ force: true });
-    if (!status.granted) {
-      alert('Camera permission is required.');
+  // async scanBarcode() {
+  //   const status = await BarcodeScanner.checkPermission({ force: true });
+  //   if (!status.granted) {
+  //     alert('Camera permission is required.');
+  //     return;
+  //   }
+
+  //   await BarcodeScanner.hideBackground();
+  //   document.body.classList.add('scanner-active');
+
+  //   const result = await BarcodeScanner.startScan();
+  //   if (result.hasContent) {
+  //     this.scannedText = result.content;
+  //   } else {
+  //     alert('No barcode found.');
+  //   }
+
+  //   await BarcodeScanner.showBackground();
+  //   document.body.classList.remove('scanner-active');
+  // }
+
+
+
+async scanBarcode() {
+  try {
+    if (!Capacitor.isNativePlatform()) {
+      alert('Barcode scanning only works on a real device.');
       return;
     }
 
-    await BarcodeScanner.hideBackground();
+    const permission = await BarcodeScanner.checkPermission({ force: true });
+    if (!permission.granted) {
+      alert('Camera permission is required to scan barcodes.');
+      return;
+    }
+
+    await BarcodeScanner.prepare(); // Setup camera preview
+    await BarcodeScanner.hideBackground(); // Hide app background to show camera
     document.body.classList.add('scanner-active');
 
+    // Start scanning
     const result = await BarcodeScanner.startScan();
-    if (result.hasContent) {
+
+    if (result?.hasContent) {
+      console.log('Scanned Result:', result.content);
       this.scannedText = result.content;
     } else {
       alert('No barcode found.');
     }
 
+  } catch (error) {
+    console.error('Barcode Scan Error:', error);
+    alert('Something went wrong during scanning.');
+  } finally {
+    // Always restore background and clean up
     await BarcodeScanner.showBackground();
+    await BarcodeScanner.stopScan(); // <-- Ensure scanner is stopped
     document.body.classList.remove('scanner-active');
   }
+}
+
+
 
   getRoomId(a: string, b: string): string {
     return a < b ? `${a}_${b}` : `${b}_${a}`;

@@ -302,6 +302,21 @@
       <ion-button (click)="scanBarcode()">
         <img src="assets/images/qr-code.svg" />
       </ion-button>
+
+      <!-- <ion-button expand="block" color="primary" (click)="scanBarcode()" class="qr-scan-button">
+  <ion-icon src="assets/images/qr-code.svg" slot="start"></ion-icon>
+  Scan Barcode
+</ion-button>
+
+<ion-card *ngIf="scannedText" class="scanned-result-card">
+  <ion-card-header>
+    <ion-card-title>Scanned Result</ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+    <p>{{ scannedText }}</p>
+  </ion-card-content>
+</ion-card> -->
+
       <ion-button (click)="openCamera()">
         <img src="assets/images/camera.svg" />
       </ion-button>

@@ -252,3 +252,22 @@ ion-fab {
   vertical-align: middle;
 }
 
+.qr-scan-button {
+  ion-icon {
+    width: 22px;
+    height: 22px;
+    margin-right: 8px;
+  }
+}
+
+.scanned-result-card {
+  margin-top: 16px;
+  border: 1px solid #dcdcdc;
+  background: #f9f9f9;
+  border-radius: 12px;
+}
+
+.scanner-active {
+  background: transparent !important;
+}
+

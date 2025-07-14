@@ -280,23 +280,39 @@ export class FirebaseChatService {
     });
   }
 
-  async createGroup(groupId: string, groupName: string, members: string[]): Promise<void> {
-    const groupRef = ref(this.db, `groups/${groupId}`);
-    const memberMap = members.reduce((acc, id) => {
-      acc[id] = true;
-      return acc;
-    }, {} as Record<string, boolean>);
+  async createGroup(groupId: string, groupName: string, members: any[]) {
+  const db = getDatabase();
+  const groupRef = ref(db, `groups/${groupId}`);
 
-    await set(groupRef, {
-      name: groupName,
-      members: memberMap
-    });
-  }
+  const groupData = {
+    name: groupName,
+    groupId,
+    members: members.reduce((acc, member) => {
+      acc[member.user_id] = {
+        name: member.name,
+        phone_number: member.phone_number
+      };
+      return acc;
+    }, {}),
+    createdAt: String(new Date()),
+  };
+
+  await set(groupRef, groupData);
+}
+
+
 
   async getGroupInfo(groupId: string): Promise<any> {
     const snapshot = await get(child(ref(this.db), `groups/${groupId}`));
     return snapshot.exists() ? snapshot.val() : null;
   }
+
+//   async getGroupInfo(groupId: string): Promise<any> {
+//   const groupRef = ref(this.db, `groups/${groupId}`);
+//   const snapshot = await get(groupRef);
+//   return snapshot.exists() ? snapshot.val() : null;
+// }
+
 
   async getGroupsForUser(userId: string): Promise<string[]> {
     const snapshot = await get(child(ref(this.db), 'groups'));
@@ -313,6 +329,23 @@ export class FirebaseChatService {
 
     return userGroups;
   }
+
+//   async getGroupsForUser(userId: string): Promise<string[]> {
+//   const snapshot = await get(child(ref(this.db), 'groups'));
+//   const allGroups = snapshot.val();
+//   const userGroups: string[] = [];
+
+//   if (allGroups) {
+//     Object.entries(allGroups).forEach(([groupId, groupData]: [string, any]) => {
+//       if (groupData.members?.[userId]) {
+//         userGroups.push(groupId);
+//       }
+//     });
+//   }
+
+//   return userGroups;
+// }
+
 
   incrementUnreadCount(roomId: string, receiverId: string) {
     const unreadRef = ref(this.db, `unreadCounts/${roomId}/${receiverId}`);

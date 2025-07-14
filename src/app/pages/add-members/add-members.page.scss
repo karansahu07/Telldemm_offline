@@ -1,0 +1,42 @@
+.selected-chip-row {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding: 0.5rem 0;
+  gap: 8px;
+}
+
+ion-chip {
+  --background: #e0f0ff;
+  --color: #000;
+  cursor: pointer;
+}
+
+.selected-chip-row {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding: 8px 0;
+  gap: 8px;
+}
+
+.already-member {
+  opacity: 0.5;
+}
+
+.already-text {
+  font-style: italic;
+  color: gray;
+}
+
+.add-btn {
+  --background: linear-gradient(175deg, rgb(239, 111, 101) 0%, rgb(110, 25, 17) 50%);
+  --color: #fff;
+  --border-radius: 999px;
+  font-weight: bold;
+  text-transform: none;
+  font-size: 16px;
+//   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+padding: 25px;
+ height: 48px;
+}

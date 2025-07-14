@@ -193,7 +193,7 @@ async ngOnInit() {
   this.http.post(`${environment.apiBaseUrl}/api/users`, payload).subscribe({
   next: async () => {
     await Preferences.set({ key: 'name', value: this.name });
-
+    localStorage.setItem('name', this.name);
     if (this.imageData) {
       await Preferences.set({ key: 'profile_url', value: this.imageData.toString() });
     }

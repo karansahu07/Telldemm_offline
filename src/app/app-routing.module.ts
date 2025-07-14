@@ -146,6 +146,22 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     loadComponent: () => import('./profile-screen/userabout.page').then(m => m.UseraboutPage)
   },
+  {
+    path: 'change-group-name',
+    canActivate: [AuthGuard],
+    loadChildren: () => import('./pages/change-group-name/change-group-name.module').then( m => m.ChangeGroupNamePageModule)
+  },
+  {
+    path: 'add-members',
+    canActivate: [AuthGuard],
+    loadChildren: () => import('./pages/add-members/add-members.module').then( m => m.AddMembersPageModule)
+  },
+
+  // {
+  //   path: 'change-group-name',
+  //   loadChildren: () => import('./pages/change-group-name/change-group-name.module').then( m => m.ChangeGroupNamePageModule)
+  // },
+
 ];
 
 @NgModule({
