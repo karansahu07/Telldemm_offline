@@ -240,6 +240,7 @@ import {
 } from '@angular/fire/database';
 import { Observable } from 'rxjs';
 import { getDatabase, update } from 'firebase/database';
+import { getStorage, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 @Injectable({ providedIn: 'root' })
 export class FirebaseChatService {
@@ -280,25 +281,63 @@ export class FirebaseChatService {
     });
   }
 
-  async createGroup(groupId: string, groupName: string, members: any[]) {
+
+
+// async createGroup(groupId: string, groupName: string, members: any[], currentUserId: string) {
+//   const db = getDatabase();
+//   const groupRef = ref(db, `groups/${groupId}`);
+
+//   const groupData = {
+//     name: groupName,
+//     groupId,
+//     members: members.reduce((acc, member) => {
+//       acc[member.user_id] = {
+//         name: member.name,
+//         phone_number: member.phone_number,
+//         status: "active",
+//         role: member.user_id === currentUserId ? "admin" : "member"
+//       };
+//       return acc;
+//     }, {}),
+//     createdAt: String(new Date()),
+//   };
+
+//   await set(groupRef, groupData);
+// }
+
+
+async createGroup(groupId: string, groupName: string, members: any[], currentUserId: string) {
   const db = getDatabase();
   const groupRef = ref(db, `groups/${groupId}`);
+
+  // Find current user's name from the members array
+  const currentUser = members.find(m => m.user_id === currentUserId);
+  const currentUserName = currentUser?.name || 'Unknown';
+
+  console.log("currentUser",currentUserName);
 
   const groupData = {
     name: groupName,
     groupId,
+    description: 'Hey I am using Telldemm',
+    createdBy: currentUserId,
+    createdByName: currentUserName,                 
+    createdAt: new Date().toISOString(),         
     members: members.reduce((acc, member) => {
       acc[member.user_id] = {
         name: member.name,
-        phone_number: member.phone_number
+        phone_number: member.phone_number,
+        status: "active",
+        role: member.user_id === currentUserId ? "admin" : "member"
       };
       return acc;
-    }, {}),
-    createdAt: String(new Date()),
+    }, {})
   };
 
   await set(groupRef, groupData);
 }
+
+
 
 
 

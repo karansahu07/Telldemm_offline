@@ -928,6 +928,7 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { FirebaseChatService } from '../services/firebase-chat.service';
 import { ContactSyncService } from '../services/contact-sync.service';
+import { SecureStorageService } from '../services/secure-storage/secure-storage.service';
 
 @Component({
   selector: 'app-contacts',
@@ -956,11 +957,14 @@ export class ContactsPage implements OnInit {
     private popoverControl: PopoverController,
     private actionSheetCtrl: ActionSheetController,
     private firebaseChatService: FirebaseChatService,
-    private contactSyncService: ContactSyncService
+    private contactSyncService: ContactSyncService,
+    private secureStorage: SecureStorageService
   ) {}
 
   ngOnInit() {
     this.loadDeviceMatchedContacts();
+    const currentUserName = localStorage.getItem('name');
+    console.log("username",currentUserName);
   }
 
   /**
@@ -1002,9 +1006,14 @@ export class ContactsPage implements OnInit {
 
 async createGroup() {
   const selectedUsers = this.allUsers.filter(user => user.selected);
-  const currentUserId = localStorage.getItem('userId');
+  // const currentUserId = localStorage.getItem('userId');
+  const currentUserId = localStorage.getItem('userId')!;
   const currentUserPhone = localStorage.getItem('phone_number');
-  const currentUserName = localStorage.getItem('name') || currentUserPhone;
+  // const currentUserName = localStorage.getItem('name');
+  const currentUserName  = await this.secureStorage.getItem('name');
+console.log("Current User Name:", currentUserName);
+
+  console.log("username",currentUserName);
 
   const members = selectedUsers.map(u => ({
     user_id: u.user_id,
@@ -1027,7 +1036,8 @@ async createGroup() {
     return;
   }
 
-  await this.firebaseChatService.createGroup(groupId, this.newGroupName, members);
+  // await this.firebaseChatService.createGroup(groupId, this.newGroupName, members);
+  await this.firebaseChatService.createGroup(groupId, this.newGroupName, members, currentUserId);
   this.creatingGroup = false;
   this.newGroupName = '';
   this.allUsers.forEach(u => (u.selected = false));

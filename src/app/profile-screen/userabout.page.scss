@@ -160,6 +160,10 @@ ion-header {
 .Encry {
     font-size: 17px;
 }
+.Encry1 {
+    font-size: 17px;
+    color: red;
+}
 
 .encrypted {
     font-size: 15px;
@@ -273,3 +277,23 @@ ion-header.scrolled .backbutton,
 ion-header.scrolled .dotbutton {
     position: unset;
 }
+
+
+// ion-badge[admin] {
+//   background-color: #FFD4D4;
+//   color: #333;
+//   border-radius: 4px;
+//   padding: 2px 6px;
+//   font-weight: 500;
+// }
+
+.admin-badge {
+  background-color: #FFD4D4;  
+  color: red;            
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: lowercase;
+}
+

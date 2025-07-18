@@ -2276,12 +2276,16 @@ import { FirebaseChatService } from 'src/app/services/firebase-chat.service';
 import { EncryptionService } from 'src/app/services/encryption.service';
 import { getDatabase, ref, get } from 'firebase/database';
 import { v4 as uuidv4 } from 'uuid';
+import { SecureStorageService } from '../../services/secure-storage/secure-storage.service';
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { FileUploadService } from '../../services/file-upload/file-upload.service';
 
 interface Message{
   key?: any;
   message_id : string;
   sender_id : string;
   sender_phone : string;
+  sender_name : string;
   receiver_id? : string;
   receiver_phone? : string;
   type? : "text" | "audio" | "video" | "image";
@@ -2303,6 +2307,7 @@ interface Message{
 export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('scrollContainer', { static: false }) scrollContainer!: ElementRef;
   @ViewChild(IonContent, { static: false }) ionContent!: IonContent;
+  @ViewChild('fileInput', { static: false }) fileInput!: ElementRef<HTMLInputElement>;
 
   messages: Message[] = [];
   groupedMessages: { date: string; messages: Message[] }[] = [];
@@ -2316,11 +2321,15 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   showSendButton = false;
   private keyboardListeners: any[] = [];
 
-  private chatService = inject(FirebaseChatService);
-  private route = inject(ActivatedRoute);
-  private platform = inject(Platform);
-  private encryptionService = inject(EncryptionService);
-  private router = inject(Router);
+  constructor(
+  private chatService: FirebaseChatService,
+  private route: ActivatedRoute,
+  private platform: Platform,
+  private encryptionService: EncryptionService,
+  private router: Router,
+  private secureStorage: SecureStorageService,
+  private fileUploadService: FileUploadService
+) { }
 
   roomId = '';
   limit = 10;
@@ -2331,6 +2340,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   groupName = '';
   isGroup: any;
   receiver_name = '';
+  sender_name = '';
 
   async ngOnInit() {
   // Enable proper keyboard scrolling
@@ -2338,9 +2348,12 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   await this.initKeyboardListeners();
 
   // Load sender (current user) details
-  this.senderId = localStorage.getItem('userId') || '';
-  this.sender_phone = localStorage.getItem('phone_number') || '';
-  this.receiver_name = localStorage.getItem('receiver_name') || '';
+  this.senderId = (await this.secureStorage.getItem('userId')) || '';
+  this.sender_phone = (await this.secureStorage.getItem('phone_number')) || '';
+  this.sender_name = (await this.secureStorage.getItem('name')) || '';
+  // this.receiver_name = await this.secureStorage.getItem('receiver_name') || '';
+  const nameFromQuery = this.route.snapshot.queryParamMap.get('receiver_name');
+this.receiver_name = nameFromQuery || await this.secureStorage.getItem('receiver_name') || '';
 
   // Get query parameters
   const rawId = this.route.snapshot.queryParamMap.get('receiverId') || '';
@@ -2377,6 +2390,53 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   setTimeout(() => this.scrollToBottom(), 100);
 }
 
+async ionViewWillEnter(){
+  // Enable proper keyboard scrolling
+  Keyboard.setScroll({ isDisabled: false });
+  await this.initKeyboardListeners();
+
+  // Load sender (current user) details
+  this.senderId = (await this.secureStorage.getItem('userId')) || '';
+  this.sender_phone = (await this.secureStorage.getItem('phone_number')) || '';
+  this.sender_name = (await this.secureStorage.getItem('name')) || '';
+  // this.receiver_name = await this.secureStorage.getItem('receiver_name') || '';
+  const nameFromQuery = this.route.snapshot.queryParamMap.get('receiver_name');
+this.receiver_name = nameFromQuery || await this.secureStorage.getItem('receiver_name') || '';
+
+  // Get query parameters
+  const rawId = this.route.snapshot.queryParamMap.get('receiverId') || '';
+  const chatTypeParam = this.route.snapshot.queryParamMap.get('isGroup');
+  const phoneFromQuery = this.route.snapshot.queryParamMap.get('receiver_phone');
+
+  // Determine chat type
+  this.chatType = chatTypeParam === 'true' ? 'group' : 'private';
+
+  if (this.chatType === 'group') {
+    // Group chat
+    this.roomId = decodeURIComponent(rawId);
+    await this.fetchGroupName(this.roomId);
+  } else {
+    // Individual chat
+    this.receiverId = decodeURIComponent(rawId);
+    this.roomId = this.getRoomId(this.senderId, this.receiverId);
+
+    // Use receiver_phone from query or fallback to localStorage
+    this.receiver_phone = phoneFromQuery || localStorage.getItem('receiver_phone') || '';
+    // Store for reuse when navigating to profile
+    localStorage.setItem('receiver_phone', this.receiver_phone);
+  }
+
+  // Reset unread count and mark messages as read
+  await this.chatService.resetUnreadCount(this.roomId, this.senderId);
+  await this.markMessagesAsRead();
+
+  // Load and render messages
+  this.loadFromLocalStorage();
+  this.listenForMessages();
+
+  // Scroll to bottom after short delay
+  setTimeout(() => this.scrollToBottom(), 100);
+}
 
   private async markMessagesAsRead() {
     const lastMessage = this.messages[this.messages.length - 1];
@@ -2403,7 +2463,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  ngAfterViewInit() {
+  async ngAfterViewInit() {
     if (this.ionContent) {
       this.ionContent.ionScroll.subscribe(async (event: any) => {
         if (event.detail.scrollTop < 50 && this.hasMoreMessages && !this.isLoadingMore) {
@@ -2412,6 +2472,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
         }
       });
     }
+    // this.receiver_name = await this.secureStorage.getItem('receiver_name') || '';
   }
 
   getRoomId(userA: string, userB: string): string {
@@ -2428,7 +2489,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       decryptedMessages.push({ ...msg, text: decryptedText });
 
       // ✅ Mark as delivered if current user is the receiver and not already delivered
-      console.log(msg);
+      // console.log(msg);
       if (
         msg.receiver_id === this.senderId && !msg.delivered
       ) {
@@ -2568,6 +2629,7 @@ observeVisibleMessages() {
       text: encryptedText,
       timestamp: String(new Date()),
       sender_phone: this.sender_phone,
+      sender_name : this.sender_name,
       receiver_id: '',
       receiver_phone: this.receiver_phone,
       delivered: false,
@@ -2594,6 +2656,7 @@ observeVisibleMessages() {
   const queryParams: any = {
     receiverId: this.chatType === 'group' ? this.roomId : this.receiverId,
     receiver_phone: this.receiver_phone,
+    receiver_name: this.receiver_name,
     isGroup: this.chatType === 'group'
   };
 

@@ -1237,6 +1237,8 @@ import { FirebaseChatService } from '../services/firebase-chat.service';
 import { Subscription } from 'rxjs';
 import { EncryptionService } from '../services/encryption.service';
 import { Capacitor } from '@capacitor/core';
+import { SecureStorageService } from '../services/secure-storage/secure-storage.service';
+import { decodeBase64 } from '../utils/decodeBase64.util';
 
 @Component({
   selector: 'app-home-screen',
@@ -1251,13 +1253,17 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     private popoverCtrl: PopoverController,
     private service: ApiService,
     private firebaseChatService: FirebaseChatService,
-    private encryptionService: EncryptionService
+    private encryptionService: EncryptionService,
+    private secureStorage: SecureStorageService
   ) { }
 
   searchText = '';
   selectedFilter = 'all';
-  currUserId: string | null = localStorage.getItem('phone_number');
-  senderUserId: string | null = localStorage.getItem('userId');
+  currUserId: string | null = null;
+  senderUserId: string | null = null;
+
+  // currUserId: string | null = localStorage.getItem('phone_number');
+  // senderUserId: string | null = localStorage.getItem('userId');
 
   // currUserId: string | null = localStorage.getItem('phone_number')?.replace(/^(\+91|91)/, '') || null; for one to one chat notification
   scannedText = '';
@@ -1267,10 +1273,18 @@ export class HomeScreenPage implements OnInit, OnDestroy {
   newGroupName = '';
   unreadSubs: Subscription[] = [];
 
-  ngOnInit() {
+    async ngOnInit() {
+     this.currUserId = await this.secureStorage.getItem('phone_number');
+    this.senderUserId = await this.secureStorage.getItem('userId');
+// console.log("currendrt user id ",encUserId);
+    // this.currUserId = decodeBase64(encPhone || '');
+    // this.senderUserId = decodeBase64(encUserId || '');
+
+      // console.log("currendrt user id ",this.currUserId);
     this.getAllUsers();
-    this.loadUserGroups(); // Optional group loading
-    console.log("fdgmnkfmkmk:", this.currUserId);
+    this.loadUserGroups();
+
+    // console.log('Decoded UserID:', this.currUserId);
   }
 
   ngOnDestroy() {
@@ -1287,11 +1301,11 @@ export class HomeScreenPage implements OnInit, OnDestroy {
         const receiverId = user.user_id.toString();
         const receiver_phone = user.phone_number.toString();
         const receiver_name = user.name.toString();
-        console.log("receiver phone", receiver_phone);
+        // console.log("receiver phone", receiver_phone);
 
         if (receiverId !== currentSenderId) {
           const roomId = this.getRoomId(currentSenderId, receiverId);
-          console.log("ROOM ID", roomId);
+          // console.log("ROOM ID", roomId);
 
           const chat = {
             ...user,
@@ -1305,7 +1319,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
             unread: false
           };
 
-          console.log("chaat:", chat);
+          // console.log("chaat:", chat);
 
           this.chatList.push(chat);
 
@@ -1333,7 +1347,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
               if (lastMsg.timestamp) {
                 chat.time = this.formatTimestamp(lastMsg.timestamp);
               }
-              console.log("kktime dkefjg", chat.time);
+              // console.log("kktime dkefjg", chat.time);
             }
           });
 
@@ -1354,9 +1368,11 @@ export class HomeScreenPage implements OnInit, OnDestroy {
 
   async loadUserGroups() {
   const userid = this.senderUserId;
+  // console.log("sender user id", userid);
   if (!userid) return;
 
   const groupIds = await this.firebaseChatService.getGroupsForUser(userid);
+  console.log("grouop id ",groupIds);
   console.log('Groups for user:', groupIds);
 
   for (const groupId of groupIds) {
@@ -1532,11 +1548,13 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     this.selectedFilter = filter;
   }
 
-  openChat(chat: any) {
+ async openChat(chat: any) {
     const receiverId = chat.receiver_Id;
     const receiver_phone = chat.receiver_phone;
     const receiver_name = chat.name;
-    localStorage.setItem('receiver_name', receiver_name);
+    // localStorage.setItem('receiver_name', receiver_name);
+    // console.log("receivers name for msfk", receiver_name);
+    await this.secureStorage.setItem('receiver_name', receiver_name);
     if (chat.group) {
       this.router.navigate(['/chatting-screen'], {
         queryParams: { receiverId, isGroup: true }
@@ -1544,7 +1562,8 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     } else {
       const cleanPhone = receiverId.replace(/\D/g, '').slice(-10);
       // console.log("lkklkklkl", )
-      localStorage.setItem('receiver_phone', receiver_phone);
+      // localStorage.setItem('receiver_phone', receiver_phone);
+      await this.secureStorage.setItem('receiver_phone', receiver_phone);
       this.router.navigate(['/chatting-screen'], {
         queryParams: { receiverId: cleanPhone, receiver_phone }
       });
@@ -1576,29 +1595,6 @@ export class HomeScreenPage implements OnInit, OnDestroy {
       console.error('Camera error:', error);
     }
   }
-
-  // async scanBarcode() {
-  //   const status = await BarcodeScanner.checkPermission({ force: true });
-  //   if (!status.granted) {
-  //     alert('Camera permission is required.');
-  //     return;
-  //   }
-
-  //   await BarcodeScanner.hideBackground();
-  //   document.body.classList.add('scanner-active');
-
-  //   const result = await BarcodeScanner.startScan();
-  //   if (result.hasContent) {
-  //     this.scannedText = result.content;
-  //   } else {
-  //     alert('No barcode found.');
-  //   }
-
-  //   await BarcodeScanner.showBackground();
-  //   document.body.classList.remove('scanner-active');
-  // }
-
-
 
 async scanBarcode() {
   try {

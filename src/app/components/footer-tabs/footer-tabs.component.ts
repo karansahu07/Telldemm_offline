@@ -13,8 +13,8 @@ import { IonTabBar, IonBadge } from '@ionic/angular/standalone';
 
 export class FooterTabsComponent {
 
-  @Input() totalUnreadCount: number = 0;  
-
+  @Input() totalUnreadCount: number = 0;
+  @Input() totalUnreadUpdates: number = 0;
   activePath: string = '/home-screen';
 
   constructor(private router: Router) {

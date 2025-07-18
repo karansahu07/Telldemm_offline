@@ -28,7 +28,7 @@ export class StatusScreenPage implements OnInit {
   }
 
   chatList = [
-    { name: 'Bob', message: 'How are you?', unread: true, time: '11:00 AM', unreadCount: 2, group: false },
+    { name: 'Bob', message: 'How are you?', unread: true, time: '11:00 AM', unreadCount: 0, group: false },
     { name: 'Alice', message: 'Hello', unread: false, time: '10:00 AM', unreadCount: 0, group: false },
   ];
 
@@ -66,7 +66,7 @@ export class StatusScreenPage implements OnInit {
     }
   }
 
-  get totalUnreadCount(): number {
+  get totalUnreadUpdates(): number {
     return this.chatList.reduce((sum, chat) => sum + (chat.unreadCount || 0), 0);
   }
 

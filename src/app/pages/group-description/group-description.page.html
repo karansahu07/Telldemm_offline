@@ -1,0 +1,21 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Edit Group Description</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-textarea
+    [(ngModel)]="description"
+    placeholder="Enter group description"
+    auto-grow="true"
+  ></ion-textarea>
+
+  <ion-button expand="block" color="primary" (click)="saveDescription()">
+    Save
+  </ion-button>
+
+  <ion-button expand="block" color="medium" (click)="cancel()">
+    Cancel
+  </ion-button>
+</ion-content>

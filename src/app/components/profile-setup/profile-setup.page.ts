@@ -111,6 +111,7 @@ import { Router } from '@angular/router';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { environment } from '../../../environments/environment'; // adjust path as needed
 import { Preferences } from '@capacitor/preferences';
+import { SecureStorageService } from '../../services/secure-storage/secure-storage.service';
 
 @Component({
   selector: 'app-profile-setup',
@@ -133,13 +134,15 @@ export class ProfileSetupPage implements OnInit {
   constructor(
     private toastController: ToastController,
     private router: Router,
-    private http: HttpClient
+    private http: HttpClient,
+    private secureStorage: SecureStorageService
   ) {}
 
 
 
 async ngOnInit() {
-  const { value: storedPhone } = await Preferences.get({ key: 'userId' });
+  const storedPhone = await this.secureStorage.getItem('userId');
+console.log('Stored Phone:', storedPhone);
 
   if (storedPhone) {
     this.userID = storedPhone;
@@ -194,8 +197,9 @@ async ngOnInit() {
   next: async () => {
     await Preferences.set({ key: 'name', value: this.name });
     localStorage.setItem('name', this.name);
+    await this.secureStorage.setItem('name', this.name);
     if (this.imageData) {
-      await Preferences.set({ key: 'profile_url', value: this.imageData.toString() });
+      await this.secureStorage.setItem('profile_url', this.imageData.toString());
     }
 
     // this.showToast('Profile saved successfully!', 'success');

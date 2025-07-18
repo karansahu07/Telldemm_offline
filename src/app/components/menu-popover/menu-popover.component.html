@@ -10,11 +10,22 @@
   </ul>
 </div> -->
 
-<ion-list class="custom-list">
+<!-- <ion-list class="custom-list">
   <ion-item button (click)="selectOption('Advertise')">Advertise</ion-item>
   <ion-item button (click)="selectOption('New group')">New group</ion-item>
   <ion-item button (click)="selectOption('New broadcast')">New broadcast</ion-item>
   <ion-item button (click)="selectOption('Labels')">Labels</ion-item>
   <ion-item button (click)="selectOption('Starred messages')">Starred messages</ion-item>
   <ion-item button (click)="selectOption('Setting')">Setting</ion-item>
+  <ion-item button (click)="selectOption('Create channels')">Create channels</ion-item>
+  <ion-item button (click)="selectOption('Status Privacy')">Status Privacy</ion-item>
+  <ion-item button (click)="selectOption('Starred')">Starred</ion-item>
+  <ion-item button (click)="selectOption('Starred')">Clear call logs</ion-item>
+</ion-list> -->
+
+
+<ion-list class="custom-list">
+  <ion-item button *ngFor="let option of menuOptions" (click)="selectOption(option)">
+    {{ option.label }}
+  </ion-item>
 </ion-list>

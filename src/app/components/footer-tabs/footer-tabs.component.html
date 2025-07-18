@@ -17,6 +17,7 @@
   <button (click)="navigateTocallingscreen()" [class.active]="isActive(['/status-screen'])">
     <div class="icon-bg" [class.active]="isActive(['/status-screen'])">
       <img src="assets/images/icon2.svg" class="footericons" alt="Updates" />
+      <ion-badge *ngIf="totalUnreadUpdates > 0" class="unread-badge">{{ totalUnreadUpdates }}</ion-badge>
     </div>
     <p class="tabtext">Updates</p>
   </button>

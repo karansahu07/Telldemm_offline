@@ -156,6 +156,18 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     loadChildren: () => import('./pages/add-members/add-members.module').then( m => m.AddMembersPageModule)
   },
+  {
+    path: 'view-past-members',
+    canActivate: [AuthGuard],
+    loadChildren: () => import('./pages/view-past-members/view-past-members.module').then( m => m.ViewPastMembersPageModule)
+  },
+  {
+    path: 'group-description',
+    canActivate: [AuthGuard],
+    loadChildren: () => import('./pages/group-description/group-description.module').then( m => m.GroupDescriptionPageModule)
+  },
+
+
 
   // {
   //   path: 'change-group-name',

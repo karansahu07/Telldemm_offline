@@ -133,9 +133,11 @@ export class AddMembersPage implements OnInit {
   //   this.navCtrl.back(); // or navigate forward
   // }
 
+
+
 // async addSelectedMembers() {
 //   if (!this.groupId) {
-//     console.error('No groupId found in route');
+//     this.showToast('Group ID not found', 'danger');
 //     return;
 //   }
 
@@ -144,6 +146,11 @@ export class AddMembersPage implements OnInit {
 //     name: u.name,
 //     phone_number: u.phone_number
 //   }));
+
+//   if (selected.length === 0) {
+//     this.showToast('No members selected', 'danger');
+//     return;
+//   }
 
 //   const db = getDatabase();
 //   const updates: any = {};
@@ -157,10 +164,11 @@ export class AddMembersPage implements OnInit {
 
 //   try {
 //     await update(ref(db), updates);
-//     console.log('Members added successfully to group:', this.groupId);
-//     this.navCtrl.back(); // or navigate to group chat screen
+//     this.showToast('Members added successfully 🎉', 'success');
+//     this.navCtrl.back();
 //   } catch (error) {
 //     console.error('Error adding members:', error);
+//     this.showToast('Error adding members', 'danger');
 //   }
 // }
 
@@ -187,7 +195,8 @@ async addSelectedMembers() {
   selected.forEach(member => {
     updates[`groups/${this.groupId}/members/${member.user_id}`] = {
       name: member.name,
-      phone_number: member.phone_number
+      phone_number: member.phone_number,
+      status: 'active'
     };
   });
 
@@ -200,6 +209,7 @@ async addSelectedMembers() {
     this.showToast('Error adding members', 'danger');
   }
 }
+
 
 
 

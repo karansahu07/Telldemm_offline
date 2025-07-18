@@ -708,7 +708,7 @@
 
         <div class="message-bubble" [attr.data-msg-key]="msg.key" [ngClass]="msg.sender_id === senderId ? 'sender-message' : 'receiver-message'">
           <span *ngIf="chatType === 'group' && msg.sender_id !== senderId" style="font-size: 12px; color: #6c6c6c; margin-left: 5px;">
-            {{ msg.sender_phone }}
+            {{ msg.sender_name }}
           </span>
 
           <p class="message-text">{{ msg.text }}</p>
@@ -761,7 +761,14 @@
         (keyup.enter)="sendMessage()"
         class="message-input"
       ></ion-textarea>
-      <ion-icon name="attach-outline" class="icon-right"></ion-icon>
+      <!-- <ion-icon name="attach-outline" class="icon-right"></ion-icon> -->
+       <!-- Attach icon -->
+<!-- Attachment Icon -->
+<ion-icon name="attach-outline" class="icon-right"></ion-icon>
+
+<!-- Hidden File Input   (click)="triggerFileInput()"-->
+<!-- <input type="file" #fileInput style="display: none" (change)="onFileSelected($event)" /> -->
+
       <ion-icon name="camera-outline" class="icon-right"></ion-icon>
     </ion-col>
     <ion-col size="auto">
