@@ -2269,16 +2269,20 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonicModule, Platform } from '@ionic/angular';
+import { IonContent, IonicModule, Platform, PopoverController, ToastController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { Keyboard } from '@capacitor/keyboard';
 import { FirebaseChatService } from 'src/app/services/firebase-chat.service';
 import { EncryptionService } from 'src/app/services/encryption.service';
-import { getDatabase, ref, get } from 'firebase/database';
+import { getDatabase, ref, get, update, set, remove } from 'firebase/database';
 import { v4 as uuidv4 } from 'uuid';
 import { SecureStorageService } from '../../services/secure-storage/secure-storage.service';
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { FileUploadService } from '../../services/file-upload/file-upload.service';
+import { ChatOptionsPopoverComponent } from 'src/app/components/chat-options-popover/chat-options-popover.component';
+import { IonDatetime } from '@ionic/angular';
+// import { ToastController } from '@ionic/angular';
+
 
 interface Message{
   key?: any;
@@ -2308,6 +2312,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('scrollContainer', { static: false }) scrollContainer!: ElementRef;
   @ViewChild(IonContent, { static: false }) ionContent!: IonContent;
   @ViewChild('fileInput', { static: false }) fileInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('datePicker', { static: false }) datePicker!: IonDatetime;
 
   messages: Message[] = [];
   groupedMessages: { date: string; messages: Message[] }[] = [];
@@ -2320,6 +2325,22 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   private messageSub?: Subscription;
   showSendButton = false;
   private keyboardListeners: any[] = [];
+  // toastCtrl: any;
+  // messages: any[] = [];
+  searchActive = false;
+  searchQuery = '';
+  searchMatches: HTMLElement[] = [];
+  currentMatchIndex = 0;
+  showSearchBar = false;
+searchTerm = '';
+searchText = '';
+matchedMessages: HTMLElement[] = [];
+currentSearchIndex = -1;
+isDateModalOpen = false;
+selectedDate: string = '';
+ isDatePickerOpen = false;
+ showDateModal = false;
+ selectedMessages: any[] = [];
 
   constructor(
   private chatService: FirebaseChatService,
@@ -2328,7 +2349,9 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   private encryptionService: EncryptionService,
   private router: Router,
   private secureStorage: SecureStorageService,
-  private fileUploadService: FileUploadService
+  private fileUploadService: FileUploadService,
+  private popoverCtrl: PopoverController,
+  private toastCtrl: ToastController,
 ) { }
 
   roomId = '';
@@ -2341,6 +2364,14 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   isGroup: any;
   receiver_name = '';
   sender_name = '';
+  groupMembers: {
+    user_id: string;
+    name: string;
+    phone: string;
+    avatar?: string;
+    role?: string;
+    phone_number?: string;
+  }[] = [];
 
   async ngOnInit() {
   // Enable proper keyboard scrolling
@@ -2437,6 +2468,328 @@ this.receiver_name = nameFromQuery || await this.secureStorage.getItem('receiver
   // Scroll to bottom after short delay
   setTimeout(() => this.scrollToBottom(), 100);
 }
+
+  async openOptions(ev: any) {
+    const popover = await this.popoverCtrl.create({
+      component: ChatOptionsPopoverComponent,
+      event: ev,
+      translucent: true,
+      componentProps: {
+        chatType: this.chatType,
+      },
+    });
+
+    await popover.present();
+
+    const { data } = await popover.onDidDismiss();
+    if (data?.selected) {
+      this.handleOption(data.selected);
+    }
+  }
+
+ async handleOption(option: string) {
+  console.log('Selected option:', option);
+
+  if (option === 'Search') {
+    this.showSearchBar = true;
+    setTimeout(() => {
+      const input = document.querySelector('ion-input');
+      (input as HTMLIonInputElement)?.setFocus();
+    }, 100);
+  }
+
+  if (option === 'View Contact') {
+    const queryParams: any = {
+      receiverId: this.receiverId,
+      receiver_phone: this.receiver_phone,
+      receiver_name: this.receiver_name,
+      isGroup: false
+    };
+    this.router.navigate(['/profile-screen'], { queryParams });
+  }
+
+  this.route.queryParams.subscribe(params => {
+    this.receiverId = params['receiverId'] || '';
+  });
+
+  const groupId = this.receiverId;
+  const userId = await this.secureStorage.getItem('userId');
+
+  if (option === 'Group Info') {
+    const queryParams: any = {
+      receiverId: this.chatType === 'group' ? this.roomId : this.receiverId,
+      receiver_phone: this.receiver_phone,
+      receiver_name: this.receiver_name,
+      isGroup: this.chatType === 'group'
+    };
+    this.router.navigate(['/profile-screen'], { queryParams });
+
+  } else if (option === 'Add Members') {
+    const memberPhones = this.groupMembers.map(member => member.phone);
+    this.router.navigate(['/add-members'], {
+      queryParams: {
+        groupId: groupId,
+        members: JSON.stringify(memberPhones)
+      }
+    });
+
+//   } else if (option === 'Exit Group') {
+//     if (!groupId || !userId) {
+//       console.error('Missing groupId or userId');
+//       return;
+//     }
+
+//     const db = getDatabase();
+//     const memberPath = `groups/${groupId}/members/${userId}`;
+//     const pastMemberPath = `groups/${groupId}/pastmembers/${userId}`;
+
+//     try {
+//       // const userName = localStorage.getItem('userName') || 'You';
+//       const userName = await this.secureStorage.getItem('name');
+
+//       await update(ref(db, memberPath), {
+//         status: 'inactive'
+//       });
+
+//       await set(ref(db, pastMemberPath), {
+//         user_id: userId,
+//         name: userName,
+//         status: 'inactive',
+//         removedAt: new Date().toISOString()
+//       });
+
+//       await remove(ref(db, memberPath));
+
+//       const toast = await this.toastCtrl.create({
+//         message: `You exited the group`,
+//         duration: 2000,
+//         color: 'medium'
+//       });
+//       toast.present();
+
+//       this.router.navigate(['/home-screen']);
+
+//     } catch (error) {
+//       console.error('Error exiting group:', error);
+//       const toast = await this.toastCtrl.create({
+//   message: `You exited the group`,
+//   duration: 2000,
+//   color: 'medium'
+// });
+// await toast.present();
+//       // toast.present();
+//     }
+//   }
+  } else if (option === 'Exit Group') {
+  if (!groupId || !userId) {
+    console.error('Missing groupId or userId');
+    return;
+  }
+
+  const db = getDatabase();
+  const memberPath = `groups/${groupId}/members/${userId}`;
+  const pastMemberPath = `groups/${groupId}/pastmembers/${userId}`;
+
+  try {
+    const memberSnap = await get(ref(db, memberPath));
+
+    if (!memberSnap.exists()) {
+      console.error('Member data not found in Firebase');
+      return;
+    }
+
+    const memberData = memberSnap.val();
+    const updatedMemberData = {
+      ...memberData,
+      status: 'inactive',
+      // removedAt: new Date().toISOString()
+      removedAt: new Date().toLocaleString()
+
+    };
+
+    // First update the member's status in members path
+    await update(ref(db, memberPath), { status: 'inactive' });
+
+    // Then store full info in pastmembers
+    await set(ref(db, pastMemberPath), updatedMemberData);
+
+    // Finally remove from current members
+    await remove(ref(db, memberPath));
+
+    const toast = await this.toastCtrl.create({
+      message: `You exited the group`,
+      duration: 2000,
+      color: 'medium'
+    });
+    toast.present();
+
+    this.router.navigate(['/home-screen']);
+  } catch (error) {
+    console.error('Error exiting group:', error);
+    const toast = await this.toastCtrl.create({
+      message: `You exited the group`,
+      duration: 2000,
+      color: 'medium'
+    });
+    await toast.present();
+  }
+}
+
+}
+
+
+onSearchInput() {
+  const elements = Array.from(document.querySelectorAll('.message-text')) as HTMLElement[];
+
+  // Clear previous highlights
+  elements.forEach(el => {
+    el.innerHTML = el.textContent || '';
+    el.style.backgroundColor = 'transparent';
+  });
+
+  if (!this.searchText.trim()) {
+    this.matchedMessages = [];
+    this.currentSearchIndex = -1;
+    return;
+  }
+
+  const regex = new RegExp(`(${this.searchText})`, 'gi'); // global + case-insensitive
+
+  this.matchedMessages = [];
+
+  elements.forEach(el => {
+    const originalText = el.textContent || '';
+    if (regex.test(originalText)) {
+      const highlightedText = originalText.replace(regex, `<mark style="background: yellow;">$1</mark>`);
+      el.innerHTML = highlightedText;
+      this.matchedMessages.push(el);
+    }
+  });
+
+  // Reset index
+  this.currentSearchIndex = this.matchedMessages.length ? 0 : -1;
+
+  // Scroll to first match (optional)
+  if (this.currentSearchIndex >= 0) {
+    this.matchedMessages[this.currentSearchIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
+
+
+navigateSearch(direction: 'up' | 'down') {
+  if (!this.matchedMessages.length) return;
+  if (direction === 'up') {
+    this.currentSearchIndex = (this.currentSearchIndex - 1 + this.matchedMessages.length) % this.matchedMessages.length;
+  } else {
+    this.currentSearchIndex = (this.currentSearchIndex + 1) % this.matchedMessages.length;
+  }
+  this.highlightMessage(this.currentSearchIndex);
+}
+
+highlightMessage(index: number) {
+  // Remove existing highlights from all matched messages
+  this.matchedMessages.forEach(el => {
+    const originalText = el.textContent || '';
+    el.innerHTML = originalText; // reset to plain text
+    el.style.backgroundColor = 'transparent';
+  });
+
+  if (!this.searchText.trim()) return;
+
+  const regex = new RegExp(`(${this.searchText})`, 'gi'); // global + case-insensitive
+
+  this.matchedMessages.forEach((el, i) => {
+    const originalText = el.textContent || '';
+    // Wrap matched text in <mark>
+    const highlightedText = originalText.replace(regex, `<mark style="background: yellow;">$1</mark>`);
+    el.innerHTML = highlightedText;
+  });
+
+  // Scroll to current match
+  const target = this.matchedMessages[index];
+  if (target) {
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
+
+cancelSearch() {
+  this.searchText = '';
+  this.showSearchBar = false;
+  this.matchedMessages.forEach(el => {
+    el.innerHTML = el.textContent || ''; // remove <mark>
+    el.style.backgroundColor = 'transparent';
+  });
+  this.matchedMessages = [];
+}
+
+// openDatePicker() {
+//   // You can use ion-datetime, or open a modal here
+//   console.log('Calendar clicked – implement your date filter logic here');
+// }
+
+openDatePicker() {
+    this.showDateModal = true;
+    console.log('Opening calendar modal...');
+  }
+
+   onDateSelected(event: any) {
+  const selectedDate = new Date(event.detail.value);
+
+  const day = String(selectedDate.getDate()).padStart(2, '0');
+  const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+  const year = selectedDate.getFullYear();
+
+  const formattedDate = `${day}/${month}/${year}`; // example: 11/07/2025
+
+  this.showDateModal = false;
+
+  setTimeout(() => {
+    const el = document.getElementById('date-group-' + formattedDate);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      console.warn('No messages found for selected date:', formattedDate);
+    }
+  }, 300);
+}
+
+onMessagePress(message: any) {
+  const index = this.selectedMessages.findIndex(m => m.key === message.key);
+  if (index > -1) {
+    this.selectedMessages.splice(index, 1); // Unselect if already selected
+  } else {
+    this.selectedMessages.push(message); // Select
+  }
+}
+
+isSelected(message: any): boolean {
+  return this.selectedMessages.some(m => m.key === message.key);
+}
+
+onMessageClick(message: any) {
+  if (this.selectedMessages.length > 0) {
+    this.onMessagePress(message); // toggle if already in selection mode
+  } else {
+    // Normal tap action here if needed
+  }
+}
+
+clearSelection() {
+  this.selectedMessages = [];
+}
+
+  // onAddMember() {
+  //   console.log("fjsdkfjdgdg on clickherees")
+  //   const memberPhones = this.groupMembers.map(member => member.phone);
+  //   this.router.navigate(['/add-members'], {
+  //     queryParams: {
+  //       groupId: this.receiverId,
+  //       members: JSON.stringify(memberPhones)
+  //     }
+  //   });
+  // }
 
   private async markMessagesAsRead() {
     const lastMessage = this.messages[this.messages.length - 1];
@@ -2696,7 +3049,7 @@ observeVisibleMessages() {
   goToCallingScreen() {
     this.router.navigate(['/calling-screen']);
   }
-
+  
   async initKeyboardListeners() {
     if (this.platform.is('capacitor')) {
       try {

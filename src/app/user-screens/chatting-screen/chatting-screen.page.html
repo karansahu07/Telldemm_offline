@@ -507,8 +507,8 @@
           <img src="assets/images/user.jfif" alt="User Avatar" onError="this.src='assets/images/default-avatar.png'" />
         </ion-avatar>
         <ion-label style="width: auto; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"> -->
-          <!-- <h2 style="margin: 0; font-size: 16px;">{{ receiverId }}</h2> -->
-            <!-- <h2 style="margin: 0; font-size: 16px;">{{ chatType === 'group' ? groupName : receiverId }}</h2>
+<!-- <h2 style="margin: 0; font-size: 16px;">{{ receiverId }}</h2> -->
+<!-- <h2 style="margin: 0; font-size: 16px;">{{ chatType === 'group' ? groupName : receiverId }}</h2>
         </ion-label>
       </ion-item>
     </ion-buttons>
@@ -658,7 +658,7 @@
 
 
 
-<ion-header [translucent]="true">
+<!-- <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start" style="color: black; width: 8%; margin-top: 15px;">
       <ion-back-button defaultHref="/home-screen"></ion-back-button>
@@ -686,63 +686,148 @@
       <ion-button (click)="goToCallingScreen()" style="color: black;">
         <ion-icon name="call-outline" style="font-size: 28px;"></ion-icon>
       </ion-button>
-      <ion-button style="color: black;">
+      <ion-button style="color: black;" (click)="openOptions($event)">
         <ion-icon name="ellipsis-vertical-outline" style="font-size: 28px;"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
+</ion-header> -->
+
+<ion-header [translucent]="true">
+  <ion-toolbar>
+
+    <!-- Left: Back Button -->
+    <ion-buttons *ngIf="!showSearchBar" slot="start" style="color: black; width: 8%; margin-top: 15px;">
+      <ion-back-button defaultHref="/home-screen"></ion-back-button>
+    </ion-buttons>
+
+    <!-- Center: Chat Avatar and Name OR Search Input -->
+    <ng-container *ngIf="!showSearchBar; else searchBar">
+      <ion-buttons>
+        <ion-item lines="none" style="--padding-start: 0; --background: white; color: black; margin-top: 15px;"
+          detail="false">
+          <ion-avatar slot="start">
+            <img src="assets/images/user.jfif" alt="User Avatar"
+              onError="this.src='assets/images/default-avatar.png'" />
+          </ion-avatar>
+          <ion-label (click)="goToProfile()"
+            style="width: auto; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;">
+            <h2 style="margin: 0; font-size: 16px;">
+              {{ chatType === 'group' ? groupName : receiver_name }}
+            </h2>
+          </ion-label>
+        </ion-item>
+      </ion-buttons>
+    </ng-container>
+
+    <!-- Search Bar -->
+    <ng-template #searchBar>
+      <ion-item lines="none"
+        style="margin-top: 10px; padding: 10px 15px; --border-radius: 25px; --background: #f5f5f5; width: 100%;">
+        <ion-icon name="arrow-back-outline" slot="start" style="font-size: 24px; cursor: pointer; margin-right: 10px;"
+          (click)="cancelSearch()"></ion-icon>
+        <ion-input placeholder="Search messages..." [(ngModel)]="searchText" (ionInput)="onSearchInput()"
+          style="margin-left: 10px; flex: 1;">
+        </ion-input>
+        <ion-buttons slot="end">
+          <ion-button (click)="openDatePicker()">
+            <ion-icon name="calendar-outline"></ion-icon>
+          </ion-button>
+          <ion-button (click)="navigateSearch('up')">
+            <ion-icon name="arrow-up-outline"></ion-icon>
+          </ion-button>
+          <ion-button (click)="navigateSearch('down')">
+            <ion-icon name="arrow-down-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-item>
+    </ng-template>
+
+    <!-- Right: Action Icons (only when not in search mode) -->
+    <ion-buttons *ngIf="!showSearchBar" slot="end" style="margin-top: 15px;">
+      <ion-button style="color: black;">
+        <ion-icon name="videocam-outline" style="font-size: 35px;"></ion-icon>
+      </ion-button>
+      <ion-button (click)="goToCallingScreen()" style="color: black;">
+        <ion-icon name="call-outline" style="font-size: 28px;"></ion-icon>
+      </ion-button>
+      <ion-button (click)="openOptions($event)" style="color: black;">
+        <ion-icon name="ellipsis-vertical-outline" style="font-size: 28px;"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+  </ion-toolbar>
 </ion-header>
+
 
 <ion-content class="chat-background" [fullscreen]="true" [scrollEvents]="true">
   <div #scrollContainer class="chat-messages" style="padding: 0 10px 80px 10px ; overflow-y: auto; min-height: 100%;">
     <ion-spinner name="dots" *ngIf="isLoadingMore" style="margin: 8px auto; display: block;"></ion-spinner>
 
     <div *ngFor="let group of groupedMessages">
-      <div class="date-divider">
-        <div class="text-bg-white date-label">{{ group.date }}</div>
-      </div>
+  <div class="date-divider" [id]="'date-group-' + group.date">
+    <div class="text-bg-white date-label">{{ group.date }}</div>
+  </div>
 
-      <div *ngFor="let msg of group.messages"
-        [ngClass]="{ 'align-end': msg.sender_id === senderId, 'align-start': msg.sender_id !== senderId }"
-        style="display: flex; flex-direction: column; margin: 5px 0;">
+  <!-- <div *ngFor="let msg of group.messages"
+    [ngClass]="{ 'align-end': msg.sender_id === senderId, 'align-start': msg.sender_id !== senderId }"
+    style="display: flex; flex-direction: column; margin: 5px 0;">
 
-        <div class="message-bubble" [attr.data-msg-key]="msg.key" [ngClass]="msg.sender_id === senderId ? 'sender-message' : 'receiver-message'">
-          <span *ngIf="chatType === 'group' && msg.sender_id !== senderId" style="font-size: 12px; color: #6c6c6c; margin-left: 5px;">
-            {{ msg.sender_name }}
-          </span>
+    <div class="message-bubble" [attr.data-msg-key]="msg.key"
+      [ngClass]="msg.sender_id === senderId ? 'sender-message' : 'receiver-message'">
+      <span *ngIf="chatType === 'group' && msg.sender_id !== senderId"
+        style="font-size: 12px; color: #6c6c6c; margin-left: 5px;">
+        {{ msg.sender_name }}
+      </span>
 
-          <p class="message-text">{{ msg.text }}</p>
+      <ion-text class="message-text">{{ msg.text }}</ion-text>
 
-          <!-- ✅ Timestamp + Tick Status -->
-          <p class="time-stamp status-container">
-            {{ msg.time }}
-
-            <ng-container *ngIf="msg.sender_id === senderId">
-              <!-- Sent only -->
-              <ion-icon
-                *ngIf="!msg.delivered"
-                name="checkmark-outline"
-                class="status-icon sent"
-              ></ion-icon>
-
-              <!-- Delivered, not read -->
-              <ion-icon
-                *ngIf="msg.delivered && !msg.read"
-                name="checkmark-done-outline"
-                class="status-icon delivered"
-              ></ion-icon>
-
-              <!-- Read -->
-              <ion-icon
-                *ngIf="msg.delivered && msg.read"
-                name="checkmark-done-outline"
-                class="status-icon read"
-              ></ion-icon>
-            </ng-container>
-          </p>
-        </div>
-      </div>
+      <p class="time-stamp status-container">
+        {{ msg.time }}
+        <ng-container *ngIf="msg.sender_id === senderId">
+          <ion-icon *ngIf="!msg.delivered" name="checkmark-outline" class="status-icon sent"></ion-icon>
+          <ion-icon *ngIf="msg.delivered && !msg.read" name="checkmark-done-outline"
+            class="status-icon delivered"></ion-icon>
+          <ion-icon *ngIf="msg.delivered && msg.read" name="checkmark-done-outline"
+            class="status-icon read"></ion-icon>
+        </ng-container>
+      </p>
     </div>
+  </div> -->
+  <div *ngFor="let msg of group.messages"
+  [ngClass]="{
+    'align-end': msg.sender_id === senderId,
+    'align-start': msg.sender_id !== senderId,
+    'selected': isSelected(msg)
+  }"
+  style="display: flex; flex-direction: column; margin: 5px 0;"
+  (press)="onMessagePress(msg)"
+  (click)="onMessageClick(msg)">
+  
+  <div class="message-bubble" [attr.data-msg-key]="msg.key"
+    [ngClass]="msg.sender_id === senderId ? 'sender-message' : 'receiver-message'">
+
+    <span *ngIf="chatType === 'group' && msg.sender_id !== senderId"
+      style="font-size: 12px; color: #6c6c6c; margin-left: 5px;">
+      {{ msg.sender_name }}
+    </span>
+
+    <ion-text class="message-text">{{ msg.text }}</ion-text>
+
+    <p class="time-stamp status-container">
+      {{ msg.time }}
+      <ng-container *ngIf="msg.sender_id === senderId">
+        <ion-icon *ngIf="!msg.delivered" name="checkmark-outline" class="status-icon sent"></ion-icon>
+        <ion-icon *ngIf="msg.delivered && !msg.read" name="checkmark-done-outline" class="status-icon delivered"></ion-icon>
+        <ion-icon *ngIf="msg.delivered && msg.read" name="checkmark-done-outline" class="status-icon read"></ion-icon>
+      </ng-container>
+    </p>
+  </div>
+</div>
+
+
+</div>
+
   </div>
 </ion-content>
 
@@ -751,23 +836,16 @@
   <ion-row class="footer-row">
     <ion-col class="message-input-container">
       <ion-icon name="document-text-outline" class="icon-left"></ion-icon>
-      <ion-textarea
-        [(ngModel)]="messageText"
-        placeholder="Message"
-        auto-grow="true"
-        (ionInput)="onInputChange()"
-        (ionFocus)="onInputFocus()"
-        (ionBlur)="onInputBlur()"
-        (keyup.enter)="sendMessage()"
-        class="message-input"
-      ></ion-textarea>
+      <ion-textarea [(ngModel)]="messageText" placeholder="Message" auto-grow="true" (ionInput)="onInputChange()"
+        (ionFocus)="onInputFocus()" (ionBlur)="onInputBlur()" (keyup.enter)="sendMessage()"
+        class="message-input"></ion-textarea>
       <!-- <ion-icon name="attach-outline" class="icon-right"></ion-icon> -->
-       <!-- Attach icon -->
-<!-- Attachment Icon -->
-<ion-icon name="attach-outline" class="icon-right"></ion-icon>
+      <!-- Attach icon -->
+      <!-- Attachment Icon -->
+      <ion-icon name="attach-outline" class="icon-right"></ion-icon>
 
-<!-- Hidden File Input   (click)="triggerFileInput()"-->
-<!-- <input type="file" #fileInput style="display: none" (change)="onFileSelected($event)" /> -->
+      <!-- Hidden File Input   (click)="triggerFileInput()"-->
+      <!-- <input type="file" #fileInput style="display: none" (change)="onFileSelected($event)" /> -->
 
       <ion-icon name="camera-outline" class="icon-right"></ion-icon>
     </ion-col>
@@ -781,3 +859,24 @@
     </ion-col>
   </ion-row>
 </div>
+
+<ion-modal [isOpen]="showDateModal" (didDismiss)="showDateModal = false">
+  <ng-template>
+    <ion-content>
+      <ion-toolbar color="primary">
+        <ion-title>Select Date</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="showDateModal = false">Close</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+
+      <ion-datetime
+        presentation="date"
+        [showDefaultButtons]="true"
+        (ionChange)="onDateSelected($event)">
+      </ion-datetime>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
+

@@ -1,0 +1,62 @@
+.button-row {
+  display: flex !important;
+  gap: 12px;
+  padding: 0 16px;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+ion-button {
+  flex: 1;
+  height: 44px;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+// .textarea-wrapper {
+//   background-color: #f1f1f1;
+//   border-radius: 10px;
+//   padding: 10px;
+
+//   ion-textarea {
+//     --background: transparent;
+//     --color: #000;
+//     --padding-start: 0px;
+//     --padding-end: 0px;
+//     --padding-top: 0px;
+//     --padding-bottom: 0px;
+
+//     // Optional: remove borders if any
+//     --border-color: transparent;
+//     border-radius: 10px;
+//   }
+// }
+
+
+// .textarea-wrapper{
+//     background-color: grey !important;
+
+//     ion-textarea{
+        
+//     }
+// }
+
+
+// .textarea-wrapper {
+//   ion-textarea {
+//     --background: transparent;
+//     --padding-start: 12px;
+//     --padding-end: 12px;
+//     --padding-top: 10px;
+//     --padding-bottom: 10px;
+//   }
+
+//   ::ng-deep ion-textarea textarea {
+//     background-color: #e0e0e0 !important;
+//     border-radius: 25px !important;
+//     padding: 10px;
+//     color: #000;
+//   }
+// }
+
+

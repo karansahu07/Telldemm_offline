@@ -733,3 +733,44 @@ ion-content.chat-background {
   color: red;
 }
 
+.highlighted {
+  background-color: yellow;
+  transition: background 0.3s ease;
+}
+
+.active-highlight {
+  border: 2px solid orange;
+}
+
+ion-datetime {
+  z-index: 9999;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+
+// This styles the modal background and center alignment
+::ng-deep .calendar-modal {
+  --background: rgba(0, 0, 0, 0.4); // slight dark transparent background
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// This styles the inside content
+::ng-deep .calendar-modal .calendar-content {
+  width: 90%;
+  max-width: 350px;
+  margin: auto;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #ffffff !important; // white card
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.selected .message-bubble {
+  background-color: rgba(0, 123, 255, 0.2); // Light blue highlight
+  border: 1px solid #007bff;
+  border-radius: 10px;
+}

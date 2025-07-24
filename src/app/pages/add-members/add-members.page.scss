@@ -37,6 +37,15 @@ ion-chip {
   text-transform: none;
   font-size: 16px;
 //   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-padding: 25px;
+    padding: 5px 50px;
  height: 48px;
 }
+
+ion-footer{
+    padding-bottom: env(safe-area-inset-bottom, 20px);
+        box-shadow: none !important;
+}
+
+//  ion-toolbar{
+//   box-shadow: none !important;
+// }

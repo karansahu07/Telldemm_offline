@@ -8,10 +8,11 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <!-- Loading Spinner -->
-  <ion-spinner *ngIf="isLoading" name="dots" style="display: block; margin: auto;"></ion-spinner>
 
   <ion-searchbar [(ngModel)]="searchText" placeholder="Search by name"></ion-searchbar>
+
+  <!-- Loading Spinner -->
+   <ion-spinner *ngIf="isLoading" name="dots" style="display: block; margin: auto;"></ion-spinner>
 
   <!-- Selected chips -->
   <div *ngIf="selectedUsers.length > 0" class="selected-chip-row">

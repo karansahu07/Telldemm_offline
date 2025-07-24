@@ -44,37 +44,6 @@ export class AddMembersPage implements OnInit {
   toast.present();
 }
 
-  // async loadDeviceMatchedContacts() {
-  //   // console.log("calling this function")
-  //   const currentUserPhone = localStorage.getItem('phone_number');
-  //   this.allUsers = [];
-  //   this.isLoading = true;
-
-  //   try {
-  //     const matchedUsers = await this.contactSyncService.getMatchedUsers();
-  //     console.log("matched contacts", matchedUsers);
-
-  //     matchedUsers.forEach((user) => {
-  //       if (user.phone_number !== currentUserPhone) {
-  //         this.allUsers.push({
-  //           ...user,
-  //           name: user.name || user.phone_number,
-  //           message: user.bio || '',
-  //           image: user.image || 'assets/images/user.jfif',
-  //           receiver_Id: user.phone_number,
-  //           selected: false,
-  //         });
-  //       }
-  //     });
-
-  //     this.filteredContacts = [...this.allUsers];
-  //   } catch (err) {
-  //     console.error('Error loading matched contacts:', err);
-  //   } finally {
-  //     this.isLoading = false;
-  //   }
-  // }
-
   async loadDeviceMatchedContacts() {
   const currentUserPhone = localStorage.getItem('phone_number');
   this.allUsers = [];
@@ -98,7 +67,7 @@ export class AddMembersPage implements OnInit {
           image: user.image || 'assets/images/user.jfif',
           receiver_Id: user.phone_number,
           selected: false,
-          disabled: isAlreadyAdded // 👈 prevent selecting already added members
+          disabled: isAlreadyAdded
         });
       }
     });
@@ -110,7 +79,6 @@ export class AddMembersPage implements OnInit {
     this.isLoading = false;
   }
 }
-
 
   get selectedUsers() {
     return this.allUsers.filter(user => user.selected);
@@ -126,51 +94,6 @@ export class AddMembersPage implements OnInit {
       user.name?.toLowerCase().includes(search)
     );
   }
-
-  // addSelectedMembers() {
-  //   const selected = this.selectedUsers.map(u => u.receiver_Id);
-  //   console.log('Selected Members:', selected);
-  //   this.navCtrl.back(); // or navigate forward
-  // }
-
-
-
-// async addSelectedMembers() {
-//   if (!this.groupId) {
-//     this.showToast('Group ID not found', 'danger');
-//     return;
-//   }
-
-//   const selected = this.selectedUsers.map(u => ({
-//     user_id: u.user_id,
-//     name: u.name,
-//     phone_number: u.phone_number
-//   }));
-
-//   if (selected.length === 0) {
-//     this.showToast('No members selected', 'danger');
-//     return;
-//   }
-
-//   const db = getDatabase();
-//   const updates: any = {};
-
-//   selected.forEach(member => {
-//     updates[`groups/${this.groupId}/members/${member.user_id}`] = {
-//       name: member.name,
-//       phone_number: member.phone_number
-//     };
-//   });
-
-//   try {
-//     await update(ref(db), updates);
-//     this.showToast('Members added successfully 🎉', 'success');
-//     this.navCtrl.back();
-//   } catch (error) {
-//     console.error('Error adding members:', error);
-//     this.showToast('Error adding members', 'danger');
-//   }
-// }
 
 async addSelectedMembers() {
   if (!this.groupId) {
@@ -193,11 +116,16 @@ async addSelectedMembers() {
   const updates: any = {};
 
   selected.forEach(member => {
+    // ✅ Add to group members
     updates[`groups/${this.groupId}/members/${member.user_id}`] = {
       name: member.name,
       phone_number: member.phone_number,
-      status: 'active'
+      status: 'active',
+      role: 'member'
     };
+
+    // ✅ Remove from pastmembers if exists
+    updates[`groups/${this.groupId}/pastmembers/${member.user_id}`] = null;
   });
 
   try {
@@ -209,9 +137,6 @@ async addSelectedMembers() {
     this.showToast('Error adding members', 'danger');
   }
 }
-
-
-
 
 
   checkboxChanged(user: any) {

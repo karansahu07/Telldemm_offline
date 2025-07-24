@@ -322,7 +322,8 @@ async createGroup(groupId: string, groupName: string, members: any[], currentUse
     description: 'Hey I am using Telldemm',
     createdBy: currentUserId,
     createdByName: currentUserName,                 
-    createdAt: new Date().toISOString(),         
+    // createdAt: new Date().toISOString(),
+    createdAt: new Date().toLocaleString(), 
     members: members.reduce((acc, member) => {
       acc[member.user_id] = {
         name: member.name,

@@ -435,27 +435,6 @@
       </ion-label>
     </ion-item>
 
-
-
-    <!-- <ion-item *ngFor="let member of groupMembers">
-  <ion-avatar slot="start">
-    <img [src]="member.avatar || 'assets/images/user.jfif'" />
-  </ion-avatar>
-
-  <ion-label>
-    <div class="Encry">{{ member.name }}</div>
-    <div class="encrypted">{{ member.phone }}</div>
-  </ion-label>
-
-
-
-  <ion-buttons slot="end" *ngIf="member.user_id !== currentUserId">
-    <ion-button fill="clear" (click)="openActionSheet(member)">
-      <ion-icon name="ellipsis-vertical"></ion-icon>
-    </ion-button>
-  </ion-buttons>
-</ion-item> -->
-
     <ion-item *ngFor="let member of groupMembers">
       <ion-avatar slot="start">
         <img [src]="member.avatar || 'assets/images/user.jfif'" />
@@ -483,10 +462,10 @@
     </ion-item>
 
 
-    <ion-item>
-      <ion-icon name="people-outline" slot="start" class="all-icon"></ion-icon>
-      <ion-label class="Encry1" (click)="viewPastMembers()">View Past Members</ion-label>
-    </ion-item>
+    <ion-item *ngIf="hasPastMembers">
+  <ion-icon name="people-outline" slot="start" class="all-icon"></ion-icon>
+  <ion-label class="Encry1" (click)="viewPastMembers()">View Past Members</ion-label>
+</ion-item>
 
 
   </ion-list>

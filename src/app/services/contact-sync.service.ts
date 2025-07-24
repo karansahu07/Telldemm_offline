@@ -158,130 +158,12 @@ import { Injectable } from '@angular/core';
 import { Contacts, GetContactsOptions } from '@capacitor-community/contacts';
 import { ApiService } from './api/api.service';
  
-// Manually define Projection values since plugin doesn't export them properly
-// const Projection = {
-//   Full: 'full',
-//   Name: 'name',
-//   PhoneNumbers: 'phoneNumbers',
-//   Emails: 'emails',
-// } as const;
- 
 @Injectable({
   providedIn: 'root',
 })
 export class ContactSyncService {
   contacts: any;
   constructor(private apiService: ApiService) {}
- 
-  /**
-   * Fetches and normalizes all device phone numbers (last 10 digits, prefixed with +91)
-   */
-  // async getDevicePhoneNumbers(): Promise<string[]> {
-  //   try {
-  //     const permissionResult = await Contacts.requestPermissions();
- 
-  //     if (permissionResult.contacts !== 'granted') {
-  //       console.warn('Contacts permission denied');
-  //       return [];
-  //     }
- 
-  //     const { contacts } = await Contacts.getContacts({
-  //       projection: Projection.PhoneNumbers,
-  //     });
- 
-  //     const numbersSet: Set<string> = new Set();
- 
-  //     (contacts || []).forEach((contact: any) => {
-  //       (contact.phoneNumbers || []).forEach((p: any) => {
-  //         if (p?.number) {
-  //           let cleaned = p.number.replace(/\D/g, '');
-  //           if (cleaned.length >= 10) {
-  //             const last10 = cleaned.slice(-10);
-  //             numbersSet.add(`+91${last10}`);
-  //           }
-  //         }
-  //       });
-  //     });
- 
-  //     return Array.from(numbersSet);
-  //   } catch (error) {
-  //     console.error('Error while fetching contacts:', error);
-  //     return [];
-  //   }
-  // }
-
-//   async getDevicePhoneNumbers(): Promise<string[]> {
-//   try {
-//     // Step 1: Request permission
-//     const permissionResult = await Contacts.requestPermissions();
-
-//     if (permissionResult?.contacts !== 'granted') {
-//       console.warn('Contacts permission denied by user');
-//       return [];
-//     }
-
-//     // Step 2: Fetch contacts (only phone numbers)
-//     const result = await Contacts.getContacts({
-//       projection: Projection.PhoneNumbers,
-//     });
-
-//     if (!result || !result.contacts) {
-//       console.warn('No contacts returned from device');
-//       return [];
-//     }
-
-//     const numbersSet: Set<string> = new Set();
-
-//     result.contacts.forEach((contact: any) => {
-//       if (Array.isArray(contact.phoneNumbers)) {
-//         contact.phoneNumbers.forEach((p: any) => {
-//           if (p?.number) {
-//             let cleaned = p.number.replace(/\D/g, ''); // remove non-digits
-
-//             if (cleaned.length >= 10) {
-//               const last10 = cleaned.slice(-10);
-//               const formatted = `+91${last10}`;
-//               numbersSet.add(formatted);
-//             }
-//           }
-//         });
-//       }
-//     });
-
-//     console.log('Normalized phone numbers:', Array.from(numbersSet));
-//     return Array.from(numbersSet);
-
-//   } catch (error: any) {
-//     console.error('Error while fetching contacts:', error?.message || error);
-//     return [];
-//   }
-// }
-
-
-// async getDevicePhoneNumbers() {
-//   try {
-//     const permission = await Contacts.requestPermissions();
- 
-//     if (permission.contacts === 'granted') {
-//       const options: GetContactsOptions = {
-//         projection: {
-//           name: true,
-//           phones: true,
-//           emails: true,
-//         },
-//       };
- 
-//       const result = await Contacts.getContacts(options);
-//       this.contacts = result.contacts;
-//       console.log('Contacts:', this.contacts);
-//     } else {
-//       console.warn('Permission not granted for contacts');
-//     }
-//   } catch (error) {
-//     console.error('Error loading contacts', error);
-//   }
-// }
-
 
 async getDevicePhoneNumbers(): Promise<any[]> {
   try {
@@ -346,52 +228,61 @@ async getDevicePhoneNumbers(): Promise<any[]> {
   }
 }
 
- 
-  /**
-   * Matches device phone numbers with backend registered users
-   */
-  // async getMatchedUsers(): Promise<any[]> {
-  //   const deviceNumbers = await this.getDevicePhoneNumbers();
- 
-  //   return new Promise((resolve, reject) => {
-  //     this.apiService.getAllUsers().subscribe({
-  //       next: (users) => {
-  //         const matched = (users || []).filter((user: any) => {
-  //           if (!user.phone_number) return false;
- 
-  //           const cleaned = user.phone_number.replace(/\D/g, '');
-  //           if (cleaned.length < 10) return false;
- 
-  //           const last10 = cleaned.slice(-10);
-  //           const normalized = `+91${last10}`;
- 
-  //           return deviceNumbers.includes(normalized);
-  //         });
- 
-  //         resolve(matched);
-  //       },
-  //       error: (err) => {
-  //         console.error('Error fetching users:', err);
-  //         reject(err);
-  //       },
-  //     });
-  //   });
-  // }
 
-  async getMatchedUsers(): Promise<any[]> {
+//   async getMatchedUsers(): Promise<any[]> {
+//   const formattedContacts = await this.getDevicePhoneNumbers();
+
+//   const deviceNumbersSet = new Set<string>();
+
+//   formattedContacts.forEach(contact => {
+//     (contact.phoneNumbers || []).forEach((number: string) => {
+//       let cleaned = number.replace(/\D/g, ''); // remove non-digits
+
+//       // Keep only last 10 digits (Indian number)
+//       if (cleaned.length >= 10) {
+//         const last10 = cleaned.slice(-10);
+//         const finalNumber = '+91' + last10;
+//         deviceNumbersSet.add(finalNumber);
+//       }
+//     });
+//   });
+
+//   return new Promise((resolve, reject) => {
+//     this.apiService.getAllUsers().subscribe({
+//       next: (users) => {
+//         // console.log("users all : ", users);
+//         const matched = (users || []).filter((user: any) => {
+//           if (!user.phone_number) return false;
+//           const cleanedUserNumber = user.phone_number.replace(/\D/g, '');
+//           if (cleanedUserNumber.length >= 10) {
+//             const userLast10 = cleanedUserNumber.slice(-10);
+//             const formattedUser = '+91' + userLast10;
+//             return deviceNumbersSet.has(formattedUser);
+//           }
+//           return false;
+//         });
+
+//         resolve(matched);
+//       },
+//       error: (err) => {
+//         console.error('Error fetching users:', err);
+//         reject(err);
+//       },
+//     });
+//   });
+// }
+
+async getMatchedUsers(): Promise<any[]> {
   const formattedContacts = await this.getDevicePhoneNumbers();
 
-  const deviceNumbersSet = new Set<string>();
-
+  const deviceNumbersMap = new Map<string, string>(); // phone => deviceName
   formattedContacts.forEach(contact => {
     (contact.phoneNumbers || []).forEach((number: string) => {
-      let cleaned = number.replace(/\D/g, ''); // remove non-digits
-
-      // Keep only last 10 digits (Indian number)
+      let cleaned = number.replace(/\D/g, '');
       if (cleaned.length >= 10) {
         const last10 = cleaned.slice(-10);
-        const finalNumber = '+91' + last10;
-        deviceNumbersSet.add(finalNumber);
+        const formatted = '+91' + last10;
+        deviceNumbersMap.set(formatted, contact.name); // save device name
       }
     });
   });
@@ -399,17 +290,21 @@ async getDevicePhoneNumbers(): Promise<any[]> {
   return new Promise((resolve, reject) => {
     this.apiService.getAllUsers().subscribe({
       next: (users) => {
-        // console.log("users all : ", users);
-        const matched = (users || []).filter((user: any) => {
-          if (!user.phone_number) return false;
+        const matched = (users || []).map((user: any) => {
           const cleanedUserNumber = user.phone_number.replace(/\D/g, '');
           if (cleanedUserNumber.length >= 10) {
             const userLast10 = cleanedUserNumber.slice(-10);
             const formattedUser = '+91' + userLast10;
-            return deviceNumbersSet.has(formattedUser);
+
+            if (deviceNumbersMap.has(formattedUser)) {
+              return {
+                ...user,
+                name: deviceNumbersMap.get(formattedUser), // ✅ override backend name
+              };
+            }
           }
-          return false;
-        });
+          return null;
+        }).filter(user => user !== null);
 
         resolve(matched);
       },
@@ -420,5 +315,6 @@ async getDevicePhoneNumbers(): Promise<any[]> {
     });
   });
 }
+
 
 }

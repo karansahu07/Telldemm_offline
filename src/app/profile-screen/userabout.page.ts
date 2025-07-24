@@ -227,6 +227,7 @@ import { ActionSheetButton } from '@ionic/angular';
 import { FirebaseChatService } from '../services/firebase-chat.service';
 import { SecureStorageService } from '../services/secure-storage/secure-storage.service';
 import { NavController } from '@ionic/angular';
+import { NgZone } from '@angular/core';
 
 @Component({
   selector: 'app-userabout',
@@ -261,6 +262,7 @@ export class UseraboutPage implements OnInit {
   groupDescription: string = '';
   groupCreatedBy: string = '';
   groupCreatedAt: string = '';
+  hasPastMembers = false;
 
 
 
@@ -277,7 +279,8 @@ export class UseraboutPage implements OnInit {
     private toastCtrl: ToastController,
     private firebaseChatService: FirebaseChatService,
     private secureStorage: SecureStorageService,
-    private navCtrl: NavController
+    private navCtrl: NavController,
+    private zone: NgZone,
   ) { }
 
   ngOnInit() {
@@ -289,7 +292,8 @@ export class UseraboutPage implements OnInit {
       // this.receiver_name = localStorage.getItem('receiver_name') || '';
       this.receiver_name = (await this.secureStorage.getItem('receiver_name')) || '';
       this.currentUserId = localStorage.getItem('userId') || '';
-      this.groupId = this.route.snapshot.queryParamMap.get('groupId') || '';
+      this.groupId = this.route.snapshot.queryParamMap.get('receiverId') || '';
+      console.log("gruop id checking:", this.groupId);
 
       console.log("dasfsdfgdg",this.isGroup);
       // if (this.chatType === 'group') {
@@ -303,6 +307,7 @@ export class UseraboutPage implements OnInit {
       }
     });
     this.checkForPastMembers();
+    // this.checkForPastMembers();
     this.findCommonGroups(this.currentUserId, this.receiverId);
 
   }
@@ -318,7 +323,7 @@ export class UseraboutPage implements OnInit {
       this.receiver_name = params['receiver_name'] || '';  //this will not update in real device
       console.log("redirect name", this.receiver_name);
       this.currentUserId = localStorage.getItem('userId') || '';
-      this.groupId = this.route.snapshot.queryParamMap.get('groupId') || '';
+      this.groupId = this.route.snapshot.queryParamMap.get('receiverId') || '';
 
       // console.log("dasfsdfgdg",this.isGroup);
       // console.log("dasfsdfgdg",params['isGroup']);
@@ -353,6 +358,7 @@ export class UseraboutPage implements OnInit {
   }
 
   onAddMember() {
+    // console.log("fjsdkfjdgdg on clickherees")
     const memberPhones = this.groupMembers.map(member => member.phone);
     this.router.navigate(['/add-members'], {
       queryParams: {
@@ -636,7 +642,7 @@ export class UseraboutPage implements OnInit {
       await set(ref(db, pastMemberPath), {
         ...member,
         status: 'inactive',
-        removedAt: new Date().toISOString()  // optional timestamp
+        removedAt: new Date().toLocaleString()  // optional timestamp
       });
 
       // Remove from current members
@@ -663,17 +669,26 @@ export class UseraboutPage implements OnInit {
   }
 
   async checkForPastMembers() {
-    const db = getDatabase();
-    const pastRef = ref(db, `groups/${this.groupId}/pastmembers`);
+  if (!this.groupId) return;
 
-    try {
-      const snapshot = await get(pastRef);
-      this.showPastMembersButton = snapshot.exists();
-    } catch (error) {
-      console.error('Error checking pastmembers:', error);
-      this.showPastMembersButton = false;
-    }
+  const db = getDatabase();
+  const pastRef = ref(db, `groups/${this.groupId}/pastmembers`);
+
+  try {
+    const snapshot = await get(pastRef);
+    const exists = snapshot.exists();
+
+    // ✅ Run inside Angular zone to trigger change detection
+    this.zone.run(() => {
+      this.hasPastMembers = exists;
+    });
+  } catch (error) {
+    console.error('Error checking past members:', error);
+    this.zone.run(() => {
+      this.hasPastMembers = false;
+    });
   }
+}
 
   async createGroupWithMember() {
     const currentUserId = localStorage.getItem('userId');
