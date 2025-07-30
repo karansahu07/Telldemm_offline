@@ -20,6 +20,7 @@ import { NetworkService } from './services/network-connection/network.service';
 import { distinctUntilChanged } from 'rxjs/operators';
 import { register } from 'swiper/element/bundle';
 import { FirebasePushService } from './services/push_notification/firebase-push.service';
+import {AttachmentService} from './services/attachment-file/attachment.service'
 
 register();
 
@@ -33,12 +34,14 @@ export class AppComponent implements OnInit{
   constructor(
     private networkService: NetworkService,
     private toastController: ToastController,
-    private FirebasePushService:FirebasePushService
+    private FirebasePushService:FirebasePushService,
+    private AttachmentService : AttachmentService
   ) {
     // this.listenToNetwork();
   }
   async ngOnInit() {
     await this.FirebasePushService.initPush();
+    await this.AttachmentService.init();
   }
 
   // listenToNetwork() {

@@ -173,7 +173,8 @@ export class LoginScreenPage {
     }
 
     this.isVerifyingOtp = true;
-    const fullPhone = `${this.countryCode}${this.phoneNumber}`;
+    // const fullPhone = `${this.countryCode}${this.phoneNumber}`;
+    const fullPhone = `${this.phoneNumber}`;
     const otpCode = this.otp.join('');
 
     const result = await this.authService.verifyOtp(fullPhone, otpCode);

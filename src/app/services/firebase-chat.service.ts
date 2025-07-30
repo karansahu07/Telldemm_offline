@@ -244,6 +244,55 @@ import { getStorage, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 @Injectable({ providedIn: 'root' })
 export class FirebaseChatService {
+  //   /** 🔍 Get group metadata */
+  //   async getGroupInfo(groupId: string): Promise<any> {
+  //     const snapshot = await get(child(ref(this.db), `groups/${groupId}`));
+  //     return snapshot.exists() ? snapshot.val() : null;
+  //   }
+  //   /** 🔍 Get all groups user belongs to */
+  //   async getGroupsForUser(userId: string): Promise<string[]> {
+  //     const snapshot = await get(child(ref(this.db), 'groups'));
+  //     const allGroups = snapshot.val();
+  //     const userGroups: string[] = [];
+  //     if (allGroups) {
+  //       Object.entries(allGroups).forEach(([groupId, groupData]: any) => {
+  //         if (groupData.members?.[userId]) {
+  //           userGroups.push(groupId);
+  //         }
+  //       });
+  //     }
+  //     return userGroups;
+  //   }
+  //   /** ✅ Generate consistent chat ID for 1:1 chat */
+  //   generateChatId(user1: string, user2: string): string {
+  //     return [user1, user2].sort().join('_');
+  //   }
+  //   /** ✅ Get unread count for a user in chat/group */
+  //   getUnreadCount(roomId: string, userId: string): Promise<number> {
+  //   return get(child(ref(this.db), `unreadCounts/${roomId}/${userId}`)).then(snapshot =>
+  //     snapshot.exists() ? snapshot.val() : 0
+  //   );
+  // }
+  // markAsRead(roomId: string, userId: string): Promise<void> {
+  //   const countRef = ref(this.db, `unreadCounts/${roomId}/${userId}`);
+  //   return set(countRef, 0);
+  // }
+  //   /** ✅ Increment unread count for a user */
+  //   async incrementUnreadCount(roomId: string, userId: string): Promise<void> {
+  //     const countRef = ref(this.db, `chats/${roomId}/unreadCounts/${userId}`);
+  //     await runTransaction(countRef, (currentCount) => {
+  //       return (currentCount || 0) + 1;
+  //     });
+  //   }
+  //   /** ✅ Reset unread count to 0 when user views chat */
+  //   async resetUnreadCount(roomId: string, userId: string): Promise<void> {
+  //     const countRef = ref(this.db, `chats/${roomId}/unreadCounts/${userId}`);
+  //     await set(countRef, 0);
+  //   }
+  // }
+  getRoomId(senderId: string, arg1: string): string {
+    throw new Error('Method not implemented.');
+  }
   constructor(private db: Database) {}
 
   async sendMessage(roomId: string, message: any, chatType: string, senderId: string) {
@@ -385,6 +434,37 @@ async createGroup(groupId: string, groupName: string, members: any[], currentUse
 
 //   return userGroups;
 // }
+
+ // ✅ Create a community
+  async createCommunity(communityId: string, name: string, description: string, createdBy: string): Promise<void> {
+    const communityRef = ref(this.db, `communities/${communityId}`);
+    await set(communityRef, {
+      name,
+      description,
+      createdBy,
+      groups: {}
+    });
+  }
+
+  // ✅ Add user to community
+  async addUserToCommunity(userId: string, communityId: string): Promise<void> {
+    const userRef = ref(this.db, `users/${userId}/joinedCommunities/${communityId}`);
+    await set(userRef, true);
+  }
+
+  // 🔍 Get all groups inside a community
+  async getGroupsInCommunity(communityId: string): Promise<string[]> {
+    const snapshot = await get(child(ref(this.db), `communities/${communityId}/groups`));
+    const groups = snapshot.val();
+    return groups ? Object.keys(groups) : [];
+  }
+
+  // 🔍 Get all communities user has joined
+  async getUserCommunities(userId: string): Promise<string[]> {
+    const snapshot = await get(child(ref(this.db), `users/${userId}/joinedCommunities`));
+    const communities = snapshot.val();
+    return communities ? Object.keys(communities) : [];
+  }
 
 
   incrementUnreadCount(roomId: string, receiverId: string) {

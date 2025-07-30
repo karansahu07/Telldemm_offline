@@ -2281,25 +2281,54 @@ import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'fire
 import { FileUploadService } from '../../services/file-upload/file-upload.service';
 import { ChatOptionsPopoverComponent } from 'src/app/components/chat-options-popover/chat-options-popover.component';
 import { IonDatetime } from '@ionic/angular';
+import { AttachmentService } from 'src/app/services/attachment-file/attachment.service';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { NavController } from '@ionic/angular';
+// import { FilePicker } from '@capawesome-team/capacitor-file-picker';
+// import {  FilePicker }  from 'capacitor-file-picker';
+// import { FilePicker } from '@capawesome/capacitor-file-picker';
+import { FilePicker, PermissionStatus } from '@capawesome/capacitor-file-picker';
+
 // import { ToastController } from '@ionic/angular';
 
 
-interface Message{
+// interface Message{
+//   attachment?: { type: ''; filePath: ''; };
+//   key?: any;
+//   message_id : string;
+//   sender_id : string;
+//   sender_phone : string;
+//   sender_name : string;
+//   receiver_id? : string;
+//   receiver_phone? : string;
+//   type? : "text" | "audio" | "video" | "image";
+//   text? : string;
+//   url? : string;
+//   delivered : boolean;
+//   read : boolean;
+//   timestamp : string;
+//   time? : string;
+// }
+
+interface Message {
+  sender_id: string;
   key?: any;
-  message_id : string;
-  sender_id : string;
-  sender_phone : string;
-  sender_name : string;
-  receiver_id? : string;
-  receiver_phone? : string;
-  type? : "text" | "audio" | "video" | "image";
-  text? : string;
-  url? : string;
-  delivered : boolean;
-  read : boolean;
-  timestamp : string;
-  time? : string;
+  text: string;
+  timestamp: string;
+  sender_phone: string;
+  sender_name: string;
+  receiver_id: string;
+  receiver_phone: string;
+  delivered: boolean;
+  read: boolean;
+  message_id: string;
+  time?: string;
+  attachment?: {
+    type: string;      // e.g., 'image', 'video', 'audio', 'file'
+    filePath: string;  // actual file URL/path
+  };
 }
+
 
 @Component({
   selector: 'app-chatting-screen',
@@ -2341,6 +2370,8 @@ selectedDate: string = '';
  isDatePickerOpen = false;
  showDateModal = false;
  selectedMessages: any[] = [];
+  imageToSend: any;
+  attachmentPath: string = '';
 
   constructor(
   private chatService: FirebaseChatService,
@@ -2352,7 +2383,14 @@ selectedDate: string = '';
   private fileUploadService: FileUploadService,
   private popoverCtrl: PopoverController,
   private toastCtrl: ToastController,
-) { }
+  private attachmentService: AttachmentService,
+  private navCtrl: NavController
+) {
+  // const nav = this.router.getCurrentNavigation();
+  // if (nav?.extras.state && nav.extras.state['imageToSend']) {
+  //   this.imageToSend = nav.extras.state['imageToSend']; // base64 image string
+  // }
+ }
 
   roomId = '';
   limit = 10;
@@ -2372,6 +2410,8 @@ selectedDate: string = '';
     role?: string;
     phone_number?: string;
   }[] = [];
+  attachments: any[] = [];
+  // attachmentPath: string | null = null;
 
   async ngOnInit() {
   // Enable proper keyboard scrolling
@@ -2402,12 +2442,16 @@ this.receiver_name = nameFromQuery || await this.secureStorage.getItem('receiver
     // Individual chat
     this.receiverId = decodeURIComponent(rawId);
     this.roomId = this.getRoomId(this.senderId, this.receiverId);
+    console.log("sadjklghdjagdfg",this.roomId)
 
     // Use receiver_phone from query or fallback to localStorage
     this.receiver_phone = phoneFromQuery || localStorage.getItem('receiver_phone') || '';
     // Store for reuse when navigating to profile
     localStorage.setItem('receiver_phone', this.receiver_phone);
   }
+
+  //  await this.attachmentService.init();
+    this.attachments = await this.attachmentService.getAttachments(this.roomId);
 
   // Reset unread count and mark messages as read
   await this.chatService.resetUnreadCount(this.roomId, this.senderId);
@@ -2421,7 +2465,55 @@ this.receiver_name = nameFromQuery || await this.secureStorage.getItem('receiver
   setTimeout(() => this.scrollToBottom(), 100);
 }
 
-async ionViewWillEnter(){
+// async ionViewWillEnter(){
+//   // Enable proper keyboard scrolling
+//   Keyboard.setScroll({ isDisabled: false });
+//   await this.initKeyboardListeners();
+
+//   // Load sender (current user) details
+//   this.senderId = (await this.secureStorage.getItem('userId')) || '';
+//   this.sender_phone = (await this.secureStorage.getItem('phone_number')) || '';
+//   this.sender_name = (await this.secureStorage.getItem('name')) || '';
+//   // this.receiver_name = await this.secureStorage.getItem('receiver_name') || '';
+//   const nameFromQuery = this.route.snapshot.queryParamMap.get('receiver_name');
+// this.receiver_name = nameFromQuery || await this.secureStorage.getItem('receiver_name') || '';
+
+//   // Get query parameters
+//   const rawId = this.route.snapshot.queryParamMap.get('receiverId') || '';
+//   const chatTypeParam = this.route.snapshot.queryParamMap.get('isGroup');
+//   const phoneFromQuery = this.route.snapshot.queryParamMap.get('receiver_phone');
+
+//   // Determine chat type
+//   this.chatType = chatTypeParam === 'true' ? 'group' : 'private';
+
+//   if (this.chatType === 'group') {
+//     // Group chat
+//     this.roomId = decodeURIComponent(rawId);
+//     await this.fetchGroupName(this.roomId);
+//   } else {
+//     // Individual chat
+//     this.receiverId = decodeURIComponent(rawId);
+//     this.roomId = this.getRoomId(this.senderId, this.receiverId);
+
+//     // Use receiver_phone from query or fallback to localStorage
+//     this.receiver_phone = phoneFromQuery || localStorage.getItem('receiver_phone') || '';
+//     // Store for reuse when navigating to profile
+//     localStorage.setItem('receiver_phone', this.receiver_phone);
+//   }
+
+//   // Reset unread count and mark messages as read
+//   await this.chatService.resetUnreadCount(this.roomId, this.senderId);
+//   await this.markMessagesAsRead();
+
+//   // Load and render messages
+//   this.loadFromLocalStorage();
+//   this.listenForMessages();
+
+//   // Scroll to bottom after short delay
+//   setTimeout(() => this.scrollToBottom(), 100);
+// }
+
+async ionViewWillEnter() {
   // Enable proper keyboard scrolling
   Keyboard.setScroll({ isDisabled: false });
   await this.initKeyboardListeners();
@@ -2430,9 +2522,9 @@ async ionViewWillEnter(){
   this.senderId = (await this.secureStorage.getItem('userId')) || '';
   this.sender_phone = (await this.secureStorage.getItem('phone_number')) || '';
   this.sender_name = (await this.secureStorage.getItem('name')) || '';
-  // this.receiver_name = await this.secureStorage.getItem('receiver_name') || '';
+
   const nameFromQuery = this.route.snapshot.queryParamMap.get('receiver_name');
-this.receiver_name = nameFromQuery || await this.secureStorage.getItem('receiver_name') || '';
+  this.receiver_name = nameFromQuery || await this.secureStorage.getItem('receiver_name') || '';
 
   // Get query parameters
   const rawId = this.route.snapshot.queryParamMap.get('receiverId') || '';
@@ -2443,17 +2535,13 @@ this.receiver_name = nameFromQuery || await this.secureStorage.getItem('receiver
   this.chatType = chatTypeParam === 'true' ? 'group' : 'private';
 
   if (this.chatType === 'group') {
-    // Group chat
     this.roomId = decodeURIComponent(rawId);
     await this.fetchGroupName(this.roomId);
   } else {
-    // Individual chat
     this.receiverId = decodeURIComponent(rawId);
     this.roomId = this.getRoomId(this.senderId, this.receiverId);
-
-    // Use receiver_phone from query or fallback to localStorage
+    // console.log("view after inint", this.roomId)
     this.receiver_phone = phoneFromQuery || localStorage.getItem('receiver_phone') || '';
-    // Store for reuse when navigating to profile
     localStorage.setItem('receiver_phone', this.receiver_phone);
   }
 
@@ -2465,9 +2553,32 @@ this.receiver_name = nameFromQuery || await this.secureStorage.getItem('receiver
   this.loadFromLocalStorage();
   this.listenForMessages();
 
-  // Scroll to bottom after short delay
-  setTimeout(() => this.scrollToBottom(), 100);
+  //  const navState = history.state;
+  // if (navState && navState.imageToSend) {
+  //   this.attachmentPath = navState.imageToSend;  // This will be used in sendMessage()
+  // }
+
+  // 📦 If redirected from preview after sending attachment
+  // const attachmentSent = this.route.snapshot.queryParamMap.get('attachmentSent');
+  // if (attachmentSent === 'true') {
+  //   // Optional: Reload last 1 message from local DB or show toast
+  //   console.log('Attachment sent just now, refreshing chat...');
+  //   await this.loadFromLocalStorage(); // to ensure latest message is shown
+  //   setTimeout(() => this.scrollToBottom(), 300);
+  // } else {
+  //   setTimeout(() => this.scrollToBottom(), 100);
+  // }
+
+  const nav = this.router.getCurrentNavigation();
+  const state = nav?.extras?.state;
+
+  if (state && state['imageToSend']) {
+    this.attachmentPath = state['imageToSend'];  // 👈 set the attachmentPath
+  }
+
+  console.log("this.attachmentPath",this.attachmentPath);
 }
+
 
   async openOptions(ev: any) {
     const popover = await this.popoverCtrl.create({
@@ -2969,39 +3080,211 @@ observeVisibleMessages() {
     this.groupedMessages = this.groupMessagesByDate(decryptedMessages);
   }
 
-  async sendMessage() {
-    if (!this.messageText.trim()) return;
-    console.log(this.sender_phone);
-    console.log("fdgsg", this.senderId);
-    const date = new Date();
-    const plainText = this.messageText.trim();
-    const encryptedText = await this.encryptionService.encrypt(plainText);
+  // async sendMessage() {
+  // if (!this.messageText.trim() && !this.attachmentPath) return;
+  //   if (!this.messageText.trim()) return;
+  //   console.log(this.sender_phone);
+  //   console.log("fdgsg", this.senderId);
+  //   const date = new Date();
+  //   const plainText = this.messageText.trim();
+  //   const encryptedText = await this.encryptionService.encrypt(plainText);
 
-    const message: Message = {
-      sender_id: this.senderId,
-      text: encryptedText,
-      timestamp: String(new Date()),
-      sender_phone: this.sender_phone,
-      sender_name : this.sender_name,
-      receiver_id: '',
-      receiver_phone: this.receiver_phone,
-      delivered: false,
-      read: false,
-      message_id: uuidv4()
-    };
+  //   const message: Message = {
+  //     sender_id: this.senderId,
+  //     text: encryptedText,
+  //     timestamp: String(new Date()),
+  //     sender_phone: this.sender_phone,
+  //     sender_name : this.sender_name,
+  //     receiver_id: '',
+  //     receiver_phone: this.receiver_phone,
+  //     delivered: false,
+  //     read: false,
+  //     message_id: uuidv4()
+  //   };
 
-    console.log(message);
+  //   console.log(message);
 
-    if (this.chatType === 'private') {
-      message.receiver_id = this.receiverId;
-    }
+  //   if (this.chatType === 'private') {
+  //     message.receiver_id = this.receiverId;
+  //   }
 
-    this.chatService.sendMessage(this.roomId, message, this.chatType, this.senderId);
+  //   this.chatService.sendMessage(this.roomId, message, this.chatType, this.senderId);
 
-    this.messageText = '';
-    this.showSendButton = false;
-    this.scrollToBottom();
+  //   this.messageText = '';
+  //   this.showSendButton = false;
+  //   this.scrollToBottom();
+  // }
+
+
+  // async selectAttachment() {
+  //   // console.log("attachment click");
+  //   try {
+  //     const image = await Camera.getPhoto({
+  //       quality: 80,
+  //       allowEditing: false,
+  //       resultType: CameraResultType.Uri,
+  //       source: CameraSource.Photos,
+  //     });
+  //     if (image?.webPath) {
+  //       await this.attachmentService.saveAttachment(this.roomId, 'image', image.webPath);
+  //       this.attachments = await this.attachmentService.getAttachments(this.roomId);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error picking image:', error);
+  //   }
+  // }
+
+//   async pickAttachment() {
+//     const image = await Camera.getPhoto({
+//       quality: 80,
+//       allowEditing: false,
+//       resultType: CameraResultType.DataUrl,
+//       source: CameraSource.Photos,
+//     });
+
+//     // if (image && image.dataUrl) {        //attachment functionality pause
+//     //   // Navigate to preview with image data
+//     //   this.navCtrl.navigateForward('/attachment-preview', {
+//     //     state: { imageData: image.dataUrl }
+//     //   });
+//     // }
+//    if (image && image.dataUrl) {
+//   const queryParams = new URLSearchParams({
+//     receiverId: this.receiverId,
+//     receiver_phone: this.receiver_phone
+//   }).toString();
+
+//   console.log("image",image);
+
+//   this.navCtrl.navigateForward(`/attachment-preview?${queryParams}`, {
+//     state: { imageData: image.dataUrl }
+//   });
+// }
+
+
+//   }
+
+//  async pickAttachment() {
+//  const result = await FilePicker.pickFiles({
+//   types : ['image/png'],
+//   readData : true
+
+//  });
+//   // const file = result.files[0];
+//   console.log("kafjsdgdfgf",result);
+// }
+
+async pickAttachment() {
+  const result = await FilePicker.pickFiles({
+    types: ['image/png'],
+    readData: true, // base64
+  });
+
+  if (result.files.length > 0) {
+    const file = result.files[0];
+    console.log('Base64 string:', file);
+    console.log('File name:', file.name);
+    console.log('Mime type:', file.mimeType);
   }
+}
+
+
+
+//   async sendMessage() {
+//   if (!this.messageText.trim() && !this.attachmentPath) return;
+
+
+//     console.log("attachment data", this.attachmentPath);
+//   console.log(this.sender_phone);
+//   console.log("fdgsg", this.roomId);
+
+//   const plainText = this.messageText.trim();
+//   const encryptedText = plainText ? await this.encryptionService.encrypt(plainText) : '';
+
+//   const message: Message = {
+//   sender_id: this.senderId,
+//   text: encryptedText,
+//   timestamp: new Date().toISOString(),
+//   sender_phone: this.sender_phone,
+//   sender_name: this.sender_name,
+//   receiver_id: '',
+//   receiver_phone: this.receiver_phone,
+//   delivered: false,
+//   read: false,
+//   message_id: uuidv4()
+// };
+
+//   // If attachment exists, save it and add to message object
+//   if (this.attachmentPath) {
+//   message.attachment = {
+//     type: 'image',
+//     filePath: this.attachmentPath,
+//   };
+// }
+// console.log("sdfjhasdjggksdfdjgfdgd",this.attachmentPath);
+
+//   if (this.chatType === 'private') {
+//     message.receiver_id = this.receiverId;
+//   }
+
+//   //  console.log("fsdkjsdkfdjgkdfgjfkhjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj",this.roomId);
+//   // Send message using your chat service
+//   this.chatService.sendMessage(this.roomId, message, this.chatType, this.senderId);
+
+//   this.messageText = '';
+//   this.showSendButton = false;
+//   this.scrollToBottom();
+
+//   // Reload attachments if you want to refresh the attachment list UI
+//   this.attachments = await this.attachmentService.getAttachments(this.roomId);
+// }
+
+
+async sendMessage() {
+  if (!this.messageText.trim() && !this.attachmentPath) return;
+
+  const plainText = this.messageText.trim();
+  const encryptedText = plainText ? await this.encryptionService.encrypt(plainText) : '';
+
+  const message: Message = {
+    sender_id: this.senderId,
+    text: encryptedText,
+    timestamp: new Date().toISOString(),
+    sender_phone: this.sender_phone,
+    sender_name: this.sender_name,
+    receiver_id: this.chatType === 'private' ? this.receiverId : '',
+    receiver_phone: this.receiver_phone,
+    delivered: false,
+    read: false,
+    message_id: uuidv4()
+  };
+
+  // ✅ If image is available, attach it
+  if (this.attachmentPath) {
+    message.attachment = {
+      type: 'image',
+      // filePath: this.attachmentPath  // 👈 This will be the base64 string or URL
+      filePath: this.attachmentPath  // 👈 This will be the base64 string or URL
+
+    };
+  }
+
+  console.log("Sending message with attachment:", message);
+
+  // Send the message to the backend
+  this.chatService.sendMessage(this.roomId, message, this.chatType, this.senderId);
+
+  // Clear message input and attachment
+  this.messageText = '';
+  this.attachmentPath = '';
+  this.showSendButton = false;
+
+  // Scroll and refresh attachments
+  this.scrollToBottom();
+  this.attachments = await this.attachmentService.getAttachments(this.roomId);
+}
+
+
 
   loadMessagesFromFirebase(isPagination = false) {}
 

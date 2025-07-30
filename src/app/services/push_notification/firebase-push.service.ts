@@ -20,14 +20,14 @@ export class FirebasePushService {
  
 
 
-  private apiUrl = ` https://telldemm-backend.onrender.com/api/notification`;
+  private apiUrl = ` https://apps.ekarigar.com/backend/api/notification`;
 
 
 
 
   async initPush() {
     const platform = Capacitor.getPlatform();
-    console.log('Detected platform:', platform); // log the platform for clarity
+    console.log('Detected platform:', platform);
 
 
     if (platform === 'android' || platform === 'ios') {

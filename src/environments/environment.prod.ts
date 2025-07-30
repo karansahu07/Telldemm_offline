@@ -1,7 +1,7 @@
 export const environment = {
   production: true,
   // apiBaseUrl: 'https://telldemm-backend.onrender.com',
-  apiBaseUrl: 'http://43.204.101.131:5000',
+  apiBaseUrl: 'https://apps.ekarigar.com/backend',
    firebase : {
   apiKey: "AIzaSyDA3bPIlko4Qbk3IFI7VbpW0mVk7HO3YfI",
   authDomain: "login-8e9ad.firebaseapp.com",

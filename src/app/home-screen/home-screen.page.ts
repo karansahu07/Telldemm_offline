@@ -1272,15 +1272,17 @@ export class HomeScreenPage implements OnInit, OnDestroy {
   toggleGroupCreator = false;
   newGroupName = '';
   unreadSubs: Subscription[] = [];
+  selectedImage: string | null = null;
+  showPopup = false;
 
-    async ngOnInit() {
-     this.currUserId = await this.secureStorage.getItem('phone_number');
+  async ngOnInit() {
+    this.currUserId = await this.secureStorage.getItem('phone_number');
     this.senderUserId = await this.secureStorage.getItem('userId');
-// console.log("currendrt user id ",encUserId);
+    // console.log("currendrt user id ",encUserId);
     // this.currUserId = decodeBase64(encPhone || '');
     // this.senderUserId = decodeBase64(encUserId || '');
 
-      // console.log("currendrt user id ",this.currUserId);
+    // console.log("currendrt user id ",this.currUserId);
     this.getAllUsers();
     this.loadUserGroups();
 
@@ -1291,6 +1293,72 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     this.unreadSubs.forEach(sub => sub.unsubscribe());
   }
 
+
+  goToUserAbout() {
+    this.showPopup = false;
+    // this.router.navigate(['/userabout']);
+    setTimeout(() => {
+      this.router.navigate(['/profile-screen']);
+    }, 100);
+  }
+
+  goToUserchat() {
+    this.showPopup = false;
+    // this.router.navigate(['/userabout']);
+    setTimeout(() => {
+      this.router.navigate(['/chatting-screen']);
+    }, 100);
+  }
+  //   async goToUserchat(chat: any) {
+  //   this.showPopup = false;
+
+  //   const receiverId = chat.receiver_Id;
+  //   const receiver_phone = chat.receiver_phone;
+  //   const receiver_name = chat.name;
+
+  //   await this.secureStorage.setItem('receiver_name', receiver_name);
+
+  //   if (chat.group) {
+  //     this.router.navigate(['/chatting-screen'], {
+  //       queryParams: { receiverId, isGroup: true }
+  //     });
+  //   } else {
+  //     const cleanPhone = receiverId.replace(/\D/g, '').slice(-10);
+  //     await this.secureStorage.setItem('receiver_phone', receiver_phone);
+  //     this.router.navigate(['/chatting-screen'], {
+  //       queryParams: { receiverId: cleanPhone, receiver_phone }
+  //     });
+  //   }
+  // }
+
+
+  goToUsercall() {
+    this.showPopup = false;
+    // this.router.navigate(['/userabout']);
+    setTimeout(() => {
+      this.router.navigate(['/calls-screen']);
+    }, 100);
+  }
+
+  goToUservideocall() {
+    this.showPopup = false;
+    // this.router.navigate(['/userabout']);
+    setTimeout(() => {
+      this.router.navigate(['/calling-screen']);
+    }, 100);
+  }
+
+  openImagePopup(imageUrl: string) {
+    this.selectedImage = imageUrl;
+    this.showPopup = true;
+  }
+
+  closeImagePopup() {
+    this.selectedImage = null;
+    this.showPopup = false;
+  }
+
+
   getAllUsers() {
     const currentSenderId = this.senderUserId;
     console.log("dfjsdjidgf", currentSenderId)
@@ -1299,7 +1367,10 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     this.service.getAllUsers().subscribe((users: any[]) => {
       users.forEach(user => {
         const receiverId = user.user_id.toString();
-        const receiver_phone = user.phone_number.toString();
+        // const receiver_phone = user.phone_number.toString();
+
+        let receiver_phone = user.phone_number.toString();
+        receiver_phone = receiver_phone.replace(/^(\+91|91)/, '');
         const receiver_name = user.name.toString();
         // console.log("receiver phone", receiver_phone);
 
@@ -1367,129 +1438,129 @@ export class HomeScreenPage implements OnInit, OnDestroy {
   }
 
   async loadUserGroups() {
-  const userid = this.senderUserId;
-  // console.log("sender user id", userid);
-  if (!userid) return;
+    const userid = this.senderUserId;
+    // console.log("sender user id", userid);
+    if (!userid) return;
 
-  const groupIds = await this.firebaseChatService.getGroupsForUser(userid);
-  console.log("grouop id ",groupIds);
-  console.log('Groups for user:', groupIds);
+    const groupIds = await this.firebaseChatService.getGroupsForUser(userid);
+    console.log("grouop id ", groupIds);
+    console.log('Groups for user:', groupIds);
 
-  for (const groupId of groupIds) {
-    const groupInfo = await this.firebaseChatService.getGroupInfo(groupId);
-    if (!groupInfo || !groupInfo.members || !groupInfo.members[userid]) continue;
+    for (const groupId of groupIds) {
+      const groupInfo = await this.firebaseChatService.getGroupInfo(groupId);
+      if (!groupInfo || !groupInfo.members || !groupInfo.members[userid]) continue;
 
-    const groupName = groupInfo.name || 'Unnamed Group';
+      const groupName = groupInfo.name || 'Unnamed Group';
 
-    const groupChat = {
-      name: groupName,
-      receiver_Id: groupId,
-      group: true,
-      message: '',
-      time: '',
-      unread: false,
-      unreadCount: 0
-    };
+      const groupChat = {
+        name: groupName,
+        receiver_Id: groupId,
+        group: true,
+        message: '',
+        time: '',
+        unread: false,
+        unreadCount: 0
+      };
 
-    this.chatList.push(groupChat);
+      this.chatList.push(groupChat);
 
-    // ✅ Listen for latest messages
-    this.firebaseChatService.listenForMessages(groupId).subscribe(async (messages) => {
-      if (messages.length > 0) {
-        const lastMsg = messages[messages.length - 1];
+      // ✅ Listen for latest messages
+      this.firebaseChatService.listenForMessages(groupId).subscribe(async (messages) => {
+        if (messages.length > 0) {
+          const lastMsg = messages[messages.length - 1];
 
-        try {
-          const decryptedText = await this.encryptionService.decrypt(lastMsg.text);
-          groupChat.message = decryptedText;
-        } catch (e) {
-          groupChat.message = '[Encrypted]';
+          try {
+            const decryptedText = await this.encryptionService.decrypt(lastMsg.text);
+            groupChat.message = decryptedText;
+          } catch (e) {
+            groupChat.message = '[Encrypted]';
+          }
+
+          if (lastMsg.timestamp) {
+            groupChat.time = this.formatTimestamp(lastMsg.timestamp);
+          }
         }
-
-        if (lastMsg.timestamp) {
-          groupChat.time = this.formatTimestamp(lastMsg.timestamp);
-        }
-      }
-    });
-
-    // ✅ Listen for unread count
-    const sub = this.firebaseChatService
-      .listenToUnreadCount(groupId, userid)
-      .subscribe((count: number) => {
-        groupChat.unreadCount = count;
-        groupChat.unread = count > 0;
       });
 
-    this.unreadSubs.push(sub);
+      // ✅ Listen for unread count
+      const sub = this.firebaseChatService
+        .listenToUnreadCount(groupId, userid)
+        .subscribe((count: number) => {
+          groupChat.unreadCount = count;
+          groupChat.unread = count > 0;
+        });
+
+      this.unreadSubs.push(sub);
+    }
   }
-}
-
-
- 
-  
-//   async loadUserGroups() {
-
-//     // console.log("calling this function")
-//   const userId = this.senderUserId;
-//   if (!userId) return;
-
-//   // Step 1: Get group IDs the user belongs to
-//   const groupIds = await this.firebaseChatService.getGroupsForUser(userId);
-
-//   // Step 2: Loop over each group ID
-//   for (const groupId of groupIds) {
-//     const groupInfo = await this.firebaseChatService.getGroupInfo(groupId);
-
-//     console.log("group info", groupInfo)
-
-//     if (!groupInfo || !groupInfo.members || !groupInfo.members[userId]) continue;
-
-//     // Step 3: Create chat object
-//     const groupChat = {
-//       name: groupInfo.name || 'Unnamed Group',
-//       receiver_Id: groupId,
-//       group: true,
-//       message: '',
-//       time: '',
-//       unread: false,
-//       unreadCount: 0,
-//     };
-
-//     this.chatList.push(groupChat);
-
-//     // Step 4: Listen for new messages
-//     this.firebaseChatService.listenForMessages(groupId).subscribe(async (messages) => {
-//       if (messages.length > 0) {
-//         const lastMsg = messages[messages.length - 1];
-
-//         try {
-//           const decryptedText = await this.encryptionService.decrypt(lastMsg.text);
-//           groupChat.message = decryptedText;
-//         } catch (e) {
-//           groupChat.message = '[Encrypted]';
-//         }
-
-//         if (lastMsg.timestamp) {
-//           groupChat.time = this.formatTimestamp(lastMsg.timestamp);
-//         }
-//       }
-//     });
-
-//     // Step 5: Listen for unread count
-//     const sub = this.firebaseChatService
-//       .listenToUnreadCount(groupId, userId)
-//       .subscribe((count: number) => {
-//         groupChat.unreadCount = count;
-//         groupChat.unread = count > 0;
-//       });
-
-//     this.unreadSubs.push(sub);
-//   }
-// }
 
 
 
 
-    // this function shows time and date on chat
+  //   async loadUserGroups() {
+
+  //     // console.log("calling this function")
+  //   const userId = this.senderUserId;
+  //   if (!userId) return;
+
+  //   // Step 1: Get group IDs the user belongs to
+  //   const groupIds = await this.firebaseChatService.getGroupsForUser(userId);
+
+  //   // Step 2: Loop over each group ID
+  //   for (const groupId of groupIds) {
+  //     const groupInfo = await this.firebaseChatService.getGroupInfo(groupId);
+
+  //     console.log("group info", groupInfo)
+
+  //     if (!groupInfo || !groupInfo.members || !groupInfo.members[userId]) continue;
+
+  //     // Step 3: Create chat object
+  //     const groupChat = {
+  //       name: groupInfo.name || 'Unnamed Group',
+  //       receiver_Id: groupId,
+  //       group: true,
+  //       message: '',
+  //       time: '',
+  //       unread: false,
+  //       unreadCount: 0,
+  //     };
+
+  //     this.chatList.push(groupChat);
+
+  //     // Step 4: Listen for new messages
+  //     this.firebaseChatService.listenForMessages(groupId).subscribe(async (messages) => {
+  //       if (messages.length > 0) {
+  //         const lastMsg = messages[messages.length - 1];
+
+  //         try {
+  //           const decryptedText = await this.encryptionService.decrypt(lastMsg.text);
+  //           groupChat.message = decryptedText;
+  //         } catch (e) {
+  //           groupChat.message = '[Encrypted]';
+  //         }
+
+  //         if (lastMsg.timestamp) {
+  //           groupChat.time = this.formatTimestamp(lastMsg.timestamp);
+  //         }
+  //       }
+  //     });
+
+  //     // Step 5: Listen for unread count
+  //     const sub = this.firebaseChatService
+  //       .listenToUnreadCount(groupId, userId)
+  //       .subscribe((count: number) => {
+  //         groupChat.unreadCount = count;
+  //         groupChat.unread = count > 0;
+  //       });
+
+  //     this.unreadSubs.push(sub);
+  //   }
+  // }
+
+
+
+
+  // this function shows time and date on chat
   formatTimestamp(timestamp: string): string {
     const date = new Date(timestamp);
     const now = new Date();
@@ -1548,7 +1619,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     this.selectedFilter = filter;
   }
 
- async openChat(chat: any) {
+  async openChat(chat: any) {
     const receiverId = chat.receiver_Id;
     const receiver_phone = chat.receiver_phone;
     const receiver_name = chat.name;
@@ -1596,43 +1667,43 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     }
   }
 
-async scanBarcode() {
-  try {
-    if (!Capacitor.isNativePlatform()) {
-      alert('Barcode scanning only works on a real device.');
-      return;
+  async scanBarcode() {
+    try {
+      if (!Capacitor.isNativePlatform()) {
+        alert('Barcode scanning only works on a real device.');
+        return;
+      }
+
+      const permission = await BarcodeScanner.checkPermission({ force: true });
+      if (!permission.granted) {
+        alert('Camera permission is required to scan barcodes.');
+        return;
+      }
+
+      await BarcodeScanner.prepare(); // Setup camera preview
+      await BarcodeScanner.hideBackground(); // Hide app background to show camera
+      document.body.classList.add('scanner-active');
+
+      // Start scanning
+      const result = await BarcodeScanner.startScan();
+
+      if (result?.hasContent) {
+        console.log('Scanned Result:', result.content);
+        this.scannedText = result.content;
+      } else {
+        alert('No barcode found.');
+      }
+
+    } catch (error) {
+      console.error('Barcode Scan Error:', error);
+      alert('Something went wrong during scanning.');
+    } finally {
+      // Always restore background and clean up
+      await BarcodeScanner.showBackground();
+      await BarcodeScanner.stopScan(); // <-- Ensure scanner is stopped
+      document.body.classList.remove('scanner-active');
     }
-
-    const permission = await BarcodeScanner.checkPermission({ force: true });
-    if (!permission.granted) {
-      alert('Camera permission is required to scan barcodes.');
-      return;
-    }
-
-    await BarcodeScanner.prepare(); // Setup camera preview
-    await BarcodeScanner.hideBackground(); // Hide app background to show camera
-    document.body.classList.add('scanner-active');
-
-    // Start scanning
-    const result = await BarcodeScanner.startScan();
-
-    if (result?.hasContent) {
-      console.log('Scanned Result:', result.content);
-      this.scannedText = result.content;
-    } else {
-      alert('No barcode found.');
-    }
-
-  } catch (error) {
-    console.error('Barcode Scan Error:', error);
-    alert('Something went wrong during scanning.');
-  } finally {
-    // Always restore background and clean up
-    await BarcodeScanner.showBackground();
-    await BarcodeScanner.stopScan(); // <-- Ensure scanner is stopped
-    document.body.classList.remove('scanner-active');
   }
-}
 
 
 

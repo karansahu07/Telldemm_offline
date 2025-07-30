@@ -839,13 +839,55 @@
       <ion-textarea [(ngModel)]="messageText" placeholder="Message" auto-grow="true" (ionInput)="onInputChange()"
         (ionFocus)="onInputFocus()" (ionBlur)="onInputBlur()" (keyup.enter)="sendMessage()"
         class="message-input"></ion-textarea>
-      <!-- <ion-icon name="attach-outline" class="icon-right"></ion-icon> -->
-      <!-- Attach icon -->
+     
       <!-- Attachment Icon -->
-      <ion-icon name="attach-outline" class="icon-right"></ion-icon>
+      <!-- <ion-icon name="attach-outline" class="icon-right"></ion-icon> -->
 
-      <!-- Hidden File Input   (click)="triggerFileInput()"-->
-      <!-- <input type="file" #fileInput style="display: none" (change)="onFileSelected($event)" /> -->
+
+      <!-- Attachment Icon -->
+<!-- <ion-icon
+  name="attach-outline"
+  class="icon-right"
+  (click)="selectAttachment()"
+></ion-icon> -->
+
+<ion-button (click)="pickAttachment()">
+        <ion-icon name="attach-outline"></ion-icon>
+      </ion-button>
+
+<!-- Show attachments -->
+<!-- <ion-list *ngIf="attachments.length > 0">
+  <ion-item *ngFor="let att of attachments">
+    <ion-thumbnail slot="start" *ngIf="att.type === 'image'">
+      <img [src]="att.filePath" />
+    </ion-thumbnail>
+    <ion-label>
+      <p>{{ att.type }} - {{ att.createdAt | date:'short' }}</p>
+    </ion-label>
+  </ion-item>
+</ion-list> -->
+
+ <!-- <div *ngFor="let message of messages">
+    <div *ngIf="message.type === 'image'">
+      <img [src]="message.url" style="max-width: 200px;" />
+    </div>
+    <div *ngIf="message.type === 'text'">{{ message.text }}</div>
+  </div> -->
+
+  <ion-list *ngIf="attachments.length > 0">
+  <ion-item *ngFor="let att of attachments">
+    <ion-thumbnail slot="start" *ngIf="att.type === 'image'">
+      <img [src]="att.filePath" />
+    </ion-thumbnail>
+    <ion-label>
+      <p>{{ att.type }} - {{ att.createdAt | date:'short' }}</p>
+    </ion-label>
+  </ion-item>
+</ion-list>
+
+
+
+
 
       <ion-icon name="camera-outline" class="icon-right"></ion-icon>
     </ion-col>

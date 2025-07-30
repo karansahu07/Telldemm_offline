@@ -359,7 +359,10 @@
 <ion-content [fullscreen]="true">
   <ion-list>
     <ion-item *ngFor="let chat of filteredChats" (click)="openChat(chat)">
-      <ion-avatar slot="start">
+      <!-- <ion-avatar slot="start">
+        <img src="assets/images/user.jfif" />
+      </ion-avatar> -->
+       <ion-avatar slot="start" (click)="openImagePopup('assets/images/user.jfif'); $event.stopPropagation()">
         <img src="assets/images/user.jfif" />
       </ion-avatar>
 
@@ -388,6 +391,22 @@
       <img src="assets/images/user.svg" />
     </div>
   </ion-fab>
+
+  <!-- 👇 Modal with blur background -->
+  <ion-modal [isOpen]="showPopup" (didDismiss)="closeImagePopup()" cssClass="custom-blur-modal">
+    <ng-template>
+      <div class="popup-container">
+        <img [src]="selectedImage" alt="Profile Image" class="popup-image" />
+        <div class="icon-row">
+          <ion-icon name="chatbox-ellipses-outline" class="popup-icon" (click)="goToUserchat()"></ion-icon>
+          <ion-icon name="call-outline" class="popup-icon" (click)="goToUsercall()"></ion-icon>
+          <ion-icon name="videocam-outline" class="popup-icon" (click)="goToUservideocall()"></ion-icon>
+          <ion-icon name="alert-circle-outline" class="popup-icon" (click)="goToUserAbout()"></ion-icon>
+        </div>
+      </div>
+    </ng-template>
+  </ion-modal>
+  
 </ion-content>
 
 <app-footer-tabs [totalUnreadCount]="totalUnreadCount"></app-footer-tabs>

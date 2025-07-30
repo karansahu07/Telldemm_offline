@@ -166,6 +166,12 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     loadChildren: () => import('./pages/group-description/group-description.module').then( m => m.GroupDescriptionPageModule)
   },
+  {
+    path: 'attachment-preview',
+    // canActivate: [AuthGuard],
+    loadChildren: () => import('./pages/attachment-preview/attachment-preview.module').then( m => m.AttachmentPreviewPageModule)
+  },
+
 
 
 
