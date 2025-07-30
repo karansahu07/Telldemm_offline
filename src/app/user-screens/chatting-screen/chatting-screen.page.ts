@@ -3174,17 +3174,54 @@ observeVisibleMessages() {
 //   console.log("kafjsdgdfgf",result);
 // }
 
-async pickAttachment() {
-  const result = await FilePicker.pickFiles({
-    types: ['image/png'],
-    readData: true, // base64
-  });
+// async pickAttachment() {
+//   const result = await FilePicker.pickFiles({
+//     types: ['image/png'],
+//     readData: true, // base64
+//   });
 
-  if (result.files.length > 0) {
-    const file = result.files[0];
-    console.log('Base64 string:', file);
-    console.log('File name:', file.name);
-    console.log('Mime type:', file.mimeType);
+//   if (result.files.length > 0) {
+//     const file = result.files[0];
+//     console.log('Base64 string:', file);
+//     console.log('File name:', file.name);
+//     console.log('Mime type:', file.mimeType);
+//   }
+// }
+
+
+async pickAttachment() {
+  // Step 1: Check current permission
+  const check = await FilePicker.checkPermissions() as unknown as { publicStorage: 'granted' | 'denied' | 'prompt' };
+
+  let hasPermission = check.publicStorage === 'granted';
+
+  // Step 2: If not granted, request permission now
+  if (!hasPermission) {
+    const request = await FilePicker.requestPermissions() as unknown as { publicStorage: 'granted' | 'denied' | 'prompt' };
+    hasPermission = request.publicStorage === 'granted';
+  }
+
+  // Step 3: If still not granted, exit
+  if (!hasPermission) {
+    console.warn('🚫 Permission not granted. Cannot pick file.');
+    return;
+  }
+
+  // Step 4: Proceed to pick file
+  try {
+    const result = await FilePicker.pickFiles({
+      types: ['image/png'], // or ['*/*'] for all files
+      readData: true,       // base64 string
+    });
+
+    if (result.files.length > 0) {
+      const file = result.files[0];
+      console.log('📦 Base64 string:', file.data);
+      console.log('📄 File name:', file.name);
+      console.log('📁 Mime type:', file.mimeType);
+    }
+  } catch (err) {
+    console.error('❌ Error picking file:', err);
   }
 }
 
