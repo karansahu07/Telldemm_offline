@@ -399,6 +399,12 @@
         <img [src]="selectedImage" alt="Profile Image" class="popup-image" />
         <div class="icon-row">
           <ion-icon name="chatbox-ellipses-outline" class="popup-icon" (click)="goToUserchat()"></ion-icon>
+           <!-- <ng-container *ngFor="let chat of chatList">
+  <ion-icon name="chatbox-ellipses-outline"
+            class="popup-icon"
+            (click)="goToUserchat(chat)">
+  </ion-icon>
+</ng-container> -->
           <ion-icon name="call-outline" class="popup-icon" (click)="goToUsercall()"></ion-icon>
           <ion-icon name="videocam-outline" class="popup-icon" (click)="goToUservideocall()"></ion-icon>
           <ion-icon name="alert-circle-outline" class="popup-icon" (click)="goToUserAbout()"></ion-icon>

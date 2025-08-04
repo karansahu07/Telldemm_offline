@@ -42,7 +42,7 @@
     "@ionic/angular": "^8.0.0",
     "@zxing/browser": "^0.1.5",
     "@zxing/library": "^0.21.3",
-    "capacitor-file-picker": "^1.0.10",
+    "browser-image-compression": "^2.0.2",
     "capacitor-secure-storage-plugin": "^0.11.0",
     "crypto-browserify": "^3.12.1",
     "crypto-js": "^4.2.0",
