@@ -358,16 +358,11 @@ import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'fire
 import { FileUploadService } from '../../services/file-upload/file-upload.service';
 import { ChatOptionsPopoverComponent } from 'src/app/components/chat-options-popover/chat-options-popover.component';
 import { IonDatetime } from '@ionic/angular';
-import { AttachmentService } from 'src/app/services/attachment-file/attachment.service';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { NavController } from '@ionic/angular';
-// import { FilePicker } from '@capawesome-team/capacitor-file-picker';
-// import {  FilePicker }  from 'capacitor-file-picker';
-// import { FilePicker } from '@capawesome/capacitor-file-picker';
 import { FilePicker, PickedFile } from '@capawesome/capacitor-file-picker';
 import { FileSystemService } from 'src/app/services/file-system.service';
 import imageCompression from 'browser-image-compression';
-// import { ModalController } from '@ionic/angular';
 import { AttachmentPreviewModalComponent } from '../../components/attachment-preview-modal/attachment-preview-modal.component';
 
 
@@ -406,10 +401,6 @@ interface Message {
   message_id: string;
   time?: string;
   type?: string;
-  // attachment?: {
-  //   type: string;      // e.g., 'image', 'video', 'audio', 'file'
-  //   filePath: string;  // actual file URL/path
-  // };
   attachment?: {
     type: 'image' | 'video' | 'audio' | 'file';
     fileName?: string;           // Optional, used for downloads
@@ -435,13 +426,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('datePicker', { static: false }) datePicker!: IonDatetime;
 
   messages: Message[] = [];
-  //   selectedAttachment: {
-  //   base64Data: string;
-  //   type: 'image' | 'video' | 'audio' | 'file';
-  //   fileName?: string;
-  //   mimeType?: string;
-  //   caption?: string;
-  // } | null = null;
 
   groupedMessages: { date: string; messages: Message[] }[] = [];
 
@@ -453,8 +437,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   private messageSub?: Subscription;
   showSendButton = false;
   private keyboardListeners: any[] = [];
-  // toastCtrl: any;
-  // messages: any[] = [];
   searchActive = false;
   searchQuery = '';
   searchMatches: HTMLElement[] = [];
@@ -470,7 +452,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   showDateModal = false;
   selectedMessages: any[] = [];
   imageToSend: any;
-  // attachmentPath: string = '';
   alertController: any;
 
   constructor(
@@ -483,7 +464,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     private fileUploadService: FileUploadService,
     private popoverCtrl: PopoverController,
     private toastCtrl: ToastController,
-    private attachmentService: AttachmentService,
     private navCtrl: NavController,
     private FileService: FileSystemService,
     private modalCtrl: ModalController
@@ -549,9 +529,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       // Store for reuse when navigating to profile
       localStorage.setItem('receiver_phone', this.receiver_phone);
     }
-
-    //  await this.attachmentService.init();
-    this.attachments = await this.attachmentService.getAttachments(this.roomId);
 
     // Reset unread count and mark messages as read
     await this.chatService.resetUnreadCount(this.roomId, this.senderId);
@@ -663,7 +640,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     console.log("this.attachmentPath", this.attachmentPath);
   }
 
-
+  //this is menu option in header of right side
   async openOptions(ev: any) {
     const popover = await this.popoverCtrl.create({
       component: ChatOptionsPopoverComponent,
@@ -728,53 +705,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
         }
       });
 
-      //   } else if (option === 'Exit Group') {
-      //     if (!groupId || !userId) {
-      //       console.error('Missing groupId or userId');
-      //       return;
-      //     }
-
-      //     const db = getDatabase();
-      //     const memberPath = `groups/${groupId}/members/${userId}`;
-      //     const pastMemberPath = `groups/${groupId}/pastmembers/${userId}`;
-
-      //     try {
-      //       // const userName = localStorage.getItem('userName') || 'You';
-      //       const userName = await this.secureStorage.getItem('name');
-
-      //       await update(ref(db, memberPath), {
-      //         status: 'inactive'
-      //       });
-
-      //       await set(ref(db, pastMemberPath), {
-      //         user_id: userId,
-      //         name: userName,
-      //         status: 'inactive',
-      //         removedAt: new Date().toISOString()
-      //       });
-
-      //       await remove(ref(db, memberPath));
-
-      //       const toast = await this.toastCtrl.create({
-      //         message: `You exited the group`,
-      //         duration: 2000,
-      //         color: 'medium'
-      //       });
-      //       toast.present();
-
-      //       this.router.navigate(['/home-screen']);
-
-      //     } catch (error) {
-      //       console.error('Error exiting group:', error);
-      //       const toast = await this.toastCtrl.create({
-      //   message: `You exited the group`,
-      //   duration: 2000,
-      //   color: 'medium'
-      // });
-      // await toast.present();
-      //       // toast.present();
-      //     }
-      //   }
     } else if (option === 'Exit Group') {
       if (!groupId || !userId) {
         console.error('Missing groupId or userId');
@@ -797,7 +727,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
         const updatedMemberData = {
           ...memberData,
           status: 'inactive',
-          // removedAt: new Date().toISOString()
           removedAt: new Date().toLocaleString()
 
         };
@@ -832,7 +761,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
 
   }
 
-
   onSearchInput() {
     const elements = Array.from(document.querySelectorAll('.message-text')) as HTMLElement[];
 
@@ -848,7 +776,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    const regex = new RegExp(`(${this.searchText})`, 'gi'); // global + case-insensitive
+    const regex = new RegExp(`(${this.searchText})`, 'gi');
 
     this.matchedMessages = [];
 
@@ -870,8 +798,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-
-
   navigateSearch(direction: 'up' | 'down') {
     if (!this.matchedMessages.length) return;
     if (direction === 'up') {
@@ -892,7 +818,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
 
     if (!this.searchText.trim()) return;
 
-    const regex = new RegExp(`(${this.searchText})`, 'gi'); // global + case-insensitive
+    const regex = new RegExp(`(${this.searchText})`, 'gi');
 
     this.matchedMessages.forEach((el, i) => {
       const originalText = el.textContent || '';
@@ -918,11 +844,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     });
     this.matchedMessages = [];
   }
-
-  // openDatePicker() {
-  //   // You can use ion-datetime, or open a modal here
-  //   console.log('Calendar clicked – implement your date filter logic here');
-  // }
 
   openDatePicker() {
     this.showDateModal = true;
@@ -974,17 +895,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   clearSelection() {
     this.selectedMessages = [];
   }
-
-  // onAddMember() {
-  //   console.log("fjsdkfjdgdg on clickherees")
-  //   const memberPhones = this.groupMembers.map(member => member.phone);
-  //   this.router.navigate(['/add-members'], {
-  //     queryParams: {
-  //       groupId: this.receiverId,
-  //       members: JSON.stringify(memberPhones)
-  //     }
-  //   });
-  // }
 
   private async markMessagesAsRead() {
     const lastMessage = this.messages[this.messages.length - 1];
@@ -1164,86 +1074,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     this.messages = decryptedMessages;
     this.groupedMessages = this.groupMessagesByDate(decryptedMessages);
   }
-
-
-  // async pickAttachment() {
-  //   const result = await FilePicker.pickFiles({
-  //     // multiple: false,
-  //     readData: true, // returns base64
-  //   });
-
-  //   // if (result.files.length === 0) return;
-
-  //   // const file = result.files[0];
-
-  //   // const base64 = file.data;
-  //   // const mimeType = file.mimeType || this.getMimeTypeFromName(file.name);
-
-  //   // if (!base64 || !mimeType) {
-  //   //   console.error('Invalid base64 or mime type');
-  //   //   return;
-  //   // }
-
-  //   // // Convert base64 to Blob
-  //   // const blob = this.base64ToBlob(base64, mimeType);
-
-  //   // // Optional: Compress if image
-  //   // const finalBlob = await this.compressIfNeeded(blob, file.name);
-
-  //   // const base64Converted = await this.blobToBase64(blob);
-
-
-
-  //   // // Save or use the blob
-  //   // const url = await this.FileService.saveFileToSent(`${Date.now()}_${file.name}`, finalBlob);
-  //   // console.log('Saved URL:', url);
-
-  //    if (!result || !result.files?.length) return;
-
-  //   const file = result.files[0];
-
-  //   const type = file.mimeType?.startsWith('image')
-  //     ? 'image'
-  //     : file.mimeType?.startsWith('video')
-  //     ? 'video'
-  //     : file.mimeType?.startsWith('audio')
-  //     ? 'audio'
-  //     : 'file';
-
-  //   this.selectedAttachment = {
-  //     base64Data: file.data || '',
-  //     type,
-  //     fileName: file.name,
-  //     mimeType: file.mimeType || ''
-  //   };
-
-  //   this.showAttachmentPreviewPopup();
-  // }
-
-  // async pickAttachment() {
-  //   const result = await FilePicker.pickFiles({ readData: true });
-  //   console.log("pickAttachment result=>", result)
-  //   if (result?.files?.length) {
-  //     const file = result.files[0];
-  //     const base64 = file.data;
-  //     const mimeType = file.mimeType;
-  //     const type = mimeType.startsWith('image')
-  //       ? 'image'
-  //       : mimeType.startsWith('video')
-  //         ? 'video'
-  //         : 'file';
-
-  //     this.selectedAttachment = {
-  //       type,
-  //       base64: await this.blobToBase64(file.blob as unknown as Blob),
-  //       blob: file.blob,
-  //       fileName: file.name,
-  //       mimeType,
-  //     };
-
-  //     console.log("From pickAttachment =>", this.selectedAttachment)
-
-  //     th
+  
 
   async pickAttachment() {
     const result = await FilePicker.pickFiles({ readData: true });
@@ -1334,7 +1165,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     this.showPreviewModal = false;
 
     this.scrollToBottom();
-    this.attachments = await this.attachmentService.getAttachments(this.roomId);
+    // this.attachments = await this.attachmentService.getAttachments(this.roomId);
   }
 
   async showAttachmentPreviewPopup() {
@@ -1398,7 +1229,12 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   async openAttachmentModal(msg: any) {
-    console.log("clicked here ");
+    // console.log("clicked here ");
+
+    //return when no attachment in found
+    if(!msg.attachment)
+      return;
+
   const modal = await this.modalCtrl.create({
     component: AttachmentPreviewModalComponent,
     componentProps: {

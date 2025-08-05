@@ -20,7 +20,7 @@ import { NetworkService } from './services/network-connection/network.service';
 import { distinctUntilChanged } from 'rxjs/operators';
 import { register } from 'swiper/element/bundle';
 import { FirebasePushService } from './services/push_notification/firebase-push.service';
-import {AttachmentService} from './services/attachment-file/attachment.service'
+// import {AttachmentService} from './services/attachment-file/attachment.service'
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import {FileSystemService} from './services/file-system.service'
 register();
@@ -36,14 +36,14 @@ export class AppComponent implements OnInit{
     private networkService: NetworkService,
     private toastController: ToastController,
     private FirebasePushService:FirebasePushService,
-    private AttachmentService : AttachmentService,
+    // private AttachmentService : AttachmentService,
     private FileSystemService : FileSystemService
   ) {
     // this.listenToNetwork();
   }
   async ngOnInit() {
     await this.FirebasePushService.initPush();
-    await this.AttachmentService.init();
+    // await this.AttachmentService.init();
     await this.FileSystemService.init();
 
   //    await Filesystem.mkdir({
