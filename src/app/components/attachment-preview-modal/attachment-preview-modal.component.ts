@@ -12,9 +12,16 @@ import { IonicModule, ModalController } from '@ionic/angular';
 export class AttachmentPreviewModalComponent {
   @Input() attachment: any;
 
+  showUI: boolean = true;
+
   constructor(private modalCtrl: ModalController) {}
 
   closeModal() {
     this.modalCtrl.dismiss();
   }
+
+  toggleUI() {
+    this.showUI = !this.showUI; // <-- Add this method
+  }
+
 }

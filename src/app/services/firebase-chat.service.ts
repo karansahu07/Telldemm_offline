@@ -414,8 +414,8 @@ async createGroup(groupId: string, groupName: string, members: any[], currentUse
   }
 
   //delete msg
-  //  deleteMessage(messageId: string, chatId: string) {
-  //   // Replace path according to your Firebase structure
-  //   return this.db.object(`chats/${chatId}/messages/${messageId}`).remove();
-  // }
+  deleteMessage(roomId: string, messageKey: string) {
+  const messageRef = ref(this.db, `chats/${roomId}/${messageKey}`);
+  update(messageRef, { isDeleted: true });
+}
 }

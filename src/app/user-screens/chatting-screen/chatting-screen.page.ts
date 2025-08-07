@@ -341,7 +341,8 @@ import {
   inject,
   ViewChild,
   ElementRef,
-  AfterViewInit
+  AfterViewInit,
+  QueryList
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -364,6 +365,9 @@ import { FilePicker, PickedFile } from '@capawesome/capacitor-file-picker';
 import { FileSystemService } from 'src/app/services/file-system.service';
 import imageCompression from 'browser-image-compression';
 import { AttachmentPreviewModalComponent } from '../../components/attachment-preview-modal/attachment-preview-modal.component';
+import { MessageMorePopoverComponent } from '../../components/message-more-popover/message-more-popover.component';
+// import { Clipboard } from '@angular/cdk/clipboard';
+import { Clipboard } from '@capacitor/clipboard';
 
 
 // import { ToastController } from '@ionic/angular';
@@ -398,6 +402,7 @@ interface Message {
   receiver_phone: string;
   delivered: boolean;
   read: boolean;
+  isDeleted?: boolean;
   message_id: string;
   time?: string;
   type?: string;
@@ -409,6 +414,12 @@ interface Message {
     filePath?: string;           // Optional original file path or local cache
     caption?: string;            // Optional caption text for images/videos
   };
+
+  replyToMessageId?: string;
+  reactions?: {
+    [userId: string]: string; 
+  }
+
 }
 
 
@@ -424,6 +435,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(IonContent, { static: false }) ionContent!: IonContent;
   @ViewChild('fileInput', { static: false }) fileInput!: ElementRef<HTMLInputElement>;
   @ViewChild('datePicker', { static: false }) datePicker!: IonDatetime;
+  @ViewChild('longPressEl') messageElements!: QueryList<ElementRef>;
 
   messages: Message[] = [];
 
@@ -466,7 +478,9 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     private toastCtrl: ToastController,
     private navCtrl: NavController,
     private FileService: FileSystemService,
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    private popoverController: PopoverController,
+    private clipboard: Clipboard
   ) {}
 
   roomId = '';
@@ -492,6 +506,9 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   selectedAttachment: any = null;
   showPreviewModal: boolean = false;
   attachmentPath: string = '';
+    // selectedMessages: any[] = [];
+    lastPressedMessage: any = null;
+  longPressTimeout: any;
 
   async ngOnInit() {
     // Enable proper keyboard scrolling
@@ -880,17 +897,17 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  isSelected(message: any): boolean {
-    return this.selectedMessages.some(m => m.key === message.key);
-  }
+  // isSelected(message: any): boolean {
+  //   return this.selectedMessages.some(m => m.key === message.key);
+  // }
 
-  onMessageClick(message: any) {
-    if (this.selectedMessages.length > 0) {
-      this.onMessagePress(message); // toggle if already in selection mode
-    } else {
-      // Normal tap action here if needed
-    }
-  }
+  // onMessageClick(message: any) {
+  //   if (this.selectedMessages.length > 0) {
+  //     this.onMessagePress(message); // toggle if already in selection mode
+  //   } else {
+  //     // Normal tap action here if needed
+  //   }
+  // }
 
   clearSelection() {
     this.selectedMessages = [];
@@ -902,6 +919,99 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       await this.chatService.resetUnreadCount(this.roomId, this.senderId);
     }
   }
+
+  //selection mode
+   startLongPress(msg: any) {
+    this.longPressTimeout = setTimeout(() => {
+      this.onLongPress(msg);
+    }, 1000); // 500ms for long press
+  }
+
+  cancelLongPress() {
+    clearTimeout(this.longPressTimeout);
+  }
+
+  onLongPress(msg: any) {
+  this.selectedMessages = [msg]; // Only select the long-pressed one
+  this.lastPressedMessage = msg;
+}
+
+onMessageClick(msg: any) {
+  if (this.selectedMessages.length > 0) {
+    this.toggleSelection(msg);
+    this.lastPressedMessage = msg;
+  }
+}
+
+toggleSelection(msg: any) {
+  const index = this.selectedMessages.findIndex((m) => m.message_id === msg.message_id);
+  if (index > -1) {
+    this.selectedMessages.splice(index, 1);
+  } else {
+    this.selectedMessages.push(msg);
+  }
+
+  // Update lastPressedMessage to last toggled one (optional)
+  this.lastPressedMessage = msg;
+}
+
+isSelected(msg: any) {
+  return this.selectedMessages.some((m) => m.message_id === msg.message_id);
+}
+
+  // onDelete() {
+  //   this.messages = this.messages.filter(
+  //     (msg) => !this.selectedMessages.includes(msg)
+  //   );
+  //   this.selectedMessages = [];
+  // }
+
+  deleteSelectedMessages() {
+    console.log("selectedMessages",this.selectedMessages);
+  this.selectedMessages.forEach(msg => {
+    this.chatService.deleteMessage(this.roomId, msg.key);
+  });
+  this.selectedMessages = [];
+}
+
+  onForward() {
+    console.log('Forwarding:', this.selectedMessages);
+  }
+
+  async onMore(ev?: Event) {
+    const popover = await this.popoverController.create({
+      component: MessageMorePopoverComponent,
+      event: ev,
+      translucent: true,
+      showBackdrop: true,
+    });
+
+    await popover.present();
+
+    const { data } = await popover.onDidDismiss();
+    if (data) {
+      this.handlePopoverAction(data);
+    }
+  }
+
+
+async handlePopoverAction(action: string) {
+  switch (action) {
+    case 'info':
+      console.log('Info clicked');
+      break;
+    case 'copy':
+      if (this.lastPressedMessage?.text) {
+        await Clipboard.write({ string: this.lastPressedMessage.text });
+        console.log('Text copied to clipboard:', this.lastPressedMessage.text);
+      }
+      break;
+    case 'pin':
+      console.log('Pin clicked');
+      break;
+  }
+}
+
 
   async fetchGroupName(groupId: string) {
     try {
@@ -938,72 +1048,140 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
 
+  // async listenForMessages() {
+  //   this.messageSub = this.chatService.listenForMessages(this.roomId).subscribe(async (data) => {
+  //     const decryptedMessages: Message[] = [];
+
+  //     for (const msg of data) {
+  //       // console.log("meaasGESA", msg)
+  //       const decryptedText = await this.encryptionService.decrypt(msg.text);
+  //       decryptedMessages.push({ ...msg, text: decryptedText });
+
+  //       // ✅ Mark as delivered if current user is the receiver and not already delivered
+  //       // console.log(msg);
+  //       if (
+  //         msg.receiver_id === this.senderId && !msg.delivered
+  //       ) {
+  //         this.chatService.markDelivered(this.roomId, msg.key);
+  //       }
+  //     }
+
+  //     this.messages = decryptedMessages;
+  //     this.groupedMessages = this.groupMessagesByDate(decryptedMessages);
+  //     this.saveToLocalStorage();
+
+  //     const last = decryptedMessages[decryptedMessages.length - 1];
+  //     if (last) {
+  //       localStorage.setItem(`lastMsg_${this.roomId}`, JSON.stringify({
+  //         text: last.text,
+  //         timestamp: last.timestamp
+  //       }));
+  //     }
+
+  //     setTimeout(() => {
+  //       this.scrollToBottom();
+  //       this.observeVisibleMessages();
+  //     }, 100);
+  //   });
+  // }
+
+
+  // observeVisibleMessages() {
+  //   const allMessageElements = document.querySelectorAll('[data-msg-key]');
+
+  //   allMessageElements.forEach((el: any) => {
+  //     const msgKey = el.getAttribute('data-msg-key');
+  //     const msgIndex = this.messages.findIndex(m => m.key === msgKey);
+  //     if (msgIndex === -1) return;
+
+  //     const msg = this.messages[msgIndex];
+  //     console.log(msg);
+
+  //     if (!msg.read && msg.receiver_id === this.senderId) {
+  //       const observer = new IntersectionObserver(entries => {
+  //         entries.forEach(entry => {
+  //           if (entry.isIntersecting) {
+  //             // ✅ Mark as read when visible
+  //             this.chatService.markRead(this.roomId, msgKey);
+  //             observer.unobserve(entry.target);
+  //           }
+  //         });
+  //       }, {
+  //         threshold: 1.0
+  //       });
+
+  //       observer.observe(el);
+  //     }
+  //   });
+  // }
+
+
   async listenForMessages() {
-    this.messageSub = this.chatService.listenForMessages(this.roomId).subscribe(async (data) => {
-      const decryptedMessages: Message[] = [];
+  this.messageSub = this.chatService.listenForMessages(this.roomId).subscribe(async (data) => {
+    const decryptedMessages: Message[] = [];
 
-      for (const msg of data) {
-        // console.log("meaasGESA", msg)
-        const decryptedText = await this.encryptionService.decrypt(msg.text);
-        decryptedMessages.push({ ...msg, text: decryptedText });
+    for (const msg of data) {
+      const decryptedText = await this.encryptionService.decrypt(msg.text);
+      decryptedMessages.push({ ...msg, text: decryptedText });
 
-        // ✅ Mark as delivered if current user is the receiver and not already delivered
-        // console.log(msg);
-        if (
-          msg.receiver_id === this.senderId && !msg.delivered
-        ) {
-          this.chatService.markDelivered(this.roomId, msg.key);
-        }
-      }
-
-      this.messages = decryptedMessages;
-      this.groupedMessages = this.groupMessagesByDate(decryptedMessages);
-      this.saveToLocalStorage();
-
-      const last = decryptedMessages[decryptedMessages.length - 1];
-      // if (last) {
-      //   localStorage.setItem(`lastMsg_${this.roomId}`, JSON.stringify({
-      //     text: last.text,
-      //     timestamp: last.timestamp
-      //   }));
-      // }
-
-      setTimeout(() => {
-        this.scrollToBottom();
-        this.observeVisibleMessages();
-      }, 100);
-    });
-  }
-
-
-  observeVisibleMessages() {
-    const allMessageElements = document.querySelectorAll('[data-msg-key]');
-
-    allMessageElements.forEach((el: any) => {
-      const msgKey = el.getAttribute('data-msg-key');
-      const msgIndex = this.messages.findIndex(m => m.key === msgKey);
-      if (msgIndex === -1) return;
-
-      const msg = this.messages[msgIndex];
+      // ✅ Mark as delivered if current user is the receiver and not already delivered
       // console.log(msg);
-
-      if (!msg.read && msg.receiver_id === this.senderId) {
-        const observer = new IntersectionObserver(entries => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              // ✅ Mark as read when visible
-              this.chatService.markRead(this.roomId, msgKey);
-              observer.unobserve(entry.target);
-            }
-          });
-        }, {
-          threshold: 1.0
-        });
-
-        observer.observe(el);
+      if (
+        msg.receiver_id === this.senderId && !msg.delivered
+      ) {
+        this.chatService.markDelivered(this.roomId, msg.key);
       }
-    });
-  }
+    }
+
+    this.messages = decryptedMessages;
+    this.groupedMessages = this.groupMessagesByDate(decryptedMessages);
+    this.saveToLocalStorage();
+
+    const last = decryptedMessages[decryptedMessages.length - 1];
+    if (last) {
+      localStorage.setItem(`lastMsg_${this.roomId}`, JSON.stringify({
+        text: last.text,
+        timestamp: last.timestamp
+      }));
+    }
+
+    setTimeout(() => {
+      this.scrollToBottom();
+      this.observeVisibleMessages();
+    }, 100);
+  });
+}
+
+
+observeVisibleMessages() {
+  const allMessageElements = document.querySelectorAll('[data-msg-key]');
+
+  allMessageElements.forEach((el: any) => {
+    const msgKey = el.getAttribute('data-msg-key');
+    const msgIndex = this.messages.findIndex(m => m.key === msgKey);
+    if (msgIndex === -1) return;
+
+    const msg = this.messages[msgIndex];
+    console.log(msg);
+
+    if (!msg.read && msg.receiver_id === this.senderId) {
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            // ✅ Mark as read when visible
+            this.chatService.markRead(this.roomId, msgKey);
+            observer.unobserve(entry.target); // stop observing
+          }
+        });
+      }, {
+        threshold: 1.0
+      });
+
+      observer.observe(el);
+    }
+  });
+}
+
 
   groupMessagesByDate(messages: Message[]) {
     const grouped: { [date: string]: any[] } = {};
@@ -1143,12 +1321,13 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       delivered: false,
       read: false,
       message_id: uuidv4(),
+      isDeleted: false,
     };
 
     if (this.selectedAttachment) {
       message.attachment = {
         type: this.selectedAttachment.type,
-        base64Data: this.selectedAttachment.base64, // base64 string
+        base64Data: this.selectedAttachment.base64,
         fileName: this.selectedAttachment.fileName,
         mimeType: this.selectedAttachment.mimeType
       };
@@ -1165,7 +1344,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     this.showPreviewModal = false;
 
     this.scrollToBottom();
-    // this.attachments = await this.attachmentService.getAttachments(this.roomId);
+    // this.attachments = await this.attachmentService.getAttachments(this.roomId); //reply and reaction functionality in progress
   }
 
   async showAttachmentPreviewPopup() {
@@ -1179,7 +1358,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
           handler: () => {
             this.selectedAttachment = null;
           }
-        },
+        },         
         {
           text: 'Send',
           handler: () => {
@@ -1244,103 +1423,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   });
   await modal.present();
 }
-
-  //   async sendMessage() {
-  //   if (!this.messageText.trim() && !this.attachmentPath) return;
-
-
-  //     console.log("attachment data", this.attachmentPath);
-  //   console.log(this.sender_phone);
-  //   console.log("fdgsg", this.roomId);
-
-  //   const plainText = this.messageText.trim();
-  //   const encryptedText = plainText ? await this.encryptionService.encrypt(plainText) : '';
-
-  //   const message: Message = {
-  //   sender_id: this.senderId,
-  //   text: encryptedText,
-  //   timestamp: new Date().toISOString(),
-  //   sender_phone: this.sender_phone,
-  //   sender_name: this.sender_name,
-  //   receiver_id: '',
-  //   receiver_phone: this.receiver_phone,
-  //   delivered: false,
-  //   read: false,
-  //   message_id: uuidv4()
-  // };
-
-  //   // If attachment exists, save it and add to message object
-  //   if (this.attachmentPath) {
-  //   message.attachment = {
-  //     type: 'image',
-  //     filePath: this.attachmentPath,
-  //   };
-  // }
-  // console.log("sdfjhasdjggksdfdjgfdgd",this.attachmentPath);
-
-  //   if (this.chatType === 'private') {
-  //     message.receiver_id = this.receiverId;
-  //   }
-
-  //   //  console.log("fsdkjsdkfdjgkdfgjfkhjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj",this.roomId);
-  //   // Send message using your chat service
-  //   this.chatService.sendMessage(this.roomId, message, this.chatType, this.senderId);
-
-  //   this.messageText = '';
-  //   this.showSendButton = false;
-  //   this.scrollToBottom();
-
-  //   // Reload attachments if you want to refresh the attachment list UI
-  //   this.attachments = await this.attachmentService.getAttachments(this.roomId);
-  // }
-
-
-  // async sendMessage() {
-  //   if (!this.messageText.trim() && !this.selectedAttachment) return;
-
-  //   const plainText = this.messageText.trim();
-  //   const encryptedText = plainText ? await this.encryptionService.encrypt(plainText) : '';
-
-  //   const message: Message = {
-  //     sender_id: this.senderId,
-  //     text: encryptedText,
-  //     timestamp: new Date().toISOString(),
-  //     sender_phone: this.sender_phone,
-  //     sender_name: this.sender_name,
-  //     receiver_id: this.chatType === 'private' ? this.receiverId : '',
-  //     receiver_phone: this.receiver_phone,
-  //     delivered: false,
-  //     read: false,
-  //     message_id: uuidv4()
-  //   };
-
-  //   // ✅ Include attachment if present
-  //   if (this.selectedAttachment) {
-  //     message.attachment = {
-  //       type: this.selectedAttachment.type,
-  //       base64Data: this.selectedAttachment.base64Data,
-  //       fileName: this.selectedAttachment.fileName || '',
-  //       mimeType: this.selectedAttachment.mimeType || ''
-  //     };
-  //   }
-
-  //   console.log("Sending message with attachment:", message);
-
-  //   // ✅ Send to backend
-  //   this.chatService.sendMessage(this.roomId, message, this.chatType, this.senderId);
-
-  //   // ✅ Reset
-  //   this.messageText = '';
-  //   this.selectedAttachment = null;
-  //   this.attachmentPath = '';
-  //   this.showSendButton = false;
-
-  //   // ✅ Refresh
-  //   this.scrollToBottom();
-  //   this.attachments = await this.attachmentService.getAttachments(this.roomId);
-  // }
-
-
 
 
   loadMessagesFromFirebase(isPagination = false) { }
