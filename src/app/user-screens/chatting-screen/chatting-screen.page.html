@@ -67,7 +67,7 @@
   <ion-toolbar>
 
     <!-- 🔁 Selection Header -->
-    <ng-container *ngIf="selectedMessages.length > 0; else defaultHeader">
+    <!-- <ng-container *ngIf="selectedMessages.length > 0; else defaultHeader">
       <ion-title>{{ selectedMessages.length }} selected</ion-title>
       <ion-buttons slot="end">
         <ion-button (click)="onForward()">
@@ -80,7 +80,83 @@
           <ion-icon name="ellipsis-vertical-outline"></ion-icon>
         </ion-button>
       </ion-buttons>
+    </ng-container> -->
+
+    <ng-container *ngIf="selectedMessages.length > 0; else defaultHeader">
+      <ion-title>{{ selectedMessages.length }} selected</ion-title>
+      <ion-buttons slot="end">
+
+        <!-- ✅ Only 1 Text Message -->
+        <ng-container *ngIf="isOnlyOneTextMessage()">
+          <ion-button (click)="onForward()">
+            <ion-icon name="arrow-redo-outline"></ion-icon>
+          </ion-button>
+          <ion-button (click)="copySelectedMessages()">
+            <ion-icon name="copy-outline"></ion-icon>
+          </ion-button>
+          <ion-button (click)="replyToMessages()">
+            <ion-icon name="return-up-back-outline"></ion-icon>
+          </ion-button>
+          <ion-button (click)="deleteSelectedMessages()">
+            <ion-icon name="trash-outline"></ion-icon>
+          </ion-button>
+          <ion-button (click)="onMore($event)">
+            <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+          </ion-button>
+        </ng-container>
+
+        <!-- ✅ Multiple Text Messages -->
+        <ng-container *ngIf="isMultipleTextMessages()">
+          <ion-button (click)="onForward()">
+            <ion-icon name="arrow-redo-outline"></ion-icon>
+          </ion-button>
+          <ion-button (click)="copySelectedMessages()">
+            <ion-icon name="copy-outline"></ion-icon>
+          </ion-button>
+          <ion-button (click)="deleteSelectedMessages()">
+            <ion-icon name="trash-outline"></ion-icon>
+          </ion-button>
+        </ng-container>
+
+        <!-- ✅ Only 1 Attachment -->
+        <ng-container *ngIf="isOnlyOneAttachment()">
+          <ion-button (click)="onForward()">
+            <ion-icon name="arrow-redo-outline"></ion-icon>
+          </ion-button>
+          <ion-button (click)="replyToMessages()">
+            <ion-icon name="return-up-back-outline"></ion-icon>
+          </ion-button>
+          <ion-button (click)="deleteSelectedMessages()">
+            <ion-icon name="trash-outline"></ion-icon>
+          </ion-button>
+          <ion-button (click)="onMore($event)">
+            <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+          </ion-button>
+        </ng-container>
+
+        <!-- ✅ Multiple Attachments -->
+        <ng-container *ngIf="isMultipleAttachments()">
+          <ion-button (click)="onForward()">
+            <ion-icon name="arrow-redo-outline"></ion-icon>
+          </ion-button>
+          <ion-button (click)="deleteSelectedMessages()">
+            <ion-icon name="trash-outline"></ion-icon>
+          </ion-button>
+        </ng-container>
+
+        <!-- ✅ Mixed: text + attachment -->
+        <ng-container *ngIf="isMixedSelection()">
+          <ion-button (click)="onForward()">
+            <ion-icon name="arrow-redo-outline"></ion-icon>
+          </ion-button>
+          <ion-button (click)="deleteSelectedMessages()">
+            <ion-icon name="trash-outline"></ion-icon>
+          </ion-button>
+        </ng-container>
+
+      </ion-buttons>
     </ng-container>
+
 
     <!-- 🔁 Default Chat Header -->
     <ng-template #defaultHeader>
@@ -165,6 +241,7 @@
 
         <div class="message-bubble" (click)="openAttachmentModal(msg)" [attr.data-msg-key]="msg.key"
           [ngClass]="msg.sender_id === senderId ? 'sender-message' : 'receiver-message'">
+
           <!-- Checkbox for selected messages -->
           <ion-icon *ngIf="selectedMessages.length > 0" [name]="isSelected(msg) ? 'checkbox' : 'square-outline'"
             style="margin-bottom: 5px; font-size: 20px;">
@@ -176,84 +253,68 @@
             {{ msg.sender_name }}
           </span>
 
-         
-          <!-- <ng-container *ngIf="msg.attachment">
-            
-            <img *ngIf="msg.attachment.type === 'image'" [src]="msg.attachment.base64Data" alt="Image"
-              style="max-width: 200px; border-radius: 10px; margin: 5px 0;" />
-
-            
-            <video *ngIf="msg.attachment.type === 'video'" controls
-              style="max-width: 200px; border-radius: 10px; margin: 5px 0;">
-              <source [src]="msg.attachment.base64Data" [type]="msg.attachment.mimeType || 'video/mp4'" />
-              Your browser does not support the video tag.
-            </video>
-
-        
-            <audio *ngIf="msg.attachment.type === 'audio'" controls style="margin: 5px 0;">
-              <source [src]="msg.attachment.base64Data" [type]="msg.attachment.mimeType || 'audio/mpeg'" />
-              Your browser does not support the audio element.
-            </audio>
-
-            
-            <div *ngIf="msg.attachment.type === 'file'" style="margin: 5px 0;">
-              <ion-icon name="document-outline" style="margin-right: 5px;"></ion-icon>
-              <a [href]="msg.attachment.base64Data" [download]="msg.attachment.fileName || 'file'" target="_blank"
-                rel="noopener">
-                {{ msg.attachment.fileName || 'Download File' }}
-              </a>
-            </div>
-
-            
-            <ion-text class="message-text" *ngIf="msg.attachment.caption">{{ msg.attachment.caption }}</ion-text>
-          </ng-container>
-
-          
-          <ion-text class="message-text" *ngIf="!msg.attachment && msg.text">{{ msg.text }}</ion-text> -->
+          <!-- REPLIED MESSAGE DISPLAY - Add this section -->
+          <div class="replied-message" *ngIf="msg.replyToMessageId"
+            (click)="scrollToRepliedMessage(msg.replyToMessageId)">
+            <ng-container *ngIf="getRepliedMessage(msg.replyToMessageId) as repliedMsg">
+              <div class="replied-header">
+                <ion-icon name="arrow-undo-outline" class="reply-icon"></ion-icon>
+                <span class="replied-sender">{{ repliedMsg.sender_name }}</span>
+              </div>
+              <div class="replied-content">
+                <div class="replied-text" *ngIf="repliedMsg.text">
+                  {{ getReplyPreviewText(repliedMsg) }}
+                </div>
+                <div class="replied-attachment" *ngIf="repliedMsg.attachment">
+                  <ion-icon name="attach-outline"></ion-icon>
+                  {{ getReplyPreviewText(repliedMsg) }}
+                </div>
+              </div>
+            </ng-container>
+          </div>
 
           <!-- Show deleted message placeholder -->
-<ng-container *ngIf="msg.isDeleted">
-  <ion-text class="message-text" color="medium"><i>This message was deleted</i></ion-text>
-</ng-container>
+          <ng-container *ngIf="msg.isDeleted">
+            <ion-text class="message-text" color="medium"><i>This message was deleted</i></ion-text>
+          </ng-container>
 
-<!-- Show normal message if not deleted -->
-<ng-container *ngIf="!msg.isDeleted">
-  <!-- Text Message -->
-  <ion-text class="message-text" *ngIf="!msg.attachment && msg.text">{{ msg.text }}</ion-text>
+          <!-- Show normal message if not deleted -->
+          <ng-container *ngIf="!msg.isDeleted">
+            <!-- Text Message -->
+            <ion-text class="message-text" *ngIf="!msg.attachment && msg.text">{{ msg.text }}</ion-text>
 
-  <!-- Attachments -->
-  <ng-container *ngIf="msg.attachment">
-    <!-- Image -->
-    <img *ngIf="msg.attachment.type === 'image'" [src]="msg.attachment.base64Data" alt="Image"
-      style="max-width: 200px; border-radius: 10px; margin: 5px 0;" />
+            <!-- Attachments -->
+            <ng-container *ngIf="msg.attachment">
+              <!-- Image -->
+              <img *ngIf="msg.attachment.type === 'image'" [src]="msg.attachment.base64Data" alt="Image"
+                style="max-width: 200px; border-radius: 10px; margin: 5px 0;" />
 
-    <!-- Video -->
-    <video *ngIf="msg.attachment.type === 'video'" controls
-      style="max-width: 200px; border-radius: 10px; margin: 5px 0;">
-      <source [src]="msg.attachment.base64Data" [type]="msg.attachment.mimeType || 'video/mp4'" />
-      Your browser does not support the video tag.
-    </video>
+              <!-- Video -->
+              <video *ngIf="msg.attachment.type === 'video'" controls
+                style="max-width: 200px; border-radius: 10px; margin: 5px 0;">
+                <source [src]="msg.attachment.base64Data" [type]="msg.attachment.mimeType || 'video/mp4'" />
+                Your browser does not support the video tag.
+              </video>
 
-    <!-- Audio -->
-    <audio *ngIf="msg.attachment.type === 'audio'" controls style="margin: 5px 0;">
-      <source [src]="msg.attachment.base64Data" [type]="msg.attachment.mimeType || 'audio/mpeg'" />
-      Your browser does not support the audio element.
-    </audio>
+              <!-- Audio -->
+              <audio *ngIf="msg.attachment.type === 'audio'" controls style="margin: 5px 0;">
+                <source [src]="msg.attachment.base64Data" [type]="msg.attachment.mimeType || 'audio/mpeg'" />
+                Your browser does not support the audio element.
+              </audio>
 
-    <!-- File -->
-    <div *ngIf="msg.attachment.type === 'file'" style="margin: 5px 0;">
-      <ion-icon name="document-outline" style="margin-right: 5px;"></ion-icon>
-      <a [href]="msg.attachment.base64Data" [download]="msg.attachment.fileName || 'file'" target="_blank"
-        rel="noopener">
-        {{ msg.attachment.fileName || 'Download File' }}
-      </a>
-    </div>
+              <!-- File -->
+              <div *ngIf="msg.attachment.type === 'file'" style="margin: 5px 0;">
+                <ion-icon name="document-outline" style="margin-right: 5px;"></ion-icon>
+                <a [href]="msg.attachment.base64Data" [download]="msg.attachment.fileName || 'file'" target="_blank"
+                  rel="noopener">
+                  {{ msg.attachment.fileName || 'Download File' }}
+                </a>
+              </div>
 
-    <!-- Optional Caption -->
-    <ion-text class="message-text" *ngIf="msg.attachment.caption">{{ msg.attachment.caption }}</ion-text>
-  </ng-container>
-</ng-container>
-
+              <!-- Optional Caption -->
+              <ion-text class="message-text" *ngIf="msg.attachment.caption">{{ msg.attachment.caption }}</ion-text>
+            </ng-container>
+          </ng-container>
 
           <!-- Timestamp & Status -->
           <p class="time-stamp status-container">
@@ -295,38 +356,24 @@
           </div>
 
           <div *ngIf="selectedAttachment?.type === 'video'">
-            <video
-              controls
-              [src]="selectedAttachment?.base64"
-              class="preview-video"
-            ></video>
+            <video controls [src]="selectedAttachment?.base64" class="preview-video"></video>
           </div>
 
           <div *ngIf="selectedAttachment?.type === 'file'" class="preview-file">
-            <ion-icon
-              name="document-attach-outline"
-              style="font-size: 48px"
-            ></ion-icon>
+            <ion-icon name="document-attach-outline" style="font-size: 48px"></ion-icon>
             <p>{{ selectedAttachment?.fileName }}</p>
           </div>
-          
+
         </div>
 
         <div class="mine">
 
-          <ion-textarea
-            [(ngModel)]="messageText"
-            placeholder="Type your message here..."
-            class="pre-message"
-          ></ion-textarea>
+          <ion-textarea [(ngModel)]="messageText" placeholder="Type your message here..."
+            class="pre-message"></ion-textarea>
 
           <div class="sendbtn">
             <p>user name</p>
-            <ion-icon
-              name="send-outline"
-              (click)="sendMessage()"
-              class="mediasend"
-            ></ion-icon>
+            <ion-icon name="send-outline" (click)="sendMessage()" class="mediasend"></ion-icon>
           </div>
 
         </div>
@@ -338,19 +385,32 @@
 
 <!-- ✅ Message Input Footer -->
 <div class="footer-fixed">
+
+  <!-- REPLY PREVIEW - Add this section -->
+  <div class="reply-preview" *ngIf="replyToMessage">
+    <div class="reply-header">
+      <span class="reply-to-text">Replying to {{ replyToMessage.sender_name }}</span>
+      <ion-button fill="clear" size="small" (click)="cancelReply()">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </div>
+    <div class="reply-content">
+      <div class="reply-line"></div>
+      <div class="reply-message">
+        {{ getReplyPreviewText(replyToMessage) }}
+      </div>
+    </div>
+  </div>
+
+
   <ion-row class="footer-row">
     <ion-col class="message-input-container">
-      <ion-icon name="document-text-outline" class="icon-left"></ion-icon>
-      <ion-textarea
-        [autoGrow]="true"
-        [(ngModel)]="messageText"
-        placeholder="Message"
-        (ionInput)="onInputChange()"
-        (ionFocus)="onInputFocus()"
-        (ionBlur)="onInputBlur()"
-        (keyup.enter)="sendMessage()"
-        class="message-input"
-      ></ion-textarea>
+      <!-- <ion-icon name="document-text-outline" class="icon-left"></ion-icon> -->
+      <ion-icon name="document-text-outline" class="icon-left" (click)="openKeyboard()">
+      </ion-icon>
+      <ion-textarea [autoGrow]="true" [(ngModel)]="messageText" placeholder="Message" (ionInput)="onInputChange()"
+        (ionFocus)="onInputFocus()" (ionBlur)="onInputBlur()" (keyup.enter)="sendMessage()"
+        class="message-input"></ion-textarea>
 
       <!-- <ion-textarea [(ngModel)]="messageText" placeholder="Type your message here..." class="pre-message"></ion-textarea> -->
 
@@ -365,7 +425,7 @@
 ></ion-icon> -->
 
       <!-- <ion-button fill="clear" (click)="pickAttachment()"> -->
-        <ion-icon name="attach-outline" (click)="pickAttachment()" class="icon-right"></ion-icon>
+      <ion-icon name="attach-outline" (click)="pickAttachment()" class="icon-right"></ion-icon>
       <!-- </ion-button> -->
 
       <!-- Show attachment -->
@@ -398,20 +458,14 @@
         </ion-item>
       </ion-list> -->
 
-      <ion-icon name="camera-outline" class="icon-right"></ion-icon>
+      <ion-icon name="camera-outline" class="icon-right" (click)="openCamera()"></ion-icon>
     </ion-col>
 
     <ion-col size="auto">
       <ion-button *ngIf="!showSendButton" class="mic-button" shape="round">
         <ion-icon slot="icon-only" name="mic"></ion-icon>
       </ion-button>
-      <ion-button
-        *ngIf="showSendButton"
-        fill="clear"
-        class="send-btn"
-        shape="round"
-        (click)="sendMessage()"
-      >
+      <ion-button *ngIf="showSendButton" fill="clear" class="send-btn" shape="round" (click)="sendMessage()">
         <ion-icon slot="icon-only" name="send"></ion-icon>
       </ion-button>
     </ion-col>
@@ -421,11 +475,7 @@
 <ion-modal [isOpen]="showDateModal" (didDismiss)="showDateModal = false">
   <ng-template>
     <ion-content>
-      <ion-datetime
-        presentation="date"
-        [showDefaultButtons]="true"
-        (ionChange)="onDateSelected($event)"
-      >
+      <ion-datetime presentation="date" [showDefaultButtons]="true" (ionChange)="onDateSelected($event)">
       </ion-datetime>
     </ion-content>
   </ng-template>

@@ -415,9 +415,10 @@ interface Message {
     caption?: string;            // Optional caption text for images/videos
   };
 
-  replyToMessageId?: string;
+  // replyToMessageId?: string;
+  replyToMessageId?: string | undefined;    //for reply
   reactions?: {
-    [userId: string]: string; 
+    [userId: string]: string;     //for reactions
   }
 
 }
@@ -481,7 +482,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     private modalCtrl: ModalController,
     private popoverController: PopoverController,
     private clipboard: Clipboard
-  ) {}
+  ) { }
 
   roomId = '';
   limit = 10;
@@ -506,9 +507,11 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   selectedAttachment: any = null;
   showPreviewModal: boolean = false;
   attachmentPath: string = '';
-    // selectedMessages: any[] = [];
-    lastPressedMessage: any = null;
+  // selectedMessages: any[] = [];
+  lastPressedMessage: any = null;
   longPressTimeout: any;
+  replyToMessage: Message | null = null;
+  capturedImage = '';
 
   async ngOnInit() {
     // Enable proper keyboard scrolling
@@ -921,7 +924,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   //selection mode
-   startLongPress(msg: any) {
+  startLongPress(msg: any) {
     this.longPressTimeout = setTimeout(() => {
       this.onLongPress(msg);
     }, 1000); // 500ms for long press
@@ -932,32 +935,152 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onLongPress(msg: any) {
-  this.selectedMessages = [msg]; // Only select the long-pressed one
-  this.lastPressedMessage = msg;
-}
-
-onMessageClick(msg: any) {
-  if (this.selectedMessages.length > 0) {
-    this.toggleSelection(msg);
+    this.selectedMessages = [msg]; // Only select the long-pressed one
     this.lastPressedMessage = msg;
   }
-}
 
-toggleSelection(msg: any) {
-  const index = this.selectedMessages.findIndex((m) => m.message_id === msg.message_id);
-  if (index > -1) {
-    this.selectedMessages.splice(index, 1);
-  } else {
-    this.selectedMessages.push(msg);
+  onMessageClick(msg: any) {
+    if (this.selectedMessages.length > 0) {
+      this.toggleSelection(msg);
+      this.lastPressedMessage = msg;
+    }
   }
 
-  // Update lastPressedMessage to last toggled one (optional)
-  this.lastPressedMessage = msg;
+  toggleSelection(msg: any) {
+    const index = this.selectedMessages.findIndex((m) => m.message_id === msg.message_id);
+    if (index > -1) {
+      this.selectedMessages.splice(index, 1);
+    } else {
+      this.selectedMessages.push(msg);
+    }
+
+    // Update lastPressedMessage to last toggled one (optional)
+    this.lastPressedMessage = msg;
+  }
+
+  isSelected(msg: any) {
+    return this.selectedMessages.some((m) => m.message_id === msg.message_id);
+  }
+
+  isOnlyOneTextMessage(): boolean {
+  return this.selectedMessages.length === 1 && this.selectedMessages[0].type === 'text';
 }
 
-isSelected(msg: any) {
-  return this.selectedMessages.some((m) => m.message_id === msg.message_id);
+isMultipleTextMessages(): boolean {
+  return this.selectedMessages.length > 1 && this.selectedMessages.every(msg => msg.type === 'text');
 }
+
+isOnlyOneAttachment(): boolean {
+  return this.selectedMessages.length === 1 && this.selectedMessages[0].type !== 'text';
+}
+
+isMultipleAttachments(): boolean {
+  return this.selectedMessages.length > 1 && this.selectedMessages.every(msg => msg.type !== 'text');
+}
+
+isMixedSelection(): boolean {
+  const types = this.selectedMessages.map(msg => msg.type);
+  return types.includes('text') && types.some(t => t !== 'text');
+}
+
+async copySelectedMessages() {
+  if (this.lastPressedMessage?.text) {
+          await Clipboard.write({ string: this.lastPressedMessage.text });
+          console.log('Text copied to clipboard:', this.lastPressedMessage.text);
+          this.selectedMessages = [];
+          this.lastPressedMessage = null;
+        }
+}
+
+replyToMessages() {
+  if (this.selectedMessages.length === 1) {
+    const messageToReply = this.selectedMessages[0];
+    this.setReplyToMessage(messageToReply);
+  }
+}
+
+// 2. Implement setReplyToMessage method
+setReplyToMessage(message: Message) {
+  this.replyToMessage = message;
+  
+  // Clear selection after setting reply
+  this.selectedMessages = [];
+  this.lastPressedMessage = null;
+  
+  // Focus on input field after a short delay
+  setTimeout(() => {
+    const inputElement = document.querySelector('ion-textarea') as HTMLIonTextareaElement;
+    if (inputElement) {
+      inputElement.setFocus();
+    }
+  }, 100);
+}
+
+// 3. Cancel reply method (already exists, but make sure it's implemented)
+cancelReply() {
+  this.replyToMessage = null;
+}
+
+// 4. Get replied message for display
+getRepliedMessage(replyToMessageId: string): Message | null {
+  return this.messages.find(msg => msg.message_id === replyToMessageId) || null;
+}
+
+// 5. Get reply preview text
+getReplyPreviewText(message: Message): string {
+  if (message.text) {
+    // Limit reply preview to 50 characters
+    return message.text.length > 50 ? 
+           message.text.substring(0, 50) + '...' : 
+           message.text;
+  } else if (message.attachment) {
+    // Show attachment type in reply preview
+    const type = message.attachment.type;
+    switch (type) {
+      case 'image': return '📷 Photo';
+      case 'video': return '🎥 Video';
+      case 'audio': return '🎵 Audio';
+      case 'file': return '📄 Document';
+      default: return '📎 Attachment';
+    }
+  }
+  return 'Message';
+}
+
+// 6. Scroll to replied message when clicked
+scrollToRepliedMessage(replyToMessageId: string) {
+
+  let targetElement: HTMLElement | any;
+
+  const messageElements = document.querySelectorAll('[data-msg-key]');
+
+  // Loop through messages and find the matching DOM element
+  this.messages.forEach((msg) => {
+    if (msg.message_id === replyToMessageId) {
+      const element = Array.from(messageElements).find(el =>
+        el.getAttribute('data-msg-key') === msg.key
+      );
+      if (element && element instanceof HTMLElement) {
+        targetElement = element;
+      }
+    }
+  });
+
+  if (targetElement) {
+    targetElement.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center'
+    });
+
+    targetElement.classList.add('highlight-message');
+    setTimeout(() => {
+      targetElement?.classList.remove('highlight-message');
+    }, 2000);
+  }
+}
+
+
+
 
   // onDelete() {
   //   this.messages = this.messages.filter(
@@ -967,32 +1090,58 @@ isSelected(msg: any) {
   // }
 
   deleteSelectedMessages() {
-    console.log("selectedMessages",this.selectedMessages);
-  this.selectedMessages.forEach(msg => {
-    this.chatService.deleteMessage(this.roomId, msg.key);
-  });
-  this.selectedMessages = [];
-}
+    console.log("selectedMessages", this.selectedMessages);
+    this.selectedMessages.forEach(msg => {
+      this.chatService.deleteMessage(this.roomId, msg.key);
+    });
+    this.selectedMessages = [];
+  }
 
   onForward() {
     console.log('Forwarding:', this.selectedMessages);
   }
 
+  // async onMore(ev?: Event) {
+  //   const popover = await this.popoverController.create({
+  //     component: MessageMorePopoverComponent,
+  //     event: ev,
+  //     translucent: true,
+  //     showBackdrop: true,
+  //   });
+
+  //   await popover.present();
+
+  //   const { data } = await popover.onDidDismiss();
+  //   if (data) {
+  //     this.handlePopoverAction(data);
+  //   }
+  // }
+
   async onMore(ev?: Event) {
-    const popover = await this.popoverController.create({
-      component: MessageMorePopoverComponent,
-      event: ev,
-      translucent: true,
-      showBackdrop: true,
-    });
+  const hasText = !!this.lastPressedMessage?.text;
+  const hasAttachment = !!(this.lastPressedMessage?.attachment || 
+                           this.lastPressedMessage?.file || 
+                           this.lastPressedMessage?.image ||
+                           this.lastPressedMessage?.media);
 
-    await popover.present();
-
-    const { data } = await popover.onDidDismiss();
-    if (data) {
-      this.handlePopoverAction(data);
+  const popover = await this.popoverController.create({
+    component: MessageMorePopoverComponent,
+    event: ev,
+    translucent: true,
+    showBackdrop: true,
+    componentProps: {
+      hasText: hasText,
+      hasAttachment: hasAttachment
     }
+  });
+
+  await popover.present();
+
+  const { data } = await popover.onDidDismiss();
+  if (data) {
+    this.handlePopoverAction(data);
   }
+}
 
 
 async handlePopoverAction(action: string) {
@@ -1004,6 +1153,19 @@ async handlePopoverAction(action: string) {
       if (this.lastPressedMessage?.text) {
         await Clipboard.write({ string: this.lastPressedMessage.text });
         console.log('Text copied to clipboard:', this.lastPressedMessage.text);
+        this.selectedMessages = [];
+        this.lastPressedMessage = null;
+      }
+      break;
+    case 'share':
+      if (this.lastPressedMessage?.attachment || 
+          this.lastPressedMessage?.file || 
+          this.lastPressedMessage?.image ||
+          this.lastPressedMessage?.media) {
+        console.log('Share clicked for attachment:', this.lastPressedMessage);
+        // Add your share logic here
+        this.selectedMessages = [];
+        this.lastPressedMessage = null;
       }
       break;
     case 'pin':
@@ -1011,6 +1173,26 @@ async handlePopoverAction(action: string) {
       break;
   }
 }
+
+
+  // async handlePopoverAction(action: string) {
+  //   switch (action) {
+  //     case 'info':
+  //       console.log('Info clicked');
+  //       break;
+  //     case 'copy':
+  //       if (this.lastPressedMessage?.text) {
+  //         await Clipboard.write({ string: this.lastPressedMessage.text });
+  //         console.log('Text copied to clipboard:', this.lastPressedMessage.text);
+  //         this.selectedMessages = [];
+  //         this.lastPressedMessage = null;
+  //       }
+  //       break;
+  //     case 'pin':
+  //       console.log('Pin clicked');
+  //       break;
+  //   }
+  // }
 
 
   async fetchGroupName(groupId: string) {
@@ -1117,70 +1299,70 @@ async handlePopoverAction(action: string) {
 
 
   async listenForMessages() {
-  this.messageSub = this.chatService.listenForMessages(this.roomId).subscribe(async (data) => {
-    const decryptedMessages: Message[] = [];
+    this.messageSub = this.chatService.listenForMessages(this.roomId).subscribe(async (data) => {
+      const decryptedMessages: Message[] = [];
 
-    for (const msg of data) {
-      const decryptedText = await this.encryptionService.decrypt(msg.text);
-      decryptedMessages.push({ ...msg, text: decryptedText });
+      for (const msg of data) {
+        const decryptedText = await this.encryptionService.decrypt(msg.text);
+        decryptedMessages.push({ ...msg, text: decryptedText });
 
-      // ✅ Mark as delivered if current user is the receiver and not already delivered
-      // console.log(msg);
-      if (
-        msg.receiver_id === this.senderId && !msg.delivered
-      ) {
-        this.chatService.markDelivered(this.roomId, msg.key);
+        // ✅ Mark as delivered if current user is the receiver and not already delivered
+        // console.log(msg);
+        if (
+          msg.receiver_id === this.senderId && !msg.delivered
+        ) {
+          this.chatService.markDelivered(this.roomId, msg.key);
+        }
       }
-    }
 
-    this.messages = decryptedMessages;
-    this.groupedMessages = this.groupMessagesByDate(decryptedMessages);
-    this.saveToLocalStorage();
+      this.messages = decryptedMessages;
+      this.groupedMessages = this.groupMessagesByDate(decryptedMessages);
+      this.saveToLocalStorage();
 
-    const last = decryptedMessages[decryptedMessages.length - 1];
-    if (last) {
-      localStorage.setItem(`lastMsg_${this.roomId}`, JSON.stringify({
-        text: last.text,
-        timestamp: last.timestamp
-      }));
-    }
+      const last = decryptedMessages[decryptedMessages.length - 1];
+      if (last) {
+        localStorage.setItem(`lastMsg_${this.roomId}`, JSON.stringify({
+          text: last.text,
+          timestamp: last.timestamp
+        }));
+      }
 
-    setTimeout(() => {
-      this.scrollToBottom();
-      this.observeVisibleMessages();
-    }, 100);
-  });
-}
+      setTimeout(() => {
+        this.scrollToBottom();
+        this.observeVisibleMessages();
+      }, 100);
+    });
+  }
 
 
-observeVisibleMessages() {
-  const allMessageElements = document.querySelectorAll('[data-msg-key]');
+  observeVisibleMessages() {
+    const allMessageElements = document.querySelectorAll('[data-msg-key]');
 
-  allMessageElements.forEach((el: any) => {
-    const msgKey = el.getAttribute('data-msg-key');
-    const msgIndex = this.messages.findIndex(m => m.key === msgKey);
-    if (msgIndex === -1) return;
+    allMessageElements.forEach((el: any) => {
+      const msgKey = el.getAttribute('data-msg-key');
+      const msgIndex = this.messages.findIndex(m => m.key === msgKey);
+      if (msgIndex === -1) return;
 
-    const msg = this.messages[msgIndex];
-    console.log(msg);
+      const msg = this.messages[msgIndex];
+      console.log(msg);
 
-    if (!msg.read && msg.receiver_id === this.senderId) {
-      const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            // ✅ Mark as read when visible
-            this.chatService.markRead(this.roomId, msgKey);
-            observer.unobserve(entry.target); // stop observing
-          }
+      if (!msg.read && msg.receiver_id === this.senderId) {
+        const observer = new IntersectionObserver(entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              // ✅ Mark as read when visible
+              this.chatService.markRead(this.roomId, msgKey);
+              observer.unobserve(entry.target); // stop observing
+            }
+          });
+        }, {
+          threshold: 1.0
         });
-      }, {
-        threshold: 1.0
-      });
 
-      observer.observe(el);
-    }
-  });
-}
+        observer.observe(el);
+      }
+    });
+  }
 
 
   groupMessagesByDate(messages: Message[]) {
@@ -1252,7 +1434,7 @@ observeVisibleMessages() {
     this.messages = decryptedMessages;
     this.groupedMessages = this.groupMessagesByDate(decryptedMessages);
   }
-  
+
 
   async pickAttachment() {
     const result = await FilePicker.pickFiles({ readData: true });
@@ -1306,46 +1488,99 @@ observeVisibleMessages() {
     this.messageText = '';
   }
 
-  async sendMessage() {
-    const plainText = this.messageText.trim();
-    const encryptedText = plainText ? await this.encryptionService.encrypt(plainText) : '';
+  setReplyTo(message: Message) {
+  this.replyToMessage = message;
+}
 
-    const message: Message = {
-      sender_id: this.senderId,
-      text: encryptedText,
-      timestamp: new Date().toISOString(),
-      sender_phone: this.sender_phone,
-      sender_name: this.sender_name,
-      receiver_id: this.chatType === 'private' ? this.receiverId : '',
-      receiver_phone: this.receiver_phone,
-      delivered: false,
-      read: false,
-      message_id: uuidv4(),
-      isDeleted: false,
+// cancelReply() {
+//   this.replyToMessage = null;
+// }
+
+async sendMessage() {
+  const plainText = this.messageText.trim();
+  const encryptedText = plainText ? await this.encryptionService.encrypt(plainText) : '';
+
+  const message: Message = {
+    sender_id: this.senderId,
+    text: encryptedText,
+    timestamp: new Date().toISOString(),
+    sender_phone: this.sender_phone,
+    sender_name: this.sender_name,
+    receiver_id: this.chatType === 'private' ? this.receiverId : '',
+    receiver_phone: this.receiver_phone,
+    delivered: false,
+    read: false,
+    message_id: uuidv4(),
+    isDeleted: false,
+    // Include reply reference if replying to a message
+    replyToMessageId: this.replyToMessage?.message_id || '',
+  };
+
+  if (this.selectedAttachment) {
+    message.attachment = {
+      type: this.selectedAttachment.type,
+      base64Data: this.selectedAttachment.base64,
+      fileName: this.selectedAttachment.fileName,
+      mimeType: this.selectedAttachment.mimeType
     };
-
-    if (this.selectedAttachment) {
-      message.attachment = {
-        type: this.selectedAttachment.type,
-        base64Data: this.selectedAttachment.base64,
-        fileName: this.selectedAttachment.fileName,
-        mimeType: this.selectedAttachment.mimeType
-      };
-      const url = await this.FileService.saveFileToSent(this.selectedAttachment.fileName, this.selectedAttachment.blob)
-      console.log(url)
-      const compressedFile = await this.FileService.getFile(url)
-      message.attachment.base64Data = await this.FileService.convertToBase64(compressedFile as Blob) as string
-    }
-
-    await this.chatService.sendMessage(this.roomId, message, this.chatType, this.senderId); //
-
-    this.messageText = '';
-    this.selectedAttachment = null;
-    this.showPreviewModal = false;
-
-    this.scrollToBottom();
-    // this.attachments = await this.attachmentService.getAttachments(this.roomId); //reply and reaction functionality in progress
+    const url = await this.FileService.saveFileToSent(this.selectedAttachment.fileName, this.selectedAttachment.blob);
+    console.log(url);
+    const compressedFile = await this.FileService.getFile(url);
+    message.attachment.base64Data = await this.FileService.convertToBase64(compressedFile as Blob) as string;
   }
+
+  await this.chatService.sendMessage(this.roomId, message, this.chatType, this.senderId);
+
+  // Clear everything after sending
+  this.messageText = '';
+  this.selectedAttachment = null;
+  this.showPreviewModal = false;
+  this.replyToMessage = null; // ⭐ Clear reply after sending
+
+  this.scrollToBottom();
+}
+
+  // async sendMessage() {
+  //   const plainText = this.messageText.trim();
+  //   const encryptedText = plainText ? await this.encryptionService.encrypt(plainText) : '';
+
+  //   const message: Message = {
+  //     sender_id: this.senderId,
+  //     text: encryptedText,
+  //     timestamp: new Date().toISOString(),
+  //     sender_phone: this.sender_phone,
+  //     sender_name: this.sender_name,
+  //     receiver_id: this.chatType === 'private' ? this.receiverId : '',
+  //     receiver_phone: this.receiver_phone,
+  //     delivered: false,
+  //     read: false,
+  //     message_id: uuidv4(),
+  //     isDeleted: false,
+  //     replyToMessageId: this.replyToMessage ? this.replyToMessage.message_id : undefined,
+  //   };
+
+  //   if (this.selectedAttachment) {
+  //     message.attachment = {
+  //       type: this.selectedAttachment.type,
+  //       base64Data: this.selectedAttachment.base64,
+  //       fileName: this.selectedAttachment.fileName,
+  //       mimeType: this.selectedAttachment.mimeType
+  //     };
+  //     const url = await this.FileService.saveFileToSent(this.selectedAttachment.fileName, this.selectedAttachment.blob)
+  //     console.log(url)
+  //     const compressedFile = await this.FileService.getFile(url)
+  //     message.attachment.base64Data = await this.FileService.convertToBase64(compressedFile as Blob) as string
+  //   }
+
+  //   await this.chatService.sendMessage(this.roomId, message, this.chatType, this.senderId); //
+
+  //   this.messageText = '';
+  //   this.selectedAttachment = null;
+  //   this.showPreviewModal = false;
+
+  //   this.scrollToBottom();
+  //   // this.attachments = await this.attachmentService.getAttachments(this.roomId); //reply and reaction functionality in progress
+  // }
 
   async showAttachmentPreviewPopup() {
     const alert = await this.alertController.create({
@@ -1358,7 +1593,7 @@ observeVisibleMessages() {
           handler: () => {
             this.selectedAttachment = null;
           }
-        },         
+        },
         {
           text: 'Send',
           handler: () => {
@@ -1408,20 +1643,24 @@ observeVisibleMessages() {
   }
 
   async openAttachmentModal(msg: any) {
-    // console.log("clicked here ");
-
-    //return when no attachment in found
-    if(!msg.attachment)
-      return;
+  if (!msg.attachment)
+    return;
 
   const modal = await this.modalCtrl.create({
     component: AttachmentPreviewModalComponent,
     componentProps: {
-      attachment: msg.attachment
+      attachment: msg.attachment,
+      message: msg
     },
     cssClass: 'attachment-modal'
   });
+
   await modal.present();
+  const { data } = await modal.onDidDismiss();
+  
+  if (data && data.action === 'reply') {
+    this.setReplyToMessage(data.message);
+  }
 }
 
 
@@ -1471,6 +1710,29 @@ observeVisibleMessages() {
   goToCallingScreen() {
     this.router.navigate(['/calling-screen']);
   }
+
+  async openCamera() {
+    try {
+      const image = await Camera.getPhoto({
+        source: CameraSource.Camera,
+        quality: 90,
+        resultType: CameraResultType.Uri
+      });
+      this.capturedImage = image.webPath!;
+      // console.log("camera checking:",this.capturedImage);
+    } catch (error) {
+      console.error('Camera error:', error);
+    }
+  }
+
+  openKeyboard() {
+  setTimeout(() => {
+    const textareaElement = document.querySelector('ion-textarea') as HTMLIonTextareaElement;
+    if (textareaElement) {
+      textareaElement.setFocus();
+    }
+  }, 100);
+}
 
   async initKeyboardListeners() {
     if (this.platform.is('capacitor')) {

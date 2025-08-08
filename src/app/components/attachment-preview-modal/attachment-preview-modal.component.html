@@ -201,7 +201,7 @@
     </p>
   </div> -->
 
-  <!-- changes by homah start  -->
+
 
   <div class="view-content">
     <ng-container *ngIf="attachment?.type === 'image'">
@@ -253,11 +253,9 @@
     </p>
   </div>
 
-  <!-- changes by homah end  -->
 
 </ion-content>
 
-<!-- changes by homah start  -->
 
 <ion-footer *ngIf="showUI">
   <ion-toolbar>
@@ -268,7 +266,7 @@
     </ion-buttons>
 
     <ion-buttons slot="end">
-      <ion-button class="reply">
+      <ion-button class="reply" (click)="onReply()">
         <ion-icon name="arrow-undo-outline" class="reply-icon"></ion-icon>
         Reply
       </ion-button>
@@ -276,4 +274,3 @@
   </ion-toolbar>
 </ion-footer>
 
-<!-- changes by homah end  -->
