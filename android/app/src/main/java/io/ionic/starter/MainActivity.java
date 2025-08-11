@@ -1,4 +1,4 @@
-package io.ionic.starter;
+package com.ekarigar.telldemm;
 
 import com.getcapacitor.BridgeActivity;
 

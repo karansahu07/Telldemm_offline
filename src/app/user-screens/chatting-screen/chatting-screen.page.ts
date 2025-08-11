@@ -1,339 +1,3 @@
-// import {
-//   Component,
-//   OnInit,
-//   OnDestroy,
-//   inject,
-//   ViewChild,
-//   ElementRef,
-//   AfterViewInit
-// } from '@angular/core';
-// import { ActivatedRoute } from '@angular/router';
-// import { CommonModule } from '@angular/common';
-// import { FormsModule } from '@angular/forms';
-// import { IonContent, IonicModule, Platform } from '@ionic/angular';
-// import { Subscription } from 'rxjs';
-// import { Keyboard } from '@capacitor/keyboard';
-// import { FirebaseChatService } from 'src/app/services/firebase-chat.service';
-// import { EncryptionService } from 'src/app/services/encryption.service';
-// import { getDatabase, ref, get } from 'firebase/database';
-
-// @Component({
-//   selector: 'app-chatting-screen',
-//   standalone: true,
-//   imports: [CommonModule, FormsModule, IonicModule],
-//   templateUrl: './chatting-screen.page.html',
-//   styleUrls: ['./chatting-screen.page.scss']
-// })
-// export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
-//   @ViewChild('scrollContainer', { static: false }) scrollContainer!: ElementRef;
-//   @ViewChild(IonContent, { static: false }) ionContent!: IonContent;
-
-//   messages: any[] = [];
-//   groupedMessages: { date: string; messages: any[] }[] = [];
-
-//   messageText = '';
-//   receiverId = '';
-//   senderId = '';
-//   private messageSub?: Subscription;
-//   showSendButton = false;
-//   private keyboardListeners: any[] = [];
-
-//   private chatService = inject(FirebaseChatService);
-//   private route = inject(ActivatedRoute);
-//   private platform = inject(Platform);
-//   private encryptionService = inject(EncryptionService);
-
-//   roomId = '';
-//   limit = 10;
-//   page = 0;
-//   isLoadingMore = false;
-//   hasMoreMessages = true;
-//   router: any;
-//   chatType: 'private' | 'group' = 'private';
-//   groupName = '';
-
-//   async ngOnInit() {
-//     Keyboard.setScroll({ isDisabled: false });
-//     await this.initKeyboardListeners();
-
-//     this.senderId = localStorage.getItem('userId') || '';
-//     const rawId = this.route.snapshot.queryParamMap.get('receiverId') || '';
-//     const chatTypeParam = this.route.snapshot.queryParamMap.get('isGroup');
-//     this.chatType = chatTypeParam === 'true' ? 'group' : 'private';
-
-//     if (this.chatType === 'group') {
-//       this.roomId = decodeURIComponent(rawId);
-//       await this.fetchGroupName(this.roomId);
-//     } else {
-//       this.receiverId = decodeURIComponent(rawId);
-//       this.roomId = this.getRoomId(this.senderId, this.receiverId);
-//     }
-
-//     // ✅ Reset unread count
-//     await this.chatService.resetUnreadCount(this.roomId, this.senderId);
-//     await this.chatService.markAsRead(this.roomId, this.senderId);
-
-//     this.loadFromLocalStorage();
-//     this.listenForMessages();
-//     setTimeout(() => this.scrollToBottom(), 100);
-//   }
-
-//   async fetchGroupName(groupId: string) {
-//     try {
-//       const db = getDatabase();
-//       const groupRef = ref(db, `groups/${groupId}`);
-//       const snapshot = await get(groupRef);
-
-//       this.groupName = snapshot.exists() ? snapshot.val().name || 'Group' : 'Group';
-//     } catch (error) {
-//       console.error('Error fetching group name:', error);
-//       this.groupName = 'Group';
-//     }
-//   }
-
-//   ngAfterViewInit() {
-//     if (this.ionContent) {
-//       this.ionContent.ionScroll.subscribe(async (event: any) => {
-//         if (event.detail.scrollTop < 50 && this.hasMoreMessages && !this.isLoadingMore) {
-//           this.page += 1;
-//           this.loadMessagesFromFirebase(true);
-//         }
-//       });
-//     }
-//   }
-
-//   getRoomId(userA: string, userB: string): string {
-//     return userA < userB ? `${userA}_${userB}` : `${userB}_${userA}`;
-//   }
-
-//   async listenForMessages() {
-//     this.messageSub = this.chatService.listenForMessages(this.roomId).subscribe(async (data) => {
-//       const decryptedMessages = [];
-//       for (const msg of data) {
-//         const decryptedText = await this.encryptionService.decrypt(msg.text);
-//         decryptedMessages.push({ ...msg, text: decryptedText });
-//       }
-//       this.messages = decryptedMessages;
-//       this.groupedMessages = this.groupMessagesByDate(decryptedMessages);
-//       this.saveToLocalStorage();
-//       setTimeout(() => this.scrollToBottom(), 100);
-//     });
-//   }
-
-//   groupMessagesByDate(messages: any[]) {
-//     const grouped: { [date: string]: any[] } = {};
-//     const today = new Date();
-//     const yesterday = new Date(today);
-//     yesterday.setDate(today.getDate() - 1);
-
-//     messages.forEach(msg => {
-//       const datePart = msg.timestamp?.split(', ')[0];
-//       const [dd, mm, yyyy] = datePart.split('/').map(Number);
-//       const msgDate = new Date(yyyy, mm - 1, dd);
-
-//       let label = datePart;
-//       if (msgDate.toDateString() === today.toDateString()) {
-//         label = 'Today';
-//       } else if (msgDate.toDateString() === yesterday.toDateString()) {
-//         label = 'Yesterday';
-//       }
-
-//       if (!grouped[label]) grouped[label] = [];
-//       grouped[label].push(msg);
-//     });
-
-//     return Object.keys(grouped).map(date => ({
-//       date,
-//       messages: grouped[date]
-//     }));
-//   }
-
-//   async loadFromLocalStorage() {
-//     const cached = localStorage.getItem(this.roomId);
-//     const rawMessages = cached ? JSON.parse(cached) : [];
-//     const decryptedMessages = [];
-
-//     for (const msg of rawMessages) {
-//       const decryptedText = await this.encryptionService.decrypt(msg.text);
-//       decryptedMessages.push({ ...msg, text: decryptedText });
-//     }
-
-//     this.messages = decryptedMessages;
-//     this.groupedMessages = this.groupMessagesByDate(decryptedMessages);
-//   }
-
-//   async sendMessage() {
-//     if (!this.messageText.trim()) return;
-
-//     const date = new Date();
-//     const plainText = this.messageText.trim();
-//     const encryptedText = await this.encryptionService.encrypt(plainText);
-
-//     const message: any = {
-//       sender_id: this.senderId,
-//       text: encryptedText,
-//       timestamp: `${date.toLocaleDateString('en-IN')}, ${date.toLocaleTimeString([], {
-//         hour: '2-digit',
-//         minute: '2-digit',
-//         hour12: true
-//       })}`
-//     };
-
-//     if (this.chatType === 'private') {
-//       message.receiver_id = this.receiverId;
-//     }
-
-//     await this.chatService.sendMessage(this.roomId, message);
-
-//     // ✅ Increment unread count for receiver(s)
-//     if (this.chatType === 'private') {
-//       await this.chatService.incrementUnreadCount(this.roomId, this.receiverId);
-//     } else {
-//       const groupInfo = await this.chatService.getGroupInfo(this.roomId);
-//       for (const userId of Object.keys(groupInfo.members)) {
-//         if (userId !== this.senderId) {
-//           await this.chatService.incrementUnreadCount(this.roomId, userId);
-//         }
-//       }
-//     }
-
-//     this.messageText = '';
-//     this.showSendButton = false;
-//     this.scrollToBottom();
-//   }
-
-//   loadMessagesFromFirebase(isPagination = false) {}
-
-//   saveToLocalStorage() {
-//     localStorage.setItem(this.roomId, JSON.stringify(this.messages));
-//   }
-
-//   scrollToBottom() {
-//     if (this.ionContent) {
-//       setTimeout(() => {
-//         this.ionContent.scrollToBottom(300);
-//       }, 100);
-//     }
-//   }
-
-//   onInputChange() {
-//     this.showSendButton = this.messageText?.trim().length > 0;
-//   }
-
-//   onInputFocus() {
-//     setTimeout(() => {
-//       this.adjustFooterPosition();
-//       this.scrollToBottom();
-//     }, 300);
-//   }
-
-//   onInputBlur() {
-//     setTimeout(() => {
-//       this.resetFooterPosition();
-//     }, 300);
-//   }
-
-//   goToCallingScreen() {
-//     this.router.navigate(['/calling-screen']);
-//   }
-
-//   async initKeyboardListeners() {
-//     if (this.platform.is('capacitor')) {
-//       try {
-//         const showListener = await Keyboard.addListener('keyboardWillShow', (info) => {
-//           this.handleKeyboardShow(info.keyboardHeight);
-//         });
-
-//         const hideListener = await Keyboard.addListener('keyboardWillHide', () => {
-//           this.handleKeyboardHide();
-//         });
-
-//         this.keyboardListeners.push(showListener, hideListener);
-//       } catch (error) {
-//         this.setupFallbackKeyboardDetection();
-//       }
-//     } else {
-//       this.setupFallbackKeyboardDetection();
-//     }
-//   }
-
-//   ngOnDestroy() {
-//     this.keyboardListeners.forEach(listener => listener?.remove());
-//     this.messageSub?.unsubscribe();
-//   }
-
-//   private handleKeyboardShow(keyboardHeight: number) {
-//     const footer = document.querySelector('.footer-fixed') as HTMLElement;
-//     const chatMessages = document.querySelector('.chat-messages') as HTMLElement;
-//     const ionContent = document.querySelector('ion-content') as HTMLElement;
-
-//     if (footer) footer.style.bottom = `${keyboardHeight}px`;
-//     if (chatMessages) chatMessages.style.paddingBottom = `${keyboardHeight + 80}px`;
-//     if (ionContent) ionContent.style.paddingBottom = `${keyboardHeight}px`;
-
-//     setTimeout(() => this.scrollToBottom(), 350);
-//   }
-
-//   private handleKeyboardHide() {
-//     const footer = document.querySelector('.footer-fixed') as HTMLElement;
-//     const chatMessages = document.querySelector('.chat-messages') as HTMLElement;
-//     const ionContent = document.querySelector('ion-content') as HTMLElement;
-
-//     if (footer) footer.style.bottom = '0px';
-//     if (chatMessages) chatMessages.style.paddingBottom = '80px';
-//     if (ionContent) ionContent.style.paddingBottom = '0px';
-//   }
-
-//   private setupFallbackKeyboardDetection() {
-//     const initialViewportHeight = window.visualViewport?.height || window.innerHeight;
-//     const initialChatPadding = 80;
-
-//     const handleViewportChange = () => {
-//       const currentHeight = window.visualViewport?.height || window.innerHeight;
-//       const heightDifference = initialViewportHeight - currentHeight;
-
-//       const footer = document.querySelector('.footer-fixed') as HTMLElement;
-//       const chatMessages = document.querySelector('.chat-messages') as HTMLElement;
-//       const ionContent = document.querySelector('ion-content') as HTMLElement;
-
-//       if (heightDifference > 150) {
-//         if (footer) footer.style.bottom = `${heightDifference}px`;
-//         if (chatMessages) chatMessages.style.paddingBottom = `${heightDifference + initialChatPadding}px`;
-//         if (ionContent) ionContent.style.paddingBottom = `${heightDifference}px`;
-//         setTimeout(() => this.scrollToBottom(), 350);
-//       } else {
-//         if (footer) footer.style.bottom = '0px';
-//         if (chatMessages) chatMessages.style.paddingBottom = `${initialChatPadding}px`;
-//         if (ionContent) ionContent.style.paddingBottom = '0px';
-//       }
-//     };
-
-//     if (window.visualViewport) {
-//       window.visualViewport.addEventListener('resize', handleViewportChange);
-//     } else {
-//       window.addEventListener('resize', handleViewportChange);
-//     }
-//   }
-
-//   private adjustFooterPosition() {
-//     const footer = document.querySelector('.footer-fixed') as HTMLElement;
-//     const chatMessages = document.querySelector('.chat-messages') as HTMLElement;
-//     if (footer) footer.classList.add('keyboard-active');
-//     if (chatMessages) chatMessages.classList.add('keyboard-active');
-//   }
-
-//   private resetFooterPosition() {
-//     const footer = document.querySelector('.footer-fixed') as HTMLElement;
-//     const chatMessages = document.querySelector('.chat-messages') as HTMLElement;
-//     if (footer) footer.classList.remove('keyboard-active');
-//     if (chatMessages) chatMessages.classList.remove('keyboard-active');
-//   }
-// }
-
-
-
-
-
 import {
   Component,
   OnInit,
@@ -366,62 +30,8 @@ import { FileSystemService } from 'src/app/services/file-system.service';
 import imageCompression from 'browser-image-compression';
 import { AttachmentPreviewModalComponent } from '../../components/attachment-preview-modal/attachment-preview-modal.component';
 import { MessageMorePopoverComponent } from '../../components/message-more-popover/message-more-popover.component';
-// import { Clipboard } from '@angular/cdk/clipboard';
 import { Clipboard } from '@capacitor/clipboard';
-
-
-// import { ToastController } from '@ionic/angular';
-
-
-// interface Message{
-//   attachment?: { type: ''; filePath: ''; };
-//   key?: any;
-//   message_id : string;
-//   sender_id : string;
-//   sender_phone : string;
-//   sender_name : string;
-//   receiver_id? : string;
-//   receiver_phone? : string;
-//   type? : "text" | "audio" | "video" | "image";
-//   text? : string;
-//   url? : string;
-//   delivered : boolean;
-//   read : boolean;
-//   timestamp : string;
-//   time? : string;
-// }
-
-interface Message {
-  sender_id: string;
-  key?: any;
-  text: string | null;
-  timestamp: string;
-  sender_phone: string;
-  sender_name: string;
-  receiver_id: string;
-  receiver_phone: string;
-  delivered: boolean;
-  read: boolean;
-  isDeleted?: boolean;
-  message_id: string;
-  time?: string;
-  type?: string;
-  attachment?: {
-    type: 'image' | 'video' | 'audio' | 'file';
-    fileName?: string;           // Optional, used for downloads
-    mimeType?: string;           // Helps identify the type
-    base64Data: string;          // Full data URI, e.g., data:image/png;base64,...Fpickattc
-    filePath?: string;           // Optional original file path or local cache
-    caption?: string;            // Optional caption text for images/videos
-  };
-
-  // replyToMessageId?: string;
-  replyToMessageId?: string | undefined;    //for reply
-  reactions?: {
-    [userId: string]: string;     //for reactions
-  }
-
-}
+import { Message, PinnedMessage } from 'src/types';
 
 
 @Component({
@@ -512,6 +122,12 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   longPressTimeout: any;
   replyToMessage: Message | null = null;
   capturedImage = '';
+  pinnedMessage: PinnedMessage | null = null;
+  pinnedMessageDetails: any = null;
+  private pinnedMessageSubscription: any;
+  showMobilePinnedBanner: boolean = false;
+  chatName: string = '';
+  onlineCount: number = 0;
 
   async ngOnInit() {
     // Enable proper keyboard scrolling
@@ -557,58 +173,13 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     // Load and render messages
     this.loadFromLocalStorage();
     this.listenForMessages();
+    this.setupPinnedMessageListener();
+
+    this.checkMobileView();
 
     // Scroll to bottom after short delay
     setTimeout(() => this.scrollToBottom(), 100);
   }
-
-  // async ionViewWillEnter(){
-  //   // Enable proper keyboard scrolling
-  //   Keyboard.setScroll({ isDisabled: false });
-  //   await this.initKeyboardListeners();
-
-  //   // Load sender (current user) details
-  //   this.senderId = (await this.secureStorage.getItem('userId')) || '';
-  //   this.sender_phone = (await this.secureStorage.getItem('phone_number')) || '';
-  //   this.sender_name = (await this.secureStorage.getItem('name')) || '';
-  //   // this.receiver_name = await this.secureStorage.getItem('receiver_name') || '';
-  //   const nameFromQuery = this.route.snapshot.queryParamMap.get('receiver_name');
-  // this.receiver_name = nameFromQuery || await this.secureStorage.getItem('receiver_name') || '';
-
-  //   // Get query parameters
-  //   const rawId = this.route.snapshot.queryParamMap.get('receiverId') || '';
-  //   const chatTypeParam = this.route.snapshot.queryParamMap.get('isGroup');
-  //   const phoneFromQuery = this.route.snapshot.queryParamMap.get('receiver_phone');
-
-  //   // Determine chat type
-  //   this.chatType = chatTypeParam === 'true' ? 'group' : 'private';
-
-  //   if (this.chatType === 'group') {
-  //     // Group chat
-  //     this.roomId = decodeURIComponent(rawId);
-  //     await this.fetchGroupName(this.roomId);
-  //   } else {
-  //     // Individual chat
-  //     this.receiverId = decodeURIComponent(rawId);
-  //     this.roomId = this.getRoomId(this.senderId, this.receiverId);
-
-  //     // Use receiver_phone from query or fallback to localStorage
-  //     this.receiver_phone = phoneFromQuery || localStorage.getItem('receiver_phone') || '';
-  //     // Store for reuse when navigating to profile
-  //     localStorage.setItem('receiver_phone', this.receiver_phone);
-  //   }
-
-  //   // Reset unread count and mark messages as read
-  //   await this.chatService.resetUnreadCount(this.roomId, this.senderId);
-  //   await this.markMessagesAsRead();
-
-  //   // Load and render messages
-  //   this.loadFromLocalStorage();
-  //   this.listenForMessages();
-
-  //   // Scroll to bottom after short delay
-  //   setTimeout(() => this.scrollToBottom(), 100);
-  // }
 
   async ionViewWillEnter() {
     // Enable proper keyboard scrolling
@@ -1101,28 +672,43 @@ scrollToRepliedMessage(replyToMessageId: string) {
     console.log('Forwarding:', this.selectedMessages);
   }
 
-  // async onMore(ev?: Event) {
-  //   const popover = await this.popoverController.create({
-  //     component: MessageMorePopoverComponent,
-  //     event: ev,
-  //     translucent: true,
-  //     showBackdrop: true,
-  //   });
 
-  //   await popover.present();
+//   async onMore(ev?: Event) {
+//   const hasText = !!this.lastPressedMessage?.text;
+//   const hasAttachment = !!(this.lastPressedMessage?.attachment || 
+//                            this.lastPressedMessage?.file || 
+//                            this.lastPressedMessage?.image ||
+//                            this.lastPressedMessage?.media);
 
-  //   const { data } = await popover.onDidDismiss();
-  //   if (data) {
-  //     this.handlePopoverAction(data);
-  //   }
-  // }
+//   const popover = await this.popoverController.create({
+//     component: MessageMorePopoverComponent,
+//     event: ev,
+//     translucent: true,
+//     showBackdrop: true,
+//     componentProps: {
+//       hasText: hasText,
+//       hasAttachment: hasAttachment
+//     }
+//   });
 
-  async onMore(ev?: Event) {
+//   await popover.present();
+
+//   const { data } = await popover.onDidDismiss();
+//   if (data) {
+//     this.handlePopoverAction(data);
+//   }
+// }
+
+async onMore(ev?: Event) {
   const hasText = !!this.lastPressedMessage?.text;
-  const hasAttachment = !!(this.lastPressedMessage?.attachment || 
-                           this.lastPressedMessage?.file || 
-                           this.lastPressedMessage?.image ||
-                           this.lastPressedMessage?.media);
+  const hasAttachment = !!(
+    this.lastPressedMessage?.attachment || 
+    this.lastPressedMessage?.file || 
+    this.lastPressedMessage?.image ||
+    this.lastPressedMessage?.media
+  );
+
+  const isPinned = this.pinnedMessage?.key === this.lastPressedMessage?.message_id; // ✅ Check if message is already pinned
 
   const popover = await this.popoverController.create({
     component: MessageMorePopoverComponent,
@@ -1131,7 +717,8 @@ scrollToRepliedMessage(replyToMessageId: string) {
     showBackdrop: true,
     componentProps: {
       hasText: hasText,
-      hasAttachment: hasAttachment
+      hasAttachment: hasAttachment,
+      isPinned: isPinned // ✅ pass pin status
     }
   });
 
@@ -1144,56 +731,177 @@ scrollToRepliedMessage(replyToMessageId: string) {
 }
 
 
+// async handlePopoverAction(action: string) {
+//     switch (action) {
+//       case 'info':
+//         console.log('Info clicked');
+//         break;
+//       case 'copy':
+//         this.copyMessage()
+//         break;
+//       case 'share':
+//         this.shareMessage()
+//         break;
+//       case 'pin':
+//         this.pinMessage()
+//         break;
+//     }
+//   }
+
 async handlePopoverAction(action: string) {
   switch (action) {
     case 'info':
       console.log('Info clicked');
       break;
     case 'copy':
-      if (this.lastPressedMessage?.text) {
-        await Clipboard.write({ string: this.lastPressedMessage.text });
-        console.log('Text copied to clipboard:', this.lastPressedMessage.text);
-        this.selectedMessages = [];
-        this.lastPressedMessage = null;
-      }
+      this.copyMessage();
       break;
     case 'share':
-      if (this.lastPressedMessage?.attachment || 
-          this.lastPressedMessage?.file || 
-          this.lastPressedMessage?.image ||
-          this.lastPressedMessage?.media) {
-        console.log('Share clicked for attachment:', this.lastPressedMessage);
-        // Add your share logic here
-        this.selectedMessages = [];
-        this.lastPressedMessage = null;
-      }
+      this.shareMessage();
       break;
     case 'pin':
-      console.log('Pin clicked');
+      this.pinMessage();
+      break;
+    case 'unpin':
+      this.unpinMessage();
       break;
   }
 }
 
 
-  // async handlePopoverAction(action: string) {
-  //   switch (action) {
-  //     case 'info':
-  //       console.log('Info clicked');
-  //       break;
-  //     case 'copy':
-  //       if (this.lastPressedMessage?.text) {
-  //         await Clipboard.write({ string: this.lastPressedMessage.text });
-  //         console.log('Text copied to clipboard:', this.lastPressedMessage.text);
-  //         this.selectedMessages = [];
-  //         this.lastPressedMessage = null;
-  //       }
-  //       break;
-  //     case 'pin':
-  //       console.log('Pin clicked');
-  //       break;
+async copyMessage() {
+    if (this.lastPressedMessage?.text) {
+      await Clipboard.write({ string: this.lastPressedMessage.text });
+      console.log('Text copied to clipboard:', this.lastPressedMessage.text);
+      this.selectedMessages = [];
+      this.lastPressedMessage = null;
+    }
+  }
+
+  shareMessage() {
+    // if (this.lastPressedMessage?.attachment ||
+    //   this.lastPressedMessage?.file ||
+    //   this.lastPressedMessage?.image ||
+    //   this.lastPressedMessage?.media) {
+    console.log('Share clicked for attachment:', this.lastPressedMessage);
+    //   // Add your share logic here
+    //   this.selectedMessages = [];
+    //   this.lastPressedMessage = null;
+    // }
+    //Todo implement this
+  }
+
+  // pinMessage() {
+  //   console.log("check group",!!this.chatType);
+  //   const pin: PinnedMessage = {
+  //     messageId: this.lastPressedMessage?.message_id as string,
+  //     key: this.lastPressedMessage?.key,
+  //     pinnedAt: Date.now(),
+  //     pinnedBy: this.senderId,
+  //     roomId: this.roomId,
+  //     scope: !!this.chatType ? 'global' : 'private'
   //   }
+  //   this.chatService.pinMessage(pin)
+
+  //   console.log("Message pinned", pin.messageId)
+  //   this.selectedMessages = [];
+  //     this.lastPressedMessage = null;
   // }
 
+  pinMessage() {
+    const pin: PinnedMessage = {
+      messageId: this.lastPressedMessage?.message_id as string,
+      key: this.lastPressedMessage?.key,
+      pinnedAt: Date.now(),
+      pinnedBy: this.senderId,
+      roomId: this.roomId,
+      scope: 'global' // Always global now
+    };
+    this.chatService.pinMessage(pin);
+
+    console.log("Message pinned", pin.messageId);
+    this.selectedMessages = [];
+    this.lastPressedMessage = null;
+}
+
+ setupPinnedMessageListener() {
+  this.pinnedMessageSubscription = this.chatService.listenToPinnedMessage(
+    this.roomId,
+    (pinnedMessage) => {
+      this.pinnedMessage = pinnedMessage;
+      if (pinnedMessage) {
+        // Find the actual message details from your messages array
+        this.findPinnedMessageDetails(pinnedMessage.key);
+      } else {
+        this.pinnedMessageDetails = null;
+      }
+    }
+  );
+}
+
+     findPinnedMessageDetails(messageId: string) {
+    // Search through all grouped messages to find the pinned message
+    for (const group of this.groupedMessages) {
+      const foundMessage = group.messages.find(msg => msg.message_id === messageId);
+      if (foundMessage) {
+        this.pinnedMessageDetails = foundMessage;
+        break;
+      }
+    }
+  }
+
+    unpinMessage() {
+  if (this.pinnedMessage) {
+    this.chatService.unpinMessage(this.roomId);
+  }
+}
+
+  scrollToPinnedMessage() {
+    if (this.pinnedMessageDetails) {
+      const element = document.querySelector(`[data-msg-key="${this.pinnedMessageDetails.key}"]`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Optional: Add highlight effect
+        element.classList.add('highlighted');
+        setTimeout(() => element.classList.remove('highlighted'), 2000);
+      }
+    }
+  }
+
+   checkMobileView() {
+    this.showMobilePinnedBanner = window.innerWidth < 480;
+  }
+
+  openChatInfo() {
+    // Implement your chat info functionality
+    console.log('Opening chat info');
+  }
+
+  getAttachmentIcon(type: string): string {
+  switch (type) {
+    case 'image': return 'image-outline';
+    case 'video': return 'videocam-outline';
+    case 'audio': return 'musical-note-outline';
+    case 'file': return 'document-outline';
+    default: return 'attach-outline';
+  }
+}
+
+getAttachmentPreview(attachment: any): string {
+  if (attachment.caption) {
+    return attachment.caption.length > 30 ? 
+           attachment.caption.substring(0, 30) + '...' : 
+           attachment.caption;
+  }
+  
+  switch (attachment.type) {
+    case 'image': return 'Photo';
+    case 'video': return 'Video';
+    case 'audio': return 'Audio';
+    case 'file': return attachment.fileName || 'File';
+    default: return 'Attachment';
+  }
+}
 
   async fetchGroupName(groupId: string) {
     try {
@@ -1579,7 +1287,7 @@ async sendMessage() {
   //   this.showPreviewModal = false;
 
   //   this.scrollToBottom();
-  //   // this.attachments = await this.attachmentService.getAttachments(this.roomId); //reply and reaction functionality in progress
+  //   // this.attachments = await this.attachmentService.getAttachments(this.roomId); //reaction functionality in progress
   // }
 
   async showAttachmentPreviewPopup() {
@@ -1757,6 +1465,9 @@ async sendMessage() {
   ngOnDestroy() {
     this.keyboardListeners.forEach(listener => listener?.remove());
     this.messageSub?.unsubscribe();
+     if (this.pinnedMessageSubscription) {
+      this.pinnedMessageSubscription();
+    }
   }
 
   // ... keyboard adjustment methods (same as your existing implementation)

@@ -1,86 +1,5 @@
-<!-- <ion-header [translucent]="true">
-  <ion-toolbar>
-
-    
-    <ion-buttons *ngIf="!showSearchBar" slot="start" style="color: black; width: 8%; margin-top: 15px;">
-      <ion-back-button defaultHref="/home-screen"></ion-back-button>
-    </ion-buttons>
-
-  
-    <ng-container *ngIf="!showSearchBar; else searchBar">
-      <ion-buttons>
-        <ion-item lines="none" style="--padding-start: 0; --background: white; color: black; margin-top: 15px;"
-          detail="false">
-          <ion-avatar slot="start">
-            <img src="assets/images/user.jfif" alt="User Avatar"
-              onError="this.src='assets/images/default-avatar.png'" />
-          </ion-avatar>
-          <ion-label (click)="goToProfile()"
-            style="width: auto; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;">
-            <h2 style="margin: 0; font-size: 16px;">
-              {{ chatType === 'group' ? groupName : receiver_name }}
-            </h2>
-          </ion-label>
-        </ion-item>
-      </ion-buttons>
-    </ng-container>
-
-    <ng-template #searchBar>
-      <ion-item lines="none"
-        style="margin-top: 10px; padding: 10px 15px; --border-radius: 25px; --background: #f5f5f5; width: 100%;">
-        <ion-icon name="arrow-back-outline" slot="start" style="font-size: 24px; cursor: pointer; margin-right: 10px;"
-          (click)="cancelSearch()"></ion-icon>
-        <ion-input placeholder="Search messages..." [(ngModel)]="searchText" (ionInput)="onSearchInput()"
-          style="margin-left: 10px; flex: 1;">
-        </ion-input>
-        <ion-buttons slot="end">
-          <ion-button (click)="openDatePicker()">
-            <ion-icon name="calendar-outline"></ion-icon>
-          </ion-button>
-          <ion-button (click)="navigateSearch('up')">
-            <ion-icon name="arrow-up-outline"></ion-icon>
-          </ion-button>
-          <ion-button (click)="navigateSearch('down')">
-            <ion-icon name="arrow-down-outline"></ion-icon>
-          </ion-button>
-        </ion-buttons>
-      </ion-item>
-    </ng-template>
-
-
-    <ion-buttons *ngIf="!showSearchBar" slot="end" style="margin-top: 15px;">
-      <ion-button style="color: black;">
-        <ion-icon name="videocam-outline" style="font-size: 35px;"></ion-icon>
-      </ion-button>
-      <ion-button (click)="goToCallingScreen()" style="color: black;">
-        <ion-icon name="call-outline" style="font-size: 28px;"></ion-icon>
-      </ion-button>
-      <ion-button (click)="openOptions($event)" style="color: black;">
-        <ion-icon name="ellipsis-vertical-outline" style="font-size: 28px;"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-
-  </ion-toolbar>
-</ion-header> -->
-
 <ion-header [translucent]="true">
   <ion-toolbar>
-
-    <!-- 🔁 Selection Header -->
-    <!-- <ng-container *ngIf="selectedMessages.length > 0; else defaultHeader">
-      <ion-title>{{ selectedMessages.length }} selected</ion-title>
-      <ion-buttons slot="end">
-        <ion-button (click)="onForward()">
-          <ion-icon name="arrow-redo-outline"></ion-icon>
-        </ion-button>
-        <ion-button (click)="deleteSelectedMessages()">
-          <ion-icon name="trash-outline"></ion-icon>
-        </ion-button>
-        <ion-button (click)="onMore($event)">
-          <ion-icon name="ellipsis-vertical-outline"></ion-icon>
-        </ion-button>
-      </ion-buttons>
-    </ng-container> -->
 
     <ng-container *ngIf="selectedMessages.length > 0; else defaultHeader">
       <ion-title>{{ selectedMessages.length }} selected</ion-title>
@@ -221,9 +140,37 @@
 </ion-header>
 
 
-
 <ion-content class="chat-background" [fullscreen]="true" [scrollEvents]="true">
-  <div #scrollContainer class="chat-messages" style="padding: 0 10px 80px 10px ; overflow-y: auto; min-height: 100%;">
+  
+  <!-- Pinned Message Banner (Alternative/Mobile View) -->
+  <div *ngIf="pinnedMessage && pinnedMessageDetails && showMobilePinnedBanner" class="pinned-message-banner" 
+       (click)="scrollToPinnedMessage()">
+    <div class="pinned-content">
+      <div class="pinned-header">
+        <ion-icon name="pin" class="pin-icon"></ion-icon>
+        <span class="pinned-text">Pinned Message</span>
+        <ion-icon name="close" class="unpin-icon" (click)="unpinMessage(); $event.stopPropagation()"></ion-icon>
+      </div>
+      <div class="pinned-message-preview">
+        <span class="pinned-sender" *ngIf="chatType === 'group'">{{ pinnedMessageDetails.sender_name }}:</span>
+        
+        <!-- Text message preview -->
+        <span *ngIf="pinnedMessageDetails.text && !pinnedMessageDetails.attachment" class="pinned-text-content">
+          {{ pinnedMessageDetails.text.length > 50 ? (pinnedMessageDetails.text | slice:0:50) + '...' : pinnedMessageDetails.text }}
+        </span>
+        
+        <!-- Attachment preview -->
+        <span *ngIf="pinnedMessageDetails.attachment" class="pinned-attachment">
+          <ion-icon [name]="getAttachmentIcon(pinnedMessageDetails.attachment.type)"></ion-icon>
+          {{ getAttachmentPreview(pinnedMessageDetails.attachment) }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div #scrollContainer class="chat-messages" 
+       style="padding: 10px 10px 80px 10px; overflow-y: auto; min-height: 100%;">
+    
     <ion-spinner name="dots" *ngIf="isLoadingMore" style="margin: 8px auto; display: block;"></ion-spinner>
 
     <div *ngFor="let group of groupedMessages">
@@ -234,13 +181,18 @@
       <div *ngFor="let msg of group.messages" [ngClass]="{
        'align-end': msg.sender_id === senderId,
        'align-start': msg.sender_id !== senderId,
-       'selected': isSelected(msg)
-     }" style="display: flex; flex-direction: column; margin: 5px 0;" (touchstart)="startLongPress(msg)"
-        (touchend)="cancelLongPress()" (touchmove)="cancelLongPress()" (click)="onMessageClick(msg)">
-
+       'selected': isSelected(msg),
+       'pinned-message-highlight': pinnedMessage && pinnedMessage.messageId === msg.message_id
+     }" style="display: flex; flex-direction: column; margin: 5px 0;" 
+        (touchstart)="startLongPress(msg)"
+        (touchend)="cancelLongPress()" 
+        (touchmove)="cancelLongPress()" 
+        (click)="onMessageClick(msg)">
 
         <div class="message-bubble" (click)="openAttachmentModal(msg)" [attr.data-msg-key]="msg.key"
           [ngClass]="msg.sender_id === senderId ? 'sender-message' : 'receiver-message'">
+
+          
 
           <!-- Checkbox for selected messages -->
           <ion-icon *ngIf="selectedMessages.length > 0" [name]="isSelected(msg) ? 'checkbox' : 'square-outline'"
@@ -253,7 +205,7 @@
             {{ msg.sender_name }}
           </span>
 
-          <!-- REPLIED MESSAGE DISPLAY - Add this section -->
+          <!-- REPLIED MESSAGE DISPLAY -->
           <div class="replied-message" *ngIf="msg.replyToMessageId"
             (click)="scrollToRepliedMessage(msg.replyToMessageId)">
             <ng-container *ngIf="getRepliedMessage(msg.replyToMessageId) as repliedMsg">
@@ -318,6 +270,9 @@
 
           <!-- Timestamp & Status -->
           <p class="time-stamp status-container">
+            <!-- Pin indicator in timestamp -->
+            <ion-icon *ngIf="pinnedMessage && pinnedMessage.messageId === msg.message_id" 
+                      name="pin" class="pin-indicator-timestamp"></ion-icon>
             {{ msg.time }}
             <ng-container *ngIf="msg.sender_id === senderId">
               <ion-icon *ngIf="!msg.delivered" name="checkmark-outline" class="status-icon sent"></ion-icon>
@@ -329,10 +284,7 @@
           </p>
         </div>
       </div>
-
-
     </div>
-
   </div>
 </ion-content>
 
