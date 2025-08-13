@@ -32,6 +32,7 @@ import { AttachmentPreviewModalComponent } from '../../components/attachment-pre
 import { MessageMorePopoverComponent } from '../../components/message-more-popover/message-more-popover.component';
 import { Clipboard } from '@capacitor/clipboard';
 import { Message, PinnedMessage } from 'src/types';
+import { AuthService } from 'src/app/auth/auth.service';
 
 
 @Component({
@@ -91,7 +92,8 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     private FileService: FileSystemService,
     private modalCtrl: ModalController,
     private popoverController: PopoverController,
-    private clipboard: Clipboard
+    private clipboard: Clipboard,
+    private authService: AuthService
   ) { }
 
   roomId = '';
@@ -135,8 +137,10 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     await this.initKeyboardListeners();
 
     // Load sender (current user) details
-    this.senderId = (await this.secureStorage.getItem('userId')) || '';
-    this.sender_phone = (await this.secureStorage.getItem('phone_number')) || '';
+    // this.senderId = (await this.secureStorage.getItem('userId')) || '';
+    this.senderId = this.authService.authData?.userId || '';
+    // this.sender_phone = (await this.secureStorage.getItem('phone_number')) || '';
+    this.sender_phone = this.authService.authData?.phone_number || '';
     this.sender_name = (await this.secureStorage.getItem('name')) || '';
     // this.receiver_name = await this.secureStorage.getItem('receiver_name') || '';
     const nameFromQuery = this.route.snapshot.queryParamMap.get('receiver_name');
@@ -187,8 +191,10 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     await this.initKeyboardListeners();
 
     // Load sender (current user) details
-    this.senderId = (await this.secureStorage.getItem('userId')) || '';
-    this.sender_phone = (await this.secureStorage.getItem('phone_number')) || '';
+    // this.senderId = (await this.secureStorage.getItem('userId')) || '';
+    this.senderId = this.authService.authData?.userId || '';
+    // this.sender_phone = (await this.secureStorage.getItem('phone_number')) || '';
+    this.sender_phone = this.authService.authData?.phone_number || '';
     this.sender_name = (await this.secureStorage.getItem('name')) || '';
 
     const nameFromQuery = this.route.snapshot.queryParamMap.get('receiver_name');
@@ -708,8 +714,8 @@ async onMore(ev?: Event) {
     this.lastPressedMessage?.media
   );
 
-  const isPinned = this.pinnedMessage?.key === this.lastPressedMessage?.message_id; // ✅ Check if message is already pinned
-
+  const isPinned = this.pinnedMessage?.key === this.lastPressedMessage?.key; // ✅ Check if message is already pinned
+  // console.log()
   const popover = await this.popoverController.create({
     component: MessageMorePopoverComponent,
     event: ev,

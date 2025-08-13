@@ -273,7 +273,7 @@ async createGroup(groupId: string, groupName: string, members: any[], currentUse
 
   // 🔍 Get all communities user has joined
   async getUserCommunities(userId: string): Promise<string[]> {
-    const snapshot = await get(child(ref(this.db), `users/${userId}/joinedCommunities`));
+    const snapshot = await get(child(ref(this.db), `users_community/${userId}/joinedCommunities`));
     const communities = snapshot.val();
     return communities ? Object.keys(communities) : [];
   }

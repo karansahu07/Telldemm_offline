@@ -18,8 +18,8 @@ export class LoginRedirectGuard implements CanActivate {
 //   }
 
 canActivate(): boolean {
-  const isLoggedIn = !!localStorage.getItem('userId');
-  if (isLoggedIn) {
+  // const isLoggedIn = !!localStorage.getItem('userId');
+  if (this.authService.isAuthenticated) {
     this.router.navigate(['/home-screen']);
     return false;
   }

@@ -1201,6 +1201,7 @@ import { FirebaseChatService } from '../services/firebase-chat.service';
 import { ContactSyncService } from '../services/contact-sync.service';
 import { SecureStorageService } from '../services/secure-storage/secure-storage.service';
 import { ApiService } from '../services/api/api.service';
+import { AuthService } from '../auth/auth.service';
 
 @Component({
   selector: 'app-contacts',
@@ -1231,7 +1232,8 @@ export class ContactsPage implements OnInit {
     private firebaseChatService: FirebaseChatService,
     private contactSyncService: ContactSyncService,
     private secureStorage: SecureStorageService,
-    private api: ApiService
+    private api: ApiService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -1244,7 +1246,8 @@ export class ContactsPage implements OnInit {
    * ✅ Loads contacts from device that match backend users
    */
   async loadDeviceMatchedContacts() {
-    const currentUserPhone = localStorage.getItem('phone_number');
+    // const currentUserPhone = localStorage.getItem('phone_number');
+    const currentUserPhone = this.authService.authData?.phone_number;
     this.allUsers = [];
     this.isLoading = true; // show loader
 
@@ -1279,8 +1282,9 @@ export class ContactsPage implements OnInit {
 
 async createGroup() {
   const selectedUsers = this.allUsers.filter(user => user.selected);
-  const currentUserId = localStorage.getItem('userId')!;
-  const currentUserPhone = localStorage.getItem('phone_number');
+  // const currentUserId = localStorage.getItem('userId')!;
+  const currentUserId = this.authService.authData?.userId || '';
+  const currentUserPhone = this.authService.authData?.phone_number
   const currentUserName = await this.secureStorage.getItem('name');
 console.log("Current User Name:", currentUserName);
 

@@ -5,6 +5,7 @@ export const environment = {
    firebase : {
   apiKey: "AIzaSyCgfncgpyaDkxpSuX8Wtq5YveUszqjGG6c",
   authDomain: "telldemmchat.firebaseapp.com",
+  databaseURL: "https://telldemmchat-default-rtdb.firebaseio.com",
   projectId: "telldemmchat",
   storageBucket: "telldemmchat.firebasestorage.app",
   messagingSenderId: "236194781114",

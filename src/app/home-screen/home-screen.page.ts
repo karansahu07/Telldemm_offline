@@ -14,6 +14,7 @@ import { EncryptionService } from '../services/encryption.service';
 import { Capacitor } from '@capacitor/core';
 import { SecureStorageService } from '../services/secure-storage/secure-storage.service';
 import { decodeBase64 } from '../utils/decodeBase64.util';
+import { AuthService } from '../auth/auth.service';
 
 @Component({
   selector: 'app-home-screen',
@@ -44,12 +45,13 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     private service: ApiService,
     private firebaseChatService: FirebaseChatService,
     private encryptionService: EncryptionService,
-    private secureStorage: SecureStorageService
+    private secureStorage: SecureStorageService,
+    private authService: AuthService
   ) { }
 
   async ngOnInit() {
-    this.currUserId = await this.secureStorage.getItem('phone_number');
-    this.senderUserId = await this.secureStorage.getItem('userId');
+    this.currUserId = this.authService.authData?.phone_number || '';
+    this.senderUserId = this.authService.authData?.userId || '';
     
     this.getAllUsers();
     this.loadUserGroups();
@@ -87,6 +89,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
   private async refreshHomeData() {
     try {
       // Reload user IDs
+      // this.currUserId = await this.secureStorage.getItem('phone_number');
       this.currUserId = await this.secureStorage.getItem('phone_number');
       this.senderUserId = await this.secureStorage.getItem('userId');
       

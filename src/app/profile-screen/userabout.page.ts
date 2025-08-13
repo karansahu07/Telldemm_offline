@@ -228,6 +228,7 @@ import { FirebaseChatService } from '../services/firebase-chat.service';
 import { SecureStorageService } from '../services/secure-storage/secure-storage.service';
 import { NavController } from '@ionic/angular';
 import { NgZone } from '@angular/core';
+import { AuthService } from '../auth/auth.service';
 
 @Component({
   selector: 'app-userabout',
@@ -281,6 +282,7 @@ export class UseraboutPage implements OnInit {
     private secureStorage: SecureStorageService,
     private navCtrl: NavController,
     private zone: NgZone,
+    private authService: AuthService
   ) { }
 
   ngOnInit() {
@@ -291,7 +293,8 @@ export class UseraboutPage implements OnInit {
       this.chatType = this.isGroup ? 'group' : 'private';
       // this.receiver_name = localStorage.getItem('receiver_name') || '';
       this.receiver_name = (await this.secureStorage.getItem('receiver_name')) || '';
-      this.currentUserId = localStorage.getItem('userId') || '';
+      // this.currentUserId = localStorage.getItem('userId') || '';
+      this.currentUserId = this.authService.authData?.userId || '';
       this.groupId = this.route.snapshot.queryParamMap.get('receiverId') || '';
       console.log("gruop id checking:", this.groupId);
 
@@ -322,7 +325,8 @@ export class UseraboutPage implements OnInit {
       // this.receiver_name = (await this.secureStorage.getItem('receiver_name')) || '';
       this.receiver_name = params['receiver_name'] || '';  //this will not update in real device
       console.log("redirect name", this.receiver_name);
-      this.currentUserId = localStorage.getItem('userId') || '';
+      // this.currentUserId = localStorage.getItem('userId') || '';
+      this.currentUserId = this.authService.authData?.userId || '';
       this.groupId = this.route.snapshot.queryParamMap.get('receiverId') || '';
 
       // console.log("dasfsdfgdg",this.isGroup);
@@ -520,7 +524,8 @@ export class UseraboutPage implements OnInit {
   // }
 
   messageMember(member: any) {
-    const senderId = localStorage.getItem('userId') || '';
+    // const senderId = localStorage.getItem('userId') || '';
+    const senderId = this.authService.authData?.userId || '';
     const receiverId = member.user_id;
 
     if (!senderId || !receiverId) {
@@ -691,8 +696,10 @@ export class UseraboutPage implements OnInit {
 }
 
   async createGroupWithMember() {
-    const currentUserId = localStorage.getItem('userId');
-    const currentUserPhone = localStorage.getItem('phone_number');
+    // const currentUserId = localStorage.getItem('userId');
+    const currentUserId = this.authService.authData?.userId;
+    // const currentUserPhone = localStorage.getItem('phone_number');
+    const currentUserPhone = this.authService.authData?.phone_number;
     const currentUserName = localStorage.getItem('name') || currentUserPhone;
 
     if (!currentUserId || !this.receiverId || !this.receiver_name) {

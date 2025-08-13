@@ -61,7 +61,7 @@
     Pin
   </ion-item>
 
-  <ion-item button (click)="selectOption('unpin')" *ngIf="showUnpin">
+  <ion-item button (click)="selectOption('unpin')" *ngIf="!showPin">
     <ion-icon slot="start" name="pin-outline"></ion-icon>
     Unpin
   </ion-item>

@@ -11,6 +11,7 @@ import {
 import { MenuPopoverComponent } from '../components/menu-popover/menu-popover.component';
 import { FooterTabsComponent } from '../components/footer-tabs/footer-tabs.component';
  import { FirebaseChatService } from '../services/firebase-chat.service';
+import { AuthService } from '../auth/auth.service';
 
 @Component({
   selector: 'app-community',
@@ -20,7 +21,8 @@ import { FooterTabsComponent } from '../components/footer-tabs/footer-tabs.compo
   imports: [IonicModule, CommonModule, FooterTabsComponent],
 })
 export class CommunityPage implements OnInit {
- userId = localStorage.getItem('userId') || '';
+//  userId = localStorage.getItem('userId') || '';
+  userId = this.authService.authData?.userId as string;
   joinedCommunities: any[] = [];
   selectedCommunity: any = null;
   communityGroups: any[] = [];
@@ -31,7 +33,8 @@ export class CommunityPage implements OnInit {
     private actionSheetCtrl: ActionSheetController,
     private firebaseService: FirebaseChatService,
     private alertCtrl: AlertController,
-    private toastCtrl: ToastController
+    private toastCtrl: ToastController,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {

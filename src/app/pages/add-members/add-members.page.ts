@@ -6,6 +6,7 @@ import { ContactSyncService } from 'src/app/services/contact-sync.service'; // a
 import { get, child, getDatabase, ref as dbRef, update, ref } from 'firebase/database';
 import { ActivatedRoute } from '@angular/router';
 import { ToastController } from '@ionic/angular';
+import { AuthService } from 'src/app/auth/auth.service';
 
 @Component({
   selector: 'app-add-members',
@@ -25,7 +26,8 @@ export class AddMembersPage implements OnInit {
     private navCtrl: NavController,
     private contactSyncService: ContactSyncService,
     private route: ActivatedRoute,
-    private toastCtrl: ToastController
+    private toastCtrl: ToastController,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -45,7 +47,8 @@ export class AddMembersPage implements OnInit {
 }
 
   async loadDeviceMatchedContacts() {
-  const currentUserPhone = localStorage.getItem('phone_number');
+  const currentUserPhone = this.authService.authData?.phone_number;
+  // const currentUserPhone = localStorage.getItem('phone_number');
   this.allUsers = [];
   this.isLoading = true;
 
