@@ -98,45 +98,87 @@ export class AuthService {
   }
 
   /** Send OTP */
-  sendOtp(payload: { phone_number: string; email: string }): Promise<any> {
-    return this.api.post('/api/auth/send-otp', payload).toPromise();
-  }
+  // sendOtp(payload: { phone_number: string; email: string }): Promise<any> {
+  //   return this.api.post('/api/auth/send-otp', payload).toPromise();
+  // }
+
+  /** Send OTP */
+sendOtp(payload: { phone_number: string; country_code: string }): Promise<any> {
+  return this.api.post('/api/auth/send-otp_mb', payload).toPromise();
+}
 
   /** Verify OTP & store in secure storage */
-  async verifyOtp(fullPhone: string, otp: string): Promise<{ success: boolean; userId?: number; message?: string }> {
-    try {
-      const res: any = await this.api.post('/api/auth/verify-otp', { phone_number: fullPhone, otp_code: otp }).toPromise();
+  // async verifyOtp(fullPhone: string, otp: string): Promise<{ success: boolean; userId?: number; message?: string }> {
+  //   try {
+  //     const res: any = await this.api.post('/api/auth/verify-otp', { phone_number: fullPhone, otp_code: otp }).toPromise();
 
-      if (res.status) {
-        const authData: AuthData = {
-          loggedIn: true,
-          phone_number: fullPhone,
-          userId: res.user_id.toString()
-        };
+  //     if (res.status) {
+  //       const authData: AuthData = {
+  //         loggedIn: true,
+  //         phone_number: fullPhone,
+  //         userId: res.user_id.toString()
+  //       };
 
-        // Store whole object in SecureStorage under "AUTH"
-        await this.secureStorage.setItem('AUTH', JSON.stringify(authData));
+  //       // Store whole object in SecureStorage under "AUTH"
+  //       await this.secureStorage.setItem('AUTH', JSON.stringify(authData));
 
-        // In-memory state
-        this._authData = authData;
-        this._isAuthenticated = true;
+  //       // In-memory state
+  //       this._authData = authData;
+  //       this._isAuthenticated = true;
 
-        // Generate and upload public key
-        const publicKeyHex = await this.encryptionService.generateAndStoreECCKeys();
-        await this.api.post('/api/users/update-public-key', {
-          user_id: res.user_id,
-          public_key: publicKeyHex
-        }).toPromise();
+  //       // Generate and upload public key
+  //       const publicKeyHex = await this.encryptionService.generateAndStoreECCKeys();
+  //       await this.api.post('/api/users/update-public-key', {
+  //         user_id: res.user_id,
+  //         public_key: publicKeyHex
+  //       }).toPromise();
 
-        return { success: true, userId: res.user_id };
-      } else {
-        return { success: false, message: res.message || 'Invalid OTP' };
-      }
-    } catch (error) {
-      console.error('OTP verification failed:', error);
-      return { success: false, message: 'OTP verification failed' };
+  //       return { success: true, userId: res.user_id };
+  //     } else {
+  //       return { success: false, message: res.message || 'Invalid OTP' };
+  //     }
+  //   } catch (error) {
+  //     console.error('OTP verification failed:', error);
+  //     return { success: false, message: 'OTP verification failed' };
+  //   }
+  // }
+
+  /** Verify OTP & store in secure storage */
+async verifyOtp(payload: { country_code: string; phone_number: string; otp_code: string }): Promise<{ success: boolean; userId?: number; message?: string }> {
+  try {
+    const res: any = await this.api.post('/api/auth/verify-otp_mb', payload).toPromise();
+
+    if (res.status) {
+      const authData: AuthData = {
+        loggedIn: true,
+        phone_number: payload.phone_number,
+        userId: res.user_id.toString()
+      };
+
+      // Store whole object in SecureStorage under "AUTH"
+      await this.secureStorage.setItem('AUTH', JSON.stringify(authData));
+
+      // In-memory state
+      this._authData = authData;
+      this._isAuthenticated = true;
+
+      // Generate and upload public key
+      const publicKeyHex = await this.encryptionService.generateAndStoreECCKeys();
+      await this.api.post('/api/users/update-public-key', {
+        user_id: res.user_id,
+        public_key: publicKeyHex
+      }).toPromise();
+
+      return { success: true, userId: res.user_id };
+    } else {
+      return { success: false, message: res.message || 'Invalid OTP' };
     }
+  } catch (error) {
+    console.error('OTP verification failed:', error);
+    return { success: false, message: 'OTP verification failed' };
   }
+}
+
 
   /** Hydrate auth data on app start */
   async hydrateAuth(): Promise<void> {

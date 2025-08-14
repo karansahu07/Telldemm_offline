@@ -117,31 +117,56 @@ export class LoginScreenPage {
     this.isSendingOtp = false;
   }
 
+  // async sendOtp() {
+  //   const fullPhone = `${this.phoneNumber}`;
+  //   // console.log("sfdhdjkszf", this.phoneNumber);
+  //   const payload = {
+  //     phone_number: fullPhone,
+  //     email: this.email,
+  //   };
+
+  //   try {
+  //     console.log('📨 Sending OTP payload:', payload);
+  //     const res = await this.authService.sendOtp(payload);
+  //     console.log('📬 OTP API Response:', res);
+
+  //     if (res.status) {
+  //       this.showToast('OTP sent successfully.', 'success');
+  //       this.showOtpPopup = true;
+  //       this.startTimer();
+  //     } else {
+  //       this.showToast(res.message || 'Failed to send OTP.', 'danger');
+  //     }
+  //   } catch (err) {
+  //     console.error('❌ OTP API Error:', err);
+  //     this.showToast('Failed to send OTP. Try again.', 'danger');
+  //   }
+  // }
+
   async sendOtp() {
-    const fullPhone = `${this.phoneNumber}`;
-    // console.log("sfdhdjkszf", this.phoneNumber);
-    const payload = {
-      phone_number: fullPhone,
-      email: this.email,
-    };
+  const payload = {
+    phone_number: this.phoneNumber.trim(),
+    country_code: this.countryCode
+  };
 
-    try {
-      console.log('📨 Sending OTP payload:', payload);
-      const res = await this.authService.sendOtp(payload);
-      console.log('📬 OTP API Response:', res);
+  try {
+    console.log('📨 Sending OTP payload:', payload);
+    const res = await this.authService.sendOtp(payload);
+    console.log('📬 OTP API Response:', res);
 
-      if (res.status) {
-        this.showToast('OTP sent successfully.', 'success');
-        this.showOtpPopup = true;
-        this.startTimer();
-      } else {
-        this.showToast(res.message || 'Failed to send OTP.', 'danger');
-      }
-    } catch (err) {
-      console.error('❌ OTP API Error:', err);
-      this.showToast('Failed to send OTP. Try again.', 'danger');
+    if (res.status) {
+      this.showToast('OTP sent successfully.', 'success');
+      this.showOtpPopup = true;
+      this.startTimer();
+    } else {
+      this.showToast(res.message || 'Failed to send OTP.', 'danger');
     }
+  } catch (err) {
+    console.error('❌ OTP API Error:', err);
+    this.showToast('Failed to send OTP. Try again.', 'danger');
   }
+}
+
 
   onOtpInput(event: any, index: number) {
     const input = event.target.value;
@@ -166,18 +191,44 @@ export class LoginScreenPage {
     }
   }
 
+  // async goToHome() {
+  //   if (!this.isOtpComplete()) {
+  //     this.showToast('Please enter the complete 6-digit OTP.');
+  //     return;
+  //   }
+
+  //   this.isVerifyingOtp = true;
+  //   // const fullPhone = `${this.countryCode}${this.phoneNumber}`;
+  //   const fullPhone = `${this.phoneNumber}`;
+  //   const otpCode = this.otp.join('');
+
+  //   const result = await this.authService.verifyOtp(fullPhone, otpCode);
+  //   this.isVerifyingOtp = false;
+
+  //   if (result.success) {
+  //     this.showToast('Login successful!', 'success');
+  //     this.router.navigateByUrl('/profile-setup');
+  //   } else {
+  //     this.showToast(result.message || 'Invalid OTP', 'danger');
+  //   }
+  // }
+
   async goToHome() {
-    if (!this.isOtpComplete()) {
-      this.showToast('Please enter the complete 6-digit OTP.');
-      return;
-    }
+  if (!this.isOtpComplete()) {
+    this.showToast('Please enter the complete 6-digit OTP.');
+    return;
+  }
 
-    this.isVerifyingOtp = true;
-    // const fullPhone = `${this.countryCode}${this.phoneNumber}`;
-    const fullPhone = `${this.phoneNumber}`;
-    const otpCode = this.otp.join('');
+  this.isVerifyingOtp = true;
 
-    const result = await this.authService.verifyOtp(fullPhone, otpCode);
+  const payload = {
+    country_code: this.countryCode,
+    phone_number: this.phoneNumber.trim(),
+    otp_code: this.otp.join('')
+  };
+
+  try {
+    const result = await this.authService.verifyOtp(payload);
     this.isVerifyingOtp = false;
 
     if (result.success) {
@@ -186,7 +237,13 @@ export class LoginScreenPage {
     } else {
       this.showToast(result.message || 'Invalid OTP', 'danger');
     }
+  } catch (err) {
+    this.isVerifyingOtp = false;
+    this.showToast('Verification failed. Please try again.', 'danger');
+    console.error(err);
   }
+}
+
 
 
 }

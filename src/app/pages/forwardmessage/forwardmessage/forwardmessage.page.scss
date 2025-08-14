@@ -1,0 +1,564 @@
+ion-toolbar {
+  --background: white;
+  color: black;
+}
+
+.tick-icon {
+  vertical-align: middle;
+}
+
+.tick-seen {
+  width: 22px;
+  vertical-align: middle;
+}
+
+.telldemm {
+  padding-top: 30px;
+  // padding-top: env(safe-area-inset-top);
+}
+
+ion-title {
+  color: red;
+}
+
+ion-button img {
+  width: 24px;
+  height: 24px;
+}
+
+ion-content {
+  --background: white;
+}
+
+.main-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#searchInput {
+  width: 92%;
+  height: 46px;
+  border-radius: 10px;
+  font-size: 16px;
+  background-color: white;
+  background-image: url(https://cdn2.iconfinder.com/data/icons/ios-7-icons/50/search-24.png);
+  background-position: 10px 13px;
+  background-size: 20px 20px;
+  background-repeat: no-repeat;
+  padding: 8px 20px 8px 40px;
+  color: black;
+  border: 1px solid black;
+}
+
+.filters {
+  color: black;
+  display: flex;
+}
+
+.main-filters {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.filters {
+  width: 92%;
+  display: flex;
+  gap: 10px;
+}
+
+.filter-link {
+  background: #444343;
+  color: #aeacac;
+  padding: 8px 15px 8px 15px;
+  border-radius: 15px;
+  font-family: Montserrat-Medium;
+  font-size: 14px;
+  margin: 15px 0px 10px 0px;
+}
+
+.active-filter {
+  background-color: #ffd2d2 !important;
+  color: #ff1414 !important;
+}
+
+ion-list {
+  background: white;
+}
+
+ion-toolbar {
+  color: black;
+}
+
+ion-item {
+  --padding-start: 10px;
+  --inner-padding-end: 10px;
+  --background: white;
+  --color: black;
+}
+
+ion-item {
+  --inner-border-width: 0px;
+  --border-style: none;
+  --border-width: 0;
+}
+
+.chat-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.chat-meta .time {
+  font-size: 12px;
+  color: #999;
+  margin: 0px;
+}
+
+.chat-message {
+  color: #000000;
+  display: flex;
+  align-items: center;
+  font-size: 17px;
+  font-family: Montserrat-Regular;
+}
+
+ion-badge {
+  font-size: 10px;
+  border-radius: 10px;
+  height: 15px;
+  color: white;
+  background: #ff1414;
+}
+
+.icon-image {
+  background: #ff1414;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  width: 60px;
+  height: 60px;
+}
+
+ion-fab {
+  margin-right: 15px;
+}
+
+.footer-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: inherit;
+  padding: 8px;
+  min-width: 70px;
+}
+
+.footer-link img {
+  width: 24px;
+  height: 24px;
+}
+
+.footer-link ion-label {
+  font-size: 12px;
+  text-align: center;
+}
+
+.footer-buttons {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+}
+
+.check-icon {
+  font-size: 16px;
+  color: gray;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+.message-row {
+  display: flex;
+  align-items: center;
+}
+
+.check-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+}
+
+.chat-text {
+  margin: 0;
+}
+
+//cxvgfb
+
+.gallery-scroll {
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  padding: 10px 0;
+  gap: 10px;
+  background: #f8f8f8;
+  position: relative;
+  z-index: 1;
+}
+
+.thumb {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+//fgdfghf d
+
+.scanner-active {
+  background: transparent !important;
+}
+
+.unread-badge {
+  font-size: 12px;
+  min-width: 20px;
+  height: 20px;
+  text-align: center;
+  padding: 4px 6px;
+  border-radius: 12px;
+}
+
+.tick-icon,
+.tick-seen {
+  width: 14px;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+.qr-scan-button {
+  ion-icon {
+    width: 22px;
+    height: 22px;
+    margin-right: 8px;
+  }
+}
+
+.scanned-result-card {
+  margin-top: 16px;
+  border: 1px solid #dcdcdc;
+  background: #f9f9f9;
+  border-radius: 12px;
+}
+
+.scanner-active {
+  background: transparent !important;
+}
+
+ion-toolbar {
+  --background: white;
+  color: black;
+}
+
+.tick-icon {
+  vertical-align: middle;
+}
+
+.tick-seen {
+  width: 22px;
+  vertical-align: middle;
+}
+
+.telldemm {
+  padding-top: 30px;
+}
+
+ion-title {
+  color: red;
+}
+
+ion-button img {
+  width: 24px;
+  height: 24px;
+}
+
+ion-content {
+  --background: white;
+}
+
+.main-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#searchInput {
+  width: 92%;
+  height: 46px;
+  border-radius: 10px;
+  font-size: 16px;
+  background-color: white;
+  background-image: url(https://cdn2.iconfinder.com/data/icons/ios-7-icons/50/search-24.png);
+  background-position: 10px 10px;
+  background-repeat: no-repeat;
+  padding: 8px 20px 8px 40px;
+  color: black;
+  border: 1px solid black;
+}
+
+.filters {
+  color: black;
+  display: flex;
+}
+
+.main-filters {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.filters {
+  width: 92%;
+  display: flex;
+  gap: 10px;
+}
+
+.filter-link {
+  background: #444343;
+  color: #aeacac;
+  padding: 8px 15px 8px 15px;
+  border-radius: 15px;
+  font-family: Montserrat-Medium;
+  font-size: 14px;
+  margin: 15px 0px 10px 0px;
+}
+
+.active-filter {
+  background-color: #ffd2d2 !important;
+  color: #ff1414 !important;
+}
+
+ion-list {
+  background: white;
+}
+
+ion-toolbar {
+  color: black;
+}
+
+ion-item {
+  --padding-start: 10px;
+  --inner-padding-end: 10px;
+  --background: white;
+  --color: black;
+}
+
+ion-item {
+  --inner-border-width: 0px;
+  --border-style: none;
+  --border-width: 0;
+}
+
+.chat-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.chat-meta .time {
+  font-size: 12px;
+  color: #999;
+  margin: 0px;
+}
+
+.chat-message {
+  color: #000000;
+  display: flex;
+  align-items: center;
+  font-size: 17px;
+  font-family: Montserrat-Regular;
+}
+
+ion-badge {
+  font-size: 10px;
+  border-radius: 10px;
+  height: 15px;
+  color: white;
+  background: #ff1414;
+}
+
+.icon-image {
+  background: #ff1414;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  width: 60px;
+  height: 60px;
+}
+
+ion-fab {
+  margin-right: 15px;
+}
+
+.footer-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: inherit;
+  padding: 8px;
+  min-width: 70px;
+}
+
+.footer-link img {
+  width: 24px;
+  height: 24px;
+}
+
+.footer-link ion-label {
+  font-size: 12px;
+  text-align: center;
+}
+
+.footer-buttons {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+}
+
+.check-icon {
+  font-size: 16px;
+  color: gray;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+.message-row {
+  display: flex;
+  align-items: center;
+}
+
+.check-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+}
+
+.chat-text {
+  margin: 0;
+}
+
+.custom-blur-modal::part(backdrop) {
+  backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.custom-blur-modal::part(content) {
+  --background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.popup-image {
+  width: 250px;
+  height: 250px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+.icon-row {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  padding: 10px 0px 10px 0px;
+  background-color: white;
+}
+
+.popup-icon {
+  font-size: 28px;
+  color: #ff1414;
+}
+
+.ion-delegate-host.ion-page {
+  display: flex;
+  justify-content: center;
+}
+
+.person {
+  font-size: 24px;
+}
+
+.Forward {
+  margin-left: 10px;
+  font-size: 20px;
+}
+
+.Frequently {
+  font-size: 15px;
+  margin: 0;
+  padding-left: 10px;
+}
+
+ion-item.selected {
+  background-color: #e0f7fa; // light highlight when selected
+}
+
+.avatar-container {
+  position: relative; /* make this the positioning context */
+}
+
+.check-overlay {
+    position: absolute;
+    font-size: 23px;
+    background: white;
+    border-radius: 50%;
+    top: 23px;
+    left: 24px;
+    color: #ff1414;
+}
+
+.selected-footer {
+  background: #fff;
+  border-top: 1px solid #ddd;
+
+  .selected-names {
+    padding: 8px;
+    font-size: 14px;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.multi-send{
+    color: #ff1414;
+}
+

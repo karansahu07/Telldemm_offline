@@ -171,6 +171,11 @@ const routes: Routes = [
     // canActivate: [AuthGuard],
     loadChildren: () => import('./pages/attachment-preview/attachment-preview.module').then( m => m.AttachmentPreviewPageModule)
   },
+  {
+    path: 'forwardmessage',
+    // canActivate: [AuthGuard],
+    loadChildren: () => import('./pages/forwardmessage/forwardmessage/forwardmessage.module').then( m => m.ForwardmessagePageModule)
+  },
 
 
 

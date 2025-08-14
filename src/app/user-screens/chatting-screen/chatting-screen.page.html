@@ -192,12 +192,15 @@
         <div class="message-bubble" (click)="openAttachmentModal(msg)" [attr.data-msg-key]="msg.key"
           [ngClass]="msg.sender_id === senderId ? 'sender-message' : 'receiver-message'">
 
-          
+            <div *ngIf="msg.isForwarded" class="forwarded-label">
+    <ion-icon name="arrow-undo-outline" class="forwarded-icon"></ion-icon>
+    Forwarded
+  </div>
 
           <!-- Checkbox for selected messages -->
-          <ion-icon *ngIf="selectedMessages.length > 0" [name]="isSelected(msg) ? 'checkbox' : 'square-outline'"
+          <!-- <ion-icon *ngIf="selectedMessages.length > 0" [name]="isSelected(msg) ? 'checkbox' : 'square-outline'"
             style="margin-bottom: 5px; font-size: 20px;">
-          </ion-icon>
+          </ion-icon> -->
 
           <!-- Sender name for group chat -->
           <span *ngIf="chatType === 'group' && msg.sender_id !== senderId"

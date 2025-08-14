@@ -435,7 +435,7 @@
       </ion-label>
     </ion-item>
 
-    <ion-item *ngFor="let member of groupMembers">
+    <ion-item *ngFor="let member of groupMembers" (click)="openActionSheet(member)">
       <ion-avatar slot="start">
         <img [src]="member.avatar || 'assets/images/user.jfif'" />
       </ion-avatar>
@@ -454,11 +454,11 @@
 
 
       <!-- Show 3-dot menu ONLY if it's NOT the current user -->
-      <ion-buttons slot="end" *ngIf="member.user_id !== currentUserId">
+      <!-- <ion-buttons slot="end" *ngIf="member.user_id !== currentUserId">
         <ion-button fill="clear" (click)="openActionSheet(member)">
           <ion-icon name="ellipsis-vertical"></ion-icon>
         </ion-button>
-      </ion-buttons>
+      </ion-buttons> -->
     </ion-item>
 
 

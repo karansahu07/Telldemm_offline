@@ -13,9 +13,12 @@ import { Observable } from 'rxjs';
 import { getDatabase, remove, update } from 'firebase/database';
 // import { getStorage, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { Message, PinnedMessage } from 'src/types';
+import { CLOSING } from 'ws';
 
 @Injectable({ providedIn: 'root' })
 export class FirebaseChatService {
+
+  private forwardMessages: any[] = [];
 
   constructor(private db: Database) {}
 
@@ -26,7 +29,7 @@ export class FirebaseChatService {
   async sendMessage(roomId: string, message: Message, chatType: string, senderId: string) {
     const messagesRef = ref(this.db, `chats/${roomId}`);
     await push(messagesRef, message);
-
+    console.log("messages is forwards id ",message);
     if (chatType === 'private') {
       // Increment unread for receiver only
       const receiverId = message.receiver_id;
@@ -323,4 +326,17 @@ async createGroup(groupId: string, groupName: string, members: any[], currentUse
   const messageRef = ref(this.db, `chats/${roomId}/${messageKey}`);
   update(messageRef, { isDeleted: true });
 }
+
+setForwardMessages(messages: any[]) {
+    this.forwardMessages = messages;
+  }
+
+  getForwardMessages() {
+    return this.forwardMessages;
+  }
+
+  clearForwardMessages() {
+    this.forwardMessages = [];
+  }
+
 }

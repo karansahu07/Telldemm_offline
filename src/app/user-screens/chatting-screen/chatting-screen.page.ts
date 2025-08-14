@@ -675,8 +675,14 @@ scrollToRepliedMessage(replyToMessageId: string) {
   }
 
   onForward() {
-    console.log('Forwarding:', this.selectedMessages);
-  }
+  console.log('Forwarding:', this.selectedMessages);
+
+  this.chatService.setForwardMessages(this.selectedMessages);
+
+  this.selectedMessages = [];
+
+  this.router.navigate(['/forwardmessage']);
+}
 
 
 //   async onMore(ev?: Event) {
@@ -859,6 +865,8 @@ async copyMessage() {
     unpinMessage() {
   if (this.pinnedMessage) {
     this.chatService.unpinMessage(this.roomId);
+    this.selectedMessages = [];
+    this.lastPressedMessage = null;
   }
 }
 
