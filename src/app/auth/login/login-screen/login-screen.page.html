@@ -141,7 +141,9 @@
 
         <div class="main-dropdown">
           <select class="drop-down" (change)="onCountryChange($event)">
-            <option *ngFor="let c of countries" [value]="c.name">{{ c.name }}</option>
+            <option *ngFor="let c of countries" [value]="c.name">
+              ({{ c.code }}) {{ c.name }} 
+            </option>
           </select>
           <div class="underline-text"></div>
         </div>

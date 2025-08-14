@@ -105,7 +105,7 @@ console.log('Stored Phone:', storedPhone);
     }
 
     // this.showToast('Profile saved successfully!', 'success');
-    this.router.navigateByUrl('/home-screen');
+    this.router.navigateByUrl('/home-screen', { replaceUrl: true });
   },
   error: async (err) => {
     console.error(err);

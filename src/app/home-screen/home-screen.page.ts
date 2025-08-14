@@ -280,10 +280,8 @@ getAllUsers() {
     users.forEach(user => {
       const receiverId = user.user_id.toString();
 
-      // Apne aap ko skip karo
       if (receiverId === currentSenderId) return;
 
-      // ✅ Pehle check karo ki chat hai ya nahi
       this.checkUserInRooms(receiverId).subscribe((hasChat: boolean) => {
         if (!hasChat) return; // Agar chat nahi hai to skip karo
 

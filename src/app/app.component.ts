@@ -23,6 +23,10 @@ import { FirebasePushService } from './services/push_notification/firebase-push.
 // import {AttachmentService} from './services/attachment-file/attachment.service'
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import {FileSystemService} from './services/file-system.service'
+import { AuthService } from './auth/auth.service';
+import { Router } from '@angular/router';
+import { Platform } from '@ionic/angular';
+
 register();
 
 @Component({
@@ -37,7 +41,10 @@ export class AppComponent implements OnInit{
     private toastController: ToastController,
     private FirebasePushService:FirebasePushService,
     // private AttachmentService : AttachmentService,
-    private FileSystemService : FileSystemService
+    private FileSystemService : FileSystemService,
+     private authService: AuthService,
+    private router: Router,
+    private platform: Platform
   ) {
     // this.listenToNetwork();
   }
@@ -45,6 +52,18 @@ export class AppComponent implements OnInit{
     await this.FirebasePushService.initPush();
     // await this.AttachmentService.init();
     await this.FileSystemService.init();
+
+    await this.platform.ready();
+    
+    
+    await this.authService.hydrateAuth();
+    
+    
+    if (this.authService.isAuthenticated) {
+      this.router.navigateByUrl('/home-screen', { replaceUrl: true });
+    } else {
+      this.router.navigateByUrl('/welcome-screen', { replaceUrl: true });
+    }
 
   //    await Filesystem.mkdir({
   //   path: 'ChatMedia',
