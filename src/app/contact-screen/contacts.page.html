@@ -118,7 +118,7 @@
   </ion-list-header>
 
   <ion-list class="list2" lines="none" *ngIf="!creatingGroup && !isLoading && filteredContacts.length > 0">
-    <ion-item *ngFor="let contact of filteredContacts">
+    <ion-item *ngFor="let contact of filteredContacts" (click)="openContactChat(contact)">
       <ion-avatar slot="start">
         <img [src]="contact.image" />
       </ion-avatar>

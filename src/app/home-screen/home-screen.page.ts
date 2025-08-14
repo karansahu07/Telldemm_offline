@@ -15,6 +15,9 @@ import { Capacitor } from '@capacitor/core';
 import { SecureStorageService } from '../services/secure-storage/secure-storage.service';
 import { decodeBase64 } from '../utils/decodeBase64.util';
 import { AuthService } from '../auth/auth.service';
+import { Observable } from 'rxjs';
+import { onValue, ref } from '@angular/fire/database';
+import { Database } from '@angular/fire/database';
 
 @Component({
   selector: 'app-home-screen',
@@ -46,7 +49,8 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     private firebaseChatService: FirebaseChatService,
     private encryptionService: EncryptionService,
     private secureStorage: SecureStorageService,
-    private authService: AuthService
+    private authService: AuthService,
+    private db: Database
   ) { }
 
   async ngOnInit() {
@@ -167,7 +171,107 @@ export class HomeScreenPage implements OnInit, OnDestroy {
   }
   }
 
-  getAllUsers() {
+//   getAllUsers() {
+//   const currentSenderId = this.senderUserId;
+//   console.log("current sender id:", currentSenderId);
+//   if (!currentSenderId) return;
+
+//   this.service.getAllUsers().subscribe((users: any[]) => {
+//     users.forEach(user => {
+//       const receiverId = user.user_id.toString();
+//       let receiver_phone = user.phone_number.toString();
+//       receiver_phone = receiver_phone.replace(/^(\+91|91)/, '');
+//       const receiver_name = user.name.toString();
+
+//       if (receiverId !== currentSenderId) {
+//         const roomId = this.getRoomId(currentSenderId, receiverId);
+
+//         // ✅ Skip duplicate chats
+//         const existingChat = this.chatList.find(chat =>
+//           chat.receiver_Id === receiverId && !chat.group
+//         );
+//         if (existingChat) {
+//           console.log('Chat already exists for user:', receiverId);
+//           return;
+//         }
+
+//         const chat = {
+//           ...user,
+//           name: user.name,
+//           receiver_Id: receiverId,
+//           receiver_phone: receiver_phone,
+//           group: false,
+//           message: '',
+//           time: '',
+//           unreadCount: 0,
+//           unread: false
+//         };
+
+//         this.chatList.push(chat);
+
+//         // 🔔 Listen to last message
+//         this.firebaseChatService.listenForMessages(roomId).subscribe(async (messages) => {
+//           if (messages.length > 0) {
+//             const lastMsg = messages[messages.length - 1];
+//             // console.log("attachment type",lastMsg.attachment.type);
+//             // ✅ Mark as delivered if needed
+//             if (lastMsg.receiver_id === currentSenderId && !lastMsg.delivered) {
+//               this.firebaseChatService.markDelivered(roomId, lastMsg.key);
+//             }
+//             // console.log("typeeeeeeee",lastMsg.type);
+//             // 🔐 Show "deleted" or decrypt message or show attachment type
+//             if (lastMsg.isDeleted) {
+//               chat.message = 'This message was deleted';
+//             } else if (lastMsg.attachment?.type && lastMsg.attachment.type !== 'text') {
+//               // Show type for attachments
+//               switch (lastMsg.attachment.type) {
+//                 case 'image':
+//                   chat.message = '📷 Photo';
+//                   break;
+//                 case 'video':
+//                   chat.message = '🎥 Video';
+//                   break;
+//                 case 'audio':
+//                   chat.message = '🎵 Audio';
+//                   break;
+//                 case 'file':
+//                   chat.message = '📎 Attachment';
+//                   break;
+//                 default:
+//                   chat.message = '[Media]';
+//               }
+//             } else {
+//               // Decrypt text
+//               try {
+//                 const decryptedText = await this.encryptionService.decrypt(lastMsg.text);
+//                 chat.message = decryptedText;
+//               } catch (e) {
+//                 chat.message = '[Encrypted]';
+//               }
+//             }
+
+//             // 🕒 Set time
+//             if (lastMsg.timestamp) {
+//               chat.time = this.formatTimestamp(lastMsg.timestamp);
+//             }
+//           }
+//         });
+
+//         // 🔔 Listen to unread message count
+//         const sub = this.firebaseChatService
+//           .listenToUnreadCount(roomId, currentSenderId)
+//           .subscribe((count: number) => {
+//             chat.unreadCount = count;
+//             chat.unread = count > 0;
+//           });
+
+//         this.unreadSubs.push(sub);
+//       }
+//     });
+//   });
+// }
+
+getAllUsers() {
   const currentSenderId = this.senderUserId;
   console.log("current sender id:", currentSenderId);
   if (!currentSenderId) return;
@@ -175,21 +279,24 @@ export class HomeScreenPage implements OnInit, OnDestroy {
   this.service.getAllUsers().subscribe((users: any[]) => {
     users.forEach(user => {
       const receiverId = user.user_id.toString();
-      let receiver_phone = user.phone_number.toString();
-      receiver_phone = receiver_phone.replace(/^(\+91|91)/, '');
-      const receiver_name = user.name.toString();
 
-      if (receiverId !== currentSenderId) {
+      // Apne aap ko skip karo
+      if (receiverId === currentSenderId) return;
+
+      // ✅ Pehle check karo ki chat hai ya nahi
+      this.checkUserInRooms(receiverId).subscribe((hasChat: boolean) => {
+        if (!hasChat) return; // Agar chat nahi hai to skip karo
+
+        let receiver_phone = user.phone_number.toString();
+        receiver_phone = receiver_phone.replace(/^(\+91|91)/, '');
+
         const roomId = this.getRoomId(currentSenderId, receiverId);
 
-        // ✅ Skip duplicate chats
+        // Skip duplicate
         const existingChat = this.chatList.find(chat =>
           chat.receiver_Id === receiverId && !chat.group
         );
-        if (existingChat) {
-          console.log('Chat already exists for user:', receiverId);
-          return;
-        }
+        if (existingChat) return;
 
         const chat = {
           ...user,
@@ -209,35 +316,22 @@ export class HomeScreenPage implements OnInit, OnDestroy {
         this.firebaseChatService.listenForMessages(roomId).subscribe(async (messages) => {
           if (messages.length > 0) {
             const lastMsg = messages[messages.length - 1];
-            // console.log("attachment type",lastMsg.attachment.type);
-            // ✅ Mark as delivered if needed
+
             if (lastMsg.receiver_id === currentSenderId && !lastMsg.delivered) {
               this.firebaseChatService.markDelivered(roomId, lastMsg.key);
             }
-            // console.log("typeeeeeeee",lastMsg.type);
-            // 🔐 Show "deleted" or decrypt message or show attachment type
+
             if (lastMsg.isDeleted) {
               chat.message = 'This message was deleted';
             } else if (lastMsg.attachment?.type && lastMsg.attachment.type !== 'text') {
-              // Show type for attachments
               switch (lastMsg.attachment.type) {
-                case 'image':
-                  chat.message = '📷 Photo';
-                  break;
-                case 'video':
-                  chat.message = '🎥 Video';
-                  break;
-                case 'audio':
-                  chat.message = '🎵 Audio';
-                  break;
-                case 'file':
-                  chat.message = '📎 Attachment';
-                  break;
-                default:
-                  chat.message = '[Media]';
+                case 'image': chat.message = '📷 Photo'; break;
+                case 'video': chat.message = '🎥 Video'; break;
+                case 'audio': chat.message = '🎵 Audio'; break;
+                case 'file': chat.message = '📎 Attachment'; break;
+                default: chat.message = '[Media]';
               }
             } else {
-              // Decrypt text
               try {
                 const decryptedText = await this.encryptionService.decrypt(lastMsg.text);
                 chat.message = decryptedText;
@@ -246,14 +340,13 @@ export class HomeScreenPage implements OnInit, OnDestroy {
               }
             }
 
-            // 🕒 Set time
             if (lastMsg.timestamp) {
               chat.time = this.formatTimestamp(lastMsg.timestamp);
             }
           }
         });
 
-        // 🔔 Listen to unread message count
+        // 🔔 Listen to unread count
         const sub = this.firebaseChatService
           .listenToUnreadCount(roomId, currentSenderId)
           .subscribe((count: number) => {
@@ -262,7 +355,32 @@ export class HomeScreenPage implements OnInit, OnDestroy {
           });
 
         this.unreadSubs.push(sub);
+      });
+    });
+  });
+}
+checkUserInRooms(userId: string): Observable<boolean> {
+  return new Observable(observer => {
+    const chatsRef = ref(this.db, 'chats');
+
+    // Firebase listener
+    onValue(chatsRef, (snapshot: any) => {
+      const data = snapshot.val();
+      let userFound = false;
+
+      if (data) {
+        // Sirf roomId me current logged in user + given user ki presence check karo
+        Object.keys(data).some((roomId: string) => {
+          const userIds = roomId.split('_');
+         if (userIds.includes(this.senderUserId as string) && userIds.includes(userId)) {
+  userFound = true;
+  return true; // break loop
+}
+          return false;
+        });
       }
+
+      observer.next(userFound);
     });
   });
 }
