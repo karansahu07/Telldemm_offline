@@ -58,7 +58,9 @@
   <ion-toolbar>
     <!-- Left: Back Button -->
     <ion-buttons slot="start" style="color: black; width: 8%; margin-top: 15px">
-      <ion-back-button defaultHref="/home-screen" (click)="closeModal()"></ion-back-button>
+        <ion-button (click)="closeModal()">
+    <ion-icon name="arrow-back-outline"></ion-icon>
+  </ion-button>
     </ion-buttons>
 
     <!-- Center: Chat Avatar and Name OR Search Input -->
@@ -84,7 +86,7 @@
               cursor: pointer;
             "
           >
-            <h2 style="margin: 0; font-size: 16px">user name</h2>
+            <h2 style="margin: 0; font-size: 16px">{{ receiver_name }}</h2>
           </ion-label>
         </ion-item>
       </ion-buttons>
@@ -149,7 +151,6 @@
   </ion-toolbar>
 </ion-header>
 
-<!-- changes by homah end  -->
 
 <ion-content
   [fullscreen]="true"

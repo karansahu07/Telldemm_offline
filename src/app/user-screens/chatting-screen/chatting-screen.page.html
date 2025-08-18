@@ -266,6 +266,9 @@
                 </a>
               </div>
 
+
+              <ion-text class="message-text" *ngIf="msg.text" style="margin-top: 5px;">{{ msg.text }}</ion-text>
+              
               <!-- Optional Caption -->
               <ion-text class="message-text" *ngIf="msg.attachment.caption">{{ msg.attachment.caption }}</ion-text>
             </ng-container>
@@ -327,7 +330,7 @@
             class="pre-message"></ion-textarea>
 
           <div class="sendbtn">
-            <p>user name</p>
+            <p>{{receiver_name}}</p>
             <ion-icon name="send-outline" (click)="sendMessage()" class="mediasend"></ion-icon>
           </div>
 

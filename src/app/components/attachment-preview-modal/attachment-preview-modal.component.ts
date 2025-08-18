@@ -30,6 +30,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { IonicModule, ModalController } from '@ionic/angular';
+import { SecureStorageService } from 'src/app/services/secure-storage/secure-storage.service';
 
 @Component({
   selector: 'app-attachment-preview-modal',
@@ -43,8 +44,16 @@ export class AttachmentPreviewModalComponent {
   @Input() message: any;
 
   showUI: boolean = true;
+  receiver_name: string = '';
 
-  constructor(private modalCtrl: ModalController) {}
+  constructor(
+    private modalCtrl: ModalController,
+    private secureStorage: SecureStorageService
+  ) {}
+
+  async ngOnInit() {
+    this.receiver_name = (await this.secureStorage.getItem('receiver_name')) || '';
+  }
 
   closeModal() {
     this.modalCtrl.dismiss();

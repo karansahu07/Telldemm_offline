@@ -106,6 +106,9 @@ export class AuthService {
 sendOtp(payload: { phone_number: string; country_code: string }): Promise<any> {
   return this.api.post('/api/auth/send-otp_mb', payload).toPromise();
 }
+sendOtpDev(payload: { phone_number: string; country_code: string }): Promise<any> {
+  return this.api.post('/api/auth/send-otp_mb_dev', payload).toPromise();
+}
 
   /** Verify OTP & store in secure storage */
   // async verifyOtp(fullPhone: string, otp: string): Promise<{ success: boolean; userId?: number; message?: string }> {
