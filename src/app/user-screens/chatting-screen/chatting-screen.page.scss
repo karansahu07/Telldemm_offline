@@ -37,7 +37,8 @@ ion-toolbar {
   border-radius: 20px;
   padding: 5px 15px;
   gap: 10px;
-  margin-bottom: 10px;
+  // margin-bottom: 10px;
+  margin : 5px 0px;
 }
 
 .sender-message {
@@ -105,7 +106,8 @@ ion-toolbar {
 .message-input-container {
   flex: 1;
   display: flex;
-  align-items: center;
+  // align-items: center;
+  align-items: flex-end;
   background: #f1f1f1;
   border-radius: 20px;
   padding: 6px 12px;
@@ -264,8 +266,14 @@ ion-datetime {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.selected .message-bubble {
-  background-color: rgba(0, 123, 255, 0.2); // Light blue highlight
+// .selected .message-bubble {
+//   background-color: rgba(0, 123, 255, 0.2); // Light blue highlight
+//   border: 1px solid #007bff;
+//   border-radius: 10px;
+// }
+
+.selected {
+  background-color: rgba(0, 123, 255, 0.2);
   border: 1px solid #007bff;
   border-radius: 10px;
 }
@@ -850,4 +858,149 @@ ion-datetime {
   font-size: 12px;
   margin-right: 3px;
   color: #888;
+}
+
+
+.pre-message {
+  box-shadow: 0px 0px 12px 0px #cdcd;
+  border-radius: 25px;
+  padding: 10px 5px 0px 5px;
+  --highlight-height: black;
+  background: white;
+}
+
+.pre-model {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100vh;
+}
+
+.sendbtn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sendbtn p {
+  box-shadow: 0px 0px 11px 0px rgba(204, 221, 204, 0.8666666667);
+  padding: 10px 10px;
+  border-radius: 25px;
+  background: white;
+}
+
+.mediasend {
+  font-size: 25px;
+  // background: red;
+  color: black;
+  padding: 10px 10px;
+  border-radius: 25px;
+  box-shadow: 0px 0px 10px 0px #cdcd;
+  background: red;
+}
+
+.mine2 {
+  height: 100%;
+  text-align: center;
+  display: flex;
+  align-items: center;
+}
+
+.mine2 div {
+  margin: auto;
+  height: 100%;
+}
+
+.mine2 div * {
+  object-fit: contain;
+  height: 99%;
+  width: 100%;
+}
+
+.preview-video {
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 8px; /* optional */
+  display: block;
+}
+
+.message-input {
+  flex: 1;
+  font-size: 16px;
+  font-family: Montserrat-Medium;
+  color: black;
+  --padding-start: 0px;
+  --padding-end: 0px;
+  --background: transparent;
+  --highlight-color-focused: transparent;
+  border: none;
+  background: transparent;
+  resize: none;
+  overflow: hidden;
+  min-height: 25px;
+  max-height: 110px;
+  --highlight-height: black;
+}
+
+.user-head {
+  margin-left: 15px;
+}
+
+.pre-icons {
+  gap: 20px;
+}
+
+.hd-icon {
+  width: 25px;
+}
+
+.blur-background {
+  filter: blur(6px);
+  pointer-events: none; /* Prevent interaction while blurred */
+}
+
+/* Apply blur when modal is open */
+.calendar-modal::part(backdrop) {
+  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.2); /* Optional dim */
+}
+
+/* Optional: prevent scroll on background */
+.calendar-modal::part(content) {
+  pointer-events: auto;
+}
+
+.head-allicon {
+  background: #00000036;
+  border-radius: 15px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+.custom-modal-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.model-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  box-shadow: none;
+}
+
+.mine {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+
+.model-toll {
+  --background: transparent;
 }

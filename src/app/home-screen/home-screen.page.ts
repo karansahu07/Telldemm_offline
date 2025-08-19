@@ -94,8 +94,10 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     try {
       // Reload user IDs
       // this.currUserId = await this.secureStorage.getItem('phone_number');
-      this.currUserId = await this.secureStorage.getItem('phone_number');
-      this.senderUserId = await this.secureStorage.getItem('userId');
+      // this.currUserId = await this.secureStorage.getItem('phone_number');
+      // this.senderUserId = await this.secureStorage.getItem('userId');
+      this.currUserId = this.authService.authData?.phone_number || '';
+    this.senderUserId = this.authService.authData?.userId || '';
       
       // Reload users and groups
       this.getAllUsers();

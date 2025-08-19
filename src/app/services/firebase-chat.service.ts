@@ -227,6 +227,46 @@ async createGroup(groupId: string, groupName: string, members: any[], currentUse
   await set(groupRef, groupData);
 }
 
+async updateBackendGroupId(groupId: string, backendGroupId: string) {
+  const db = getDatabase();
+  const groupRef = ref(db, `groups/${groupId}/backendGroupId`);
+  await set(groupRef, backendGroupId);
+}
+
+
+
+// async createGroup(groupId: string, groupName: string, members: any[], currentUserId: string) {
+//   const db = getDatabase();
+//   const groupRef = ref(db, `groups/${groupId}`);
+
+//   const currentUser = members.find(m => m.user_id === currentUserId);
+//   const currentUserName = currentUser?.name || 'Unknown';
+
+//   console.log("currentUser", currentUserName);
+
+//   const groupData = {
+//     name: groupName,
+//     groupId,
+//     description: 'Hey I am using Telldemm',
+//     createdBy: currentUserId,
+//     createdByName: currentUserName,                 
+//     createdAt: new Date().toLocaleString(),
+//     backend_group_id: null, // ✅ Placeholder, updated after backend responds
+//     members: members.reduce((acc, member) => {
+//       acc[member.user_id] = {
+//         name: member.name,
+//         phone_number: member.phone_number,
+//         status: "active",
+//         role: member.user_id === currentUserId ? "admin" : "member"
+//       };
+//       return acc;
+//     }, {})
+//   };
+
+//   await set(groupRef, groupData);
+// }
+
+
 
   async getGroupInfo(groupId: string): Promise<any> {
     const snapshot = await get(child(ref(this.db), `groups/${groupId}`));

@@ -7,6 +7,7 @@ import { get, child, getDatabase, ref as dbRef, update, ref } from 'firebase/dat
 import { ActivatedRoute } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import { AuthService } from 'src/app/auth/auth.service';
+import { ApiService } from 'src/app/services/api/api.service';
 
 @Component({
   selector: 'app-add-members',
@@ -27,7 +28,8 @@ export class AddMembersPage implements OnInit {
     private contactSyncService: ContactSyncService,
     private route: ActivatedRoute,
     private toastCtrl: ToastController,
-    private authService: AuthService
+    private authService: AuthService,
+    private service : ApiService
   ) {}
 
   ngOnInit() {
@@ -119,7 +121,7 @@ async addSelectedMembers() {
   const updates: any = {};
 
   selected.forEach(member => {
-    // ✅ Add to group members
+    // Add to group members in Firebase
     updates[`groups/${this.groupId}/members/${member.user_id}`] = {
       name: member.name,
       phone_number: member.phone_number,
@@ -127,16 +129,41 @@ async addSelectedMembers() {
       role: 'member'
     };
 
-    // ✅ Remove from pastmembers if exists
+    // Remove from pastmembers if exists
     updates[`groups/${this.groupId}/pastmembers/${member.user_id}`] = null;
   });
 
   try {
+    // Update Firebase
     await update(ref(db), updates);
+
+    // Get backendGroupId from Firebase
+    const backendGroupIdSnap = await get(ref(db, `groups/${this.groupId}/backendGroupId`));
+    const backendGroupId = backendGroupIdSnap.val();
+
+    if (!backendGroupId) {
+      this.showToast("Backend group ID missing", "danger");
+      return;
+    }
+
+    // Sync each member to backend
+    selected.forEach(member => {
+      this.service.addGroupMember(
+        Number(backendGroupId), // backend group_id
+        Number(member.user_id), // user_id
+        2 // role_id (2 = member, 1 = admin etc.)
+      ).subscribe({
+        next: () => {},
+        error: () => {
+          this.showToast(`Failed to sync member ${member.name}`, 'danger');
+        }
+      });
+    });
+
     this.showToast('Members added successfully 🎉', 'success');
     this.navCtrl.back();
-  } catch (error) {
-    console.error('Error adding members:', error);
+
+  } catch {
     this.showToast('Error adding members', 'danger');
   }
 }

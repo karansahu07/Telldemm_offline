@@ -131,6 +131,9 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   chatName: string = '';
   onlineCount: number = 0;
 
+  showPopover = false;
+popoverEvent: any;
+
   async ngOnInit() {
     // Enable proper keyboard scrolling
     Keyboard.setScroll({ isDisabled: false });
@@ -409,7 +412,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     // Remove existing highlights from all matched messages
     this.matchedMessages.forEach(el => {
       const originalText = el.textContent || '';
-      el.innerHTML = originalText; // reset to plain text
+      el.innerHTML = originalText;
       el.style.backgroundColor = 'transparent';
     });
 
@@ -436,37 +439,67 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     this.searchText = '';
     this.showSearchBar = false;
     this.matchedMessages.forEach(el => {
-      el.innerHTML = el.textContent || ''; // remove <mark>
+      el.innerHTML = el.textContent || '';
       el.style.backgroundColor = 'transparent';
     });
     this.matchedMessages = [];
   }
+
+  openPopover(ev: any) {
+  this.popoverEvent = ev;
+  this.showPopover = true;
+}
+ 
+ 
+onDateSelected(event: any) {
+  const selectedDateObj = new Date(event.detail.value);
+ 
+  const day = String(selectedDateObj.getDate()).padStart(2, '0');
+  const month = String(selectedDateObj.getMonth() + 1).padStart(2, '0');
+  const year = selectedDateObj.getFullYear();
+ 
+  const formattedDate = `${day}/${month}/${year}`; // Example: "11/07/2025"
+ 
+  this.selectedDate = event.detail.value; // Original ISO format
+  this.showPopover = false; // Close the popover
+  this.showDateModal = false; // In case you're also using modal variant
+ 
+  // Smooth scroll to that date's section
+  setTimeout(() => {
+    const el = document.getElementById('date-group-' + formattedDate);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      console.warn('No messages found for selected date:', formattedDate);
+    }
+  }, 300);
+}
 
   openDatePicker() {
     this.showDateModal = true;
     console.log('Opening calendar modal...');
   }
 
-  onDateSelected(event: any) {
-    const selectedDate = new Date(event.detail.value);
+  // onDateSelected(event: any) {
+  //   const selectedDate = new Date(event.detail.value);
 
-    const day = String(selectedDate.getDate()).padStart(2, '0');
-    const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
-    const year = selectedDate.getFullYear();
+  //   const day = String(selectedDate.getDate()).padStart(2, '0');
+  //   const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+  //   const year = selectedDate.getFullYear();
 
-    const formattedDate = `${day}/${month}/${year}`; // example: 11/07/2025
+  //   const formattedDate = `${day}/${month}/${year}`; // example: 11/07/2025
 
-    this.showDateModal = false;
+  //   this.showDateModal = false;
 
-    setTimeout(() => {
-      const el = document.getElementById('date-group-' + formattedDate);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      } else {
-        console.warn('No messages found for selected date:', formattedDate);
-      }
-    }, 300);
-  }
+  //    (() => {
+  //     const el = document.getElementById('date-group-' + formattedDate);
+  //     if (el) {
+  //       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  //     } else {
+  //       console.warn('No messages found for selected date:', formattedDate);
+  //     }
+  //   }, 300);
+  // }
 
   onMessagePress(message: any) {
     const index = this.selectedMessages.findIndex(m => m.key === message.key);
@@ -512,7 +545,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onLongPress(msg: any) {
-    this.selectedMessages = [msg]; // Only select the long-pressed one
+    this.selectedMessages = [msg];
     this.lastPressedMessage = msg;
   }
 

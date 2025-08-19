@@ -53,9 +53,21 @@
   <div style="padding: 5%;">
     <div style="display: flex;align-items: center;justify-content: space-between;">
       <div style="display: flex;align-items: center;gap: 15px;">
-        <img src="assets/images/user.jfif" alt="user_image" style="width: 65px; height: 65px;border-radius: 50px">
+        <!-- <img src="assets/images/user.jfif" alt="user_image" style="width: 65px; height: 65px;border-radius: 50px"> -->
+         <div class="profile-image-container">
+ 
+  <ion-spinner name="circular" *ngIf="isLoading" 
+               style="width: 65px; height: 65px;"></ion-spinner>
+  
+ 
+  <img *ngIf="!isLoading" 
+       [src]="profileImageUrl" 
+       alt="user_image" 
+       (error)="onImageError($event)"
+       style="width: 65px; height: 65px; border-radius: 50px; object-fit: cover;" />
+</div>
         <div>
-          <p style="color: black;font-family: 'Montserrat-bold';font-size: 20px;margin: 0;">Madhav Kaushik</p>
+          <p style="color: black;font-family: 'Montserrat-bold';font-size: 20px;margin: 0;">{{sender_name}}</p>
           <p style="color: black;font-family: Montserrat, Medium;font-size: 14px;margin: 0;">Hey there! I am using
             tellde..</p>
         </div>
