@@ -103,7 +103,7 @@ const routes: Routes = [
   },
   {
     path: 'calling-screen',
-    // canActivate: [AuthGuard],
+    canActivate: [AuthGuard],
     loadChildren: () => import('./user-screens/voice-call/calling-screen/calling-screen.module').then(m => m.CallingScreenPageModule)
   },
   {
@@ -168,22 +168,19 @@ const routes: Routes = [
   },
   {
     path: 'attachment-preview',
-    // canActivate: [AuthGuard],
+    canActivate: [AuthGuard],
     loadChildren: () => import('./pages/attachment-preview/attachment-preview.module').then( m => m.AttachmentPreviewPageModule)
   },
   {
     path: 'forwardmessage',
-    // canActivate: [AuthGuard],
+    canActivate: [AuthGuard],
     loadChildren: () => import('./pages/forwardmessage/forwardmessage/forwardmessage.module').then( m => m.ForwardmessagePageModule)
   },
-
-
-
-
-  // {
-  //   path: 'change-group-name',
-  //   loadChildren: () => import('./pages/change-group-name/change-group-name.module').then( m => m.ChangeGroupNamePageModule)
-  // },
+  {
+    path: 'setting-profile',
+    canActivate: [AuthGuard],
+    loadChildren: () => import('./pages/setting-profile/setting-profile.module').then( m => m.SettingProfilePageModule)
+  },
 
 ];
 

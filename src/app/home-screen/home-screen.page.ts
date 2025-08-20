@@ -56,7 +56,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
   async ngOnInit() {
     this.currUserId = this.authService.authData?.phone_number || '';
     this.senderUserId = this.authService.authData?.userId || '';
-    
+
     this.getAllUsers();
     this.loadUserGroups();
   }
@@ -64,16 +64,16 @@ export class HomeScreenPage implements OnInit, OnDestroy {
   // ✅ Check for refresh flag when entering page
   async ionViewWillEnter() {
     const shouldRefresh = localStorage.getItem('shouldRefreshHome');
-    
+
     if (shouldRefresh === 'true') {
       console.log('Refreshing home page after group creation...');
-      
+
       // Clear the flag
       localStorage.removeItem('shouldRefreshHome');
-      
+
       // Clear existing chat data to prevent duplicates
       this.clearChatData();
-      
+
       // Reload data
       await this.refreshHomeData();
     }
@@ -84,7 +84,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     // Unsubscribe from existing subscriptions
     this.unreadSubs.forEach(sub => sub.unsubscribe());
     this.unreadSubs = [];
-    
+
     // Clear chat list
     this.chatList = [];
   }
@@ -97,12 +97,12 @@ export class HomeScreenPage implements OnInit, OnDestroy {
       // this.currUserId = await this.secureStorage.getItem('phone_number');
       // this.senderUserId = await this.secureStorage.getItem('userId');
       this.currUserId = this.authService.authData?.phone_number || '';
-    this.senderUserId = this.authService.authData?.userId || '';
-      
+      this.senderUserId = this.authService.authData?.userId || '';
+
       // Reload users and groups
       this.getAllUsers();
       await this.loadUserGroups();
-      
+
       console.log('Home page refreshed successfully');
     } catch (error) {
       console.error('Error refreshing home data:', error);
@@ -121,12 +121,12 @@ export class HomeScreenPage implements OnInit, OnDestroy {
   }
 
   async goToUserchat() {
-  this.showPopup = false;
+    this.showPopup = false;
 
-  setTimeout(async () => {
-    // await this.prepareAndNavigateToChat(chat);
-  }, 100);
-}
+    setTimeout(async () => {
+      // await this.prepareAndNavigateToChat(chat);
+    }, 100);
+  }
 
 
   goToUsercall() {
@@ -154,325 +154,225 @@ export class HomeScreenPage implements OnInit, OnDestroy {
   }
 
   async prepareAndNavigateToChat(chat: any) {
-  const receiverId = chat.receiver_Id;
-  const receiver_phone = chat.receiver_phone;
-  const receiver_name = chat.name;
+    const receiverId = chat.receiver_Id;
+    const receiver_phone = chat.receiver_phone;
+    const receiver_name = chat.name;
 
-  await this.secureStorage.setItem('receiver_name', receiver_name);
+    await this.secureStorage.setItem('receiver_name', receiver_name);
 
-  if (chat.group) {
-    this.router.navigate(['/chatting-screen'], {
-      queryParams: { receiverId, isGroup: true }
-    });
-  } else {
-    const cleanPhone = receiverId.replace(/\D/g, '').slice(-10);
-    await this.secureStorage.setItem('receiver_phone', receiver_phone);
-    this.router.navigate(['/chatting-screen'], {
-      queryParams: { receiverId: cleanPhone, receiver_phone }
-    });
+    if (chat.group) {
+      this.router.navigate(['/chatting-screen'], {
+        queryParams: { receiverId, isGroup: true }
+      });
+    } else {
+      const cleanPhone = receiverId.replace(/\D/g, '').slice(-10);
+      await this.secureStorage.setItem('receiver_phone', receiver_phone);
+      this.router.navigate(['/chatting-screen'], {
+        queryParams: { receiverId: cleanPhone, receiver_phone }
+      });
+    }
   }
-  }
 
-//   getAllUsers() {
-//   const currentSenderId = this.senderUserId;
-//   console.log("current sender id:", currentSenderId);
-//   if (!currentSenderId) return;
+  getAllUsers() {
+    const currentSenderId = this.senderUserId;
+    console.log("current sender id:", currentSenderId);
+    if (!currentSenderId) return;
 
-//   this.service.getAllUsers().subscribe((users: any[]) => {
-//     users.forEach(user => {
-//       const receiverId = user.user_id.toString();
-//       let receiver_phone = user.phone_number.toString();
-//       receiver_phone = receiver_phone.replace(/^(\+91|91)/, '');
-//       const receiver_name = user.name.toString();
+    this.service.getAllUsers().subscribe((users: any[]) => {
+      users.forEach(user => {
+        const receiverId = user.user_id.toString();
 
-//       if (receiverId !== currentSenderId) {
-//         const roomId = this.getRoomId(currentSenderId, receiverId);
+        if (receiverId === currentSenderId) return;
 
-//         // ✅ Skip duplicate chats
-//         const existingChat = this.chatList.find(chat =>
-//           chat.receiver_Id === receiverId && !chat.group
-//         );
-//         if (existingChat) {
-//           console.log('Chat already exists for user:', receiverId);
-//           return;
-//         }
+        this.checkUserInRooms(receiverId).subscribe((hasChat: boolean) => {
+          if (!hasChat) return; // Agar chat nahi hai to skip karo
 
-//         const chat = {
-//           ...user,
-//           name: user.name,
-//           receiver_Id: receiverId,
-//           receiver_phone: receiver_phone,
-//           group: false,
-//           message: '',
-//           time: '',
-//           unreadCount: 0,
-//           unread: false
-//         };
+          let receiver_phone = user.phone_number.toString();
+          // receiver_phone = receiver_phone.replace(/^(\+91|91)/, '');
 
-//         this.chatList.push(chat);
+          const roomId = this.getRoomId(currentSenderId, receiverId);
 
-//         // 🔔 Listen to last message
-//         this.firebaseChatService.listenForMessages(roomId).subscribe(async (messages) => {
-//           if (messages.length > 0) {
-//             const lastMsg = messages[messages.length - 1];
-//             // console.log("attachment type",lastMsg.attachment.type);
-//             // ✅ Mark as delivered if needed
-//             if (lastMsg.receiver_id === currentSenderId && !lastMsg.delivered) {
-//               this.firebaseChatService.markDelivered(roomId, lastMsg.key);
-//             }
-//             // console.log("typeeeeeeee",lastMsg.type);
-//             // 🔐 Show "deleted" or decrypt message or show attachment type
-//             if (lastMsg.isDeleted) {
-//               chat.message = 'This message was deleted';
-//             } else if (lastMsg.attachment?.type && lastMsg.attachment.type !== 'text') {
-//               // Show type for attachments
-//               switch (lastMsg.attachment.type) {
-//                 case 'image':
-//                   chat.message = '📷 Photo';
-//                   break;
-//                 case 'video':
-//                   chat.message = '🎥 Video';
-//                   break;
-//                 case 'audio':
-//                   chat.message = '🎵 Audio';
-//                   break;
-//                 case 'file':
-//                   chat.message = '📎 Attachment';
-//                   break;
-//                 default:
-//                   chat.message = '[Media]';
-//               }
-//             } else {
-//               // Decrypt text
-//               try {
-//                 const decryptedText = await this.encryptionService.decrypt(lastMsg.text);
-//                 chat.message = decryptedText;
-//               } catch (e) {
-//                 chat.message = '[Encrypted]';
-//               }
-//             }
+          // Skip duplicate
+          const existingChat = this.chatList.find(chat =>
+            chat.receiver_Id === receiverId && !chat.group
+          );
+          if (existingChat) return;
 
-//             // 🕒 Set time
-//             if (lastMsg.timestamp) {
-//               chat.time = this.formatTimestamp(lastMsg.timestamp);
-//             }
-//           }
-//         });
+          const chat = {
+            ...user,
+            name: user.name,
+            receiver_Id: receiverId,
+            receiver_phone: receiver_phone,
+            group: false,
+            message: '',
+            time: '',
+            unreadCount: 0,
+            unread: false
+          };
 
-//         // 🔔 Listen to unread message count
-//         const sub = this.firebaseChatService
-//           .listenToUnreadCount(roomId, currentSenderId)
-//           .subscribe((count: number) => {
-//             chat.unreadCount = count;
-//             chat.unread = count > 0;
-//           });
+          this.chatList.push(chat);
 
-//         this.unreadSubs.push(sub);
-//       }
-//     });
-//   });
-// }
+          // 🔔 Listen to last message
+          this.firebaseChatService.listenForMessages(roomId).subscribe(async (messages) => {
+            if (messages.length > 0) {
+              const lastMsg = messages[messages.length - 1];
 
-getAllUsers() {
-  const currentSenderId = this.senderUserId;
-  console.log("current sender id:", currentSenderId);
-  if (!currentSenderId) return;
-
-  this.service.getAllUsers().subscribe((users: any[]) => {
-    users.forEach(user => {
-      const receiverId = user.user_id.toString();
-
-      if (receiverId === currentSenderId) return;
-
-      this.checkUserInRooms(receiverId).subscribe((hasChat: boolean) => {
-        if (!hasChat) return; // Agar chat nahi hai to skip karo
-
-        let receiver_phone = user.phone_number.toString();
-        receiver_phone = receiver_phone.replace(/^(\+91|91)/, '');
-
-        const roomId = this.getRoomId(currentSenderId, receiverId);
-
-        // Skip duplicate
-        const existingChat = this.chatList.find(chat =>
-          chat.receiver_Id === receiverId && !chat.group
-        );
-        if (existingChat) return;
-
-        const chat = {
-          ...user,
-          name: user.name,
-          receiver_Id: receiverId,
-          receiver_phone: receiver_phone,
-          group: false,
-          message: '',
-          time: '',
-          unreadCount: 0,
-          unread: false
-        };
-
-        this.chatList.push(chat);
-
-        // 🔔 Listen to last message
-        this.firebaseChatService.listenForMessages(roomId).subscribe(async (messages) => {
-          if (messages.length > 0) {
-            const lastMsg = messages[messages.length - 1];
-
-            if (lastMsg.receiver_id === currentSenderId && !lastMsg.delivered) {
-              this.firebaseChatService.markDelivered(roomId, lastMsg.key);
-            }
-
-            if (lastMsg.isDeleted) {
-              chat.message = 'This message was deleted';
-            } else if (lastMsg.attachment?.type && lastMsg.attachment.type !== 'text') {
-              switch (lastMsg.attachment.type) {
-                case 'image': chat.message = '📷 Photo'; break;
-                case 'video': chat.message = '🎥 Video'; break;
-                case 'audio': chat.message = '🎵 Audio'; break;
-                case 'file': chat.message = '📎 Attachment'; break;
-                default: chat.message = '[Media]';
+              if (lastMsg.receiver_id === currentSenderId && !lastMsg.delivered) {
+                this.firebaseChatService.markDelivered(roomId, lastMsg.key);
               }
-            } else {
-              try {
-                const decryptedText = await this.encryptionService.decrypt(lastMsg.text);
-                chat.message = decryptedText;
-              } catch (e) {
-                chat.message = '[Encrypted]';
+
+              if (lastMsg.isDeleted) {
+                chat.message = 'This message was deleted';
+              } else if (lastMsg.attachment?.type && lastMsg.attachment.type !== 'text') {
+                switch (lastMsg.attachment.type) {
+                  case 'image': chat.message = '📷 Photo'; break;
+                  case 'video': chat.message = '🎥 Video'; break;
+                  case 'audio': chat.message = '🎵 Audio'; break;
+                  case 'file': chat.message = '📎 Attachment'; break;
+                  default: chat.message = '[Media]';
+                }
+              } else {
+                try {
+                  const decryptedText = await this.encryptionService.decrypt(lastMsg.text);
+                  chat.message = decryptedText;
+                } catch (e) {
+                  chat.message = '[Encrypted]';
+                }
+              }
+
+              if (lastMsg.timestamp) {
+                chat.time = this.formatTimestamp(lastMsg.timestamp);
               }
             }
-
-            if (lastMsg.timestamp) {
-              chat.time = this.formatTimestamp(lastMsg.timestamp);
-            }
-          }
-        });
-
-        // 🔔 Listen to unread count
-        const sub = this.firebaseChatService
-          .listenToUnreadCount(roomId, currentSenderId)
-          .subscribe((count: number) => {
-            chat.unreadCount = count;
-            chat.unread = count > 0;
           });
 
-        this.unreadSubs.push(sub);
+          // 🔔 Listen to unread count
+          const sub = this.firebaseChatService
+            .listenToUnreadCount(roomId, currentSenderId)
+            .subscribe((count: number) => {
+              chat.unreadCount = count;
+              chat.unread = count > 0;
+            });
+
+          this.unreadSubs.push(sub);
+        });
       });
     });
-  });
-}
-checkUserInRooms(userId: string): Observable<boolean> {
-  return new Observable(observer => {
-    const chatsRef = ref(this.db, 'chats');
+  }
+  checkUserInRooms(userId: string): Observable<boolean> {
+    return new Observable(observer => {
+      const chatsRef = ref(this.db, 'chats');
 
-    // Firebase listener
-    onValue(chatsRef, (snapshot: any) => {
-      const data = snapshot.val();
-      let userFound = false;
+      // Firebase listener
+      onValue(chatsRef, (snapshot: any) => {
+        const data = snapshot.val();
+        let userFound = false;
 
-      if (data) {
-        // Sirf roomId me current logged in user + given user ki presence check karo
-        Object.keys(data).some((roomId: string) => {
-          const userIds = roomId.split('_');
-         if (userIds.includes(this.senderUserId as string) && userIds.includes(userId)) {
-  userFound = true;
-  return true; // break loop
-}
-          return false;
-        });
-      }
+        if (data) {
+          // Sirf roomId me current logged in user + given user ki presence check karo
+          Object.keys(data).some((roomId: string) => {
+            const userIds = roomId.split('_');
+            if (userIds.includes(this.senderUserId as string) && userIds.includes(userId)) {
+              userFound = true;
+              return true;
+            }
+            return false;
+          });
+        }
 
-      observer.next(userFound);
+        observer.next(userFound);
+      });
     });
-  });
-}
+  }
 
   async loadUserGroups() {
-  const userid = this.senderUserId;
-  console.log("sender user id:", userid);
-  if (!userid) return;
+    const userid = this.senderUserId;
+    console.log("sender user id:", userid);
+    if (!userid) return;
 
-  const groupIds = await this.firebaseChatService.getGroupsForUser(userid);
-  console.log("group ids:", groupIds);
+    const groupIds = await this.firebaseChatService.getGroupsForUser(userid);
+    console.log("group ids:", groupIds);
 
-  for (const groupId of groupIds) {
-    // ✅ Skip duplicate group chats
-    const existingGroup = this.chatList.find(chat =>
-      chat.receiver_Id === groupId && chat.group
-    );
-    if (existingGroup) {
-      console.log('Group already exists:', groupId);
-      continue;
-    }
-
-    const groupInfo = await this.firebaseChatService.getGroupInfo(groupId);
-    if (!groupInfo || !groupInfo.members || !groupInfo.members[userid]) continue;
-
-    const groupName = groupInfo.name || 'Unnamed Group';
-
-    const groupChat = {
-      name: groupName,
-      receiver_Id: groupId,
-      group: true,
-      message: '',
-      time: '',
-      unread: false,
-      unreadCount: 0
-    };
-
-    this.chatList.push(groupChat);
-
-    // ✅ Listen for latest message in group
-    this.firebaseChatService.listenForMessages(groupId).subscribe(async (messages) => {
-      if (messages.length > 0) {
-        const lastMsg = messages[messages.length - 1];
-
-        if (lastMsg.isDeleted) {
-          groupChat.message = 'This message was deleted';
-        } else if (lastMsg.attachment?.type && lastMsg.attachment.type !== 'text') {
-          // Show appropriate icon for attachment
-          switch (lastMsg.attachment.type) {
-            case 'image':
-              groupChat.message = '📷 Photo';
-              break;
-            case 'video':
-              groupChat.message = '🎥 Video';
-              break;
-            case 'audio':
-              groupChat.message = '🎵 Audio';
-              break;
-            case 'file':
-              groupChat.message = '📎 Attachment';
-              break;
-            default:
-              groupChat.message = '[Media]';
-          }
-        } else {
-          // Decrypt normal text message
-          try {
-            const decryptedText = await this.encryptionService.decrypt(lastMsg.text);
-            groupChat.message = decryptedText;
-          } catch (e) {
-            groupChat.message = '[Encrypted]';
-          }
-        }
-
-        // Format time
-        if (lastMsg.timestamp) {
-          groupChat.time = this.formatTimestamp(lastMsg.timestamp);
-        }
+    for (const groupId of groupIds) {
+      // ✅ Skip duplicate group chats
+      const existingGroup = this.chatList.find(chat =>
+        chat.receiver_Id === groupId && chat.group
+      );
+      if (existingGroup) {
+        console.log('Group already exists:', groupId);
+        continue;
       }
-    });
 
-    // ✅ Listen for unread messages
-    const sub = this.firebaseChatService
-      .listenToUnreadCount(groupId, userid)
-      .subscribe((count: number) => {
-        groupChat.unreadCount = count;
-        groupChat.unread = count > 0;
+      const groupInfo = await this.firebaseChatService.getGroupInfo(groupId);
+      if (!groupInfo || !groupInfo.members || !groupInfo.members[userid]) continue;
+
+      const groupName = groupInfo.name || 'Unnamed Group';
+
+      const groupChat = {
+        name: groupName,
+        receiver_Id: groupId,
+        group: true,
+        message: '',
+        time: '',
+        unread: false,
+        unreadCount: 0
+      };
+
+      this.chatList.push(groupChat);
+
+      // ✅ Listen for latest message in group
+      this.firebaseChatService.listenForMessages(groupId).subscribe(async (messages) => {
+        if (messages.length > 0) {
+          const lastMsg = messages[messages.length - 1];
+
+          if (lastMsg.isDeleted) {
+            groupChat.message = 'This message was deleted';
+          } else if (lastMsg.attachment?.type && lastMsg.attachment.type !== 'text') {
+            // Show appropriate icon for attachment
+            switch (lastMsg.attachment.type) {
+              case 'image':
+                groupChat.message = '📷 Photo';
+                break;
+              case 'video':
+                groupChat.message = '🎥 Video';
+                break;
+              case 'audio':
+                groupChat.message = '🎵 Audio';
+                break;
+              case 'file':
+                groupChat.message = '📎 Attachment';
+                break;
+              default:
+                groupChat.message = '[Media]';
+            }
+          } else {
+            // Decrypt normal text message
+            try {
+              const decryptedText = await this.encryptionService.decrypt(lastMsg.text);
+              groupChat.message = decryptedText;
+            } catch (e) {
+              groupChat.message = '[Encrypted]';
+            }
+          }
+
+          // Format time
+          if (lastMsg.timestamp) {
+            groupChat.time = this.formatTimestamp(lastMsg.timestamp);
+          }
+        }
       });
 
-    this.unreadSubs.push(sub);
+      // ✅ Listen for unread messages
+      const sub = this.firebaseChatService
+        .listenToUnreadCount(groupId, userid)
+        .subscribe((count: number) => {
+          groupChat.unreadCount = count;
+          groupChat.unread = count > 0;
+        });
+
+      this.unreadSubs.push(sub);
+    }
   }
-}
 
 
   // Format timestamp for display
@@ -536,15 +436,15 @@ checkUserInRooms(userId: string): Observable<boolean> {
     const receiverId = chat.receiver_Id;
     const receiver_phone = chat.receiver_phone;
     const receiver_name = chat.name;
-    
+
     await this.secureStorage.setItem('receiver_name', receiver_name);
-    
+
     if (chat.group) {
       this.router.navigate(['/chatting-screen'], {
         queryParams: { receiverId, isGroup: true }
       });
     } else {
-      const cleanPhone = receiverId.replace(/\D/g, '').slice(-10);
+      const cleanPhone = receiverId;
       await this.secureStorage.setItem('receiver_phone', receiver_phone);
       this.router.navigate(['/chatting-screen'], {
         queryParams: { receiverId: cleanPhone, receiver_phone }

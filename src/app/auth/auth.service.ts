@@ -152,9 +152,10 @@ async verifyOtp(payload: { country_code: string; phone_number: string; otp_code:
     const res: any = await this.api.post('/api/auth/verify-otp_mb', payload).toPromise();
 
     if (res.status) {
+      const senderPhone = `${payload.country_code}${payload.phone_number}`;
       const authData: AuthData = {
         loggedIn: true,
-        phone_number: payload.phone_number,
+        phone_number: senderPhone,
         userId: res.user_id.toString()
       };
 

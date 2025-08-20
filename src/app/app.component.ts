@@ -26,6 +26,7 @@ import {FileSystemService} from './services/file-system.service'
 import { AuthService } from './auth/auth.service';
 import { Router } from '@angular/router';
 import { Platform } from '@ionic/angular';
+import { FcmService } from './services/fcm-service';
 
 register();
 
@@ -44,11 +45,13 @@ export class AppComponent implements OnInit{
     private FileSystemService : FileSystemService,
      private authService: AuthService,
     private router: Router,
-    private platform: Platform
+    private platform: Platform,
+    private fcmService: FcmService
   ) {
     // this.listenToNetwork();
   }
   async ngOnInit() {
+    await this.fcmService.initializePushNotifications();
     await this.FirebasePushService.initPush();
     // await this.AttachmentService.init();
     await this.FileSystemService.init();

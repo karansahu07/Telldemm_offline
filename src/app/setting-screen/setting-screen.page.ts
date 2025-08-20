@@ -35,6 +35,7 @@ import { MenuPopoverComponent } from '../components/menu-popover/menu-popover.co
 import { ApiService } from '../services/api/api.service';
 import { AuthService } from '../auth/auth.service';
 import { SecureStorageService } from '../services/secure-storage/secure-storage.service';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -52,13 +53,18 @@ export class SettingScreenPage implements OnInit {
     private popoverCtrl: PopoverController,
     private service: ApiService,
     private authService: AuthService,
-    private secureStorage : SecureStorageService
+    private secureStorage : SecureStorageService,
+    private router : Router
   ) { }
 
   async ngOnInit() {
     this.loadUserProfile();
     this.sender_name = (await this.secureStorage.getItem('name')) || '';
   }
+
+  goToProfile() {
+  this.router.navigateByUrl('/setting-profile');
+}
 
   async loadUserProfile() {
     try {

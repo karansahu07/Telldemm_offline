@@ -1,33 +1,14 @@
 {
   "project_info": {
-    "project_number": "759077376995",
-    "firebase_url": "https://login-8e9ad-default-rtdb.firebaseio.com",
-    "project_id": "login-8e9ad",
-    "storage_bucket": "login-8e9ad.firebasestorage.app"
+    "project_number": "236194781114",
+    "firebase_url": "https://telldemmchat-default-rtdb.firebaseio.com",
+    "project_id": "telldemmchat",
+    "storage_bucket": "telldemmchat.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:759077376995:android:db89c6904284bdb5b306d6",
-        "android_client_info": {
-          "package_name": "com.telldemm.app"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyBJJVGdIsLEHKll0-g0KP6IYLgHnG887Sw"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:759077376995:android:1abbd20bf14232cfb306d6",
+        "mobilesdk_app_id": "1:236194781114:android:2a66eb309ffd4df1f8ef83",
         "android_client_info": {
           "package_name": "com.ekarigar.telldemm"
         }
@@ -35,7 +16,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBJJVGdIsLEHKll0-g0KP6IYLgHnG887Sw"
+          "current_key": "AIzaSyBtJEn6pKBOd3hrOPl5YUir5ID6G4OOK0c"
         }
       ],
       "services": {
