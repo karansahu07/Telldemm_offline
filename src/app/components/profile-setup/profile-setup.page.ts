@@ -394,7 +394,7 @@ export class ProfileSetupPage implements OnInit {
       await this.secureStorage.setItem('profile_url', this.imageData.toString());
     }
 
-    const savedUserId = localStorage.getItem('userId') || this.userID;
+    const savedUserId = this.authService.authData?.userId || this.userID;
 
     this.checkUserInRooms(savedUserId).subscribe({
       next: (userFound: any) => {

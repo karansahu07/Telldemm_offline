@@ -415,25 +415,6 @@ export class UseraboutPage implements OnInit {
     // console.log("this.chatType === 'group'",this.isGroup);
   }
 
-  // async openActionSheet(member: any) {
-  //   const actionSheet = await this.actionSheetCtrl.create({
-  //     header: member.name,
-  //     buttons: [
-  //       {
-  //         text: 'Remove from group',
-  //         role: 'destructive',
-  //         icon: 'person-remove',
-  //         handler: () => this.removeMemberFromGroup(member)
-  //       },
-  //       {
-  //         text: 'Cancel',
-  //         role: 'cancel'
-  //       }
-  //     ]
-  //   });
-  //   await actionSheet.present();
-  // }
-
   async openActionSheet(member: any) {
     const buttons: ActionSheetButton[] = [
       {
@@ -647,7 +628,7 @@ export class UseraboutPage implements OnInit {
       await set(ref(db, pastMemberPath), {
         ...member,
         status: 'inactive',
-        removedAt: new Date().toLocaleString()  // optional timestamp
+        removedAt: new Date().toLocaleString()
       });
 
       // Remove from current members

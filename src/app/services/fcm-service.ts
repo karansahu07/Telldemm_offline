@@ -113,10 +113,11 @@ export class FcmService {
     }
   }
   
-  // Profile setup ke baad ye function call kariye
+  // Profile setup ke baad ye function call ho rha hai
   async saveFcmTokenToDatabase(userId: string, userName: string, userPhone: string) {
     try {
       if (!this.fcmToken) {
+        // console.log("fcm token is", this.fcmToken);
         console.log('FCM Token not available yet, retrying...');
         // Retry after 2 seconds
         setTimeout(() => {
@@ -146,7 +147,6 @@ export class FcmService {
     }
   }
   
-  // Token refresh handle karne ke liye
   async updateFcmToken(userId: string) {
     try {
       if (this.fcmToken && userId) {
