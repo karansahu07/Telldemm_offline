@@ -59,7 +59,7 @@ export class SettingScreenPage implements OnInit {
 
   async ngOnInit() {
     this.loadUserProfile();
-    this.sender_name = (await this.secureStorage.getItem('name')) || '';
+    this.sender_name = this.authService.authData?.name || '';
   }
 
   goToProfile() {

@@ -140,12 +140,10 @@ popoverEvent: any;
     await this.initKeyboardListeners();
 
     // Load sender (current user) details
-    // this.senderId = (await this.secureStorage.getItem('userId')) || '';
     this.senderId = this.authService.authData?.userId || '';
-    // this.sender_phone = (await this.secureStorage.getItem('phone_number')) || '';
     this.sender_phone = this.authService.authData?.phone_number || '';
-    this.sender_name = (await this.secureStorage.getItem('name')) || '';
-    // this.receiver_name = await this.secureStorage.getItem('receiver_name') || '';
+    this.sender_name = this.authService.authData?.name || '';
+
     const nameFromQuery = this.route.snapshot.queryParamMap.get('receiver_name');
     this.receiver_name = nameFromQuery || await this.secureStorage.getItem('receiver_name') || '';
 
@@ -194,11 +192,9 @@ popoverEvent: any;
     await this.initKeyboardListeners();
 
     // Load sender (current user) details
-    // this.senderId = (await this.secureStorage.getItem('userId')) || '';
     this.senderId = this.authService.authData?.userId || '';
-    // this.sender_phone = (await this.secureStorage.getItem('phone_number')) || '';
     this.sender_phone = this.authService.authData?.phone_number || '';
-    this.sender_name = (await this.secureStorage.getItem('name')) || '';
+    this.sender_name = this.authService.authData?.name || '';
 
     const nameFromQuery = this.route.snapshot.queryParamMap.get('receiver_name');
     this.receiver_name = nameFromQuery || await this.secureStorage.getItem('receiver_name') || '';
@@ -234,7 +230,7 @@ popoverEvent: any;
     const state = nav?.extras?.state;
 
     if (state && state['imageToSend']) {
-      this.attachmentPath = state['imageToSend'];  // 👈 set the attachmentPath
+      this.attachmentPath = state['imageToSend'];
     }
 
     console.log("this.attachmentPath", this.attachmentPath);

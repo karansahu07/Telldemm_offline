@@ -229,6 +229,7 @@ import { SecureStorageService } from '../services/secure-storage/secure-storage.
 import { NavController } from '@ionic/angular';
 import { NgZone } from '@angular/core';
 import { AuthService } from '../auth/auth.service';
+import { ApiService } from '../services/api/api.service';
 
 @Component({
   selector: 'app-userabout',
@@ -282,7 +283,8 @@ export class UseraboutPage implements OnInit {
     private secureStorage: SecureStorageService,
     private navCtrl: NavController,
     private zone: NgZone,
-    private authService: AuthService
+    private authService: AuthService,
+    private service : ApiService
   ) { }
 
   ngOnInit() {
@@ -603,56 +605,134 @@ export class UseraboutPage implements OnInit {
     }
   }
 
+  // async removeMemberFromGroup(member: any) {
+  //   const db = getDatabase();
+  //   const groupId = this.groupId || this.receiverId;
+
+  //   if (!groupId || !member?.user_id) {
+  //     console.error('Missing groupId or member.user_id');
+  //     return;
+  //   }
+
+  //   const memberPath = `groups/${groupId}/members/${member.user_id}`;
+  //   const pastMemberPath = `groups/${groupId}/pastmembers/${member.user_id}`;
+
+  //   console.log('Deactivating and moving to pastmembers:', memberPath);
+
+  //   try {
+  //     // Update the status to "inactive" in members first
+  //     await update(ref(db, memberPath), {
+  //       ...member,
+  //       status: 'inactive'
+  //     });
+
+  //     // Move member to pastmembers node
+  //     await set(ref(db, pastMemberPath), {
+  //       ...member,
+  //       status: 'inactive',
+  //       removedAt: new Date().toLocaleString()
+  //     });
+
+  //     // Remove from current members
+  //     await remove(ref(db, memberPath));
+
+  //     // Remove from UI
+  //     this.groupMembers = this.groupMembers.filter(m => m.user_id !== member.user_id);
+
+  //     const toast = await this.toastCtrl.create({
+  //       message: `${member.name} removed from group`,
+  //       duration: 2000,
+  //       color: 'success'
+  //     });
+  //     await toast.present();
+  //   } catch (error) {
+  //     console.error('Error moving member to pastmembers:', error);
+  //     const toast = await this.toastCtrl.create({
+  //       message: `Error removing member`,
+  //       duration: 2000,
+  //       color: 'danger'
+  //     });
+  //     await toast.present();
+  //   }
+  // }
+
   async removeMemberFromGroup(member: any) {
-    const db = getDatabase();
-    const groupId = this.groupId || this.receiverId;
+  const db = getDatabase();
+  const groupId = this.groupId || this.receiverId;
 
-    if (!groupId || !member?.user_id) {
-      console.error('Missing groupId or member.user_id');
-      return;
-    }
-
-    const memberPath = `groups/${groupId}/members/${member.user_id}`;
-    const pastMemberPath = `groups/${groupId}/pastmembers/${member.user_id}`;
-
-    console.log('Deactivating and moving to pastmembers:', memberPath);
-
-    try {
-      // Update the status to "inactive" in members first
-      await update(ref(db, memberPath), {
-        ...member,
-        status: 'inactive'
-      });
-
-      // Move member to pastmembers node
-      await set(ref(db, pastMemberPath), {
-        ...member,
-        status: 'inactive',
-        removedAt: new Date().toLocaleString()
-      });
-
-      // Remove from current members
-      await remove(ref(db, memberPath));
-
-      // Remove from UI
-      this.groupMembers = this.groupMembers.filter(m => m.user_id !== member.user_id);
-
-      const toast = await this.toastCtrl.create({
-        message: `${member.name} removed from group`,
-        duration: 2000,
-        color: 'success'
-      });
-      await toast.present();
-    } catch (error) {
-      console.error('Error moving member to pastmembers:', error);
-      const toast = await this.toastCtrl.create({
-        message: `Error removing member`,
-        duration: 2000,
-        color: 'danger'
-      });
-      await toast.present();
-    }
+  if (!groupId || !member?.user_id) {
+    console.error('Missing groupId or member.user_id');
+    return;
   }
+
+  const memberPath = `groups/${groupId}/members/${member.user_id}`;
+  const pastMemberPath = `groups/${groupId}/pastmembers/${member.user_id}`;
+
+  console.log('Deactivating and moving to pastmembers:', memberPath);
+
+  try {
+    // Update the status to "inactive" in members first
+    await update(ref(db, memberPath), {
+      ...member,
+      status: 'inactive'
+    });
+
+    // Move member to pastmembers node
+    await set(ref(db, pastMemberPath), {
+      ...member,
+      status: 'inactive',
+      removedAt: new Date().toLocaleString()
+    });
+
+    // Remove from current members
+    await remove(ref(db, memberPath));
+
+    // Get backend group ID from Firebase
+    const backendGroupId = await this.getBackendGroupId(groupId);
+    
+    if (backendGroupId) {
+      // Call API to update member status in backend
+      this.service.updateMemberStatus(backendGroupId, Number(member.user_id), false).subscribe({
+        next: (res: any) => {
+          console.log('Member status updated in backend:', res);
+        },
+        error: (error: any) => {
+          console.error('Error updating member status in backend:', error);
+        }
+      });
+    }
+
+    this.groupMembers = this.groupMembers.filter(m => m.user_id !== member.user_id);
+
+    const toast = await this.toastCtrl.create({
+      message: `${member.name} removed from group`,
+      duration: 2000,
+      color: 'success'
+    });
+    await toast.present();
+  } catch (error) {
+    console.error('Error moving member to pastmembers:', error);
+    const toast = await this.toastCtrl.create({
+      message: `Error removing member`,
+      duration: 2000,
+      color: 'danger'
+    });
+    await toast.present();
+  }
+}
+
+// Helper function to get backend group ID from Firebase (if you don't have it already)
+async getBackendGroupId(firebaseGroupId: string): Promise<number | null> {
+  try {
+    const db = getDatabase();
+    const groupRef = ref(db, `groups/${firebaseGroupId}/backendGroupId`);
+    const snapshot = await get(groupRef);
+    return snapshot.exists() ? snapshot.val() : null;
+  } catch (error) {
+    console.error('Error getting backend group ID:', error);
+    return null;
+  }
+}
 
   async checkForPastMembers() {
   if (!this.groupId) return;
@@ -681,7 +761,7 @@ export class UseraboutPage implements OnInit {
     const currentUserId = this.authService.authData?.userId;
     // const currentUserPhone = localStorage.getItem('phone_number');
     const currentUserPhone = this.authService.authData?.phone_number;
-    const currentUserName = localStorage.getItem('name') || currentUserPhone;
+    const currentUserName = this.authService.authData?.name || currentUserPhone;
 
     if (!currentUserId || !this.receiverId || !this.receiver_name) {
       console.error('Missing data for group creation');
