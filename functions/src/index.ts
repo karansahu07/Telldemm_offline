@@ -89,6 +89,158 @@ setGlobalOptions({ maxInstances: 10 });
 
 
 
+// import * as functions from 'firebase-functions/v1';
+// import * as admin from 'firebase-admin';
+// import { webcrypto } from 'crypto';
+
+// const { subtle } = webcrypto;
+
+// admin.initializeApp();
+
+// /**
+//  * AES Decrypt (same logic as frontend service)
+//  */
+// const secretKey = 'YourSuperSecretPassphrase';
+// let aesKey: CryptoKey | null = null;
+
+// // derive AES key
+// async function importAESKey(passphrase: string): Promise<void> {
+//   const enc = new TextEncoder();
+//   const keyMaterial = await subtle.importKey(
+//     'raw',
+//     enc.encode(passphrase),
+//     { name: 'PBKDF2' },
+//     false,
+//     ['deriveKey']
+//   );
+
+//   aesKey = await subtle.deriveKey(
+//     {
+//       name: 'PBKDF2',
+//       salt: enc.encode('your_salt_value'),
+//       iterations: 100000,
+//       hash: 'SHA-256'
+//     },
+//     keyMaterial,
+//     { name: 'AES-GCM', length: 256 },
+//     false,
+//     ['encrypt', 'decrypt']
+//   );
+// }
+
+// async function decryptText(cipherText: string): Promise<string> {
+//   if (!aesKey) {
+//     await importAESKey(secretKey);
+//   }
+
+//   if (!cipherText) return '';
+
+//   try {
+//     const data = Uint8Array.from(atob(cipherText), c => c.charCodeAt(0));
+
+//     if (data.length <= 12) {
+//       return cipherText; // fallback (maybe plain text)
+//     }
+
+//     const iv = data.slice(0, 12);
+//     const encrypted = data.slice(12);
+
+//     const decrypted = await subtle.decrypt(
+//       { name: 'AES-GCM', iv },
+//       aesKey!,
+//       encrypted
+//     );
+
+//     return new TextDecoder().decode(decrypted);
+//   } catch (err) {
+//     console.error('❌ Decryption failed:', err);
+//     return cipherText;
+//   }
+// }
+
+// export const sendNotificationOnNewMessage = functions.database
+//   .ref('/chats/{roomId}/{messageId}')
+//   .onCreate(async (snapshot: functions.database.DataSnapshot, context: functions.EventContext) => {
+//     const messageData = snapshot.val();
+//     const roomId = context.params.roomId;
+//     const messageId = context.params.messageId;
+
+//     try {
+//       // ✅ Get receiver FCM token
+//       const receiverTokenSnapshot = await admin.database()
+//         .ref(`/users/${messageData.receiver_id}/fcmToken`)
+//         .once('value');
+
+//       const receiverToken = receiverTokenSnapshot.val();
+
+//       if (!receiverToken) {
+//         console.log('Receiver FCM token not found for:', messageData.receiver_id);
+//         return;
+//       }
+
+//       // ✅ Avoid self notification
+//       if (messageData.sender_id === messageData.receiver_id) {
+//         console.log('Self message, notification not sent');
+//         return;
+//       }
+
+//       // ✅ Prepare message body
+//       let messageBody = 'New message';
+
+//       if (messageData.text) {
+//         // 🔑 Decrypt text before sending notification
+//         messageBody = await decryptText(messageData.text);
+//       }
+
+//       if (messageData.attachment) {
+//         switch (messageData.attachment.type) {
+//           case 'image': messageBody = '📷 Image'; break;
+//           case 'video': messageBody = '🎥 Video'; break;
+//           case 'audio': messageBody = '🎵 Audio'; break;
+//           case 'document': messageBody = '📄 Document'; break;
+//           default: messageBody = '📎 Attachment';
+//         }
+//       }
+
+//       // ✅ Send notification (new format)
+//       const response = await admin.messaging().send({
+//         token: receiverToken,
+//         notification: {
+//           title: messageData.sender_name || 'New Message',
+//           body: messageBody,
+//         },
+//         android: {
+//           notification: {
+//             sound: 'default',
+//             clickAction: 'FCM_PLUGIN_ACTIVITY',
+//             icon: 'assets/icon/favicon.ico',
+//           },
+//         },
+//         data: {
+//           roomId: roomId,
+//           senderId: messageData.sender_id,
+//           receiverId: messageData.receiver_id,
+//           messageId: messageId,
+//           chatType: 'private',
+//           timestamp: messageData.timestamp.toString()
+//         }
+//       });
+
+//       console.log('✅ Notification sent successfully:', response);
+
+//       // (Optional) delivered mark
+//       // await admin.database()
+//       //   .ref(`/chats/${roomId}/messages/${messageId}/delivered`)
+//       //   .set(true);
+
+//     } catch (error) {
+//       console.error('❌ Error sending notification:', error);
+//     }
+//   });
+
+
+
+
 import * as functions from 'firebase-functions/v1';
 import * as admin from 'firebase-admin';
 import { webcrypto } from 'crypto';
@@ -158,6 +310,7 @@ async function decryptText(cipherText: string): Promise<string> {
   }
 }
 
+// 🔥 UNIFIED NOTIFICATION FUNCTION (Private + Group)
 export const sendNotificationOnNewMessage = functions.database
   .ref('/chats/{roomId}/{messageId}')
   .onCreate(async (snapshot: functions.database.DataSnapshot, context: functions.EventContext) => {
@@ -166,75 +319,253 @@ export const sendNotificationOnNewMessage = functions.database
     const messageId = context.params.messageId;
 
     try {
-      // ✅ Get receiver FCM token
-      const receiverTokenSnapshot = await admin.database()
-        .ref(`/users/${messageData.receiver_id}/fcmToken`)
-        .once('value');
-
-      const receiverToken = receiverTokenSnapshot.val();
-
-      if (!receiverToken) {
-        console.log('Receiver FCM token not found for:', messageData.receiver_id);
-        return;
+      // ✅ Check if this is a group chat
+      const isGroupChat = roomId.startsWith('group_');
+      
+      if (isGroupChat) {
+        console.log('👥 Group chat message detected:', { roomId, messageId });
+        await handleGroupNotification(messageData, roomId, messageId);
+      } else {
+        console.log('📱 Private chat message detected:', { roomId, messageId });
+        await handlePrivateNotification(messageData, roomId, messageId);
       }
-
-      // ✅ Avoid self notification
-      if (messageData.sender_id === messageData.receiver_id) {
-        console.log('Self message, notification not sent');
-        return;
-      }
-
-      // ✅ Prepare message body
-      let messageBody = 'New message';
-
-      if (messageData.text) {
-        // 🔑 Decrypt text before sending notification
-        messageBody = await decryptText(messageData.text);
-      }
-
-      if (messageData.attachment) {
-        switch (messageData.attachment.type) {
-          case 'image': messageBody = '📷 Image'; break;
-          case 'video': messageBody = '🎥 Video'; break;
-          case 'audio': messageBody = '🎵 Audio'; break;
-          case 'document': messageBody = '📄 Document'; break;
-          default: messageBody = '📎 Attachment';
-        }
-      }
-
-      // ✅ Send notification (new format)
-      const response = await admin.messaging().send({
-        token: receiverToken,
-        notification: {
-          title: messageData.sender_name || 'New Message',
-          body: messageBody,
-        },
-        android: {
-          notification: {
-            sound: 'default',
-            clickAction: 'FCM_PLUGIN_ACTIVITY',
-            icon: 'assets/icon/favicon.ico',
-          },
-        },
-        data: {
-          roomId: roomId,
-          senderId: messageData.sender_id,
-          receiverId: messageData.receiver_id,
-          messageId: messageId,
-          chatType: 'private',
-          timestamp: messageData.timestamp.toString()
-        }
-      });
-
-      console.log('✅ Notification sent successfully:', response);
-
-      // (Optional) delivered mark
-      // await admin.database()
-      //   .ref(`/chats/${roomId}/messages/${messageId}/delivered`)
-      //   .set(true);
 
     } catch (error) {
-      console.error('❌ Error sending notification:', error);
+      console.error('❌ Error in notification function:', error);
     }
   });
 
+// 📱 Private Chat Notification Handler
+async function handlePrivateNotification(messageData: any, roomId: string, messageId: string) {
+  try {
+    // ✅ Get receiver FCM token
+    const receiverTokenSnapshot = await admin.database()
+      .ref(`/users/${messageData.receiver_id}/fcmToken`)
+      .once('value');
+
+    const receiverToken = receiverTokenSnapshot.val();
+
+    if (!receiverToken) {
+      console.log('Receiver FCM token not found for:', messageData.receiver_id);
+      return;
+    }
+
+    // ✅ Avoid self notification
+    if (messageData.sender_id === messageData.receiver_id) {
+      console.log('Self message, notification not sent');
+      return;
+    }
+
+    // ✅ Prepare message body
+    let messageBody = 'New message';
+
+    if (messageData.text) {
+      // 🔑 Decrypt text before sending notification
+      messageBody = await decryptText(messageData.text);
+    }
+
+    if (messageData.attachment) {
+      switch (messageData.attachment.type) {
+        case 'image': messageBody = '📷 Image'; break;
+        case 'video': messageBody = '🎥 Video'; break;
+        case 'audio': messageBody = '🎵 Audio'; break;
+        case 'document': messageBody = '📄 Document'; break;
+        default: messageBody = '📎 Attachment';
+      }
+    }
+
+    // ✅ Send notification
+    const response = await admin.messaging().send({
+      token: receiverToken,
+      notification: {
+        title: messageData.sender_name || 'New Message',
+        body: messageBody,
+      },
+      android: {
+        notification: {
+          sound: 'default',
+          clickAction: 'FCM_PLUGIN_ACTIVITY',
+          icon: 'assets/icon/favicon.ico',
+        },
+      },
+      data: {
+        roomId: roomId,
+        senderId: messageData.sender_id,
+        receiverId: messageData.receiver_id,
+        messageId: messageId,
+        chatType: 'private',
+        timestamp: messageData.timestamp.toString()
+      }
+    });
+
+    console.log('✅ Private notification sent successfully:', response);
+
+  } catch (error) {
+    console.error('❌ Error sending private notification:', error);
+  }
+}
+
+// 👥 Group Chat Notification Handler
+async function handleGroupNotification(messageData: any, roomId: string, messageId: string) {
+  try {
+    // ✅ Get group details
+    const groupSnapshot = await admin.database()
+      .ref(`/groups/${roomId}`)
+      .once('value');
+
+    const groupData = groupSnapshot.val();
+    if (!groupData) {
+      console.log('❌ Group not found:', roomId);
+      return;
+    }
+
+    // ✅ Get all group members (excluding sender)
+    const members = groupData.members || {};
+    const memberIds = Object.keys(members).filter(memberId => 
+      memberId !== messageData.sender_id
+    );
+
+    if (memberIds.length === 0) {
+      console.log('📭 No members to notify in group:', roomId);
+      return;
+    }
+
+    // ✅ Get FCM tokens for all members
+    const memberTokens: string[] = [];
+    const tokenPromises = memberIds.map(async (memberId) => {
+      try {
+        const tokenSnapshot = await admin.database()
+          .ref(`/users/${memberId}/fcmToken`)
+          .once('value');
+        
+        const token = tokenSnapshot.val();
+        if (token) {
+          memberTokens.push(token);
+          console.log(`✅ Token found for member: ${memberId}`);
+        } else {
+          console.log(`⚠️ No token for member: ${memberId}`);
+        }
+      } catch (error) {
+        console.error(`❌ Error getting token for member ${memberId}:`, error);
+      }
+    });
+
+    await Promise.all(tokenPromises);
+
+    if (memberTokens.length === 0) {
+      console.log('📭 No valid FCM tokens found for group members');
+      return;
+    }
+
+    // ✅ Prepare message content
+    let messageBody = 'New message';
+    const groupName = groupData.name || 'Group Chat';
+    const senderName = messageData.sender_name || 'Someone';
+
+    if (messageData.text) {
+      // 🔑 Decrypt text before sending notification
+      const decryptedText = await decryptText(messageData.text);
+      messageBody = decryptedText.length > 50 
+        ? `${decryptedText.substring(0, 50)}...` 
+        : decryptedText;
+    }
+
+    if (messageData.attachment) {
+      switch (messageData.attachment.type) {
+        case 'image': messageBody = '📷 sent an image'; break;
+        case 'video': messageBody = '🎥 sent a video'; break;
+        case 'audio': messageBody = '🎵 sent an audio'; break;
+        case 'document': messageBody = '📄 sent a document'; break;
+        default: messageBody = '📎 sent an attachment';
+      }
+    }
+
+    // ✅ Send notifications to all group members (individual sends instead of multicast)
+    const notificationResults = {
+      successCount: 0,
+      failureCount: 0,
+      responses: [] as any[]
+    };
+
+    // Send individual notifications to avoid multicast issues
+    const sendPromises = memberTokens.map(async (token) => {
+      try {
+        const message = {
+          token: token,
+          notification: {
+            title: `${senderName} in ${groupName}`,
+            body: messageBody,
+          },
+          android: {
+            notification: {
+              sound: 'default',
+              clickAction: 'FCM_PLUGIN_ACTIVITY',
+              icon: 'assets/icon/favicon.ico',
+              tag: roomId, // Group notifications with same tag will replace each other
+            },
+          },
+          data: {
+            roomId: roomId,
+            senderId: messageData.sender_id,
+            messageId: messageId,
+            chatType: 'group',
+            groupName: groupName,
+            timestamp: messageData.timestamp.toString()
+          }
+        };
+
+        const response = await admin.messaging().send(message);
+        notificationResults.successCount++;
+        notificationResults.responses.push({ success: true, messageId: response });
+        console.log(`✅ Group notification sent to token: ${token.substring(0, 10)}...`);
+        
+      } catch (error: any) {
+        notificationResults.failureCount++;
+        notificationResults.responses.push({ 
+          success: false, 
+          error: error,
+          token: token 
+        });
+        console.error(`❌ Failed to send group notification to token ${token.substring(0, 10)}...:`, error.message);
+      }
+    });
+
+    await Promise.all(sendPromises);
+    const response = notificationResults;
+
+    console.log('✅ Group notifications sent:', {
+      successCount: response.successCount,
+      failureCount: response.failureCount,
+      totalTokens: memberTokens.length
+    });
+
+    // ✅ Handle failed tokens
+    if (response.failureCount > 0) {
+      const failedTokens: string[] = [];
+      response.responses.forEach((resp, idx) => {
+        if (!resp.success) {
+          const token = resp.token || memberTokens[idx];
+          console.error(`❌ Failed to send to token ${token?.substring(0, 10)}...:`, resp.error?.message);
+          
+          // Track invalid tokens
+          if (resp.error?.code === 'messaging/registration-token-not-registered' ||
+              resp.error?.code === 'messaging/invalid-registration-token') {
+            failedTokens.push(token);
+          }
+        }
+      });
+
+      if (failedTokens.length > 0) {
+        console.log(`🧹 Found ${failedTokens.length} invalid tokens to clean up`);
+      }
+    }
+
+    // ✅ Update message notification status (optional)
+    await admin.database()
+      .ref(`/chats/${roomId}/${messageId}/notified`)
+      .set(true);
+
+  } catch (error) {
+    console.error('❌ Error sending group notification:', error);
+  }
+}

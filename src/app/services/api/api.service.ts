@@ -20,15 +20,6 @@ put(url: string, payload: any): Observable<any> {
   return this.http.put(`${this.baseUrl}${url}`, payload);
 }
 
-  // /**
-  //  * Send OTP to user
-  //  * @param phone_number 
-  //  */
-  // sendOtp(phone_number: string): Observable<any> {
-  //   return this.post('/send-otp', { phone_number });
-  // }
-
-
   /**
    * Send OTP to user
    * @param phone_number 
