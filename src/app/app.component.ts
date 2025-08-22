@@ -27,6 +27,7 @@ import { AuthService } from './auth/auth.service';
 import { Router } from '@angular/router';
 import { Platform } from '@ionic/angular';
 import { FcmService } from './services/fcm-service';
+import { SqliteService } from './services/sqlite.service';
 
 register();
 
@@ -46,14 +47,15 @@ export class AppComponent implements OnInit{
      private authService: AuthService,
     private router: Router,
     private platform: Platform,
-    private fcmService: FcmService
+    private fcmService: FcmService,
+    private sqliteService : SqliteService
   ) {
     // this.listenToNetwork();
   }
   async ngOnInit() {
     await this.fcmService.initializePushNotifications();
     await this.FirebasePushService.initPush();
-    // await this.AttachmentService.init();
+    await this.sqliteService.init();
     await this.FileSystemService.init();
 
     await this.platform.ready();
