@@ -55,7 +55,8 @@ export interface Message {
         mediaId?: string;            // S3 media ID from upload response
         fileSize?: number;           // File size in bytes
         filePath?: string;           
-        caption?: string;            
+        caption?: string;  
+        previewUrl?: string | null;       
     };
     replyToMessageId?: string | undefined;    
     reactions?: {

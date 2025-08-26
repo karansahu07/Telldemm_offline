@@ -110,19 +110,19 @@
             style="margin-left: 10px; flex: 1;">
           </ion-input>
           <ion-buttons slot="end">
-          <!-- <ion-button (click)="openDatePicker()">
+            <!-- <ion-button (click)="openDatePicker()">
             <ion-icon name="calendar-outline"></ion-icon>
           </ion-button> -->
-          <ion-button (click)="openPopover($event)">
-            <ion-icon name="calendar-outline"></ion-icon>
-          </ion-button>
-          <ion-button (click)="navigateSearch('up')">
-            <ion-icon name="arrow-up-outline"></ion-icon>
-          </ion-button>
-          <ion-button (click)="navigateSearch('down')">
-            <ion-icon name="arrow-down-outline"></ion-icon>
-          </ion-button>
-        </ion-buttons>
+            <ion-button (click)="openPopover($event)">
+              <ion-icon name="calendar-outline"></ion-icon>
+            </ion-button>
+            <ion-button (click)="navigateSearch('up')">
+              <ion-icon name="arrow-up-outline"></ion-icon>
+            </ion-button>
+            <ion-button (click)="navigateSearch('down')">
+              <ion-icon name="arrow-down-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
         </ion-item>
       </ng-template>
 
@@ -144,10 +144,10 @@
 
 
 <ion-content class="chat-background" [fullscreen]="true" [scrollEvents]="true">
-  
+
   <!-- Pinned Message Banner (Alternative/Mobile View) -->
-  <div *ngIf="pinnedMessage && pinnedMessageDetails && showMobilePinnedBanner" class="pinned-message-banner" 
-       (click)="scrollToPinnedMessage()">
+  <div *ngIf="pinnedMessage && pinnedMessageDetails && showMobilePinnedBanner" class="pinned-message-banner"
+    (click)="scrollToPinnedMessage()">
     <div class="pinned-content">
       <div class="pinned-header">
         <ion-icon name="pin" class="pin-icon"></ion-icon>
@@ -156,12 +156,13 @@
       </div>
       <div class="pinned-message-preview">
         <span class="pinned-sender" *ngIf="chatType === 'group'">{{ pinnedMessageDetails.sender_name }}:</span>
-        
+
         <!-- Text message preview -->
         <span *ngIf="pinnedMessageDetails.text && !pinnedMessageDetails.attachment" class="pinned-text-content">
-          {{ pinnedMessageDetails.text.length > 50 ? (pinnedMessageDetails.text | slice:0:50) + '...' : pinnedMessageDetails.text }}
+          {{ pinnedMessageDetails.text.length > 50 ? (pinnedMessageDetails.text | slice:0:50) + '...' :
+          pinnedMessageDetails.text }}
         </span>
-        
+
         <!-- Attachment preview -->
         <span *ngIf="pinnedMessageDetails.attachment" class="pinned-attachment">
           <ion-icon [name]="getAttachmentIcon(pinnedMessageDetails.attachment.type)"></ion-icon>
@@ -171,9 +172,8 @@
     </div>
   </div>
 
-  <div #scrollContainer class="chat-messages" 
-       style="padding: 10px 10px 80px 10px; overflow-y: auto; min-height: 100%;">
-    
+  <div #scrollContainer class="chat-messages" style="padding: 10px 10px 80px 10px; overflow-y: auto; min-height: 100%;">
+
     <ion-spinner name="dots" *ngIf="isLoadingMore" style="margin: 8px auto; display: block;"></ion-spinner>
 
     <div *ngFor="let group of groupedMessages">
@@ -186,19 +186,16 @@
        'align-start': msg.sender_id !== senderId,
        'selected': isSelected(msg),
        'pinned-message-highlight': pinnedMessage && pinnedMessage.messageId === msg.message_id
-     }" style="display: flex; flex-direction: column; margin: 5px 0;" 
-        (touchstart)="startLongPress(msg)"
-        (touchend)="cancelLongPress()" 
-        (touchmove)="cancelLongPress()" 
-        (click)="onMessageClick(msg)">
+     }" style="display: flex; flex-direction: column; margin: 5px 0;" (touchstart)="startLongPress(msg)"
+        (touchend)="cancelLongPress()" (touchmove)="cancelLongPress()" (click)="onMessageClick(msg)">
 
         <div class="message-bubble" (click)="openAttachmentModal(msg)" [attr.data-msg-key]="msg.key"
           [ngClass]="msg.sender_id === senderId ? 'sender-message' : 'receiver-message'">
 
-            <div *ngIf="msg.isForwarded" class="forwarded-label">
-    <ion-icon name="arrow-undo-outline" class="forwarded-icon"></ion-icon>
-    Forwarded
-  </div>
+          <div *ngIf="msg.isForwarded" class="forwarded-label">
+            <ion-icon name="arrow-undo-outline" class="forwarded-icon"></ion-icon>
+            Forwarded
+          </div>
 
           <!-- Checkbox for selected messages -->
           <!-- <ion-icon *ngIf="selectedMessages.length > 0" [name]="isSelected(msg) ? 'checkbox' : 'square-outline'"
@@ -244,26 +241,26 @@
             <!-- Attachments -->
             <ng-container *ngIf="msg.attachment">
               <!-- Image -->
-              <img *ngIf="msg.attachment.type === 'image'" [src]="msg.attachment.base64Data" alt="Image"
+              <img *ngIf="msg.attachment.type === 'image'" [src]="msg.attachment.previewUrl" alt="Image"
                 style="max-width: 200px; border-radius: 10px; margin: 5px 0;" />
 
               <!-- Video -->
               <video *ngIf="msg.attachment.type === 'video'" controls
                 style="max-width: 200px; border-radius: 10px; margin: 5px 0;">
-                <source [src]="msg.attachment.base64Data" [type]="msg.attachment.mimeType || 'video/mp4'" />
+                <source [src]="msg.attachment.previewUrl" [type]="msg.attachment.mimeType || 'video/mp4'" />
                 Your browser does not support the video tag.
               </video>
 
               <!-- Audio -->
               <audio *ngIf="msg.attachment.type === 'audio'" controls style="margin: 5px 0;">
-                <source [src]="msg.attachment.base64Data" [type]="msg.attachment.mimeType || 'audio/mpeg'" />
+                <source [src]="msg.attachment.previewUrl" [type]="msg.attachment.mimeType || 'audio/mpeg'" />
                 Your browser does not support the audio element.
               </audio>
 
               <!-- File -->
               <div *ngIf="msg.attachment.type === 'file'" style="margin: 5px 0;">
                 <ion-icon name="document-outline" style="margin-right: 5px;"></ion-icon>
-                <a [href]="msg.attachment.base64Data" [download]="msg.attachment.fileName || 'file'" target="_blank"
+                <a [href]="msg.attachment.previewUrl" [download]="msg.attachment.fileName || 'file'" target="_blank"
                   rel="noopener">
                   {{ msg.attachment.fileName || 'Download File' }}
                 </a>
@@ -271,7 +268,7 @@
 
 
               <ion-text class="message-text" *ngIf="msg.text" style="margin-top: 5px;">{{ msg.text }}</ion-text>
-              
+
               <!-- Optional Caption -->
               <ion-text class="message-text" *ngIf="msg.attachment.caption">{{ msg.attachment.caption }}</ion-text>
             </ng-container>
@@ -280,8 +277,8 @@
           <!-- Timestamp & Status -->
           <p class="time-stamp status-container">
             <!-- Pin indicator in timestamp -->
-            <ion-icon *ngIf="pinnedMessage && pinnedMessage.messageId === msg.message_id" 
-                      name="pin" class="pin-indicator-timestamp"></ion-icon>
+            <ion-icon *ngIf="pinnedMessage && pinnedMessage.messageId === msg.message_id" name="pin"
+              class="pin-indicator-timestamp"></ion-icon>
             {{ msg.time }}
             <ng-container *ngIf="msg.sender_id === senderId">
               <ion-icon *ngIf="!msg.delivered" name="checkmark-outline" class="status-icon sent"></ion-icon>
@@ -297,95 +294,6 @@
   </div>
 </ion-content>
 
-<!-- <ion-modal [isOpen]="showPreviewModal" (didDismiss)="showPreviewModal = false">
-  <ng-template>
-    <ion-header translucent>
-      <ion-toolbar>
-        <ion-title>Preview Attachment</ion-title>
-        <ion-buttons slot="end">
-          <ion-button (click)="cancelAttachment()">Cancel</ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header> -->
-
-    <!-- <ion-content class="ion-padding">
-      <div class="pre-model">
-        <div class="mine2">
-
-          <div *ngIf="selectedAttachment?.type === 'image'">
-            <img [src]="selectedAttachment?.base64" class="preview-image" />
-          </div>
-
-          <div *ngIf="selectedAttachment?.type === 'video'">
-            <video controls [src]="selectedAttachment?.base64" class="preview-video"></video>
-          </div>
-
-          <div *ngIf="selectedAttachment?.type === 'file'" class="preview-file">
-            <ion-icon name="document-attach-outline" style="font-size: 48px"></ion-icon>
-            <p>{{ selectedAttachment?.fileName }}</p>
-          </div>
-
-        </div>
-
-        <div class="mine">
-
-          <ion-textarea [(ngModel)]="messageText" placeholder="Type your message here..."
-            class="pre-message"></ion-textarea>
-
-          <div class="sendbtn">
-            <p>{{receiver_name}}</p>
-            <ion-icon name="send-outline" (click)="sendMessage()" class="mediasend"></ion-icon>
-          </div>
-
-        </div>
-
-      </div>
-    </ion-content> -->
-    
-    <!-- <ion-content class="">
-      <div class="pre-model">
-        <div class="mine2">
-          <div *ngIf="selectedAttachment?.type === 'image'">
-            <img [src]="selectedAttachment?.base64" class="preview-image" />
-          </div>
-
-          <div *ngIf="selectedAttachment?.type === 'video'">
-            <video
-              controls
-              [src]="selectedAttachment?.base64"
-              class="preview-video"
-            ></video>
-          </div>
-
-          <div *ngIf="selectedAttachment?.type === 'file'" class="preview-file">
-            <ion-icon
-              name="document-attach-outline"
-              style="font-size: 48px"
-            ></ion-icon>
-            <p>{{ selectedAttachment?.fileName }}</p>
-          </div>
-        </div>
-
-        <div class="mine ion-padding">
-          <ion-textarea
-            [(ngModel)]="messageText"
-            placeholder="Type your message here..."
-            class="pre-message"
-          ></ion-textarea>
-
-          <div class="sendbtn">
-            <p>user name</p>
-            <ion-icon
-              name="send-outline"
-              (click)="sendMessage()"
-              class="mediasend"
-            ></ion-icon>
-          </div>
-        </div>
-      </div>
-    </ion-content>
-  </ng-template>
-</ion-modal> -->
 
 <ion-modal [isOpen]="showPreviewModal" (didDismiss)="showPreviewModal = false">
   <ng-template>
@@ -393,11 +301,7 @@
       <ion-toolbar class="model-toll">
         <ion-buttons slot="start">
           <!-- <ion-button (click)="cancelAttachment()">Cancel</ion-button> -->
-          <ion-icon
-            (click)="cancelAttachment()"
-            name="close"
-            style="font-size: 25px"
-          ></ion-icon>
+          <ion-icon (click)="cancelAttachment()" name="close" style="font-size: 25px"></ion-icon>
         </ion-buttons>
 
         <ion-buttons slot="end" class="pre-icons">
@@ -413,40 +317,35 @@
       <div class="pre-model">
         <div class="mine2">
           <div *ngIf="selectedAttachment?.type === 'image'">
-            <img [src]="selectedAttachment?.base64" class="preview-image" />
+            <img [src]="selectedAttachment?.previewUrl" class="preview-image" />
           </div>
 
           <div *ngIf="selectedAttachment?.type === 'video'">
-            <video
-              controls
-              [src]="selectedAttachment?.base64"
-              class="preview-video"
-            ></video>
+            <video controls [src]="selectedAttachment?.previewUrl" class="preview-video"></video>
           </div>
 
           <div *ngIf="selectedAttachment?.type === 'file'" class="preview-file">
-            <ion-icon
-              name="document-attach-outline"
-              style="font-size: 48px"
-            ></ion-icon>
+            <ion-icon name="document-attach-outline" style="font-size: 48px"></ion-icon>
             <p>{{ selectedAttachment?.fileName }}</p>
           </div>
         </div>
 
         <div class="mine ion-padding">
-          <ion-textarea
-            [(ngModel)]="messageText"
-            placeholder="Type your message here..."
-            class="pre-message"
-          ></ion-textarea>
+          <ion-textarea [(ngModel)]="messageText" placeholder="Type your message here..."
+            class="pre-message"></ion-textarea>
 
           <div class="sendbtn">
             <p>{{ receiver_name }}</p>
-            <ion-icon
+            <!-- <ion-icon
               name="send-outline"
               (click)="sendMessage()"
               class="mediasend"
-            ></ion-icon>
+            ></ion-icon> -->
+
+            <ion-icon name="send-outline" (click)="sendMessage()" class="mediasend" [class.sending]="isSending"
+              [style.pointer-events]="isSending ? 'none' : 'auto'" [style.opacity]="isSending ? '0.5' : '1'">
+            </ion-icon>
+
           </div>
         </div>
       </div>
@@ -553,18 +452,10 @@
   </ng-template>
 </ion-modal> -->
 
-<ion-popover
-  [isOpen]="showPopover"
-  [event]="popoverEvent"
-  (didDismiss)="showPopover = false"
-  style="--width: 300px; --height: 400px"
->
+<ion-popover [isOpen]="showPopover" [event]="popoverEvent" (didDismiss)="showPopover = false"
+  style="--width: 300px; --height: 400px">
   <ng-template>
-    <ion-datetime
-      presentation="date"
-      (ionChange)="onDateSelected($event)"
-      [value]="selectedDate"
-      showDefaultButtons="true"
-    ></ion-datetime>
+    <ion-datetime presentation="date" (ionChange)="onDateSelected($event)" [value]="selectedDate"
+      showDefaultButtons="true"></ion-datetime>
   </ng-template>
 </ion-popover>

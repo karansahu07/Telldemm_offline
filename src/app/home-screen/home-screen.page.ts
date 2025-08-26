@@ -63,6 +63,13 @@ export class HomeScreenPage implements OnInit, OnDestroy {
 
   // ✅ Check for refresh flag when entering page
   async ionViewWillEnter() {
+
+    // this.currUserId = this.authService.authData?.phone_number || '';
+    // this.senderUserId = this.authService.authData?.userId || '';
+
+    // this.getAllUsers();
+    // this.loadUserGroups();
+
     const shouldRefresh = localStorage.getItem('shouldRefreshHome');
 
     if (shouldRefresh === 'true') {
@@ -143,8 +150,8 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     }, 100);
   }
 
-  openImagePopup(imageUrl: string) {
-    this.selectedImage = imageUrl;
+  openImagePopup(profile_picture_url : string) {
+    this.selectedImage = profile_picture_url;
     this.showPopup = true;
   }
 
@@ -191,7 +198,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
           // receiver_phone = receiver_phone.replace(/^(\+91|91)/, '');
 
           const roomId = this.getRoomId(currentSenderId, receiverId);
-
+          // console.log("fdkgdfkgdfgkdfgjfkgf",user.profile_picture_url);
           // Skip duplicate
           const existingChat = this.chatList.find(chat =>
             chat.receiver_Id === receiverId && !chat.group
@@ -202,6 +209,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
             ...user,
             name: user.name,
             receiver_Id: receiverId,
+            profile_picture_url : user.profile_picture_url,
             receiver_phone: receiver_phone,
             group: false,
             message: '',
@@ -259,6 +267,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
       });
     });
   }
+
   checkUserInRooms(userId: string): Observable<boolean> {
     return new Observable(observer => {
       const chatsRef = ref(this.db, 'chats');
@@ -285,94 +294,203 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     });
   }
 
+  // async loadUserGroups() {
+  //   const userid = this.senderUserId;
+  //   console.log("sender user id:", userid);
+  //   if (!userid) return;
+
+  //   const groupIds = await this.firebaseChatService.getGroupsForUser(userid);
+  //   console.log("group ids:", groupIds);
+
+  //   for (const groupId of groupIds) {
+  //     // ✅ Skip duplicate group chats
+  //     const existingGroup = this.chatList.find(chat =>
+  //       chat.receiver_Id === groupId && chat.group
+  //     );
+  //     if (existingGroup) {
+  //       console.log('Group already exists:', groupId);
+  //       continue;
+  //     }
+
+  //     const groupInfo = await this.firebaseChatService.getGroupInfo(groupId);
+  //     if (!groupInfo || !groupInfo.members || !groupInfo.members[userid]) continue;
+
+  //     const groupName = groupInfo.name || 'Unnamed Group';
+
+  //     const groupChat = {
+  //       name: groupName,
+  //       receiver_Id: groupId,
+  //       group: true,
+  //       message: '',
+  //       time: '',
+  //       unread: false,
+  //       unreadCount: 0
+  //     };
+
+  //     this.chatList.push(groupChat);
+
+  //     // ✅ Listen for latest message in group
+  //     this.firebaseChatService.listenForMessages(groupId).subscribe(async (messages) => {
+  //       if (messages.length > 0) {
+  //         const lastMsg = messages[messages.length - 1];
+
+  //         if (lastMsg.isDeleted) {
+  //           groupChat.message = 'This message was deleted';
+  //         } else if (lastMsg.attachment?.type && lastMsg.attachment.type !== 'text') {
+  //           // Show appropriate icon for attachment
+  //           switch (lastMsg.attachment.type) {
+  //             case 'image':
+  //               groupChat.message = '📷 Photo';
+  //               break;
+  //             case 'video':
+  //               groupChat.message = '🎥 Video';
+  //               break;
+  //             case 'audio':
+  //               groupChat.message = '🎵 Audio';
+  //               break;
+  //             case 'file':
+  //               groupChat.message = '📎 Attachment';
+  //               break;
+  //             default:
+  //               groupChat.message = '[Media]';
+  //           }
+  //         } else {
+  //           // Decrypt normal text message
+  //           try {
+  //             const decryptedText = await this.encryptionService.decrypt(lastMsg.text);
+  //             groupChat.message = decryptedText;
+  //           } catch (e) {
+  //             groupChat.message = '[Encrypted]';
+  //           }
+  //         }
+
+  //         // Format time
+  //         if (lastMsg.timestamp) {
+  //           groupChat.time = this.formatTimestamp(lastMsg.timestamp);
+  //         }
+  //       }
+  //     });
+
+  //     // ✅ Listen for unread messages
+  //     const sub = this.firebaseChatService
+  //       .listenToUnreadCount(groupId, userid)
+  //       .subscribe((count: number) => {
+  //         groupChat.unreadCount = count;
+  //         groupChat.unread = count > 0;
+  //       });
+
+  //     this.unreadSubs.push(sub);
+  //   }
+  // }
+
   async loadUserGroups() {
-    const userid = this.senderUserId;
-    console.log("sender user id:", userid);
-    if (!userid) return;
+  const userid = this.senderUserId;
+  console.log("sender user id:", userid);
+  if (!userid) return;
 
-    const groupIds = await this.firebaseChatService.getGroupsForUser(userid);
-    console.log("group ids:", groupIds);
+  const groupIds = await this.firebaseChatService.getGroupsForUser(userid);
+  console.log("group ids:", groupIds);
 
-    for (const groupId of groupIds) {
-      // ✅ Skip duplicate group chats
-      const existingGroup = this.chatList.find(chat =>
-        chat.receiver_Id === groupId && chat.group
-      );
-      if (existingGroup) {
-        console.log('Group already exists:', groupId);
-        continue;
-      }
+  for (const groupId of groupIds) {
+    // ✅ Skip duplicate group chats
+    const existingGroup = this.chatList.find(chat =>
+      chat.receiver_Id === groupId && chat.group
+    );
+    if (existingGroup) {
+      console.log('Group already exists:', groupId);
+      continue;
+    }
 
-      const groupInfo = await this.firebaseChatService.getGroupInfo(groupId);
-      if (!groupInfo || !groupInfo.members || !groupInfo.members[userid]) continue;
+    const groupInfo = await this.firebaseChatService.getGroupInfo(groupId);
+    if (!groupInfo || !groupInfo.members || !groupInfo.members[userid]) continue;
 
-      const groupName = groupInfo.name || 'Unnamed Group';
+    const groupName = groupInfo.name || 'Unnamed Group';
 
-      const groupChat = {
-        name: groupName,
-        receiver_Id: groupId,
-        group: true,
-        message: '',
-        time: '',
-        unread: false,
-        unreadCount: 0
-      };
+    // ✅ Default DP
+    let groupDp = 'assets/images/default-group.png';
 
-      this.chatList.push(groupChat);
-
-      // ✅ Listen for latest message in group
-      this.firebaseChatService.listenForMessages(groupId).subscribe(async (messages) => {
-        if (messages.length > 0) {
-          const lastMsg = messages[messages.length - 1];
-
-          if (lastMsg.isDeleted) {
-            groupChat.message = 'This message was deleted';
-          } else if (lastMsg.attachment?.type && lastMsg.attachment.type !== 'text') {
-            // Show appropriate icon for attachment
-            switch (lastMsg.attachment.type) {
-              case 'image':
-                groupChat.message = '📷 Photo';
-                break;
-              case 'video':
-                groupChat.message = '🎥 Video';
-                break;
-              case 'audio':
-                groupChat.message = '🎵 Audio';
-                break;
-              case 'file':
-                groupChat.message = '📎 Attachment';
-                break;
-              default:
-                groupChat.message = '[Media]';
-            }
-          } else {
-            // Decrypt normal text message
-            try {
-              const decryptedText = await this.encryptionService.decrypt(lastMsg.text);
-              groupChat.message = decryptedText;
-            } catch (e) {
-              groupChat.message = '[Encrypted]';
-            }
-          }
-
-          // Format time
-          if (lastMsg.timestamp) {
-            groupChat.time = this.formatTimestamp(lastMsg.timestamp);
+    // ✅ Fetch Group DP from API
+    this.service.getGroupDp(groupId).subscribe({
+      next: (res : any) => {
+        if (res?.status && res.group_dp) {
+          const targetGroup = this.chatList.find(chat => chat.receiver_Id === groupId);
+          if (targetGroup) {
+            targetGroup.dp = res.group_dp; // add dp property
           }
         }
+      },
+      error: (err : any) => {
+        console.error('❌ Failed to fetch group DP:', err);
+      }
+    });
+
+    const groupChat: any = {
+      name: groupName,
+      receiver_Id: groupId,
+      group: true,
+      message: '',
+      time: '',
+      unread: false,
+      unreadCount: 0,
+      dp: groupDp   // ✅ add DP in object
+    };
+
+    this.chatList.push(groupChat);
+
+    // ✅ Listen for latest message in group
+    this.firebaseChatService.listenForMessages(groupId).subscribe(async (messages) => {
+      if (messages.length > 0) {
+        const lastMsg = messages[messages.length - 1];
+
+        if (lastMsg.isDeleted) {
+          groupChat.message = 'This message was deleted';
+        } else if (lastMsg.attachment?.type && lastMsg.attachment.type !== 'text') {
+          // Show appropriate icon for attachment
+          switch (lastMsg.attachment.type) {
+            case 'image':
+              groupChat.message = '📷 Photo';
+              break;
+            case 'video':
+              groupChat.message = '🎥 Video';
+              break;
+            case 'audio':
+              groupChat.message = '🎵 Audio';
+              break;
+            case 'file':
+              groupChat.message = '📎 Attachment';
+              break;
+            default:
+              groupChat.message = '[Media]';
+          }
+        } else {
+          // Decrypt normal text message
+          try {
+            const decryptedText = await this.encryptionService.decrypt(lastMsg.text);
+            groupChat.message = decryptedText;
+          } catch (e) {
+            groupChat.message = '[Encrypted]';
+          }
+        }
+
+        // Format time
+        if (lastMsg.timestamp) {
+          groupChat.time = this.formatTimestamp(lastMsg.timestamp);
+        }
+      }
+    });
+
+    // ✅ Listen for unread messages
+    const sub = this.firebaseChatService
+      .listenToUnreadCount(groupId, userid)
+      .subscribe((count: number) => {
+        groupChat.unreadCount = count;
+        groupChat.unread = count > 0;
       });
 
-      // ✅ Listen for unread messages
-      const sub = this.firebaseChatService
-        .listenToUnreadCount(groupId, userid)
-        .subscribe((count: number) => {
-          groupChat.unreadCount = count;
-          groupChat.unread = count > 0;
-        });
-
-      this.unreadSubs.push(sub);
-    }
+    this.unreadSubs.push(sub);
   }
+}
+
 
 
   // Format timestamp for display

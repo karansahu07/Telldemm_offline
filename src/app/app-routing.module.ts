@@ -180,7 +180,11 @@ const routes: Routes = [
     path: 'setting-profile',
     canActivate: [AuthGuard],
     loadChildren: () => import('./pages/setting-profile/setting-profile.module').then( m => m.SettingProfilePageModule)
+  },  {
+    path: 'profile-dp-view',
+    loadChildren: () => import('./pages/profile-dp-view/profile-dp-view.module').then( m => m.ProfileDpViewPageModule)
   },
+
 
 ];
 

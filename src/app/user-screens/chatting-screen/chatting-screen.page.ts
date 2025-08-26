@@ -12,7 +12,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonicModule, ModalController, Platform, PopoverController, ToastController } from '@ionic/angular';
-import { Subscription } from 'rxjs';
+import { firstValueFrom, Subscription } from 'rxjs';
 import { Keyboard } from '@capacitor/keyboard';
 import { FirebaseChatService } from 'src/app/services/firebase-chat.service';
 import { EncryptionService } from 'src/app/services/encryption.service';
@@ -34,6 +34,7 @@ import { Clipboard } from '@capacitor/clipboard';
 import { Message, PinnedMessage } from 'src/types';
 import { AuthService } from 'src/app/auth/auth.service';
 import { ApiService } from 'src/app/services/api/api.service';
+import { SqliteService } from 'src/app/services/sqlite.service';
 
 
 @Component({
@@ -95,7 +96,8 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     private popoverController: PopoverController,
     private clipboard: Clipboard,
     private authService: AuthService,
-    private service : ApiService
+    private service: ApiService,
+    private sqliteService : SqliteService 
   ) { }
 
   roomId = '';
@@ -134,7 +136,8 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   onlineCount: number = 0;
 
   showPopover = false;
-popoverEvent: any;
+  popoverEvent: any;
+  isSending = false;
 
   async ngOnInit() {
     // Enable proper keyboard scrolling
@@ -444,34 +447,34 @@ popoverEvent: any;
   }
 
   openPopover(ev: any) {
-  this.popoverEvent = ev;
-  this.showPopover = true;
-}
- 
- 
-onDateSelected(event: any) {
-  const selectedDateObj = new Date(event.detail.value);
- 
-  const day = String(selectedDateObj.getDate()).padStart(2, '0');
-  const month = String(selectedDateObj.getMonth() + 1).padStart(2, '0');
-  const year = selectedDateObj.getFullYear();
- 
-  const formattedDate = `${day}/${month}/${year}`; // Example: "11/07/2025"
- 
-  this.selectedDate = event.detail.value; // Original ISO format
-  this.showPopover = false; // Close the popover
-  this.showDateModal = false; // In case you're also using modal variant
- 
-  // Smooth scroll to that date's section
-  setTimeout(() => {
-    const el = document.getElementById('date-group-' + formattedDate);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } else {
-      console.warn('No messages found for selected date:', formattedDate);
-    }
-  }, 300);
-}
+    this.popoverEvent = ev;
+    this.showPopover = true;
+  }
+
+
+  onDateSelected(event: any) {
+    const selectedDateObj = new Date(event.detail.value);
+
+    const day = String(selectedDateObj.getDate()).padStart(2, '0');
+    const month = String(selectedDateObj.getMonth() + 1).padStart(2, '0');
+    const year = selectedDateObj.getFullYear();
+
+    const formattedDate = `${day}/${month}/${year}`; // Example: "11/07/2025"
+
+    this.selectedDate = event.detail.value; // Original ISO format
+    this.showPopover = false; // Close the popover
+    this.showDateModal = false; // In case you're also using modal variant
+
+    // Smooth scroll to that date's section
+    setTimeout(() => {
+      const el = document.getElementById('date-group-' + formattedDate);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        console.warn('No messages found for selected date:', formattedDate);
+      }
+    }, 300);
+  }
 
   openDatePicker() {
     this.showDateModal = true;
@@ -571,121 +574,121 @@ onDateSelected(event: any) {
   }
 
   isOnlyOneTextMessage(): boolean {
-  return this.selectedMessages.length === 1 && this.selectedMessages[0].type === 'text';
-}
-
-isMultipleTextMessages(): boolean {
-  return this.selectedMessages.length > 1 && this.selectedMessages.every(msg => msg.type === 'text');
-}
-
-isOnlyOneAttachment(): boolean {
-  return this.selectedMessages.length === 1 && this.selectedMessages[0].type !== 'text';
-}
-
-isMultipleAttachments(): boolean {
-  return this.selectedMessages.length > 1 && this.selectedMessages.every(msg => msg.type !== 'text');
-}
-
-isMixedSelection(): boolean {
-  const types = this.selectedMessages.map(msg => msg.type);
-  return types.includes('text') && types.some(t => t !== 'text');
-}
-
-async copySelectedMessages() {
-  if (this.lastPressedMessage?.text) {
-          await Clipboard.write({ string: this.lastPressedMessage.text });
-          console.log('Text copied to clipboard:', this.lastPressedMessage.text);
-          this.selectedMessages = [];
-          this.lastPressedMessage = null;
-        }
-}
-
-replyToMessages() {
-  if (this.selectedMessages.length === 1) {
-    const messageToReply = this.selectedMessages[0];
-    this.setReplyToMessage(messageToReply);
+    return this.selectedMessages.length === 1 && this.selectedMessages[0].type === 'text';
   }
-}
 
-// 2. Implement setReplyToMessage method
-setReplyToMessage(message: Message) {
-  this.replyToMessage = message;
-  
-  // Clear selection after setting reply
-  this.selectedMessages = [];
-  this.lastPressedMessage = null;
-  
-  // Focus on input field after a short delay
-  setTimeout(() => {
-    const inputElement = document.querySelector('ion-textarea') as HTMLIonTextareaElement;
-    if (inputElement) {
-      inputElement.setFocus();
-    }
-  }, 100);
-}
+  isMultipleTextMessages(): boolean {
+    return this.selectedMessages.length > 1 && this.selectedMessages.every(msg => msg.type === 'text');
+  }
 
-// 3. Cancel reply method (already exists, but make sure it's implemented)
-cancelReply() {
-  this.replyToMessage = null;
-}
+  isOnlyOneAttachment(): boolean {
+    return this.selectedMessages.length === 1 && this.selectedMessages[0].type !== 'text';
+  }
 
-// 4. Get replied message for display
-getRepliedMessage(replyToMessageId: string): Message | null {
-  return this.messages.find(msg => msg.message_id === replyToMessageId) || null;
-}
+  isMultipleAttachments(): boolean {
+    return this.selectedMessages.length > 1 && this.selectedMessages.every(msg => msg.type !== 'text');
+  }
 
-// 5. Get reply preview text
-getReplyPreviewText(message: Message): string {
-  if (message.text) {
-    // Limit reply preview to 50 characters
-    return message.text.length > 50 ? 
-           message.text.substring(0, 50) + '...' : 
-           message.text;
-  } else if (message.attachment) {
-    // Show attachment type in reply preview
-    const type = message.attachment.type;
-    switch (type) {
-      case 'image': return '📷 Photo';
-      case 'video': return '🎥 Video';
-      case 'audio': return '🎵 Audio';
-      case 'file': return '📄 Document';
-      default: return '📎 Attachment';
+  isMixedSelection(): boolean {
+    const types = this.selectedMessages.map(msg => msg.type);
+    return types.includes('text') && types.some(t => t !== 'text');
+  }
+
+  async copySelectedMessages() {
+    if (this.lastPressedMessage?.text) {
+      await Clipboard.write({ string: this.lastPressedMessage.text });
+      console.log('Text copied to clipboard:', this.lastPressedMessage.text);
+      this.selectedMessages = [];
+      this.lastPressedMessage = null;
     }
   }
-  return 'Message';
-}
 
-// 6. Scroll to replied message when clicked
-scrollToRepliedMessage(replyToMessageId: string) {
+  replyToMessages() {
+    if (this.selectedMessages.length === 1) {
+      const messageToReply = this.selectedMessages[0];
+      this.setReplyToMessage(messageToReply);
+    }
+  }
 
-  let targetElement: HTMLElement | any;
+  // 2. Implement setReplyToMessage method
+  setReplyToMessage(message: Message) {
+    this.replyToMessage = message;
 
-  const messageElements = document.querySelectorAll('[data-msg-key]');
+    // Clear selection after setting reply
+    this.selectedMessages = [];
+    this.lastPressedMessage = null;
 
-  // Loop through messages and find the matching DOM element
-  this.messages.forEach((msg) => {
-    if (msg.message_id === replyToMessageId) {
-      const element = Array.from(messageElements).find(el =>
-        el.getAttribute('data-msg-key') === msg.key
-      );
-      if (element && element instanceof HTMLElement) {
-        targetElement = element;
+    // Focus on input field after a short delay
+    setTimeout(() => {
+      const inputElement = document.querySelector('ion-textarea') as HTMLIonTextareaElement;
+      if (inputElement) {
+        inputElement.setFocus();
+      }
+    }, 100);
+  }
+
+  // 3. Cancel reply method (already exists, but make sure it's implemented)
+  cancelReply() {
+    this.replyToMessage = null;
+  }
+
+  // 4. Get replied message for display
+  getRepliedMessage(replyToMessageId: string): Message | null {
+    return this.messages.find(msg => msg.message_id === replyToMessageId) || null;
+  }
+
+  // 5. Get reply preview text
+  getReplyPreviewText(message: Message): string {
+    if (message.text) {
+      // Limit reply preview to 50 characters
+      return message.text.length > 50 ?
+        message.text.substring(0, 50) + '...' :
+        message.text;
+    } else if (message.attachment) {
+      // Show attachment type in reply preview
+      const type = message.attachment.type;
+      switch (type) {
+        case 'image': return '📷 Photo';
+        case 'video': return '🎥 Video';
+        case 'audio': return '🎵 Audio';
+        case 'file': return '📄 Document';
+        default: return '📎 Attachment';
       }
     }
-  });
+    return 'Message';
+  }
 
-  if (targetElement) {
-    targetElement.scrollIntoView({
-      behavior: 'smooth',
-      block: 'center'
+  // 6. Scroll to replied message when clicked
+  scrollToRepliedMessage(replyToMessageId: string) {
+
+    let targetElement: HTMLElement | any;
+
+    const messageElements = document.querySelectorAll('[data-msg-key]');
+
+    // Loop through messages and find the matching DOM element
+    this.messages.forEach((msg) => {
+      if (msg.message_id === replyToMessageId) {
+        const element = Array.from(messageElements).find(el =>
+          el.getAttribute('data-msg-key') === msg.key
+        );
+        if (element && element instanceof HTMLElement) {
+          targetElement = element;
+        }
+      }
     });
 
-    targetElement.classList.add('highlight-message');
-    setTimeout(() => {
-      targetElement?.classList.remove('highlight-message');
-    }, 2000);
+    if (targetElement) {
+      targetElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+
+      targetElement.classList.add('highlight-message');
+      setTimeout(() => {
+        targetElement?.classList.remove('highlight-message');
+      }, 2000);
+    }
   }
-}
 
 
 
@@ -706,113 +709,113 @@ scrollToRepliedMessage(replyToMessageId: string) {
   }
 
   onForward() {
-  console.log('Forwarding:', this.selectedMessages);
+    console.log('Forwarding:', this.selectedMessages);
 
-  this.chatService.setForwardMessages(this.selectedMessages);
+    this.chatService.setForwardMessages(this.selectedMessages);
 
-  this.selectedMessages = [];
+    this.selectedMessages = [];
 
-  this.router.navigate(['/forwardmessage']);
-}
+    this.router.navigate(['/forwardmessage']);
+  }
 
 
-//   async onMore(ev?: Event) {
-//   const hasText = !!this.lastPressedMessage?.text;
-//   const hasAttachment = !!(this.lastPressedMessage?.attachment || 
-//                            this.lastPressedMessage?.file || 
-//                            this.lastPressedMessage?.image ||
-//                            this.lastPressedMessage?.media);
+  //   async onMore(ev?: Event) {
+  //   const hasText = !!this.lastPressedMessage?.text;
+  //   const hasAttachment = !!(this.lastPressedMessage?.attachment || 
+  //                            this.lastPressedMessage?.file || 
+  //                            this.lastPressedMessage?.image ||
+  //                            this.lastPressedMessage?.media);
 
-//   const popover = await this.popoverController.create({
-//     component: MessageMorePopoverComponent,
-//     event: ev,
-//     translucent: true,
-//     showBackdrop: true,
-//     componentProps: {
-//       hasText: hasText,
-//       hasAttachment: hasAttachment
-//     }
-//   });
+  //   const popover = await this.popoverController.create({
+  //     component: MessageMorePopoverComponent,
+  //     event: ev,
+  //     translucent: true,
+  //     showBackdrop: true,
+  //     componentProps: {
+  //       hasText: hasText,
+  //       hasAttachment: hasAttachment
+  //     }
+  //   });
 
-//   await popover.present();
+  //   await popover.present();
 
-//   const { data } = await popover.onDidDismiss();
-//   if (data) {
-//     this.handlePopoverAction(data);
-//   }
-// }
+  //   const { data } = await popover.onDidDismiss();
+  //   if (data) {
+  //     this.handlePopoverAction(data);
+  //   }
+  // }
 
-async onMore(ev?: Event) {
-  const hasText = !!this.lastPressedMessage?.text;
-  const hasAttachment = !!(
-    this.lastPressedMessage?.attachment || 
-    this.lastPressedMessage?.file || 
-    this.lastPressedMessage?.image ||
-    this.lastPressedMessage?.media
-  );
+  async onMore(ev?: Event) {
+    const hasText = !!this.lastPressedMessage?.text;
+    const hasAttachment = !!(
+      this.lastPressedMessage?.attachment ||
+      this.lastPressedMessage?.file ||
+      this.lastPressedMessage?.image ||
+      this.lastPressedMessage?.media
+    );
 
-  const isPinned = this.pinnedMessage?.key === this.lastPressedMessage?.key; // ✅ Check if message is already pinned
-  // console.log()
-  const popover = await this.popoverController.create({
-    component: MessageMorePopoverComponent,
-    event: ev,
-    translucent: true,
-    showBackdrop: true,
-    componentProps: {
-      hasText: hasText,
-      hasAttachment: hasAttachment,
-      isPinned: isPinned // ✅ pass pin status
+    const isPinned = this.pinnedMessage?.key === this.lastPressedMessage?.key;
+    // console.log()
+    const popover = await this.popoverController.create({
+      component: MessageMorePopoverComponent,
+      event: ev,
+      translucent: true,
+      showBackdrop: true,
+      componentProps: {
+        hasText: hasText,
+        hasAttachment: hasAttachment,
+        isPinned: isPinned // ✅ pass pin status
+      }
+    });
+
+    await popover.present();
+
+    const { data } = await popover.onDidDismiss();
+    if (data) {
+      this.handlePopoverAction(data);
     }
-  });
-
-  await popover.present();
-
-  const { data } = await popover.onDidDismiss();
-  if (data) {
-    this.handlePopoverAction(data);
   }
-}
 
 
-// async handlePopoverAction(action: string) {
-//     switch (action) {
-//       case 'info':
-//         console.log('Info clicked');
-//         break;
-//       case 'copy':
-//         this.copyMessage()
-//         break;
-//       case 'share':
-//         this.shareMessage()
-//         break;
-//       case 'pin':
-//         this.pinMessage()
-//         break;
-//     }
-//   }
+  // async handlePopoverAction(action: string) {
+  //     switch (action) {
+  //       case 'info':
+  //         console.log('Info clicked');
+  //         break;
+  //       case 'copy':
+  //         this.copyMessage()
+  //         break;
+  //       case 'share':
+  //         this.shareMessage()
+  //         break;
+  //       case 'pin':
+  //         this.pinMessage()
+  //         break;
+  //     }
+  //   }
 
-async handlePopoverAction(action: string) {
-  switch (action) {
-    case 'info':
-      console.log('Info clicked');
-      break;
-    case 'copy':
-      this.copyMessage();
-      break;
-    case 'share':
-      this.shareMessage();
-      break;
-    case 'pin':
-      this.pinMessage();
-      break;
-    case 'unpin':
-      this.unpinMessage();
-      break;
+  async handlePopoverAction(action: string) {
+    switch (action) {
+      case 'info':
+        console.log('Info clicked');
+        break;
+      case 'copy':
+        this.copyMessage();
+        break;
+      case 'share':
+        this.shareMessage();
+        break;
+      case 'pin':
+        this.pinMessage();
+        break;
+      case 'unpin':
+        this.unpinMessage();
+        break;
+    }
   }
-}
 
 
-async copyMessage() {
+  async copyMessage() {
     if (this.lastPressedMessage?.text) {
       await Clipboard.write({ string: this.lastPressedMessage.text });
       console.log('Text copied to clipboard:', this.lastPressedMessage.text);
@@ -865,24 +868,38 @@ async copyMessage() {
     console.log("Message pinned", pin.messageId);
     this.selectedMessages = [];
     this.lastPressedMessage = null;
-}
+  }
 
- setupPinnedMessageListener() {
-  this.pinnedMessageSubscription = this.chatService.listenToPinnedMessage(
-    this.roomId,
-    (pinnedMessage) => {
-      this.pinnedMessage = pinnedMessage;
-      if (pinnedMessage) {
-        // Find the actual message details from your messages array
-        this.findPinnedMessageDetails(pinnedMessage.key);
-      } else {
-        this.pinnedMessageDetails = null;
+  setupPinnedMessageListener() {
+    this.pinnedMessageSubscription = this.chatService.listenToPinnedMessage(
+      this.roomId,
+      (pinnedMessage) => {
+        this.pinnedMessage = pinnedMessage;
+        if (pinnedMessage) {
+          // Find the actual message details from your messages array
+          this.findPinnedMessageDetails(pinnedMessage.key);
+        } else {
+          this.pinnedMessageDetails = null;
+        }
       }
-    }
-  );
-}
+    );
+  }
 
-     findPinnedMessageDetails(messageId: string) {
+//   getPinnedMessageText(): string {
+//   if (this.pinnedMessageDetails) {
+//     // Get text from the actual message details
+//     const text = this.pinnedMessageDetails.text || 
+//                  this.pinnedMessageDetails.attachment?.caption || 
+//                  'Media message';
+    
+//     // Truncate long messages for banner display
+//     return text.length > 50 ? text.substring(0, 50) + '...' : text;
+//   }
+  
+//   return 'This message is pinned';
+// }
+
+  findPinnedMessageDetails(messageId: string) {
     // Search through all grouped messages to find the pinned message
     for (const group of this.groupedMessages) {
       const foundMessage = group.messages.find(msg => msg.message_id === messageId);
@@ -893,13 +910,13 @@ async copyMessage() {
     }
   }
 
-    unpinMessage() {
-  if (this.pinnedMessage) {
-    this.chatService.unpinMessage(this.roomId);
-    this.selectedMessages = [];
-    this.lastPressedMessage = null;
+  unpinMessage() {
+    if (this.pinnedMessage) {
+      this.chatService.unpinMessage(this.roomId);
+      this.selectedMessages = [];
+      this.lastPressedMessage = null;
+    }
   }
-}
 
   scrollToPinnedMessage() {
     if (this.pinnedMessageDetails) {
@@ -913,7 +930,7 @@ async copyMessage() {
     }
   }
 
-   checkMobileView() {
+  checkMobileView() {
     this.showMobilePinnedBanner = window.innerWidth < 480;
   }
 
@@ -923,30 +940,30 @@ async copyMessage() {
   }
 
   getAttachmentIcon(type: string): string {
-  switch (type) {
-    case 'image': return 'image-outline';
-    case 'video': return 'videocam-outline';
-    case 'audio': return 'musical-note-outline';
-    case 'file': return 'document-outline';
-    default: return 'attach-outline';
+    switch (type) {
+      case 'image': return 'image-outline';
+      case 'video': return 'videocam-outline';
+      case 'audio': return 'musical-note-outline';
+      case 'file': return 'document-outline';
+      default: return 'attach-outline';
+    }
   }
-}
 
-// getAttachmentPreview(attachment: any): string {
-//   if (attachment.caption) {
-//     return attachment.caption.length > 30 ? 
-//            attachment.caption.substring(0, 30) + '...' : 
-//            attachment.caption;
-//   }
-  
-//   switch (attachment.type) {
-//     case 'image': return 'Photo';
-//     case 'video': return 'Video';
-//     case 'audio': return 'Audio';
-//     case 'file': return attachment.fileName || 'File';
-//     default: return 'Attachment';
-//   }
-// }
+  // getAttachmentPreview(attachment: any): string {
+  //   if (attachment.caption) {
+  //     return attachment.caption.length > 30 ? 
+  //            attachment.caption.substring(0, 30) + '...' : 
+  //            attachment.caption;
+  //   }
+
+  //   switch (attachment.type) {
+  //     case 'image': return 'Photo';
+  //     case 'video': return 'Video';
+  //     case 'audio': return 'Audio';
+  //     case 'file': return attachment.fileName || 'File';
+  //     default: return 'Attachment';
+  //   }
+  // }
 
   async fetchGroupName(groupId: string) {
     try {
@@ -1001,7 +1018,7 @@ async copyMessage() {
       }
 
       this.messages = decryptedMessages;
-      this.groupedMessages = this.groupMessagesByDate(decryptedMessages);
+      this.groupedMessages = await this.groupMessagesByDate(decryptedMessages);
       this.saveToLocalStorage();
 
       const last = decryptedMessages[decryptedMessages.length - 1];
@@ -1037,7 +1054,7 @@ async copyMessage() {
             if (entry.isIntersecting) {
               // ✅ Mark as read when visible
               this.chatService.markRead(this.roomId, msgKey);
-              observer.unobserve(entry.target); // stop observing
+              observer.unobserve(entry.target);
             }
           });
         }, {
@@ -1050,54 +1067,153 @@ async copyMessage() {
   }
 
 
-  groupMessagesByDate(messages: Message[]) {
+ async groupMessagesByDate(messages: Message[]) {
     const grouped: { [date: string]: any[] } = {};
 
     const today = new Date();
     const yesterday = new Date();
     yesterday.setDate(today.getDate() - 1);
 
-    messages.forEach(msg => {
-      const timestamp = new Date(msg.timestamp); // convert to Date object
+    // messages.forEach( async msg => {
+    //   const timestamp = new Date(msg.timestamp); // convert to Date object
 
-      // Format time (e.g., "6:15 PM")
-      const hours = timestamp.getHours();
-      const minutes = timestamp.getMinutes();
-      const ampm = hours >= 12 ? 'PM' : 'AM';
-      const formattedHours = hours % 12 || 12;
-      const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
-      const timeStr = `${formattedHours}:${formattedMinutes} ${ampm}`;
-      msg.time = timeStr;
+    //   // Format time (e.g., "6:15 PM")
+    //   const hours = timestamp.getHours();
+    //   const minutes = timestamp.getMinutes();
+    //   const ampm = hours >= 12 ? 'PM' : 'AM';
+    //   const formattedHours = hours % 12 || 12;
+    //   const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+    //   const timeStr = `${formattedHours}:${formattedMinutes} ${ampm}`;
+    //   msg.time = timeStr;
 
-      // Label logic
-      const isToday =
-        timestamp.getDate() === today.getDate() &&
-        timestamp.getMonth() === today.getMonth() &&
-        timestamp.getFullYear() === today.getFullYear();
+    //   if(msg.attachment){
+    //    msg.attachment.previewUrl = await this.sqliteService.getAttachmentPreview(msg.attachment.mediaId as string)
+    //   }
 
-      const isYesterday =
-        timestamp.getDate() === yesterday.getDate() &&
-        timestamp.getMonth() === yesterday.getMonth() &&
-        timestamp.getFullYear() === yesterday.getFullYear();
+    //   // Label logic
+    //   const isToday =
+    //     timestamp.getDate() === today.getDate() &&
+    //     timestamp.getMonth() === today.getMonth() &&
+    //     timestamp.getFullYear() === today.getFullYear();
 
-      let label = '';
-      if (isToday) {
-        label = 'Today';
-      } else if (isYesterday) {
-        label = 'Yesterday';
-      } else {
-        // Format as DD/MM/YYYY
-        const dd = timestamp.getDate().toString().padStart(2, '0');
-        const mm = (timestamp.getMonth() + 1).toString().padStart(2, '0');
-        const yyyy = timestamp.getFullYear();
-        label = `${dd}/${mm}/${yyyy}`;
+    //   const isYesterday =
+    //     timestamp.getDate() === yesterday.getDate() &&
+    //     timestamp.getMonth() === yesterday.getMonth() &&
+    //     timestamp.getFullYear() === yesterday.getFullYear();
+
+    //   let label = '';
+    //   if (isToday) {
+    //     label = 'Today';
+    //   } else if (isYesterday) {
+    //     label = 'Yesterday';
+    //   } else {
+    //     // Format as DD/MM/YYYY
+    //     const dd = timestamp.getDate().toString().padStart(2, '0');
+    //     const mm = (timestamp.getMonth() + 1).toString().padStart(2, '0');
+    //     const yyyy = timestamp.getFullYear();
+    //     label = `${dd}/${mm}/${yyyy}`;
+    //   }
+
+    //   if (!grouped[label]) {
+    //     grouped[label] = [];
+    //   }
+    //   grouped[label].push(msg);
+    // });
+
+  for (const msg of messages) {
+  const timestamp = new Date(msg.timestamp);
+
+  // Format time
+  const hours = timestamp.getHours();
+  const minutes = timestamp.getMinutes();
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  const formattedHours = hours % 12 || 12;
+  const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+  msg.time = `${formattedHours}:${formattedMinutes} ${ampm}`;
+
+  // ✅ Await sequentially so order is preserved
+  // if (msg.attachment) {
+  //   console.log("msg dot attachment", msg);
+  //   msg.attachment.previewUrl = await this.sqliteService.getAttachmentPreview(
+  //     msg.attachment.mediaId as string
+  //   );
+  // }
+
+  if (msg.attachment) {
+  console.log("msg dot attachment", msg);
+
+  const currentUserId = this.authService.authData?.userId;
+  const receiverId = msg.receiver_id;
+
+  if (receiverId === currentUserId) {
+    try {
+
+      const apiResponse = await firstValueFrom(
+        this.service.getDownloadUrl(msg.attachment.mediaId as string)
+      );
+
+      if (apiResponse.status && apiResponse.downloadUrl) {
+
+        const response = await fetch(apiResponse.downloadUrl);
+        const blob = await response.blob();
+
+        const extension = msg.attachment.fileName?.split('.').pop() || 'dat';
+        const filename = `${msg.attachment.mediaId}.${extension}`;
+
+        const file_Path = await this.FileService.saveFileToReceived(
+          filename,
+          blob
+        );
+
+        // this.roomId = this.getRoomId(msg.sender_id, this.receiverId);
+
+        await this.sqliteService.saveAttachment(
+          this.roomId,
+          msg.attachment.type,
+          file_Path,
+          msg.attachment.mediaId as string
+        );
       }
+    } catch (error) {
+      console.error("❌ Error handling received attachment:", error);
+    }
+  }
 
-      if (!grouped[label]) {
-        grouped[label] = [];
-      }
-      grouped[label].push(msg);
-    });
+  msg.attachment.previewUrl = await this.sqliteService.getAttachmentPreview(
+    msg.attachment.mediaId as string
+  );
+}
+
+
+  // Label logic
+  const isToday =
+    timestamp.getDate() === today.getDate() &&
+    timestamp.getMonth() === today.getMonth() &&
+    timestamp.getFullYear() === today.getFullYear();
+
+  const isYesterday =
+    timestamp.getDate() === yesterday.getDate() &&
+    timestamp.getMonth() === yesterday.getMonth() &&
+    timestamp.getFullYear() === yesterday.getFullYear();
+
+  let label = '';
+  if (isToday) {
+    label = 'Today';
+  } else if (isYesterday) {
+    label = 'Yesterday';
+  } else {
+    const dd = timestamp.getDate().toString().padStart(2, '0');
+    const mm = (timestamp.getMonth() + 1).toString().padStart(2, '0');
+    const yyyy = timestamp.getFullYear();
+    label = `${dd}/${mm}/${yyyy}`;
+  }
+
+  if (!grouped[label]) {
+    grouped[label] = [];
+  }
+  grouped[label].push(msg);
+}
+
 
     return Object.keys(grouped).map(date => ({
       date,
@@ -1117,7 +1233,7 @@ async copyMessage() {
     }
 
     this.messages = decryptedMessages;
-    this.groupedMessages = this.groupMessagesByDate(decryptedMessages);
+    this.groupedMessages = await this.groupMessagesByDate(decryptedMessages);
   }
 
 
@@ -1166,10 +1282,57 @@ async copyMessage() {
   //   }
   // }
 
+  blobToFile(blob: Blob, fileName: string, mimeType?: string): File {
+    return new File([blob], fileName, {
+      type: mimeType || blob.type,
+      lastModified: Date.now(),
+    });
+  }
+
+  // async pickAttachment() {
+  //   const result = await FilePicker.pickFiles({ readData: true });
+
+  //   console.log("files result of pick", result);
+  //   if (result?.files?.length) {
+  //     const file = result.files[0];
+  //     const mimeType = file.mimeType;
+  //     const type = mimeType?.startsWith('image')
+  //       ? 'image'
+  //       : mimeType?.startsWith('video')
+  //         ? 'video'
+  //         : 'file';
+
+  //     let blob = file.blob as Blob;
+
+  //     // console.log("file data", file.data);
+  //     if (!blob && file.data) {
+  //       blob = this.FileService.convertToBlob(`data:${mimeType};base64,${file.data}`, mimeType);
+  //     }
+
+  //     console.log("blob object is ::::", blob)
+  //     // Compress if needed (for images)
+  //     // if (type === 'image') {
+  //     //   blob = await this.compressImage(blob);
+  //     // }
+
+  //     // console.log("")
+
+  //     this.selectedAttachment = {
+  //       type,
+  //       blob,
+  //       fileName: file.name,
+  //       mimeType,
+  //       fileSize: blob.size
+  //     };
+
+  //     this.showPreviewModal = true;
+  //   }
+  // }
 
   async pickAttachment() {
   const result = await FilePicker.pickFiles({ readData: true });
 
+  console.log("files result of pick", result);
   if (result?.files?.length) {
     const file = result.files[0];
     const mimeType = file.mimeType;
@@ -1182,44 +1345,54 @@ async copyMessage() {
     let blob = file.blob as Blob;
 
     if (!blob && file.data) {
-      blob = this.FileService.convertToBlob(`data:${mimeType};base64,${file.data}`, mimeType);
+      blob = this.FileService.convertToBlob(
+        `data:${mimeType};base64,${file.data}`,
+        mimeType
+      );
     }
 
-    // Compress if needed (for images)
-    if (type === 'image') {
-      blob = await this.compressImage(blob);
-    }
+    console.log("blob object is ::::", blob);
+
+    // ✅ Create preview URL
+    const previewUrl = URL.createObjectURL(blob);
 
     this.selectedAttachment = {
       type,
       blob,
-      fileName: file.name,
+      fileName: `${Date.now()}.${this.getFileExtension(file.name)}`,
       mimeType,
-      fileSize: blob.size
+      fileSize: blob.size,
+      previewUrl,
     };
 
     this.showPreviewModal = true;
   }
 }
 
-private async compressImage(blob: Blob): Promise<Blob> {
-  if (!blob.type.startsWith('image/')) {
-    return blob;
-  }
-
-  const options = {
-    maxSizeMB: 1,
-    maxWidthOrHeight: 1024,
-    useWebWorker: true,
-  };
-
-  try {
-    return await imageCompression(blob as any, options);
-  } catch (err) {
-    console.warn('Image compression failed:', err);
-    return blob;
-  }
+ getFileExtension(fileName: string): string {
+  const parts = fileName.split('.');
+  return parts.length > 1 ? parts.pop()!.toLowerCase() : '';
 }
+
+
+  private async compressImage(blob: Blob): Promise<Blob> {
+    if (!blob.type.startsWith('image/')) {
+      return blob;
+    }
+
+    const options = {
+      maxSizeMB: 1,
+      maxWidthOrHeight: 1024,
+      useWebWorker: true,
+    };
+
+    try {
+      return await imageCompression(blob as any, options);
+    } catch (err) {
+      console.warn('Image compression failed:', err);
+      return blob;
+    }
+  }
 
 
   cancelAttachment() {
@@ -1229,236 +1402,321 @@ private async compressImage(blob: Blob): Promise<Blob> {
   }
 
   setReplyTo(message: Message) {
-  this.replyToMessage = message;
-}
-
-// cancelReply() {
-//   this.replyToMessage = null;
-// }
-
-// async sendMessage() {
-//   const plainText = this.messageText.trim();
-//   const encryptedText = plainText ? await this.encryptionService.encrypt(plainText) : '';
-
-//   const message: Message = {
-//     sender_id: this.senderId,
-//     text: encryptedText,
-//     timestamp: new Date().toISOString(),
-//     sender_phone: this.sender_phone,
-//     sender_name: this.sender_name,
-//     receiver_id: this.chatType === 'private' ? this.receiverId : '',
-//     receiver_phone: this.receiver_phone,
-//     delivered: false,
-//     read: false,
-//     message_id: uuidv4(),
-//     isDeleted: false,
-//     // Include reply reference if replying to a message
-//     replyToMessageId: this.replyToMessage?.message_id || '',
-//   };
-
-//   if (this.selectedAttachment) {
-//     message.attachment = {
-//       type: this.selectedAttachment.type,
-//       base64Data: this.selectedAttachment.base64,
-//       fileName: this.selectedAttachment.fileName,
-//       mimeType: this.selectedAttachment.mimeType
-//     };
-//     const url = await this.FileService.saveFileToSent(this.selectedAttachment.fileName, this.selectedAttachment.blob);
-//     console.log(url);
-//     const compressedFile = await this.FileService.getFile(url);
-//     message.attachment.base64Data = await this.FileService.convertToBase64(compressedFile as Blob) as string;
-//   }
-
-//   await this.chatService.sendMessage(this.roomId, message, this.chatType, this.senderId);
-
-//   // Clear everything after sending
-//   this.messageText = '';
-//   this.selectedAttachment = null;
-//   this.showPreviewModal = false;
-//   this.replyToMessage = null; // ⭐ Clear reply after sending
-
-//   this.scrollToBottom();
-// }
-
-
-async sendMessage() {
-  const plainText = this.messageText.trim();
-  const encryptedText = plainText ? await this.encryptionService.encrypt(plainText) : '';
-
-  const message: Message = {
-    sender_id: this.senderId,
-    text: encryptedText,
-    timestamp: new Date().toISOString(),
-    sender_phone: this.sender_phone,
-    sender_name: this.sender_name,
-    receiver_id: this.chatType === 'private' ? this.receiverId : '',
-    receiver_phone: this.receiver_phone,
-    delivered: false,
-    read: false,
-    message_id: uuidv4(),
-    isDeleted: false,
-    replyToMessageId: this.replyToMessage?.message_id || '',
-  };
-
-  // Handle attachment with S3 upload
-  if (this.selectedAttachment) {
-    try {
-      const mediaId = await this.uploadAttachmentToS3(this.selectedAttachment);
-      
-      message.attachment = {
-        type: this.selectedAttachment.type,
-        mediaId: mediaId, // Store media_id instead of base64
-        fileName: this.selectedAttachment.fileName,
-        mimeType: this.selectedAttachment.mimeType,
-        fileSize: this.selectedAttachment.fileSize,
-        caption: plainText // Use message text as caption if exists
-      };
-
-      // Also save locally for quick access
-      await this.FileService.saveFileToSent(this.selectedAttachment.fileName, this.selectedAttachment.blob);
-      
-    } catch (error) {
-      console.error('Failed to upload attachment:', error);
-      // Show error toast
-      const toast = await this.toastCtrl.create({
-        message: 'Failed to upload attachment. Please try again.',
-        duration: 3000,
-        color: 'danger'
-      });
-      await toast.present();
-      return; // Don't send message if attachment upload fails
-    }
+    this.replyToMessage = message;
   }
 
-  await this.chatService.sendMessage(this.roomId, message, this.chatType, this.senderId);
+  // cancelReply() {
+  //   this.replyToMessage = null;
+  // }
 
-  // Clear everything after sending
-  this.messageText = '';
-  this.selectedAttachment = null;
-  this.showPreviewModal = false;
-  this.replyToMessage = null;
 
-  this.scrollToBottom();
-}
+  // async sendMessage() {
+  //   const plainText = this.messageText.trim();
+  //   const encryptedText = plainText ? await this.encryptionService.encrypt(plainText) : '';
 
-private async uploadAttachmentToS3(attachment: any): Promise<string> {
-  try {
-    // Step 1: Get upload URL from your API
-    const uploadResponse = await this.service.getUploadUrl(
-      parseInt(this.senderId), // Convert to number if needed
-      attachment.type,
-      attachment.fileSize,
-      attachment.mimeType,
-      { 
-        caption: this.messageText.trim(),
-        fileName: attachment.fileName 
-      }
-    ).toPromise();
+  //   const message: Message = {
+  //     sender_id: this.senderId,
+  //     text: encryptedText,
+  //     timestamp: new Date().toISOString(),
+  //     sender_phone: this.sender_phone,
+  //     sender_name: this.sender_name,
+  //     receiver_id: this.chatType === 'private' ? this.receiverId : '',
+  //     receiver_phone: this.receiver_phone,
+  //     delivered: false,
+  //     read: false,
+  //     message_id: uuidv4(),
+  //     isDeleted: false,
+  //     replyToMessageId: this.replyToMessage?.message_id || '',
+  //   };
 
-    if (!uploadResponse?.status || !uploadResponse.upload_url) {
-      throw new Error('Failed to get upload URL');
-    }
+  //   // Handle attachment with S3 upload
+  //   if (this.selectedAttachment) {
+  //     try {
+  //       const mediaId = await this.uploadAttachmentToS3(this.selectedAttachment);
+  //       console.log("media id is dfksdfgs", mediaId);
 
-    // Step 2: Upload file directly to S3
-    const uploadResult = await this.service.uploadToS3(
-      uploadResponse.upload_url,
-      attachment.blob
-    ).toPromise();
+  //       message.attachment = {
+  //         type: this.selectedAttachment.type,
+  //         mediaId: mediaId,
+  //         fileName: this.selectedAttachment.fileName,
+  //         mimeType: this.selectedAttachment.mimeType,
+  //         fileSize: this.selectedAttachment.fileSize,
+  //         caption: plainText
+  //       };
 
-    // Step 3: Return media_id for storage in message
-    return uploadResponse.media_id;
+  //       // Also save locally for quick access
+  //       const file_path = await this.FileService.saveFileToSent(this.selectedAttachment.fileName, this.selectedAttachment.blob);
 
-  } catch (error) {
-    console.error('S3 upload error:', error);
-    throw error;
+  //       await this.sqliteService.saveAttachment(this.roomId, this.selectedAttachment.type, file_path, mediaId);
+
+  //     } catch (error) {
+  //       console.error('Failed to upload attachment:', error);
+  //       // Show error toast
+  //       const toast = await this.toastCtrl.create({
+  //         message: 'Failed to upload attachment. Please try again.',
+  //         duration: 3000,
+  //         color: 'danger'
+  //       });
+  //       await toast.present();
+  //       return; // Don't send message if attachment upload fails
+  //     }
+  //   }
+
+  //   await this.chatService.sendMessage(this.roomId, message, this.chatType, this.senderId);
+
+  //   // Clear everything after sending
+  //   this.messageText = '';
+  //   this.selectedAttachment = null;
+  //   this.showPreviewModal = false;
+  //   this.replyToMessage = null;
+
+  //   this.scrollToBottom();
+  // }
+
+  async sendMessage() {
+
+  if (this.isSending) {
+    return;
   }
-}
 
+  this.isSending = true;
 
-async openAttachmentModal(msg: any) {
-  if (!msg.attachment) return;
-
-  let attachmentUrl = '';
-  
   try {
-    // First try to get from local storage for quick access
-    const localUrl = await this.FileService.getFilePreview(
-      `${msg.sender_id === this.senderId ? 'sent' : 'received'}/${msg.attachment.fileName}`
-    );
-    
-    if (localUrl) {
-      attachmentUrl = localUrl;
-    } else {
-      // If not available locally, get download URL from S3
-      const downloadResponse = await this.service.getDownloadUrl(msg.attachment.mediaId).toPromise();
-      
-      if (downloadResponse?.status && downloadResponse.downloadUrl) {
-        attachmentUrl = downloadResponse.downloadUrl;
-        
-        // Optionally save to local storage for future use
-        if (msg.sender_id !== this.senderId) {
-          this.downloadAndSaveLocally(downloadResponse.downloadUrl, msg.attachment.fileName);
-        }
+    const plainText = this.messageText.trim();
+    const encryptedText = plainText ? await this.encryptionService.encrypt(plainText) : '';
+
+    const message: Message = {
+      sender_id: this.senderId,
+      text: encryptedText,
+      timestamp: new Date().toISOString(),
+      sender_phone: this.sender_phone,
+      sender_name: this.sender_name,
+      receiver_id: this.chatType === 'private' ? this.receiverId : '',
+      receiver_phone: this.receiver_phone,
+      delivered: false,
+      read: false,
+      message_id: uuidv4(),
+      isDeleted: false,
+      replyToMessageId: this.replyToMessage?.message_id || '',
+    };
+
+    // Handle attachment with S3 upload
+    if (this.selectedAttachment) {
+      try {
+        const mediaId = await this.uploadAttachmentToS3(this.selectedAttachment);
+        console.log("media id is dfksdfgs", mediaId);
+
+        message.attachment = {
+          type: this.selectedAttachment.type,
+          mediaId: mediaId,
+          fileName: this.selectedAttachment.fileName,
+          mimeType: this.selectedAttachment.mimeType,
+          fileSize: this.selectedAttachment.fileSize,
+          caption: plainText
+        };
+
+        // Also save locally for quick access
+        const file_path = await this.FileService.saveFileToSent(this.selectedAttachment.fileName, this.selectedAttachment.blob);
+
+        await this.sqliteService.saveAttachment(this.roomId, this.selectedAttachment.type, file_path, mediaId);
+
+      } catch (error) {
+        console.error('Failed to upload attachment:', error);
+        // Show error toast
+        const toast = await this.toastCtrl.create({
+          message: 'Failed to upload attachment. Please try again.',
+          duration: 3000,
+          color: 'danger'
+        });
+        await toast.present();
+        return; // Don't send message if attachment upload fails
       }
     }
 
-    const modal = await this.modalCtrl.create({
-      component: AttachmentPreviewModalComponent,
-      componentProps: {
-        attachment: {
-          ...msg.attachment,
-          url: attachmentUrl // Pass the URL to modal
-        },
-        message: msg
-      },
-      cssClass: 'attachment-modal'
-    });
+    await this.chatService.sendMessage(this.roomId, message, this.chatType, this.senderId);
 
-    await modal.present();
-    const { data } = await modal.onDidDismiss();
-    
-    if (data && data.action === 'reply') {
-      this.setReplyToMessage(data.message);
-    }
+    // Clear everything after sending
+    this.messageText = '';
+    this.selectedAttachment = null;
+    this.showPreviewModal = false;
+    this.replyToMessage = null;
+
+    this.scrollToBottom();
 
   } catch (error) {
-    console.error('Failed to load attachment:', error);
+    console.error('Error sending message:', error);
+    // Show error toast
     const toast = await this.toastCtrl.create({
-      message: 'Failed to load attachment',
-      duration: 2000,
+      message: 'Failed to send message. Please try again.',
+      duration: 3000,
       color: 'danger'
     });
     await toast.present();
+  } finally {
+    // Always reset sending state
+    this.isSending = false;
   }
 }
 
-// 6. Helper method to download and save files locally
-private async downloadAndSaveLocally(url: string, fileName: string) {
-  try {
-    const response = await fetch(url);
-    const blob = await response.blob();
-    await this.FileService.saveFileToReceived(fileName, blob);
-  } catch (error) {
-    console.warn('Failed to save file locally:', error);
-  }
-}
+  // private async uploadAttachmentToS3(attachment: any): Promise<string> {
+  //   try {
+  //     // Step 1: Get upload URL from your API
+  //     const uploadResponse = await this.service.getUploadUrl(
+  //       parseInt(this.senderId), // Convert to number if needed
+  //       attachment.type,
+  //       attachment.fileSize,
+  //       attachment.mimeType,
+  //       { 
+  //         caption: this.messageText.trim(),
+  //         fileName: attachment.fileName 
+  //       }
+  //     ).toPromise();
 
-// 7. Updated attachment preview in chat (for thumbnails)
-getAttachmentPreview(attachment: any): string {
-  if (attachment.caption) {
-    return attachment.caption.length > 30 ? 
-           attachment.caption.substring(0, 30) + '...' : 
-           attachment.caption;
+  //     if (!uploadResponse?.status || !uploadResponse.upload_url) {
+  //       throw new Error('Failed to get upload URL');
+  //     }
+
+  //     // Step 2: Upload file directly to S3
+  //     const uploadResult = await this.service.uploadToS3(
+  //       uploadResponse.upload_url,
+  //       attachment.blob
+  //     ).toPromise();
+
+  //     // Step 3: Return media_id for storage in message
+  //     return uploadResponse.media_id;
+
+  //   } catch (error) {
+  //     console.error('S3 upload error:', error);
+  //     throw error;
+  //   }
+  // }
+
+  private async uploadAttachmentToS3(attachment: any): Promise<string> {
+    try {
+      // Step 1: Get upload URL from your API
+      const uploadResponse = await firstValueFrom(
+        this.service.getUploadUrl(
+          parseInt(this.senderId), // Convert to number if needed
+          attachment.type,
+          attachment.fileSize,
+          attachment.mimeType,
+          {
+            caption: this.messageText.trim(),
+            fileName: attachment.fileName
+          }
+        )
+      );
+
+      if (!uploadResponse?.status || !uploadResponse.upload_url) {
+        throw new Error('Failed to get upload URL');
+      }
+
+      // Step 2: Upload file directly to S3
+      // const uploadResult = await firstValueFrom(
+      //   this.service.uploadToS3(
+      //     uploadResponse.upload_url,
+      //     attachment.blob
+      //   )
+      // );
+
+      const uploadResult = await firstValueFrom(
+        this.service.uploadToS3(uploadResponse.upload_url, this.blobToFile(attachment.blob, attachment.fileName, attachment.mimeType))
+      );
+
+      // Step 3: Return media_id for storage in message
+      return uploadResponse.media_id;
+
+    } catch (error) {
+      console.error('S3 upload error:', error);
+      throw error;
+    }
   }
-  
-  switch (attachment.type) {
-    case 'image': return '📷 Photo';
-    case 'video': return '🎥 Video';
-    case 'audio': return '🎵 Audio';
-    case 'file': return attachment.fileName || '📄 File';
-    default: return '📎 Attachment';
+
+
+  async openAttachmentModal(msg: any) {
+    if (!msg.attachment) return;
+
+    let attachmentUrl = '';
+
+    try {
+      // First try to get from local storage for quick access
+      const localUrl = await this.FileService.getFilePreview(
+        `${msg.sender_id === this.senderId ? 'sent' : 'received'}/${msg.attachment.fileName}`
+      );
+
+      if (localUrl) {
+        attachmentUrl = localUrl;
+      } else {
+        // If not available locally, get download URL from S3
+        const downloadResponse = await this.service.getDownloadUrl(msg.attachment.mediaId).toPromise();
+
+        if (downloadResponse?.status && downloadResponse.downloadUrl) {
+          attachmentUrl = downloadResponse.downloadUrl;
+
+          // Optionally save to local storage for future use
+          if (msg.sender_id !== this.senderId) {
+            this.downloadAndSaveLocally(downloadResponse.downloadUrl, msg.attachment.fileName);
+          }
+        }
+      }
+
+      const modal = await this.modalCtrl.create({
+        component: AttachmentPreviewModalComponent,
+        componentProps: {
+          attachment: {
+            ...msg.attachment,
+            url: attachmentUrl // Pass the URL to modal
+          },
+          message: msg
+        },
+        cssClass: 'attachment-modal'
+      });
+
+      await modal.present();
+      const { data } = await modal.onDidDismiss();
+
+      if (data && data.action === 'reply') {
+        this.setReplyToMessage(data.message);
+      }
+
+    } catch (error) {
+      console.error('Failed to load attachment:', error);
+      const toast = await this.toastCtrl.create({
+        message: 'Failed to load attachment',
+        duration: 2000,
+        color: 'danger'
+      });
+      await toast.present();
+    }
   }
-}
+
+  // 6. Helper method to download and save files locally
+  private async downloadAndSaveLocally(url: string, fileName: string) {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      await this.FileService.saveFileToReceived(fileName, blob);
+    } catch (error) {
+      console.warn('Failed to save file locally:', error);
+    }
+  }
+
+  // 7. Updated attachment preview in chat (for thumbnails)
+  getAttachmentPreview(attachment: any): string {
+    if (attachment.caption) {
+      return attachment.caption.length > 30 ?
+        attachment.caption.substring(0, 30) + '...' :
+        attachment.caption;
+    }
+
+    switch (attachment.type) {
+      case 'image': return '📷 Photo';
+      case 'video': return '🎥 Video';
+      case 'audio': return '🎵 Audio';
+      case 'file': return attachment.fileName || '📄 File';
+      default: return '📎 Attachment';
+    }
+  }
 
 
   async showAttachmentPreviewPopup() {
@@ -1521,26 +1779,26 @@ getAttachmentPreview(attachment: any): string {
     }
   }
 
-//   async openAttachmentModal(msg: any) {
-//   if (!msg.attachment)
-//     return;
+  //   async openAttachmentModal(msg: any) {
+  //   if (!msg.attachment)
+  //     return;
 
-//   const modal = await this.modalCtrl.create({
-//     component: AttachmentPreviewModalComponent,
-//     componentProps: {
-//       attachment: msg.attachment,
-//       message: msg
-//     },
-//     cssClass: 'attachment-modal'
-//   });
+  //   const modal = await this.modalCtrl.create({
+  //     component: AttachmentPreviewModalComponent,
+  //     componentProps: {
+  //       attachment: msg.attachment,
+  //       message: msg
+  //     },
+  //     cssClass: 'attachment-modal'
+  //   });
 
-//   await modal.present();
-//   const { data } = await modal.onDidDismiss();
-  
-//   if (data && data.action === 'reply') {
-//     this.setReplyToMessage(data.message);
-//   }
-// }
+  //   await modal.present();
+  //   const { data } = await modal.onDidDismiss();
+
+  //   if (data && data.action === 'reply') {
+  //     this.setReplyToMessage(data.message);
+  //   }
+  // }
 
 
   loadMessagesFromFirebase(isPagination = false) { }
@@ -1605,13 +1863,13 @@ getAttachmentPreview(attachment: any): string {
   }
 
   openKeyboard() {
-  setTimeout(() => {
-    const textareaElement = document.querySelector('ion-textarea') as HTMLIonTextareaElement;
-    if (textareaElement) {
-      textareaElement.setFocus();
-    }
-  }, 100);
-}
+    setTimeout(() => {
+      const textareaElement = document.querySelector('ion-textarea') as HTMLIonTextareaElement;
+      if (textareaElement) {
+        textareaElement.setFocus();
+      }
+    }, 100);
+  }
 
   async initKeyboardListeners() {
     if (this.platform.is('capacitor')) {
@@ -1636,7 +1894,7 @@ getAttachmentPreview(attachment: any): string {
   ngOnDestroy() {
     this.keyboardListeners.forEach(listener => listener?.remove());
     this.messageSub?.unsubscribe();
-     if (this.pinnedMessageSubscription) {
+    if (this.pinnedMessageSubscription) {
       this.pinnedMessageSubscription();
     }
   }

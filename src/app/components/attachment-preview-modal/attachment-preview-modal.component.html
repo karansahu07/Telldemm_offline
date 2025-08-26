@@ -207,7 +207,7 @@
   <div class="view-content">
     <ng-container *ngIf="attachment?.type === 'image'">
       <img
-        [src]="attachment.base64Data"
+        [src]="attachment.previewUrl"
         alt="Preview"
         (click)="toggleUI()"
         style="max-width: 100%; border-radius: 10px"
@@ -221,7 +221,7 @@
         style="width: 100%; border-radius: 10px"
       >
         <source
-          [src]="attachment.base64Data"
+          [src]="attachment.previewUrl"
           [type]="attachment.mimeType || 'video/mp4'"
         />
       </video>
@@ -230,7 +230,7 @@
     <ng-container *ngIf="attachment?.type === 'audio'">
       <audio controls style="width: 100%">
         <source
-          [src]="attachment.base64Data"
+          [src]="attachment.previewUrl"
           [type]="attachment.mimeType || 'audio/mpeg'"
         />
       </audio>
@@ -240,7 +240,7 @@
       <ion-icon name="document-outline" size="large"></ion-icon>
       <p>{{ attachment.fileName }}</p>
       <a
-        [href]="attachment.base64Data"
+        [href]="attachment.previewUrl"
         [download]="attachment.fileName"
         target="_blank"
         rel="noopener"

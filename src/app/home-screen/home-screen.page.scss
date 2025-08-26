@@ -486,6 +486,10 @@ ion-fab {
     justify-content: center;
 }
 
+// ion-modal.custom-blur-modal::part(backdrop) {
+//   pointer-events: auto !important;
+// }
+
 .popup-container {
     display: flex;
     flex-direction: column;

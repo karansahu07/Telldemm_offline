@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { PushNotifications } from '@capacitor/push-notifications';
 import { HttpClient } from '@angular/common/http';
+import { AuthService } from 'src/app/auth/auth.service';
 
 
 
@@ -12,7 +13,10 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root',
 })
 export class FirebasePushService {
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient,
+    private authService : AuthService
+
+  ) {
    
   }
 
@@ -51,7 +55,7 @@ export class FirebasePushService {
 
 
           // ✅ Replace this with your actual logged-in user ID
-          const userId = 44;
+          const userId = this.authService.authData?.userId;
          
           console.log("userId", userId);
 
