@@ -20,7 +20,7 @@ export class FirebaseChatService {
 
   private forwardMessages: any[] = [];
 
-  constructor(private db: Database) {}
+  constructor(private db: Database) { }
 
   getRoomId(senderId: string, arg1: string): string {
     throw new Error('Method not implemented.');
@@ -29,7 +29,7 @@ export class FirebaseChatService {
   async sendMessage(roomId: string, message: Message, chatType: string, senderId: string) {
     const messagesRef = ref(this.db, `chats/${roomId}`);
     await push(messagesRef, message);
-    console.log("messages is forwards id ",message);
+    console.log("messages is forwards id ", message);
     if (chatType === 'private') {
       // Increment unread for receiver only
       const receiverId = message.receiver_id;
@@ -95,176 +95,176 @@ export class FirebaseChatService {
     const snapshot = await get(pinRef);
 
     const pinData = {
-        key: message.key,
-        roomId: message.roomId,
-        messageId: message.messageId,
-        pinnedBy: message.pinnedBy,
-        pinnedAt: Date.now(),
-        scope: 'global'
+      key: message.key,
+      roomId: message.roomId,
+      messageId: message.messageId,
+      pinnedBy: message.pinnedBy,
+      pinnedAt: Date.now(),
+      scope: 'global'
     };
 
     if (snapshot.exists()) {
-        await update(pinRef, pinData);
+      await update(pinRef, pinData);
     } else {
-        await set(pinRef, pinData);
+      await set(pinRef, pinData);
     }
-}
-
-async getPinnedMessage(roomId: string): Promise<PinnedMessage | null> {
-  try {
-    const pinRef = ref(this.db, `pinnedMessages/${roomId}`);
-    const snapshot = await get(pinRef);
-
-    if (snapshot.exists()) {
-      return snapshot.val() as PinnedMessage;
-    }
-    return null;
-  } catch (error) {
-    console.error('Error getting pinned message:', error);
-    return null;
   }
-}
 
-listenToPinnedMessage(roomId: string, callback: (pinnedMessage: PinnedMessage | null) => void) {
-  const pinRef = ref(this.db, `pinnedMessages/${roomId}`);
+  async getPinnedMessage(roomId: string): Promise<PinnedMessage | null> {
+    try {
+      const pinRef = ref(this.db, `pinnedMessages/${roomId}`);
+      const snapshot = await get(pinRef);
 
-  return onValue(pinRef, (snapshot) => {
-    if (snapshot.exists()) {
-      callback(snapshot.val() as PinnedMessage);
-    } else {
-      callback(null);
+      if (snapshot.exists()) {
+        return snapshot.val() as PinnedMessage;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error getting pinned message:', error);
+      return null;
     }
-  });
-}
-
-async unpinMessage(roomId: string) {
-  try {
-    const pinRef = ref(this.db, `pinnedMessages/${roomId}`);
-    await remove(pinRef);
-    console.log("Message unpinned");
-  } catch (error) {
-    console.error('Error unpinning message:', error);
   }
-}
+
+  listenToPinnedMessage(roomId: string, callback: (pinnedMessage: PinnedMessage | null) => void) {
+    const pinRef = ref(this.db, `pinnedMessages/${roomId}`);
+
+    return onValue(pinRef, (snapshot) => {
+      if (snapshot.exists()) {
+        callback(snapshot.val() as PinnedMessage);
+      } else {
+        callback(null);
+      }
+    });
+  }
+
+  async unpinMessage(roomId: string) {
+    try {
+      const pinRef = ref(this.db, `pinnedMessages/${roomId}`);
+      await remove(pinRef);
+      console.log("Message unpinned");
+    } catch (error) {
+      console.error('Error unpinning message:', error);
+    }
+  }
 
 
   // Get pinned message for current chat
-// async getPinnedMessage(roomId: string, userId: string, chatType: string): Promise<PinnedMessage | null> {
-//   try {
-//     const scope = chatType === 'group' ? 'global' : 'private';
-//     const key = scope === 'private' ? `${roomId}_${userId}` : roomId;
-//     const pinRef = ref(this.db, `pinnedMessages/${key}`);
-//     const snapshot = await get(pinRef);
-    
-//     if (snapshot.exists()) {
-//       return snapshot.val() as PinnedMessage;
-//     }
-//     return null;
-//   } catch (error) {
-//     console.error('Error getting pinned message:', error);
-//     return null;
-//   }
-// }
+  // async getPinnedMessage(roomId: string, userId: string, chatType: string): Promise<PinnedMessage | null> {
+  //   try {
+  //     const scope = chatType === 'group' ? 'global' : 'private';
+  //     const key = scope === 'private' ? `${roomId}_${userId}` : roomId;
+  //     const pinRef = ref(this.db, `pinnedMessages/${key}`);
+  //     const snapshot = await get(pinRef);
 
-// // Listen to pinned message changes
-// listenToPinnedMessage(roomId: string, userId: string, chatType: string, callback: (pinnedMessage: PinnedMessage | null) => void) {
-//   const scope = chatType === 'group' ? 'global' : 'private';
-//   const key = scope === 'private' ? `${roomId}_${userId}` : roomId;
-//   const pinRef = ref(this.db, `pinnedMessages/${key}`);
-  
-//   return onValue(pinRef, (snapshot) => {
-//     if (snapshot.exists()) {
-//       callback(snapshot.val() as PinnedMessage);
-//     } else {
-//       callback(null);
-//     }
-//   });
-// }
+  //     if (snapshot.exists()) {
+  //       return snapshot.val() as PinnedMessage;
+  //     }
+  //     return null;
+  //   } catch (error) {
+  //     console.error('Error getting pinned message:', error);
+  //     return null;
+  //   }
+  // }
 
-// // Unpin message
-// async unpinMessage(roomId: string, userId: string, chatType: string) {
-//   try {
-//     const scope = chatType === 'group' ? 'global' : 'private';
-//     const key = scope === 'private' ? `${roomId}_${userId}` : roomId;
-//     const pinRef = ref(this.db, `pinnedMessages/${key}`);
-//     await remove(pinRef);
-//     console.log("Message unpinned");
-//   } catch (error) {
-//     console.error('Error unpinning message:', error);
-//   }
-// }
+  // // Listen to pinned message changes
+  // listenToPinnedMessage(roomId: string, userId: string, chatType: string, callback: (pinnedMessage: PinnedMessage | null) => void) {
+  //   const scope = chatType === 'group' ? 'global' : 'private';
+  //   const key = scope === 'private' ? `${roomId}_${userId}` : roomId;
+  //   const pinRef = ref(this.db, `pinnedMessages/${key}`);
 
+  //   return onValue(pinRef, (snapshot) => {
+  //     if (snapshot.exists()) {
+  //       callback(snapshot.val() as PinnedMessage);
+  //     } else {
+  //       callback(null);
+  //     }
+  //   });
+  // }
 
-async createGroup(groupId: string, groupName: string, members: any[], currentUserId: string) {
-  const db = getDatabase();
-  const groupRef = ref(db, `groups/${groupId}`);
-
-  // Find current user's name from the members array
-  const currentUser = members.find(m => m.user_id === currentUserId);
-  const currentUserName = currentUser?.name || 'Unknown';
-
-  console.log("currentUser",currentUserName);
-
-  const groupData = {
-    name: groupName,
-    groupId,
-    description: 'Hey I am using Telldemm',
-    createdBy: currentUserId,
-    createdByName: currentUserName,                 
-    // createdAt: new Date().toISOString(),
-    createdAt: new Date().toLocaleString(), 
-    members: members.reduce((acc, member) => {
-      acc[member.user_id] = {
-        name: member.name,
-        phone_number: member.phone_number,
-        status: "active",
-        role: member.user_id === currentUserId ? "admin" : "member"
-      };
-      return acc;
-    }, {})
-  };
-
-  await set(groupRef, groupData);
-}
-
-async updateBackendGroupId(groupId: string, backendGroupId: string) {
-  const db = getDatabase();
-  const groupRef = ref(db, `groups/${groupId}/backendGroupId`);
-  await set(groupRef, backendGroupId);
-}
+  // // Unpin message
+  // async unpinMessage(roomId: string, userId: string, chatType: string) {
+  //   try {
+  //     const scope = chatType === 'group' ? 'global' : 'private';
+  //     const key = scope === 'private' ? `${roomId}_${userId}` : roomId;
+  //     const pinRef = ref(this.db, `pinnedMessages/${key}`);
+  //     await remove(pinRef);
+  //     console.log("Message unpinned");
+  //   } catch (error) {
+  //     console.error('Error unpinning message:', error);
+  //   }
+  // }
 
 
+  async createGroup(groupId: string, groupName: string, members: any[], currentUserId: string) {
+    const db = getDatabase();
+    const groupRef = ref(db, `groups/${groupId}`);
 
-// async createGroup(groupId: string, groupName: string, members: any[], currentUserId: string) {
-//   const db = getDatabase();
-//   const groupRef = ref(db, `groups/${groupId}`);
+    // Find current user's name from the members array
+    const currentUser = members.find(m => m.user_id === currentUserId);
+    const currentUserName = currentUser?.name || 'Unknown';
 
-//   const currentUser = members.find(m => m.user_id === currentUserId);
-//   const currentUserName = currentUser?.name || 'Unknown';
+    console.log("currentUser", currentUserName);
 
-//   console.log("currentUser", currentUserName);
+    const groupData = {
+      name: groupName,
+      groupId,
+      description: 'Hey I am using Telldemm',
+      createdBy: currentUserId,
+      createdByName: currentUserName,
+      // createdAt: new Date().toISOString(),
+      createdAt: new Date().toLocaleString(),
+      members: members.reduce((acc, member) => {
+        acc[member.user_id] = {
+          name: member.name,
+          phone_number: member.phone_number,
+          status: "active",
+          role: member.user_id === currentUserId ? "admin" : "member"
+        };
+        return acc;
+      }, {})
+    };
 
-//   const groupData = {
-//     name: groupName,
-//     groupId,
-//     description: 'Hey I am using Telldemm',
-//     createdBy: currentUserId,
-//     createdByName: currentUserName,                 
-//     createdAt: new Date().toLocaleString(),
-//     backend_group_id: null, // ✅ Placeholder, updated after backend responds
-//     members: members.reduce((acc, member) => {
-//       acc[member.user_id] = {
-//         name: member.name,
-//         phone_number: member.phone_number,
-//         status: "active",
-//         role: member.user_id === currentUserId ? "admin" : "member"
-//       };
-//       return acc;
-//     }, {})
-//   };
+    await set(groupRef, groupData);
+  }
 
-//   await set(groupRef, groupData);
-// }
+  async updateBackendGroupId(groupId: string, backendGroupId: string) {
+    const db = getDatabase();
+    const groupRef = ref(db, `groups/${groupId}/backendGroupId`);
+    await set(groupRef, backendGroupId);
+  }
+
+
+
+  // async createGroup(groupId: string, groupName: string, members: any[], currentUserId: string) {
+  //   const db = getDatabase();
+  //   const groupRef = ref(db, `groups/${groupId}`);
+
+  //   const currentUser = members.find(m => m.user_id === currentUserId);
+  //   const currentUserName = currentUser?.name || 'Unknown';
+
+  //   console.log("currentUser", currentUserName);
+
+  //   const groupData = {
+  //     name: groupName,
+  //     groupId,
+  //     description: 'Hey I am using Telldemm',
+  //     createdBy: currentUserId,
+  //     createdByName: currentUserName,                 
+  //     createdAt: new Date().toLocaleString(),
+  //     backend_group_id: null, // ✅ Placeholder, updated after backend responds
+  //     members: members.reduce((acc, member) => {
+  //       acc[member.user_id] = {
+  //         name: member.name,
+  //         phone_number: member.phone_number,
+  //         status: "active",
+  //         role: member.user_id === currentUserId ? "admin" : "member"
+  //       };
+  //       return acc;
+  //     }, {})
+  //   };
+
+  //   await set(groupRef, groupData);
+  // }
 
 
 
@@ -290,7 +290,7 @@ async updateBackendGroupId(groupId: string, backendGroupId: string) {
     return userGroups;
   }
 
- // ✅ Create a community
+  // ✅ Create a community
   async createCommunity(communityId: string, name: string, description: string, createdBy: string): Promise<void> {
     const communityRef = ref(this.db, `communities/${communityId}`);
     await set(communityRef, {
@@ -303,7 +303,7 @@ async updateBackendGroupId(groupId: string, backendGroupId: string) {
 
   // ✅ Add user to community
   async addUserToCommunity(userId: string, communityId: string): Promise<void> {
-    const userRef = ref(this.db, `users/${userId}/joinedCommunities/${communityId}`);
+    const userRef = ref(this.db, `usersInCommunity/${userId}/joinedCommunities/${communityId}`);
     await set(userRef, true);
   }
 
@@ -316,7 +316,9 @@ async updateBackendGroupId(groupId: string, backendGroupId: string) {
 
   // 🔍 Get all communities user has joined
   async getUserCommunities(userId: string): Promise<string[]> {
-    const snapshot = await get(child(ref(this.db), `users_community/${userId}/joinedCommunities`));
+    const snapshot = await get(
+      child(ref(this.db), `usersInCommunity/${userId}/joinedCommunities`)
+    );
     const communities = snapshot.val();
     return communities ? Object.keys(communities) : [];
   }
@@ -348,7 +350,7 @@ async updateBackendGroupId(groupId: string, backendGroupId: string) {
     return membersObj ? Object.keys(membersObj) : [];
   }
 
- // 👇 Call when message arrives on receiver's device
+  // 👇 Call when message arrives on receiver's device
   markDelivered(roomId: string, messageKey: string) {
     const messageRef = ref(this.db, `chats/${roomId}/${messageKey}`);
     // console.log("sdffsdd",messageRef);
@@ -363,11 +365,11 @@ async updateBackendGroupId(groupId: string, backendGroupId: string) {
 
   //delete msg
   deleteMessage(roomId: string, messageKey: string) {
-  const messageRef = ref(this.db, `chats/${roomId}/${messageKey}`);
-  update(messageRef, { isDeleted: true });
-}
+    const messageRef = ref(this.db, `chats/${roomId}/${messageKey}`);
+    update(messageRef, { isDeleted: true });
+  }
 
-setForwardMessages(messages: any[]) {
+  setForwardMessages(messages: any[]) {
     this.forwardMessages = messages;
   }
 

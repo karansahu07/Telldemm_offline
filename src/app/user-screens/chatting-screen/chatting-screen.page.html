@@ -280,6 +280,9 @@
             <ion-icon *ngIf="pinnedMessage && pinnedMessage.messageId === msg.message_id" name="pin"
               class="pin-indicator-timestamp"></ion-icon>
             {{ msg.time }}
+            <span *ngIf="msg.isEdit" style="font-size: 11px; color: gray; margin-left: 4px;">
+              (edited)
+            </span>
             <ng-container *ngIf="msg.sender_id === senderId">
               <ion-icon *ngIf="!msg.delivered" name="checkmark-outline" class="status-icon sent"></ion-icon>
               <ion-icon *ngIf="msg.delivered && !msg.read" name="checkmark-done-outline"

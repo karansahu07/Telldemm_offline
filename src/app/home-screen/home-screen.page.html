@@ -3,7 +3,7 @@
     <ion-title>
       <img src="assets/images/TELLDEMM.svg" />
     </ion-title>
-    <ion-buttons slot="end">
+    <!-- <ion-buttons slot="end">
       <ion-button (click)="scanBarcode()">
         <img src="assets/images/qr-code.svg" />
       </ion-button>
@@ -15,7 +15,21 @@
       <ion-button (click)="presentPopover($event)">
         <img src="assets/images/dots (1).svg" />
       </ion-button>
-    </ion-buttons>
+    </ion-buttons> -->
+
+    <ion-buttons slot="end">
+  <ion-button (click)="scanBarcode()">
+    <img src="assets/images/qr-code.svg" />
+  </ion-button>
+
+  <ion-button (click)="openCamera()">
+    <img src="assets/images/camera.svg" />
+  </ion-button>
+
+  <ion-button (click)="presentPopover($event)">
+    <img src="assets/images/dots (1).svg" />
+  </ion-button>
+</ion-buttons>
   </ion-toolbar>
 
   <ion-toolbar>
@@ -51,30 +65,36 @@
 <ion-content [fullscreen]="true">
   <ion-list>
     <ion-item *ngFor="let chat of filteredChats" (click)="openChat(chat)">
-      
-       <ion-avatar slot="start" (click)="openImagePopup('assets/images/user.jfif'); $event.stopPropagation()">
-        <!-- <img src="assets/images/user.jfif" /> -->
-         <img [src]="chat.profile_picture_url || 'assets/images/user.jfif'" alt="Profile" />
-      </ion-avatar>
+  <ion-avatar 
+    slot="start" 
+    (click)="openImagePopup(chat.group ? (chat.dp || 'assets/images/user.jfif') : (chat.profile_picture_url || 'assets/images/user.jfif')); $event.stopPropagation()">
 
-      <ion-label>
-        <p class="chat-message">{{ chat.name }}</p>
-        <p [style.color]="chat.unread ? '#FF1414' : '#444343'">
-          <ng-container [ngSwitch]="chat.messageStatus">
-            <img *ngSwitchCase="'sent'" src="assets/images/read.svg" class="tick-icon" />
-            <img *ngSwitchCase="'seen'" src="assets/images/double-tick.svg" class="tick-seen" />
-          </ng-container>
-          {{ chat.message }}
-        </p>
-      </ion-label>
+    <img 
+      [src]="chat.group 
+              ? (chat.dp || 'assets/images/user.jfif') 
+              : (chat.profile_picture_url || 'assets/images/user.jfif')" 
+      alt="Profile" />
+  </ion-avatar>
 
-      <div slot="end" class="chat-meta">
-        <p class="time">{{ chat.time }}</p>
-        <ion-badge *ngIf="chat.unreadCount > 0" color="danger" class="unread-badge">
-          {{ chat.unreadCount }}
-        </ion-badge>
-      </div>
-    </ion-item>
+  <ion-label>
+    <p class="chat-message">{{ chat.name }}</p>
+    <p [style.color]="chat.unread ? '#FF1414' : '#444343'">
+      <ng-container [ngSwitch]="chat.messageStatus">
+        <img *ngSwitchCase="'sent'" src="assets/images/read.svg" class="tick-icon" />
+        <img *ngSwitchCase="'seen'" src="assets/images/double-tick.svg" class="tick-seen" />
+      </ng-container>
+      {{ chat.message }}
+    </p>
+  </ion-label>
+
+  <div slot="end" class="chat-meta">
+    <p class="time">{{ chat.time }}</p>
+    <ion-badge *ngIf="chat.unreadCount > 0" color="danger" class="unread-badge">
+      {{ chat.unreadCount }}
+    </ion-badge>
+  </div>
+</ion-item>
+
   </ion-list>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">

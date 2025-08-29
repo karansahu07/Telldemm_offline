@@ -65,4 +65,9 @@
     <ion-icon slot="start" name="pin-outline"></ion-icon>
     Unpin
   </ion-item>
+  <ion-item button (click)="selectOption('edit')" *ngIf="showEdit">
+  <ion-icon slot="start" name="create-outline"></ion-icon>
+  Edit
+</ion-item>
+
 </ion-list>

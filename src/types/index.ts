@@ -30,39 +30,40 @@
 // }
 
 export interface Message {
-    sender_id: string;
-    key?: any;
-    text: string | null;
-    timestamp: string;
-    sender_phone: string;
-    sender_name: string;
-    receiver_id: string;
-    receiver_phone: string;
-    delivered: boolean;
-    read: boolean;
-    isDeleted?: boolean;
-    message_id: string;
-    time?: string;
-    type?: string;
-    isForwarded?: boolean;
-    attachment?: {
-        type: 'image' | 'video' | 'audio' | 'file';
-        fileName?: string;           
-        mimeType?: string;           
-        // Keep base64Data for backward compatibility but make it optional
-        base64Data?: string;         
-        // Add new S3 properties
-        mediaId?: string;            // S3 media ID from upload response
-        fileSize?: number;           // File size in bytes
-        filePath?: string;           
-        caption?: string;  
-        previewUrl?: string | null;       
-    };
-    replyToMessageId?: string | undefined;    
-    reactions?: {
-        [userId: string]: string;     
-    }
+  sender_id: string;
+  key?: any;
+  text: string | null;
+  timestamp: string;
+  sender_phone: string;
+  sender_name: string;
+  receiver_id: string;
+  receiver_phone: string;
+  receiver_name?: string;
+  delivered: boolean;
+  read: boolean;
+  isDeleted?: boolean;
+  message_id: string;
+  isEdit?: boolean;
+  time?: string;
+  type?: string;
+  isForwarded?: boolean;
+  attachment?: {
+    type: 'image' | 'video' | 'audio' | 'file';
+    fileName?: string;           
+    mimeType?: string;           
+    base64Data?: string;         
+    mediaId?: string;            
+    fileSize?: number;           
+    filePath?: string;           
+    caption?: string;  
+    previewUrl?: string | null;       
+  };
+  replyToMessageId?: string | undefined;    
+  reactions?: {
+    [userId: string]: string;     
+  }
 }
+
 
 
 export interface PinnedMessage {

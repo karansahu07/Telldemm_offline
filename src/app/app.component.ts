@@ -62,7 +62,7 @@ export class AppComponent implements OnInit{
     
     
     await this.authService.hydrateAuth();
-    
+
     
     if (this.authService.isAuthenticated) {
       this.router.navigateByUrl('/home-screen', { replaceUrl: true });
@@ -70,6 +70,8 @@ export class AppComponent implements OnInit{
       this.router.navigateByUrl('/welcome-screen', { replaceUrl: true });
     }
 
+    }
+  }
   //    await Filesystem.mkdir({
   //   path: 'ChatMedia',
   //   directory: Directory.Documents,
@@ -78,7 +80,7 @@ export class AppComponent implements OnInit{
   //   if (err.message !== 'Directory exists') console.log('Folder exists');
   //   else console.error('Error creating ChatMedia folder', err);
   // });
-  }
+
 
   // listenToNetwork() {
   //   this.networkService.isOnline$
@@ -95,7 +97,7 @@ export class AppComponent implements OnInit{
   //       toast.present();
   //     });
   // }
-}
+
 
 
 // import { Component } from '@angular/core';

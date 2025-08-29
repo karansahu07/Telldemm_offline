@@ -55,7 +55,7 @@ export class CommunityPage implements OnInit {
     const communityIds = await this.firebaseService.getUserCommunities(this.userId);
 
     for (const id of communityIds) {
-      const snapshot = await this.firebaseService.getGroupInfo(id); // fallback if no direct community info
+      const snapshot = await this.firebaseService.getGroupInfo(id);
       this.joinedCommunities.push({
         id,
         name: snapshot?.name || 'Unnamed Community',

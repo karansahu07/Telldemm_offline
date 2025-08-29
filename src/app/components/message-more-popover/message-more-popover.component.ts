@@ -68,7 +68,9 @@ import { CommonModule } from '@angular/common';
 export class MessageMorePopoverComponent {
   @Input() hasText: boolean = true;
   @Input() hasAttachment: boolean = false;
-  @Input() isPinned: boolean = false; // ✅ New
+  @Input() isPinned: boolean = false;
+  @Input() message: any;
+  @Input() currentUserId: string = '';
 
   constructor(private popoverCtrl: PopoverController) {}
 
@@ -95,4 +97,15 @@ export class MessageMorePopoverComponent {
   get showUnpin(): boolean {
     return this.isPinned; // ✅ Only show Unpin if already pinned
   }
+
+    get showEdit(): boolean {
+    if (!this.message) return false;
+
+    const now = Date.now();
+    const msgTime = new Date(this.message.timestamp).getTime();
+    const diff = now - msgTime;
+
+    return this.message.sender_id === this.currentUserId && diff < (15 * 60 * 1000);
+  }
+
 }
