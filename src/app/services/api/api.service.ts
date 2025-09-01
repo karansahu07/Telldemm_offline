@@ -23,6 +23,23 @@ export class ApiService {
     return this.http.get<T>(`${this.baseUrl}${url}`, { params });
   }
 
+  // ----------------- 🔐 push fcm to admin APIs -----------------
+
+    /**
+   * ✅ Send FCM token to admin
+   * @param userId The user ID
+   * @param fcmToken The Firebase device token
+   */
+  pushFcmToAdmin(userId: number, fcmToken: string) {
+    const payload = {
+      user_id: userId,
+      fcm_token: fcmToken,
+    };
+
+    return this.http.post(`${this.baseUrl}/api/notification/save_fcm_token`, payload);
+  }
+
+
   // ----------------- 🔐 AUTH APIs -----------------
 
   sendOtp(phone_number: string, email: string): Observable<any> {

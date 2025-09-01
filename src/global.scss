@@ -85,3 +85,18 @@
 // ion-toolbar {
 //   padding-top: env(safe-area-inset-top);
 // }
+
+
+// app-footer-tabs {
+//   position: fixed;
+//   bottom: 0;
+//   left: 0;
+//   right: 0;
+
+//   // Make sure it sits above Android/iOS navigation bar
+//   padding-bottom: env(safe-area-inset-bottom);
+
+//   // Optional: style so it doesn’t get clipped
+//   background: #fff; // adjust to your footer bg
+//   z-index: 999;
+// }

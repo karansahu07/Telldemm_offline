@@ -25,28 +25,28 @@ export class MenuPopoverComponent implements OnInit {
 
     if (this.currentUrl.includes('/home-screen')) {
       this.menuOptions = [
-        { label: 'Advertise' },
-        { label: 'New group' },
-        { label: 'New broadcast' },
-        { label: 'Labels' },
-        { label: 'Starred' },
-        { label: 'Setting', route: '/setting-screen' }
+        { label: 'Advertise wip' },
+        { label: 'New group',  route: '/contact-screen' },
+        { label: 'New broadcast wip' },
+        { label: 'Labels wip' },
+        { label: 'Starred wip' },
+        { label: 'Settings', route: '/setting-screen' }
       ];
     } else if (this.currentUrl.includes('/status')) {
       this.menuOptions = [
-        { label: 'Create channels' },
-        { label: 'Status Privacy' },
-        { label: 'Starred' },
-        { label: 'Setting', route: '/setting-screen' }
+        { label: 'Create channels wip' },
+        { label: 'Status Privacy wip' },
+        { label: 'Starred wip' },
+        { label: 'Settings', route: '/setting-screen' }
       ];
     } else if (this.currentUrl.includes('/community-screen')) {
       this.menuOptions = [
-        { label: 'Setting', route: '/setting-screen' }
+        { label: 'Settings', route: '/setting-screen' }
       ];
     } else if (this.currentUrl.includes('/calls-screen')) {
       this.menuOptions = [
-        { label: 'Clear call logs' },
-        { label: 'Setting', route: '/setting-screen' }
+        { label: 'Clear call logs wip' },
+        { label: 'Settings', route: '/setting-screen' }
       ];
     }
   }

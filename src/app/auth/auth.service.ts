@@ -54,7 +54,7 @@ export class AuthService {
           loggedIn: true,
           phone_number: senderPhone,
           userId: res.user_id.toString(),
-          name: res.name || undefined // If API returns name, store it
+          name: res.name || undefined
         };
 
         // Store whole object in SecureStorage under "AUTH"

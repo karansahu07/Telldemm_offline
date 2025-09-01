@@ -2525,7 +2525,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   startLongPress(msg: any) {
     this.longPressTimeout = setTimeout(() => {
       this.onLongPress(msg);
-    }, 1000);
+    }, 1000); // 500ms for long press
   }
 
   cancelLongPress() {

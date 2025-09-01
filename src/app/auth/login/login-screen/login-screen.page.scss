@@ -22,7 +22,7 @@ ion-content {
 .Lorem-main {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    // justify-content: space-between;
     height: 100%;
 }
 
@@ -125,7 +125,8 @@ input[type=number]::-webkit-outer-spin-button {
     display: flex;
     justify-content: center;
     // margin-bottom: 30px;
-    padding-bottom: env(safe-area-inset-bottom, 0px);
+    // padding-bottom: env(safe-area-inset-bottom, 0px);
+    margin-top: 70px;
 }
 
 .agree-div button {
@@ -192,11 +193,11 @@ input[type=number]::-webkit-outer-spin-button {
     margin: 0;
 }
 
-.agree-div {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-}
+// .agree-div {
+//     width: 100%;
+//     display: flex;
+//     justify-content: center;
+// }
 
 .submit {
     width: 100%;
@@ -249,7 +250,7 @@ input[type=number]::-webkit-outer-spin-button {
   color: white;
   padding: 10px 20px;
   border: none;
-  border-radius: 6px;
+  border-radius: 30px;
   font-size: 16px;
   transition: background-color 0.3s, opacity 0.3s;
   cursor: pointer;
@@ -266,7 +267,7 @@ input[type=number]::-webkit-outer-spin-button {
   color: white;
   padding: 10px 20px;
   border: none;
-  border-radius: 6px;
+  border-radius: 30px;
   font-size: 16px;
   transition: background-color 0.3s, opacity 0.3s;
   cursor: pointer;

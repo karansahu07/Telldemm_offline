@@ -22,7 +22,7 @@ export class ChatOptionsPopoverComponent {
     if (this.chatType === 'group') {
       return ['Group Info','Group Media','Search','Add Members', 'Exit Group'];
     } else {
-      return ['View Contact', 'Search', 'Mute Notifications'];
+      return ['View Contact', 'Search', 'Mute Notifications wip'];
     }
   }
 }

@@ -54,7 +54,7 @@ export class AppComponent implements OnInit{
   }
   async ngOnInit() {
     await this.fcmService.initializePushNotifications();
-    await this.FirebasePushService.initPush();
+    // await this.FirebasePushService.initPush();
     await this.sqliteService.init();
     await this.FileSystemService.init();
 

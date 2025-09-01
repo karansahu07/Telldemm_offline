@@ -192,7 +192,7 @@
   </ion-modal>
 </div>
 
-<!-- otp modal open from here -->
+<!-- Updated OTP modal with Ionic Input OTP -->
 <div *ngIf="showOtpPopup" class="otp-popup-wrapper">
   <div class="backgrounds">
     <div class="opt">
@@ -201,19 +201,14 @@
 
     <div class="border-line"></div>
 
-    <div class="otp-input">
-      <input type="tel" inputmode="numeric" maxlength="1" pattern="[0-9]*" (input)="onOtpInput($event, 0)"
-        (keydown)="handleBackspace($event, 0)" (paste)="$event.preventDefault()" #otp0 />
-      <input type="tel" inputmode="numeric" maxlength="1" pattern="[0-9]*" (input)="onOtpInput($event, 1)"
-        (keydown)="handleBackspace($event, 1)" (paste)="$event.preventDefault()" #otp1 />
-      <input type="tel" inputmode="numeric" maxlength="1" pattern="[0-9]*" (input)="onOtpInput($event, 2)"
-        (keydown)="handleBackspace($event, 2)" (paste)="$event.preventDefault()" #otp2 />
-      <input type="tel" inputmode="numeric" maxlength="1" pattern="[0-9]*" (input)="onOtpInput($event, 3)"
-        (keydown)="handleBackspace($event, 3)" (paste)="$event.preventDefault()" #otp3 />
-      <input type="tel" inputmode="numeric" maxlength="1" pattern="[0-9]*" (input)="onOtpInput($event, 4)"
-        (keydown)="handleBackspace($event, 4)" (paste)="$event.preventDefault()" #otp4 />
-      <input type="tel" inputmode="numeric" maxlength="1" pattern="[0-9]*" (input)="onOtpInput($event, 5)"
-        (keydown)="handleBackspace($event, 5)" (paste)="$event.preventDefault()" #otp5 />
+    <div class="otp-input-wrapper">
+      <ion-input-otp 
+        #otpInput
+        length="6"
+        [value]="otpValue"
+        (ionInput)="onOtpChange($event)"
+        class="custom-otp-input">
+      </ion-input-otp>
     </div>
 
     <div class="submit" style="margin-bottom: 10px;">

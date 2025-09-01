@@ -142,7 +142,8 @@ ion-content {
   box-sizing: border-box;
   z-index: 10;
   background: white;
-  bottom: env(safe-area-inset-bottom, 0px);
+//   bottom: env(safe-area-inset-bottom, 0px);
+bottom: 60px;
 }
 
 .btn {

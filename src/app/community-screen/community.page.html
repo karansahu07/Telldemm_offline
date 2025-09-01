@@ -87,7 +87,7 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <div class="info-banner">
+  <!-- <div class="info-banner">
     <img src="assets/images/idea.png" class="info-icon" />
     <div class="info-text">
       <h3>Communities are moving</h3>
@@ -99,7 +99,7 @@
   </div>
 
   <ion-content class="light-theme">
-    <!-- ➕ New Community Button -->
+    
     <ion-item lines="none" class="new-community" button (click)="createCommunityPrompt()">
       <ion-avatar slot="start">
         <img src="assets/images/profile.png" />
@@ -110,7 +110,6 @@
       </ion-label>
     </ion-item>
 
-    <!-- 🔹 Community List -->
     <ion-item
       *ngFor="let community of joinedCommunities"
       lines="none"
@@ -137,13 +136,12 @@
       </div>
     </ion-item>
 
-    <!-- 🔽 View All -->
+  
     <ion-item lines="none" class="view-all-row" button detail="false">
       <ion-icon name="chevron-forward-outline" class="view-all-icon"></ion-icon>
       <span class="view-all-text">View all</span>
     </ion-item>
 
-    <!-- 📦 Groups inside Selected Community -->
     <ion-card *ngIf="selectedCommunity">
       <ion-card-header>
         <ion-card-title>{{ selectedCommunity.name }} Groups</ion-card-title>
@@ -169,7 +167,9 @@
         </ion-item>
       </ion-list> 
     </ion-card>
-  </ion-content>
+  </ion-content> -->
+
+  <h1>Work In Progress....</h1>
 </ion-content>
 
 <app-footer-tabs></app-footer-tabs>
