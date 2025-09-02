@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule, ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
+// import { environment } from '../../../environments/environment';
 import { Preferences } from '@capacitor/preferences';
 import { SecureStorageService } from '../../services/secure-storage/secure-storage.service';
 import { Database } from '@angular/fire/database';
@@ -13,6 +13,7 @@ import { onValue, ref } from '@angular/fire/database';
 import { AuthService } from 'src/app/auth/auth.service';
 import { FcmService } from 'src/app/services/fcm-service';
 import { ApiService } from 'src/app/services/api/api.service';
+import { environment } from 'src/environments/environment.prod';
 
 @Component({
   selector: 'app-profile-setup',

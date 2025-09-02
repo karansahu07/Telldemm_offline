@@ -1,199 +1,10 @@
-// import { Injectable } from '@angular/core';
-// import { PushNotifications, Token, PushNotificationSchema, ActionPerformed } from '@capacitor/push-notifications';
-// import { getDatabase, ref, set } from 'firebase/database';
-// import { getAuth } from 'firebase/auth';
-
-// @Injectable({
-//   providedIn: 'root'
-// })
-// export class FcmService {
-  
-//   constructor() { }
-
-//   async initializePushNotifications() {
-//     // Request permission
-//     const result = await PushNotifications.requestPermissions();
-    
-//     if (result.receive === 'granted') {
-//       // Register for push notifications
-//       await PushNotifications.register();
-      
-//       // Get FCM token
-//       PushNotifications.addListener('registration', (token: Token) => {
-//         console.log('FCM Token:', token.value);
-//         this.saveFcmTokenToDatabase(token.value);
-//       });
-      
-//       // Handle notification received
-//       PushNotifications.addListener('pushNotificationReceived', (notification: PushNotificationSchema) => {
-//         console.log('Push received: ', notification);
-//       });
-      
-//       // Handle notification click
-//       PushNotifications.addListener('pushNotificationActionPerformed', (notification: ActionPerformed) => {
-//         console.log('Push action performed: ', notification);
-//         // Navigate to specific chat
-//         const chatId = notification.notification.data?.chatId;
-//         if (chatId) {
-//           // Router navigation logic yahan add kariye
-//         }
-//       });
-//     }
-//   }
-  
-//   private saveFcmTokenToDatabase(token: string) {
-//     const auth = getAuth();
-//     const user = auth.currentUser;
-    
-//     if (user) {
-//       const db = getDatabase();
-//       const userRef = ref(db, `users/${user.uid}/fcmToken`);
-//       set(userRef, token);
-//     }
-//   }
-// }
-
-
-
-// import { Injectable } from '@angular/core';
-// import { PushNotifications, Token, PushNotificationSchema, ActionPerformed } from '@capacitor/push-notifications';
-// import { getDatabase, ref, set } from 'firebase/database';
-// import { Router } from '@angular/router';
-// import { ApiService } from './api/api.service';
-
-// @Injectable({
-//   providedIn: 'root'
-// })
-// export class FcmService {
-//   private fcmToken: string = '';
-  
-//   constructor(
-//     private router: Router,
-//     private service : ApiService
-//   ) { }
-
-//   async initializePushNotifications() {
-//     try {
-//       // Request permission
-//       const result = await PushNotifications.requestPermissions();
-      
-//       if (result.receive === 'granted') {
-//         // Register for push notifications
-//         await PushNotifications.register();
-        
-//         // Get FCM token
-//         PushNotifications.addListener('registration', (token: Token) => {
-//           console.log('FCM Token:', token.value);
-//           this.fcmToken = token.value;
-//           // Token ko temporarily store kar liye, profile setup ke baad save karenge
-//         });
-        
-//         // Handle notification received (when app is open)
-//         PushNotifications.addListener('pushNotificationReceived', (notification: PushNotificationSchema) => {
-//           console.log('Push received: ', notification);
-//           // Optional: Show in-app notification or update badge
-//         });
-        
-//         // Handle notification click (when app is closed/background)
-//         PushNotifications.addListener('pushNotificationActionPerformed', (notification: ActionPerformed) => {
-//           console.log('Push action performed: ', notification);
-//           const roomId = notification.notification.data?.roomId;
-//           const senderId = notification.notification.data?.senderId;
-          
-//           if (roomId && senderId) {
-//             // Navigate to specific chat
-//             this.router.navigate(['/chat', roomId, senderId]);
-//           }
-//         });
-        
-//         return true;
-//       } else {
-//         console.log('Push notification permission denied');
-//         return false;
-//       }
-//     } catch (error) {
-//       console.error('Error initializing push notifications:', error);
-//       return false;
-//     }
-//   }
-  
-//   // Profile setup ke baad ye function call ho rha hai
-//   async saveFcmTokenToDatabase(userId: string, userName: string, userPhone: string) {
-//     try {
-//       if (!this.fcmToken) {
-//         // console.log("fcm token is", this.fcmToken);
-//         console.log('FCM Token not available yet, retrying...');
-//         // Retry after 2 seconds
-//         setTimeout(() => {
-//           if (this.fcmToken) {
-//             this.saveFcmTokenToDatabase(userId, userName, userPhone);
-//           }
-//         }, 2000);
-//         return;
-//       }
-       
-//       const db = getDatabase();
-//       const userRef = ref(db, `users/${userId}`);
-      
-//       const userData = {
-//         name: userName,
-//         phone: userPhone,
-//         fcmToken: this.fcmToken,
-//         lastActive: new Date().toISOString(),
-//         isOnline: true
-//       };
-      
-//       await set(userRef, userData);
-//       console.log('User data and FCM token saved successfully');
-
-//       this.service.pushFcmToAdmin(Number(userId), this.fcmToken).subscribe({
-//         next: (res : any) => console.log('✅ Token saved in backend:', res),
-//         error: (err : any) => console.error('❌ Error saving token in backend:', err),
-//       });
-      
-//     } catch (error) {
-//       console.error('Error saving FCM token:', error);
-//     }
-//   }
-  
-//   async updateFcmToken(userId: string) {
-//     try {
-//       if (this.fcmToken && userId) {
-//         const db = getDatabase();
-//         const tokenRef = ref(db, `users/${userId}/fcmToken`);
-//         await set(tokenRef, this.fcmToken);
-//         console.log('FCM Token updated successfully');
-//       }
-//     } catch (error) {
-//       console.error('Error updating FCM token:', error);
-//     }
-//   }
-  
-//   // Get current FCM token
-//   getFcmToken(): string {
-//     return this.fcmToken;
-//   }
-  
-//   // User offline karne ke liye (optional)
-//   async setUserOffline(userId: string) {
-//     try {
-//       const db = getDatabase();
-//       const userRef = ref(db, `users/${userId}/isOnline`);
-//       await set(userRef, false);
-//     } catch (error) {
-//       console.error('Error setting user offline:', error);
-//     }
-//   }
-// }
-
-
-
 import { Injectable } from '@angular/core';
 import { PushNotifications, Token, PushNotificationSchema, ActionPerformed } from '@capacitor/push-notifications';
-import { LocalNotifications } from '@capacitor/local-notifications';
+import { LocalNotifications, LocalNotificationActionPerformed } from '@capacitor/local-notifications';
 import { getDatabase, ref, set } from 'firebase/database';
 import { Router } from '@angular/router';
 import { Platform, ToastController } from '@ionic/angular';
+import { App } from '@capacitor/app';
 
 @Injectable({
   providedIn: 'root'
@@ -204,139 +15,186 @@ export class FcmService {
   constructor(
     private router: Router,
     private platform: Platform,
-    private toastController: ToastController // Inject ToastController
-  ) {}
+    private toastController: ToastController
+  ) { }
 
   async initializePushNotifications(): Promise<boolean> {
     try {
-      // Request push notification permissions
-      const result = await PushNotifications.requestPermissions();
-
-      if (result.receive === 'granted') {
-        // Register for push notifications
-        await PushNotifications.register();
-
-        // Request local notification permissions
-        const localPermResult = await LocalNotifications.requestPermissions();
-        if (localPermResult.display !== 'granted') {
-          console.warn('Local notification permission not granted');
-        }
-
-        // Handle FCM token registration
-        PushNotifications.addListener('registration', (token: Token) => {
-          console.log('FCM Token:', token.value);
-          this.fcmToken = token.value;
-        });
-
-        // Handle registration errors
-        PushNotifications.addListener('registrationError', (error: any) => {
-          console.error('FCM registration error:', error);
-        });
-
-        // Handle notification received (foreground)
-        PushNotifications.addListener('pushNotificationReceived', async (notification: PushNotificationSchema) => {
-          console.log('Push received (foreground):', notification);
-
-          // Display OS-level notification and toast when app is in foreground
-          if (this.platform.is('ios') || this.platform.is('android')) {
-            await this.showLocalNotification(notification);
-          }
-        });
-
-        // Handle notification click (background/foreground)
-        PushNotifications.addListener('pushNotificationActionPerformed', (notification: ActionPerformed) => {
-          console.log('Push action performed:', notification);
-          const data = notification.notification.data;
-          const roomId = data?.roomId;
-          const senderId = data?.senderId;
-
-          if (roomId && senderId) {
-            // Navigate to specific chat
-            this.router.navigate(['/home-screen', roomId, senderId]);
-          }
-        });
-
-        // Handle local notification click
-        LocalNotifications.addListener('localNotificationActionPerformed', (notification) => {
-          console.log('Local notification action performed:', notification);
-          const data = notification.notification.extra || {};
-          const roomId = data?.roomId;
-          const senderId = data?.senderId;
-
-          if (roomId && senderId) {
-            // Navigate to specific chat
-            this.router.navigate(['/home-screen', roomId, senderId]);
-          }
-        });
-
-        return true;
-      } else {
-        console.log('Push notification permission denied');
+      // ✅ Request push notification permissions
+      let permStatus = await PushNotifications.checkPermissions();
+      if (permStatus.receive !== 'granted') {
+        permStatus = await PushNotifications.requestPermissions();
+      }
+      if (permStatus.receive !== 'granted') {
+        console.warn('Push notification permission denied');
         return false;
       }
+
+      // ✅ Register for push notifications
+      await PushNotifications.register();
+
+      // ✅ Request local notification permissions
+      const localPerm = await LocalNotifications.requestPermissions();
+      if (localPerm.display !== 'granted') {
+        console.warn('Local notification permission not granted');
+      }
+
+      // 📌 Token registration
+      PushNotifications.addListener('registration', (token: Token) => {
+        console.log('✅ FCM Token:', token.value);
+        this.fcmToken = token.value;
+      });
+
+      // ❌ Registration error
+      PushNotifications.addListener('registrationError', (error: any) => {
+        console.error('❌ FCM registration error:', error);
+      });
+
+      // 📩 Foreground push
+      PushNotifications.addListener('pushNotificationReceived', async (notification: PushNotificationSchema) => {
+        console.log('📩 Foreground push received:', notification);
+        await this.showLocalNotification(notification);
+      });
+
+      // 👉 CRITICAL: Background notification tapped
+      PushNotifications.addListener('pushNotificationActionPerformed', (notification: ActionPerformed) => {
+        console.log('👉 Background push action performed:', notification);
+        this.handleNotificationTap(notification.notification?.data || {});
+      });
+
+      // 👉 Local notification tapped (when shown in foreground)
+      LocalNotifications.addListener('localNotificationActionPerformed', (evt: LocalNotificationActionPerformed) => {
+        console.log('👉 Local notification tapped:', evt);
+        this.handleNotificationTap(evt.notification?.extra || {});
+      });
+
+      // ✅ ADDITIONAL: Handle app state resume (for better reliability)
+      App.addListener('appStateChange', ({ isActive }) => {
+        if (isActive) {
+          console.log('App became active, checking for pending notifications');
+          this.checkForPendingNotifications();
+        }
+      });
+
+      // ✅ ADDITIONAL: Custom event listener for MainActivity
+      window.addEventListener('notificationTapped', (event: any) => {
+        console.log('👉 Custom notification event from MainActivity:', event.detail);
+        try {
+          const data = JSON.parse(event.detail);
+          this.handleNotificationTap(data);
+        } catch (e) {
+          console.error('Error parsing notification data:', e);
+        }
+      });
+
+      return true;
     } catch (error) {
-      console.error('Error initializing push notifications:', error);
+      console.error('❌ Error initializing push notifications:', error);
       return false;
     }
   }
 
-  // Display local notification and toast for foreground
-  private async showLocalNotification(notification: PushNotificationSchema) {
-    try {
-      // Schedule OS-level notification
-      await LocalNotifications.schedule({
-        notifications: [
-          {
-            id: Math.floor(Math.random() * 1000000), // Unique ID for each notification
-            title: notification.title || 'New Message',
-            body: notification.body || 'You have a new message',
-            extra: notification.data, // Use 'extra' for custom data
-            sound: 'default', // Use default notification sound
-            smallIcon: 'assets/icon/favicon.ico', // Ensure this icon exists in Android resources
-            schedule: { at: new Date(Date.now() + 1000) }, // Show immediately (slight delay)
-          }
-        ]
-      });
-      console.log('Local notification scheduled for foreground');
+  // ✅ UNIFIED notification tap handler
+  private handleNotificationTap(data: any) {
+    console.log('🎯 Handling notification tap with data:', data);
 
-      // Show toast notification
-      const toast = await this.toastController.create({
-        message: notification.body || 'You have a new message',
-        duration: 3000, // Display for 3 seconds
-        position: 'top', // Display at the top to mimic WhatsApp
-        cssClass: 'custom-toast', // Custom class for styling
-        buttons: [
-          {
-            text: 'View',
-            handler: () => {
-              const data = notification.data || {};
-              const roomId = data.roomId;
-              const senderId = data.senderId;
-              if (roomId && senderId) {
-                this.router.navigate(['/home-screen', roomId, senderId]);
-              }
-            }
-          }
-        ]
+    if (!data || Object.keys(data).length === 0) {
+      console.log('No notification data available, navigating to home');
+      this.router.navigate(['/home-screen']);
+      return;
+    }
+
+    const route = data.route || '/home-screen';
+    const queryParams: any = {};
+
+    // ✅ Build query params from notification data
+    if (data.roomId) queryParams.roomId = data.roomId;
+    if (data.senderId) queryParams.senderId = data.senderId;
+    if (data.receiverId) queryParams.receiverId = data.receiverId;
+    if (data.chatType) queryParams.chatType = data.chatType;
+    if (data.messageId) queryParams.messageId = data.messageId;
+
+    console.log('🚀 Navigating to:', route, 'with params:', queryParams);
+
+    // ✅ Navigate with a slight delay to ensure app is ready
+    setTimeout(() => {
+      this.router.navigate([route], {
+        queryParams: Object.keys(queryParams).length > 0 ? queryParams : undefined,
+        replaceUrl: true
       });
-      await toast.present();
-      console.log('Toast notification displayed');
+    }, 100);
+  }
+
+  // ✅ Check for pending notifications (when app becomes active)
+  private async checkForPendingNotifications() {
+    try {
+      // Check for delivered notifications that might have been tapped
+      const delivered = await PushNotifications.getDeliveredNotifications();
+      console.log('📨 Delivered notifications:', delivered);
+
+      // You can process any pending notifications here if needed
     } catch (error) {
-      console.error('Error scheduling local notification or toast:', error);
+      console.error('Error checking delivered notifications:', error);
     }
   }
 
-  // Save FCM token and user data to Firebase
+  // ✅ Enhanced foreground local notification
+  private async showLocalNotification(notification: PushNotificationSchema) {
+    try {
+      // ✅ Extract data properly - check both data and body for FCM structure
+      const notificationData = notification.data || {};
+      const title = notificationData.title || notification.title || 'New Message';
+      const body = notificationData.body || notification.body || 'You have a new message';
+
+     
+
+      await LocalNotifications.schedule({
+  notifications: [
+    {
+      id: Math.floor(Math.random() * 1000000),
+      title: 'New Message',
+      body: 'You have a new message',
+      extra: notificationData,
+      smallIcon: 'ic_notification',  // ✅ no file extension
+      sound: 'default',
+      schedule: { at: new Date(Date.now() + 500) }
+    }
+  ]
+});
+
+
+
+
+const toast = await this.toastController.create({
+  message: `test`,
+  duration: 3000,
+  position: 'top',
+  cssClass: 'custom-toast',   // keep same class
+  buttons: [
+    {
+      text: '',
+      handler: () => {
+        this.handleNotificationTap(notificationData);
+      }
+    }
+  ]
+});
+// await toast.present();
+
+await toast.present();
+
+
+    } catch (error) {
+      console.error('❌ Error scheduling local notification or toast:', error);
+    }
+  }
+
+  // ✅ Save FCM token & user info to Firebase
   async saveFcmTokenToDatabase(userId: string, userName: string, userPhone: string) {
     try {
       if (!this.fcmToken) {
-        console.log('FCM Token not available yet, retrying...');
-        // Retry after 2 seconds
-        setTimeout(() => {
-          if (this.fcmToken) {
-            this.saveFcmTokenToDatabase(userId, userName, userPhone);
-          }
-        }, 2000);
+        console.log('⚠️ FCM Token not available yet, retrying...');
+        setTimeout(() => this.saveFcmTokenToDatabase(userId, userName, userPhone), 2000);
         return;
       }
 
@@ -347,44 +205,47 @@ export class FcmService {
         name: userName,
         phone: userPhone,
         fcmToken: this.fcmToken,
+        platform: this.isIos() ? 'ios' : 'android',
         lastActive: new Date().toISOString(),
         isOnline: true
       };
 
       await set(userRef, userData);
-      console.log('User data and FCM token saved successfully');
+      console.log('✅ User data + FCM token saved');
     } catch (error) {
-      console.error('Error saving FCM token:', error);
+      console.error('❌ Error saving FCM token:', error);
     }
   }
 
-  // Update FCM token
+  // ✅ Update FCM token only
   async updateFcmToken(userId: string) {
     try {
       if (this.fcmToken && userId) {
         const db = getDatabase();
         const tokenRef = ref(db, `users/${userId}/fcmToken`);
         await set(tokenRef, this.fcmToken);
-        console.log('FCM Token updated successfully');
+        console.log('✅ FCM Token updated successfully');
       }
     } catch (error) {
-      console.error('Error updating FCM token:', error);
+      console.error('❌ Error updating FCM token:', error);
     }
   }
 
-  // Get current FCM token
   getFcmToken(): string {
     return this.fcmToken;
   }
 
-  // Set user offline
   async setUserOffline(userId: string) {
     try {
       const db = getDatabase();
       const userRef = ref(db, `users/${userId}/isOnline`);
       await set(userRef, false);
     } catch (error) {
-      console.error('Error setting user offline:', error);
+      console.error('❌ Error setting user offline:', error);
     }
+  }
+
+  private isIos(): boolean {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent);
   }
 }

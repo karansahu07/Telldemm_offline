@@ -100,3 +100,53 @@
 //   background: #fff; // adjust to your footer bg
 //   z-index: 999;
 // }
+
+
+.custom-toast {
+  --background: #323232;               /* Neutral dark background */
+  --color: #ffffff;                    /* Bright white text */
+  --border-radius: 10px;               /* Slightly more rounded */
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* More depth */
+  font-size: 14px;
+  font-weight: 400;
+  padding: 10px 14px;
+  min-height: 48px;
+  margin-top: 16px;                    /* More breathing space */
+}
+
+/* Layout: message + action button */
+ion-toast.custom-toast .toast-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0;
+}
+
+/* Message styling */
+ion-toast.custom-toast .toast-message {
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.3;
+  margin: 0;
+  color: #ffffff;
+  overflow-wrap: break-word;
+}
+
+/* Native-style "View" button */
+ion-toast.custom-toast button {
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: none;
+  background: #ffffff;                  /* White button */
+  color: #000000;                       /* Black text */
+  border-radius: 6px;
+  padding: 6px 14px;
+  height: 32px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: background 0.2s;
+}
+
+ion-toast.custom-toast button:hover {
+  background: #f0f0f0;
+}
