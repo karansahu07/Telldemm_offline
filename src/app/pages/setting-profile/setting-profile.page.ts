@@ -43,6 +43,7 @@ import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { AuthService } from '../../auth/auth.service';
 import { ApiService } from 'src/app/services/api/api.service';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 
 @Component({
   selector: 'app-setting-profile',
@@ -60,6 +61,7 @@ export class SettingProfilePage implements OnInit {
     about: '',
     phone: ''
   };
+ currentUserId: number | null = null;
 
   constructor(
     private authService: AuthService,
@@ -69,6 +71,13 @@ export class SettingProfilePage implements OnInit {
   async ngOnInit() {
     // Make sure auth is hydrated (if app just started)
     await this.authService.hydrateAuth();
+
+    // this.currentUserId = await this.authService.authData?.userId;
+
+     const id = this.authService.authData?.userId;
+    if (id) {
+      this.currentUserId = Number(id);
+    }
     
     if (this.authService.authData) {
       const auth = this.authService.authData;
@@ -118,8 +127,39 @@ export class SettingProfilePage implements OnInit {
     this.profileImageUrl = 'assets/images/user.jfif';
   }
 
-  editProfileImage() {
-    console.log('Edit profile image clicked');
+  // editProfileImage() {
+  //   console.log('Edit profile image clicked');
+  // }
+
+async editProfileImage() {
+    try {
+      const image = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: true,
+        resultType: CameraResultType.Uri,
+        source: CameraSource.Photos,
+      });
+
+      if (image && image.webPath) {
+        this.profileImageUrl = image.webPath;
+
+        // ✅ File create karo
+        const response = await fetch(image.webPath);
+        const blob = await response.blob();
+        const file = new File([blob], 'profile.jpg', { type: blob.type });
+
+        if (this.currentUserId) {
+          this.service.updateUserDp(this.currentUserId, file).subscribe({
+            next: (res) => console.log('Profile updated successfully:', res),
+            error: (err) => console.error('Error updating profile picture:', err),
+          });
+        } else {
+          console.error('No userId found');
+        }
+      }
+    } catch (error) {
+      console.error('Error selecting image:', error);
+    }
   }
 
   addLinks() {

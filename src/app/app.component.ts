@@ -28,6 +28,7 @@ import { Router } from '@angular/router';
 import { Platform } from '@ionic/angular';
 import { FcmService } from './services/fcm-service';
 import { SqliteService } from './services/sqlite.service';
+import { StatusBar, Style } from '@capacitor/status-bar';
 
 register();
 
@@ -51,6 +52,7 @@ export class AppComponent implements OnInit{
     private sqliteService : SqliteService
   ) {
     // this.listenToNetwork();
+    this.initializeApp();
   }
   async ngOnInit() {
     await this.fcmService.initializePushNotifications();
@@ -71,54 +73,26 @@ export class AppComponent implements OnInit{
     }
 
     }
+
+    async initializeApp() {
+    await this.platform.ready();
+   
+    if (this.platform.is('capacitor')) {
+      await StatusBar.setBackgroundColor({ color: '#ffffff' });
+ 
+      // await StatusBar.setStyle({ style: Style.Dark }); // For light text
+      // await StatusBar.setStyle({ style: Style.Custom, color: '#333333' });
+ 
+      await StatusBar.setStyle({ style: Style.Light });
+ 
+      // / Set the status bar text color based on the platform
+      // if (this.platform.is('ios')) {
+      //   // On iOS, set the style to light content (dark text)
+      //   await StatusBar.setStyle({ style: Style.Dark });
+      // } else {
+      //   // On Android, the text color will automatically adjust based on the background color
+      // }
+    }
   }
-  //    await Filesystem.mkdir({
-  //   path: 'ChatMedia',
-  //   directory: Directory.Documents,
-  //   recursive: true,
-  // }).catch(err => {
-  //   if (err.message !== 'Directory exists') console.log('Folder exists');
-  //   else console.error('Error creating ChatMedia folder', err);
-  // });
 
-
-  // listenToNetwork() {
-  //   this.networkService.isOnline$
-  //     .pipe(distinctUntilChanged())
-  //     .subscribe(async (isOnline: any) => {
-  //       const toast = await this.toastController.create({      // this is for verify network available or not
-  //         message: isOnline
-  //           ? '✅ Back Online'
-  //           : '❌ No Internet Connection',
-  //         duration: 3000,
-  //         color: isOnline ? 'success' : 'danger',
-  //         position: 'bottom',
-  //       });
-  //       toast.present();
-  //     });
-  // }
-
-
-
-// import { Component } from '@angular/core';
-// import { register } from 'swiper/element/bundle';
-// import { FirebasePushService } from './services/push_notification/firebase-push.service';
-
-// register();
-
-// @Component({
-//   selector: 'app-root',
-//   templateUrl: 'app.component.html',
-//   styleUrls: ['app.component.scss'],
-//   standalone: false,
-// })
-// export class AppComponent {
-//   constructor(private firebasePush: FirebasePushService) {
-//     this.initializeApp();
-//   }
-
-//   initializeApp() {
-//     this.firebasePush.initFCM();
-//   }
-// }
-
+}

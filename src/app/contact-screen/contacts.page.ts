@@ -241,7 +241,7 @@ export class ContactsPage implements OnInit {
   creatingGroup = false;
   newGroupName: string = '';
 
-  isLoading = true; // ✅ loader flag
+  isLoading = true;
 
   constructor(
     private router: Router,
@@ -260,9 +260,6 @@ export class ContactsPage implements OnInit {
     console.log("username", currentUserName);
   }
 
-  /**
-   * ✅ Loads contacts from device that match backend users
-   */
   async loadDeviceMatchedContacts() {
     // const currentUserPhone = localStorage.getItem('phone_number');
     const currentUserPhone = this.authService.authData?.phone_number;
@@ -410,7 +407,6 @@ export class ContactsPage implements OnInit {
   // Prepare members as IDs only
   const memberIds = selectedUsers.map(u => u.user_id);
 
-  // Add current user ID also
   if (currentUserId) {
     memberIds.push(Number(currentUserId));
   }
@@ -444,7 +440,6 @@ export class ContactsPage implements OnInit {
       currentUserId
     );
 
-    // Step 2: Sync to backend (IDs only)
     this.api.createGroup(this.newGroupName, Number(currentUserId), groupId, memberIds)
       .subscribe({
         next: async (res: any) => {

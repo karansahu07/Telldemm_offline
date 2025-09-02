@@ -69,6 +69,11 @@ export class SettingScreenPage implements OnInit {
     this.sender_name = this.authService.authData?.name || '';
   }
 
+  ionViewWillEnter() {
+  this.loadUserProfile();
+  this.sender_name = this.authService.authData?.name || '';
+}
+
   goToProfile() {
   this.router.navigateByUrl('/setting-profile');
 }

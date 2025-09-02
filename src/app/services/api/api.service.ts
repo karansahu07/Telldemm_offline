@@ -23,6 +23,19 @@ export class ApiService {
     return this.http.get<T>(`${this.baseUrl}${url}`, { params });
   }
 
+   /**
+   * 📌 Update User Display Picture
+   * @param user_id number
+   * @param file File (profile picture)
+   */
+  updateUserDp(user_id: number, file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('user_id', user_id.toString());
+    formData.append('profile_picture', file);
+
+    return this.http.post(`${this.baseUrl}/api/users/update-dp`, formData);
+  }
+
   // ----------------- 🔐 push fcm to admin APIs -----------------
 
     /**
@@ -57,8 +70,12 @@ export class ApiService {
     );
   }
 
-  getUserProfilebyId(user_id: string): Observable<{ publicKeyHex: string }> {
-    return this.http.post<{ publicKeyHex: string }>(
+  getUserProfilebyId(user_id: string): Observable<{
+    phone_number: string;
+    profile: null;
+    name: string; publicKeyHex: string 
+}> {
+    return this.http.post<any>(
       `${this.baseUrl}/api/users/profile_by_userid`,
       { user_id }
     );

@@ -3,48 +3,64 @@
     <ion-title>
       <img src="assets/images/TELLDEMM.svg" />
     </ion-title>
-    <!-- <ion-buttons slot="end">
+
+    <ion-buttons slot="end">
       <ion-button (click)="scanBarcode()">
         <img src="assets/images/qr-code.svg" />
       </ion-button>
 
-
       <ion-button (click)="openCamera()">
         <img src="assets/images/camera.svg" />
       </ion-button>
+
       <ion-button (click)="presentPopover($event)">
         <img src="assets/images/dots (1).svg" />
       </ion-button>
-    </ion-buttons> -->
-
-    <ion-buttons slot="end">
-  <ion-button (click)="scanBarcode()">
-    <img src="assets/images/qr-code.svg" />
-  </ion-button>
-
-  <ion-button (click)="openCamera()">
-    <img src="assets/images/camera.svg" />
-  </ion-button>
-
-  <ion-button (click)="presentPopover($event)">
-    <img src="assets/images/dots (1).svg" />
-  </ion-button>
-</ion-buttons>
+    </ion-buttons>
   </ion-toolbar>
 
   <ion-toolbar>
     <div class="main-header">
       <div class="container">
-        <input type="text" id="searchInput" [(ngModel)]="searchText" placeholder="Ask Meta AI or Search" />
+        <input
+          type="text"
+          id="searchInput"
+          [(ngModel)]="searchText"
+          placeholder="Ask Meta AI or Search"
+        />
       </div>
     </div>
 
     <div class="main-filters">
       <div class="filters">
-        <button class="filter-link" [ngClass]="{ 'active-filter': selectedFilter === 'all' }" (click)="setFilter('all')">ALL</button>
-        <button class="filter-link" [ngClass]="{ 'active-filter': selectedFilter === 'read' }" (click)="setFilter('read')">Read</button>
-        <button class="filter-link" [ngClass]="{ 'active-filter': selectedFilter === 'unread' }" (click)="setFilter('unread')">Unread</button>
-        <button class="filter-link" [ngClass]="{ 'active-filter': selectedFilter === 'groups' }" (click)="setFilter('groups')">Groups</button>
+        <button
+          class="filter-link"
+          [ngClass]="{ 'active-filter': selectedFilter === 'all' }"
+          (click)="setFilter('all')"
+        >
+          ALL
+        </button>
+        <button
+          class="filter-link"
+          [ngClass]="{ 'active-filter': selectedFilter === 'read' }"
+          (click)="setFilter('read')"
+        >
+          Read
+        </button>
+        <button
+          class="filter-link"
+          [ngClass]="{ 'active-filter': selectedFilter === 'unread' }"
+          (click)="setFilter('unread')"
+        >
+          Unread
+        </button>
+        <button
+          class="filter-link"
+          [ngClass]="{ 'active-filter': selectedFilter === 'groups' }"
+          (click)="setFilter('groups')"
+        >
+          Groups
+        </button>
       </div>
     </div>
 
@@ -63,38 +79,56 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-list>
+
+  <!-- 🔄 Loader skeleton while chats load -->
+  <ion-list *ngIf="isLoading">
+    <ion-item *ngFor="let i of [1,2,3,4,5]">
+      <ion-avatar slot="start">
+        <ion-skeleton-text animated style="width: 40px; height: 40px; border-radius: 50%;"></ion-skeleton-text>
+      </ion-avatar>
+      <ion-label>
+        <h3>
+          <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+        </h3>
+        <p>
+          <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+        </p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <!-- ✅ Real chats once loaded -->
+  <ion-list *ngIf="!isLoading">
     <ion-item *ngFor="let chat of filteredChats" (click)="openChat(chat)">
-  <ion-avatar 
-    slot="start" 
-    (click)="openImagePopup(chat.group ? (chat.dp || 'assets/images/user.jfif') : (chat.profile_picture_url || 'assets/images/user.jfif')); $event.stopPropagation()">
+      <ion-avatar
+        slot="start"
+        (click)="openImagePopup(chat.group ? (chat.dp || 'assets/images/user.jfif') : (chat.profile_picture_url || 'assets/images/user.jfif')); $event.stopPropagation()">
 
-    <img 
-      [src]="chat.group 
-              ? (chat.dp || 'assets/images/user.jfif') 
-              : (chat.profile_picture_url || 'assets/images/user.jfif')" 
-      alt="Profile" />
-  </ion-avatar>
+        <img
+          [src]="chat.group 
+                  ? (chat.dp || 'assets/images/user.jfif') 
+                  : (chat.profile_picture_url || 'assets/images/user.jfif')"
+          alt="Profile" />
+      </ion-avatar>
 
-  <ion-label>
-    <p class="chat-message">{{ chat.name }}</p>
-    <p [style.color]="chat.unread ? '#FF1414' : '#444343'">
-      <ng-container [ngSwitch]="chat.messageStatus">
-        <img *ngSwitchCase="'sent'" src="assets/images/read.svg" class="tick-icon" />
-        <img *ngSwitchCase="'seen'" src="assets/images/double-tick.svg" class="tick-seen" />
-      </ng-container>
-      {{ chat.message }}
-    </p>
-  </ion-label>
+      <ion-label>
+        <p class="chat-message">{{ chat.name }}</p>
+        <p [style.color]="chat.unread ? '#FF1414' : '#444343'">
+          <ng-container [ngSwitch]="chat.messageStatus">
+            <img *ngSwitchCase="'sent'" src="assets/images/read.svg" class="tick-icon" />
+            <img *ngSwitchCase="'seen'" src="assets/images/double-tick.svg" class="tick-seen" />
+          </ng-container>
+          {{ chat.message }}
+        </p>
+      </ion-label>
 
-  <div slot="end" class="chat-meta">
-    <p class="time">{{ chat.time }}</p>
-    <ion-badge *ngIf="chat.unreadCount > 0" color="danger" class="unread-badge">
-      {{ chat.unreadCount }}
-    </ion-badge>
-  </div>
-</ion-item>
-
+      <div slot="end" class="chat-meta">
+        <p class="time">{{ chat.time }}</p>
+        <ion-badge *ngIf="chat.unreadCount > 0" color="danger" class="unread-badge">
+          {{ chat.unreadCount }}
+        </ion-badge>
+      </div>
+    </ion-item>
   </ion-list>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
@@ -103,43 +137,26 @@
     </div>
   </ion-fab>
 
-  <!-- 👇 Modal with blur background -->
-  <!-- <ion-modal [isOpen]="showPopup" (didDismiss)="closeImagePopup()" cssClass="custom-blur-modal" [backdropDismiss]="true">
+  <!-- 👇 Image Popup Modal -->
+  <ion-modal 
+    [isOpen]="showPopup" 
+    (didDismiss)="closeImagePopup()" 
+    [backdropDismiss]="true" 
+    cssClass="custom-blur-modal">
+
     <ng-template>
       <div class="popup-container">
         <img [src]="selectedImage" alt="Profile Image" class="popup-image" />
+
         <div class="icon-row">
           <ion-icon name="chatbox-ellipses-outline" class="popup-icon" (click)="goToUserchat()"></ion-icon>
-          
           <ion-icon name="call-outline" class="popup-icon" (click)="goToUsercall()"></ion-icon>
           <ion-icon name="videocam-outline" class="popup-icon" (click)="goToUservideocall()"></ion-icon>
           <ion-icon name="alert-circle-outline" class="popup-icon" (click)="goToUserAbout()"></ion-icon>
         </div>
       </div>
     </ng-template>
-  </ion-modal> -->
-  
-  <ion-modal 
-  [isOpen]="showPopup" 
-  (didDismiss)="closeImagePopup()" 
-  [backdropDismiss]="true" 
-  cssClass="custom-blur-modal">
-
-  <ng-template>
-    <div class="popup-container">
-      <img [src]="selectedImage" alt="Profile Image" class="popup-image" />
-      <!-- <img [src]="users?.profile_picture_url || 'assets/images/user.jfif'" alt="Profile Image"  class="popup-image"/> -->
-
-      <div class="icon-row">
-        <ion-icon name="chatbox-ellipses-outline" class="popup-icon" (click)="goToUserchat()"></ion-icon>
-        <ion-icon name="call-outline" class="popup-icon" (click)="goToUsercall()"></ion-icon>
-        <ion-icon name="videocam-outline" class="popup-icon" (click)="goToUservideocall()"></ion-icon>
-        <ion-icon name="alert-circle-outline" class="popup-icon" (click)="goToUserAbout()"></ion-icon>
-      </div>
-    </div>
-  </ng-template>
-</ion-modal>
-
+  </ion-modal>
 
 </ion-content>
 
