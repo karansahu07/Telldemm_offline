@@ -1,19 +1,232 @@
-import { Component, OnInit } from '@angular/core';
+// import { Component, OnInit } from '@angular/core';
+// import { CommonModule } from '@angular/common';
+// import { FormsModule } from '@angular/forms';
+// import { IonicModule, ToastController } from '@ionic/angular';
+// import { Router } from '@angular/router';
+// import { HttpClient, HttpClientModule } from '@angular/common/http';
+// // import { environment } from '../../../environments/environment';
+// import { Preferences } from '@capacitor/preferences';
+// import { SecureStorageService } from '../../services/secure-storage/secure-storage.service';
+// import { Database } from '@angular/fire/database';
+// import { Observable } from 'rxjs';
+// import { onValue, ref } from '@angular/fire/database';
+// import { AuthService } from 'src/app/auth/auth.service';
+// import { FcmService } from 'src/app/services/fcm-service';
+// import { ApiService } from 'src/app/services/api/api.service';
+// import { environment } from 'src/environments/environment.prod';
+
+// @Component({
+//   selector: 'app-profile-setup',
+//   standalone: true,
+//   imports: [CommonModule, FormsModule, IonicModule, HttpClientModule],
+//   templateUrl: './profile-setup.page.html',
+//   styleUrls: ['./profile-setup.page.scss'],
+// })
+// export class ProfileSetupPage implements OnInit {
+//   name: string = '';
+//   imageData: string | ArrayBuffer | null = null;
+//   selectedFile: File | null = null;
+//   phoneNumber: string = '';
+//   maxLength = 25;
+//   inputText = '';
+//   remainingCount = this.maxLength;
+//   isSubmitting: boolean = false;
+//   userID: string = '';
+
+//   constructor(
+//     private toastController: ToastController,
+//     private router: Router,
+//     private http: HttpClient,
+//     private secureStorage: SecureStorageService,
+//     private db: Database,
+//     private authService: AuthService,
+//     private fcmService: FcmService,
+//     private service : ApiService
+//   ) {}
+
+//   // async ngOnInit() {
+//   //   const storedPhone = this.authService.authData?.userId;
+//   //   console.log('Stored Phone:', storedPhone);
+//   //   if (storedPhone) {
+//   //     this.userID = storedPhone;
+//   //     this.phoneNumber = this.authService.authData?.phone_number || storedPhone;
+      
+//   //     // Pre-fill name if already exists in authData
+//   //     this.name = this.authService.getUserName() || '';
+//   //   } else {
+//   //     this.showToast('Phone number is missing, please login again.', 'danger');
+//   //     this.router.navigateByUrl('/login-screen');
+//   //   }
+//   // }
+
+//   async ngOnInit() {
+//     const storedPhone = this.authService.authData?.userId;
+//     if (storedPhone) {
+//       this.userID = storedPhone;
+//       this.phoneNumber = this.authService.authData?.phone_number || storedPhone;
+
+//       // ✅ Call API via service
+//       this.service.getUserProfilebyId(this.userID).subscribe({
+//         next: (res) => {
+//           console.log("Profile API response:", res);
+
+//           this.name = res?.name || '';
+//           this.imageData = res?.profile || null;
+//           this.phoneNumber = res?.phone_number || this.phoneNumber;
+
+//           if (res?.publicKeyHex) {
+//             this.secureStorage.setItem("publicKeyHex", res.publicKeyHex);
+//           }
+//         },
+//         error: (err) => {
+//           console.error("Error fetching profile:", err);
+//           this.showToast("Failed to load profile details.", "danger");
+//         }
+//       });
+//     } else {
+//       this.showToast('Phone number is missing, please login again.', 'danger');
+//       this.router.navigateByUrl('/login-screen');
+//     }
+//   }
+
+//   onImageSelected(event: any) {
+//     const file = event.target.files[0];
+//     if (file) {
+//       this.selectedFile = file;
+      
+//       const reader = new FileReader();
+//       reader.onload = () => {
+//         this.imageData = reader.result;
+//       };
+//       reader.readAsDataURL(file);
+//     }
+//   }
+
+//   onInputChange(event: any) {
+//     const value = event.target.value;
+//     this.inputText = value.length > this.maxLength ? value.slice(0, this.maxLength) : value;
+//     this.remainingCount = this.maxLength - this.inputText.length;
+//   }
+
+//   async showToast(message: string, color: 'danger' | 'success' | 'dark' = 'dark') {
+//     const toast = await this.toastController.create({
+//       message,
+//       duration: 2000,
+//       color,
+//     });
+//     toast.present();
+//   }
+
+//   checkUserInRooms(userId: string): Observable<boolean> {
+//     return new Observable(observer => {
+//       const chatsRef = ref(this.db, 'chats');
+//       onValue(chatsRef, (snapshot: any) => {
+//         const data = snapshot.val();
+//         let userFound = false;
+//         console.log(data, "data is <=")
+       
+//         if (data) {
+//           // Iterate through all room_ids
+//           Object.keys(data).forEach((roomId: string) => {
+//             // Check if current userId is part of the room_id
+//             // room_id format is like "42_53" or "53_42"
+//             const userIds = roomId.split('_');
+//             if (userIds.includes(userId)) {
+//               userFound = true;
+//             }
+//           });
+//         }
+       
+//         observer.next(userFound);
+//       });
+//     });
+//   }
+
+//   async onSubmit() {
+//     if (!this.name.trim()) {
+//       this.showToast('Please enter your name', 'danger');
+//       return;
+//     }
+
+//     this.isSubmitting = true;
+
+//     try {
+//       const formData = new FormData();
+//       formData.append('user_id', this.userID);
+//       formData.append('name', this.name);
+
+//       if (this.selectedFile) {
+//         formData.append('profile_picture', this.selectedFile, this.selectedFile.name);
+//       }
+
+//       console.log('FormData contents:');
+//       formData.forEach((value, key) => {
+//         console.log(key, value);
+//       });
+
+//       // Submit profile data to API
+//       await this.http.post(`${environment.apiBaseUrl}/api/users`, formData).toPromise();
+
+//       // Save FCM token
+//       await this.fcmService.saveFcmTokenToDatabase(
+//         this.userID,
+//         this.name,
+//         this.phoneNumber
+//       );
+
+//       // Update name in AuthService (this will update both memory and secure storage)
+//       await this.authService.updateUserName(this.name);
+
+//       // Save profile picture URL in secure storage if available
+//       if (this.imageData) {
+//         await this.secureStorage.setItem('profile_url', this.imageData.toString());
+//       }
+
+//       const savedUserId = this.authService.authData?.userId || this.userID;
+
+//       this.checkUserInRooms(savedUserId).subscribe({
+//         next: (userFound: any) => {
+//           if (userFound) {
+//             this.router.navigateByUrl('/home-screen', { replaceUrl: true });
+//           } else {
+//             this.router.navigateByUrl('/contact-screen', { replaceUrl: true });
+//           }
+//         },
+//         error: (err: any) => {
+//           console.error('Error checking user rooms:', err);
+//           // Default to contact-screen on error
+//           this.router.navigateByUrl('/contact-screen', { replaceUrl: true });
+//         }
+//       });
+
+//       this.showToast('Profile setup completed successfully!', 'success');
+
+//     } catch (err) {
+//       console.error('Error submitting profile:', err);
+//       this.showToast('Failed to save profile. Please try again.', 'danger');
+//     } finally {
+//       this.isSubmitting = false;
+//     }
+//   }
+// }
+
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, ToastController } from '@ionic/angular';
+import { IonicModule, ToastController, ModalController, LoadingController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
-// import { environment } from '../../../environments/environment';
 import { Preferences } from '@capacitor/preferences';
 import { SecureStorageService } from '../../services/secure-storage/secure-storage.service';
 import { Database } from '@angular/fire/database';
-import { Observable } from 'rxjs';
+import { Observable, Subject, takeUntil } from 'rxjs';
 import { onValue, ref } from '@angular/fire/database';
 import { AuthService } from 'src/app/auth/auth.service';
 import { FcmService } from 'src/app/services/fcm-service';
 import { ApiService } from 'src/app/services/api/api.service';
 import { environment } from 'src/environments/environment.prod';
+import { ImageCropperModalComponent } from '../image-cropper-modal/image-cropper-modal.component';
+import { CropResult } from 'src/types';
 
 @Component({
   selector: 'app-profile-setup',
@@ -22,16 +235,26 @@ import { environment } from 'src/environments/environment.prod';
   templateUrl: './profile-setup.page.html',
   styleUrls: ['./profile-setup.page.scss'],
 })
-export class ProfileSetupPage implements OnInit {
+export class ProfileSetupPage implements OnInit, OnDestroy {
+  // Form data
   name: string = '';
-  imageData: string | ArrayBuffer | null = null;
+  imageData: string | null = null;
   selectedFile: File | null = null;
   phoneNumber: string = '';
+  userID: string = '';
+
+  // UI state
   maxLength = 25;
-  inputText = '';
   remainingCount = this.maxLength;
   isSubmitting: boolean = false;
-  userID: string = '';
+  isLoadingProfile: boolean = false;
+
+  // Constants
+  private readonly MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+  private readonly ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+  
+  // Cleanup
+  private destroy$ = new Subject<void>();
 
   constructor(
     private toastController: ToastController,
@@ -41,132 +264,364 @@ export class ProfileSetupPage implements OnInit {
     private db: Database,
     private authService: AuthService,
     private fcmService: FcmService,
-    private service : ApiService
+    private service: ApiService,
+    private modalController: ModalController,
+    private loadingController: LoadingController
   ) {}
 
-  // async ngOnInit() {
-  //   const storedPhone = this.authService.authData?.userId;
-  //   console.log('Stored Phone:', storedPhone);
-  //   if (storedPhone) {
-  //     this.userID = storedPhone;
-  //     this.phoneNumber = this.authService.authData?.phone_number || storedPhone;
-      
-  //     // Pre-fill name if already exists in authData
-  //     this.name = this.authService.getUserName() || '';
-  //   } else {
-  //     this.showToast('Phone number is missing, please login again.', 'danger');
-  //     this.router.navigateByUrl('/login-screen');
-  //   }
-  // }
-
   async ngOnInit() {
-    const storedPhone = this.authService.authData?.userId;
-    if (storedPhone) {
-      this.userID = storedPhone;
-      this.phoneNumber = this.authService.authData?.phone_number || storedPhone;
+    await this.initializeProfileData();
+  }
 
-      // ✅ Call API via service
-      this.service.getUserProfilebyId(this.userID).subscribe({
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /**
+   * Initialize profile data from auth service and API
+   */
+  private async initializeProfileData() {
+    const storedPhone = this.authService.authData?.userId;
+    
+    if (!storedPhone) {
+      await this.showToast('Phone number is missing, please login again.', 'danger');
+      this.router.navigateByUrl('/login-screen');
+      return;
+    }
+
+    this.userID = storedPhone;
+    this.phoneNumber = this.authService.authData?.phone_number || storedPhone;
+    
+    // Update remaining count for name field
+    this.updateRemainingCount();
+
+    await this.loadUserProfile();
+  }
+
+  /**
+   * Load user profile from API
+   */
+  private async loadUserProfile() {
+    this.isLoadingProfile = true;
+
+    this.service.getUserProfilebyId(this.userID)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
         next: (res) => {
           console.log("Profile API response:", res);
-
-          this.name = res?.name || '';
-          this.imageData = res?.profile || null;
-          this.phoneNumber = res?.phone_number || this.phoneNumber;
-
-          if (res?.publicKeyHex) {
-            this.secureStorage.setItem("publicKeyHex", res.publicKeyHex);
-          }
+          this.populateProfileData(res);
+          this.isLoadingProfile = false;
         },
         error: (err) => {
           console.error("Error fetching profile:", err);
           this.showToast("Failed to load profile details.", "danger");
+          this.isLoadingProfile = false;
         }
       });
-    } else {
-      this.showToast('Phone number is missing, please login again.', 'danger');
-      this.router.navigateByUrl('/login-screen');
-    }
   }
 
-  onImageSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      this.selectedFile = file;
+  /**
+   * Populate form with profile data from API
+   */
+  private populateProfileData(profileData: any) {
+    if (profileData) {
+      this.name = profileData.name || '';
+      this.imageData = profileData.profile || null;
+      this.phoneNumber = profileData.phone_number || this.phoneNumber;
       
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.imageData = reader.result;
-      };
-      reader.readAsDataURL(file);
+      // Update remaining count after setting name
+      this.updateRemainingCount();
+
+      // Store public key if available
+      if (profileData.publicKeyHex) {
+        this.secureStorage.setItem("publicKeyHex", profileData.publicKeyHex);
+      }
     }
   }
 
-  onInputChange(event: any) {
-    const value = event.target.value;
-    this.inputText = value.length > this.maxLength ? value.slice(0, this.maxLength) : value;
-    this.remainingCount = this.maxLength - this.inputText.length;
+  /**
+   * Handle image selection with validation and cropping
+   */
+  async onImageSelected(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
+    
+    if (!file) return;
+
+    // Reset input value to allow selecting the same file again
+    target.value = '';
+
+    // Validate file
+    const validationError = this.validateImageFile(file);
+    if (validationError) {
+      await this.showToast(validationError, 'danger');
+      return;
+    }
+
+    try {
+      // Show loading
+      const loading = await this.loadingController.create({
+        message: 'Processing image...',
+        duration: 10000
+      });
+      await loading.present();
+
+      // Convert file to data URL
+      const imageUrl = await this.fileToDataURL(file);
+      await loading.dismiss();
+
+      // Open cropper modal
+      await this.openImageCropper(imageUrl, file);
+
+    } catch (error) {
+      console.error('Error processing image:', error);
+      await this.showToast('Error processing image. Please try again.', 'danger');
+    }
   }
 
+  /**
+   * Validate image file
+   */
+  private validateImageFile(file: File): string | null {
+    if (file.size > this.MAX_FILE_SIZE) {
+      return 'Image size should be less than 5MB';
+    }
+
+    if (!this.ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      return 'Please select a valid image file (JPEG, PNG, WebP)';
+    }
+
+    return null;
+  }
+
+  /**
+   * Convert file to data URL
+   */
+  private fileToDataURL(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = () => reject(new Error('Failed to read file'));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  /**
+   * Open image cropper modal
+   */
+  private async openImageCropper(imageUrl: string, originalFile: File) {
+    const modal = await this.modalController.create({
+      component: ImageCropperModalComponent,
+      componentProps: {
+        imageUrl: imageUrl,
+        aspectRatio: 1, // Square crop for profile picture
+        cropQuality: 0.9
+      },
+      cssClass: 'image-cropper-modal',
+      backdropDismiss: false
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss<CropResult>();
+    
+    if (data?.success && data.croppedImage && data.originalBlob) {
+      // Set cropped image
+      this.imageData = data.croppedImage;
+      
+      // Create File object from cropped blob
+      this.selectedFile = new File(
+        [data.originalBlob], 
+        this.generateFileName(originalFile.name),
+        {
+          type: data.originalBlob.type,
+          lastModified: Date.now()
+        }
+      );
+      
+      await this.showToast('Image cropped successfully!', 'success');
+    } else if (data?.error) {
+      await this.showToast(data.error, 'danger');
+    }
+    // If cancelled, do nothing
+  }
+
+  /**
+   * Generate unique filename for cropped image
+   */
+  private generateFileName(originalName: string): string {
+    const timestamp = Date.now();
+    const extension = originalName.split('.').pop() || 'jpg';
+    return `cropped_profile_${timestamp}.${extension}`;
+  }
+
+  /**
+   * Handle input change and update character count
+   */
+  onInputChange(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const value = target.value || '';
+    
+    // Trim to max length
+    if (value.length > this.maxLength) {
+      const trimmedValue = value.slice(0, this.maxLength);
+      target.value = trimmedValue;
+      this.name = trimmedValue;
+    } else {
+      this.name = value;
+    }
+    
+    this.updateRemainingCount();
+  }
+
+  /**
+   * Update remaining character count
+   */
+  private updateRemainingCount() {
+    this.remainingCount = this.maxLength - (this.name?.length || 0);
+  }
+
+  /**
+   * Show toast notification
+   */
   async showToast(message: string, color: 'danger' | 'success' | 'dark' = 'dark') {
     const toast = await this.toastController.create({
       message,
-      duration: 2000,
+      duration: 3000,
       color,
+      position: 'bottom',
+      buttons: [
+        {
+          text: 'OK',
+          role: 'cancel'
+        }
+      ]
     });
-    toast.present();
+    await toast.present();
   }
 
+  /**
+   * Check if user exists in any chat rooms
+   */
   checkUserInRooms(userId: string): Observable<boolean> {
     return new Observable(observer => {
       const chatsRef = ref(this.db, 'chats');
-      onValue(chatsRef, (snapshot: any) => {
+      
+      const unsubscribe = onValue(chatsRef, (snapshot: any) => {
         const data = snapshot.val();
         let userFound = false;
-        console.log(data, "data is <=")
-       
+        
         if (data) {
-          // Iterate through all room_ids
+          // Check if user ID is part of any room ID
           Object.keys(data).forEach((roomId: string) => {
-            // Check if current userId is part of the room_id
-            // room_id format is like "42_53" or "53_42"
             const userIds = roomId.split('_');
             if (userIds.includes(userId)) {
               userFound = true;
             }
           });
         }
-       
+        
         observer.next(userFound);
+      }, (error) => {
+        console.error('Firebase error:', error);
+        observer.error(error);
       });
+
+      // Return cleanup function
+      return () => unsubscribe();
     });
   }
 
+  /**
+   * Validate form before submission
+   */
+  private validateForm(): string | null {
+    if (!this.name?.trim()) {
+      return 'Please enter your name';
+    }
+
+    if (this.name.trim().length < 2) {
+      return 'Name should be at least 2 characters long';
+    }
+
+    return null;
+  }
+
+  /**
+   * Submit profile data
+   */
   async onSubmit() {
-    if (!this.name.trim()) {
-      this.showToast('Please enter your name', 'danger');
+    // Validate form
+    const validationError = this.validateForm();
+    if (validationError) {
+      await this.showToast(validationError, 'danger');
       return;
     }
 
+    if (this.isSubmitting) return;
+
     this.isSubmitting = true;
 
+    // Show loading
+    const loading = await this.loadingController.create({
+      message: 'Setting up your profile...',
+      backdropDismiss: false
+    });
+    await loading.present();
+
     try {
-      const formData = new FormData();
-      formData.append('user_id', this.userID);
-      formData.append('name', this.name);
+      // Prepare form data
+      const formData = this.prepareFormData();
 
-      if (this.selectedFile) {
-        formData.append('profile_picture', this.selectedFile, this.selectedFile.name);
-      }
+      // Submit to API
+      await this.submitProfileData(formData);
 
-      console.log('FormData contents:');
-      formData.forEach((value, key) => {
-        console.log(key, value);
-      });
+      // Save additional data
+      await this.saveAdditionalData();
 
-      // Submit profile data to API
-      await this.http.post(`${environment.apiBaseUrl}/api/users`, formData).toPromise();
+      // Navigate based on user rooms
+      await this.handleNavigation();
 
+      await loading.dismiss();
+      await this.showToast('Profile setup completed successfully!', 'success');
+
+    } catch (error) {
+      await loading.dismiss();
+      console.error('Error submitting profile:', error);
+      await this.showToast('Failed to save profile. Please try again.', 'danger');
+    } finally {
+      this.isSubmitting = false;
+    }
+  }
+
+  /**
+   * Prepare form data for API submission
+   */
+  private prepareFormData(): FormData {
+    const formData = new FormData();
+    formData.append('user_id', this.userID);
+    formData.append('name', this.name.trim());
+
+    if (this.selectedFile) {
+      formData.append('profile_picture', this.selectedFile, this.selectedFile.name);
+    }
+
+    return formData;
+  }
+
+  /**
+   * Submit profile data to API
+   */
+  private async submitProfileData(formData: FormData): Promise<void> {
+    await this.http.post(`${environment.apiBaseUrl}/api/users`, formData).toPromise();
+  }
+
+  /**
+   * Save additional data (FCM token, profile URL, etc.)
+   */
+  private async saveAdditionalData(): Promise<void> {
+    try {
       // Save FCM token
       await this.fcmService.saveFcmTokenToDatabase(
         this.userID,
@@ -174,38 +629,53 @@ export class ProfileSetupPage implements OnInit {
         this.phoneNumber
       );
 
-      // Update name in AuthService (this will update both memory and secure storage)
+      // Update name in AuthService
       await this.authService.updateUserName(this.name);
 
-      // Save profile picture URL in secure storage if available
       if (this.imageData) {
-        await this.secureStorage.setItem('profile_url', this.imageData.toString());
+        await this.secureStorage.setItem('profile_url', this.imageData);
       }
-
-      const savedUserId = this.authService.authData?.userId || this.userID;
-
-      this.checkUserInRooms(savedUserId).subscribe({
-        next: (userFound: any) => {
-          if (userFound) {
-            this.router.navigateByUrl('/home-screen', { replaceUrl: true });
-          } else {
-            this.router.navigateByUrl('/contact-screen', { replaceUrl: true });
-          }
-        },
-        error: (err: any) => {
-          console.error('Error checking user rooms:', err);
-          // Default to contact-screen on error
-          this.router.navigateByUrl('/contact-screen', { replaceUrl: true });
-        }
-      });
-
-      this.showToast('Profile setup completed successfully!', 'success');
-
-    } catch (err) {
-      console.error('Error submitting profile:', err);
-      this.showToast('Failed to save profile. Please try again.', 'danger');
-    } finally {
-      this.isSubmitting = false;
+    } catch (error) {
+      console.error('Error saving additional data:', error);
     }
+  }
+
+  /**
+   * Handle navigation based on user rooms
+   */
+  private async handleNavigation(): Promise<void> {
+    const savedUserId = this.authService.authData?.userId || this.userID;
+
+    return new Promise((resolve, reject) => {
+      this.checkUserInRooms(savedUserId)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (userFound: boolean) => {
+            const targetRoute = userFound ? '/home-screen' : '/contact-screen';
+            this.router.navigateByUrl(targetRoute, { replaceUrl: true });
+            resolve();
+          },
+          error: (error) => {
+            console.error('Error checking user rooms:', error);
+            // Default to contact-screen on error
+            this.router.navigateByUrl('/contact-screen', { replaceUrl: true });
+            resolve(); // Still resolve to not break the flow
+          }
+        });
+    });
+  }
+
+  /**
+   * Check if form is valid for submission
+   */
+  get isFormValid(): boolean {
+    return !!(this.name?.trim() && this.name.trim().length >= 2);
+  }
+
+  /**
+   * Get profile image source
+   */
+  get profileImageSrc(): string {
+    return this.imageData || 'assets/images/cameraplus.png';
   }
 }

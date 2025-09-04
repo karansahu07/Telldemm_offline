@@ -87,10 +87,15 @@
         <ion-buttons>
           <ion-item lines="none" style="--padding-start: 0; --background: white; color: black; margin-top: 15px;"
             detail="false">
-            <ion-avatar slot="start">
+            <!-- <ion-avatar slot="start">
               <img src="assets/images/user.jfif" alt="User Avatar"
                 onError="this.src='assets/images/default-avatar.png'" />
-            </ion-avatar>
+            </ion-avatar> -->
+            <ion-avatar slot="start">
+  <img [src]="receiverProfile || 'assets/images/default-avatar.png'" 
+       alt="User Avatar"
+       (error)="setDefaultAvatar($event)" />
+</ion-avatar>
             <ion-label (click)="goToProfile()"
               style="width: auto; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;">
               <h2 style="margin: 0; font-size: 16px;">
@@ -211,7 +216,7 @@
           <!-- REPLIED MESSAGE DISPLAY -->
           <div class="replied-message" *ngIf="msg.replyToMessageId"
             (click)="scrollToRepliedMessage(msg.replyToMessageId)">
-            <ng-container *ngIf="getRepliedMessage(msg.replyToMessageId) as repliedMsg">
+            <ng-container *ngIf="msg.replyToMessageId && getRepliedMessage(msg.replyToMessageId) as repliedMsg">
               <div class="replied-header">
                 <ion-icon name="arrow-undo-outline" class="reply-icon"></ion-icon>
                 <span class="replied-sender">{{ repliedMsg.sender_name }}</span>

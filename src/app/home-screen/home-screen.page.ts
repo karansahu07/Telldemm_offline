@@ -18,6 +18,7 @@ import { AuthService } from '../auth/auth.service';
 import { Observable } from 'rxjs';
 import { onValue, ref } from '@angular/fire/database';
 import { Database } from '@angular/fire/database';
+import { ContactSyncService } from '../services/contact-sync.service';
 
 @Component({
   selector: 'app-home-screen',
@@ -51,7 +52,8 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     private encryptionService: EncryptionService,
     private secureStorage: SecureStorageService,
     private authService: AuthService,
-    private db: Database
+    private db: Database,
+    private contactSyncService : ContactSyncService
   ) { }
 
   // async ngOnInit() {
@@ -61,6 +63,8 @@ export class HomeScreenPage implements OnInit, OnDestroy {
   //   this.getAllUsers();
   //   this.loadUserGroups();
   // }
+
+  private avatarErrorIds = new Set<string>();
 
   isLoading: boolean = true;
 
@@ -105,7 +109,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     // Reload data
     await this.refreshHomeData();
 
-    // ✅ User profile reload
+    // ✅ User profile reloadl
     await this.loadData();
     this.sender_name = this.authService.authData?.name || '';
   }
@@ -251,47 +255,152 @@ private async refreshHomeData() {
     }
   }
 
+private normalizePhone(num?: string): string {
+  if (!num) return '';
+  return num.replace(/\D/g, '').slice(-10);
+}
+
+
+  // getAllUsers() {
+  //   const currentSenderId = this.senderUserId;
+  //   console.log("current sender id:", currentSenderId);
+  //   if (!currentSenderId) return;
+
+  //   this.service.getAllUsers().subscribe((users: any[]) => {
+  //     users.forEach(user => {
+  //       const receiverId = user.user_id.toString();
+
+  //       if (receiverId === currentSenderId) return;
+
+  //       this.checkUserInRooms(receiverId).subscribe((hasChat: boolean) => {
+  //         if (!hasChat) return;
+
+  //         let receiver_phone = user.phone_number.toString();
+  //         // receiver_phone = receiver_phone.replace(/^(\+91|91)/, '');
+
+  //         const roomId = this.getRoomId(currentSenderId, receiverId);
+  //         // console.log("fdkgdfkgdfgkdfgjfkgf",user.profile_picture_url);
+  //         // Skip duplicate
+  //         const existingChat = this.chatList.find(chat =>
+  //           chat.receiver_Id === receiverId && !chat.group
+  //         );
+  //         if (existingChat) return;
+
+  //         const chat = {
+  //           ...user,
+  //           name: user.name,
+  //           receiver_Id: receiverId,
+  //           profile_picture_url : user.profile_picture_url,
+  //           receiver_phone: receiver_phone,
+  //           group: false,
+  //           message: '',
+  //           time: '',
+  //           unreadCount: 0,
+  //           unread: false
+  //         };
+
+  //         this.chatList.push(chat);
+
+  //         // 🔔 Listen to last message
+  //         this.firebaseChatService.listenForMessages(roomId).subscribe(async (messages) => {
+  //           if (messages.length > 0) {
+  //             const lastMsg = messages[messages.length - 1];
+
+  //             if (lastMsg.receiver_id === currentSenderId && !lastMsg.delivered) {
+  //               this.firebaseChatService.markDelivered(roomId, lastMsg.key);
+  //             }
+
+  //             if (lastMsg.isDeleted) {
+  //               chat.message = 'This message was deleted';
+  //             } else if (lastMsg.attachment?.type && lastMsg.attachment.type !== 'text') {
+  //               switch (lastMsg.attachment.type) {
+  //                 case 'image': chat.message = '📷 Photo'; break;
+  //                 case 'video': chat.message = '🎥 Video'; break;
+  //                 case 'audio': chat.message = '🎵 Audio'; break;
+  //                 case 'file': chat.message = '📎 Attachment'; break;
+  //                 default: chat.message = '[Media]';
+  //               }
+  //             } else {
+  //               try {
+  //                 const decryptedText = await this.encryptionService.decrypt(lastMsg.text);
+  //                 chat.message = decryptedText;
+  //               } catch (e) {
+  //                 chat.message = '[Encrypted]';
+  //               }
+  //             }
+
+  //             if (lastMsg.timestamp) {
+  //               chat.time = this.formatTimestamp(lastMsg.timestamp);
+  //             }
+  //           }
+  //         });
+
+  //         // 🔔 Listen to unread count
+  //         const sub = this.firebaseChatService
+  //           .listenToUnreadCount(roomId, currentSenderId)
+  //           .subscribe((count: number) => {
+  //             chat.unreadCount = count;
+  //             chat.unread = count > 0;
+  //           });
+
+  //         this.unreadSubs.push(sub);
+  //       });
+  //     });
+  //   });
+  // }
+
   getAllUsers() {
-    const currentSenderId = this.senderUserId;
-    console.log("current sender id:", currentSenderId);
-    if (!currentSenderId) return;
+  const currentSenderId = this.senderUserId;
+  console.log("current sender id:", currentSenderId);
+  if (!currentSenderId) return;
 
+  // Build a map of phone(last10)
+  // We do this once before looping users
+  this.contactSyncService.getMatchedUsers().then((matched) => {
+    const deviceNameMap = new Map<string, string>();
+    (matched || []).forEach((m: any) => {
+      const key = this.normalizePhone(m.phone_number);
+      if (key && m.name) deviceNameMap.set(key, m.name);
+    });
+
+    //Fetch all backend users (as you already do)
     this.service.getAllUsers().subscribe((users: any[]) => {
-      users.forEach(user => {
-        const receiverId = user.user_id.toString();
+      users.forEach((user) => {
+        const receiverId = user.user_id?.toString();
+        if (!receiverId || receiverId === currentSenderId) return;
 
-        if (receiverId === currentSenderId) return;
+        //normalize phone number
+        const phoneKey = this.normalizePhone(user.phone_number?.toString());
+        const displayName = deviceNameMap.get(phoneKey) || user.name || 'Unknown';
 
+        // Check existing 1:1 room with this user
         this.checkUserInRooms(receiverId).subscribe((hasChat: boolean) => {
           if (!hasChat) return;
 
-          let receiver_phone = user.phone_number.toString();
-          // receiver_phone = receiver_phone.replace(/^(\+91|91)/, '');
-
-          const roomId = this.getRoomId(currentSenderId, receiverId);
-          // console.log("fdkgdfkgdfgkdfgjfkgf",user.profile_picture_url);
-          // Skip duplicate
-          const existingChat = this.chatList.find(chat =>
-            chat.receiver_Id === receiverId && !chat.group
+          // Avoid duplicates
+          const existingChat = this.chatList.find(
+            (c: any) => c.receiver_Id === receiverId && !c.group
           );
           if (existingChat) return;
 
-          const chat = {
+          // Create chat list item (name uses device name if available)
+          const chat: any = {
             ...user,
-            name: user.name,
+            name: displayName,
             receiver_Id: receiverId,
-            profile_picture_url : user.profile_picture_url,
-            receiver_phone: receiver_phone,
+            profile_picture_url: user.profile_picture_url || null,
+            receiver_phone: phoneKey,
             group: false,
             message: '',
             time: '',
             unreadCount: 0,
-            unread: false
+            unread: false,
           };
 
           this.chatList.push(chat);
 
-          // 🔔 Listen to last message
+          // Listen to last message
+          const roomId = this.getRoomId(currentSenderId, receiverId);
           this.firebaseChatService.listenForMessages(roomId).subscribe(async (messages) => {
             if (messages.length > 0) {
               const lastMsg = messages[messages.length - 1];
@@ -314,7 +423,7 @@ private async refreshHomeData() {
                 try {
                   const decryptedText = await this.encryptionService.decrypt(lastMsg.text);
                   chat.message = decryptedText;
-                } catch (e) {
+                } catch {
                   chat.message = '[Encrypted]';
                 }
               }
@@ -322,112 +431,55 @@ private async refreshHomeData() {
               if (lastMsg.timestamp) {
                 chat.time = this.formatTimestamp(lastMsg.timestamp);
               }
+
+              this.chatList.sort((a: any, b: any) => {
+                const ta = a.time ? new Date(a.time).getTime() : 0;
+                const tb = b.time ? new Date(b.time).getTime() : 0;
+                return tb - ta;
+              });
             }
           });
 
-          // 🔔 Listen to unread count
+          // Listen to unread count
           const sub = this.firebaseChatService
             .listenToUnreadCount(roomId, currentSenderId)
             .subscribe((count: number) => {
               chat.unreadCount = count;
               chat.unread = count > 0;
             });
-
           this.unreadSubs.push(sub);
         });
       });
     });
-  }
+  });
+}
 
-//   getAllUsers() {
-//   const currentSenderId = this.senderUserId;
-//   console.log("current sender id:", currentSenderId);
-//   if (!currentSenderId) return;
+getChatAvatarUrl(chat: any): string | null {
+  const id = chat.group ? chat.receiver_Id : chat.receiver_Id;
+  if (id && this.avatarErrorIds.has(String(id))) return null;
 
-//   this.service.getAllUsers().subscribe((users: any[]) => {
-//     users.forEach(user => {
-//       const receiverId = user.user_id.toString();
+  const url = chat.group
+    ? (chat.dp || null)
+    : (chat.profile_picture_url || null);
 
-//       if (receiverId === currentSenderId) return;
+  return url && String(url).trim() ? url : null;
+}
 
-//       this.checkUserInRooms(receiverId).subscribe((hasChat: boolean) => {
-//         if (!hasChat) return;
+getChatAlt(chat: any): string {
+  const name = chat.group ? (chat.group_name || chat.name) : chat.name;
+  return name || 'Profile';
+}
 
-//         let receiver_phone = user.phone_number.toString();
-//         const roomId = this.getRoomId(currentSenderId, receiverId);
+getChatInitial(chat: any): string {
+  const name = (chat.group ? (chat.group_name || chat.name) : chat.name) || '';
+  const letter = name.trim().charAt(0);
+  return letter ? letter.toUpperCase() : '?';
+}
 
-//         // ✅ Duplicate check
-//         const existingChat = this.chatList.find(chat =>
-//           chat.receiver_Id === receiverId && !chat.group
-//         );
-//         if (existingChat) return;
-
-//         const chat = {
-//           ...user,
-//           name: user.name,
-//           receiver_Id: receiverId,
-//           profile_picture_url: user.profile_picture_url,
-//           receiver_phone: receiver_phone,
-//           group: false,
-//           message: '',
-//           time: '',
-//           unreadCount: 0,
-//           unread: false
-//         };
-
-//         // 🔔 Listen to last message
-//         this.firebaseChatService.listenForMessages(roomId).subscribe(async (messages) => {
-//           if (messages.length > 0) {
-//             const lastMsg = messages[messages.length - 1];
-
-//             if (lastMsg.receiver_id === currentSenderId && !lastMsg.delivered) {
-//               this.firebaseChatService.markDelivered(roomId, lastMsg.key);
-//             }
-
-//             if (lastMsg.isDeleted) {
-//               chat.message = 'This message was deleted';
-//             } else if (lastMsg.attachment?.type && lastMsg.attachment.type !== 'text') {
-//               switch (lastMsg.attachment.type) {
-//                 case 'image': chat.message = '📷 Photo'; break;
-//                 case 'video': chat.message = '🎥 Video'; break;
-//                 case 'audio': chat.message = '🎵 Audio'; break;
-//                 case 'file': chat.message = '📎 Attachment'; break;
-//                 default: chat.message = '[Media]';
-//               }
-//             } else {
-//               try {
-//                 const decryptedText = await this.encryptionService.decrypt(lastMsg.text);
-//                 chat.message = decryptedText;
-//               } catch (e) {
-//                 chat.message = '[Encrypted]';
-//               }
-//             }
-
-//             if (lastMsg.timestamp) {
-//               chat.time = this.formatTimestamp(lastMsg.timestamp);
-//             }
-//           }
-
-//           // ✅ Ab push karo (agar abhi list me nahi hai)
-//           const alreadyInList = this.chatList.some(c => c.receiver_Id === chat.receiver_Id && !c.group);
-//           if (!alreadyInList) {
-//             this.chatList.push(chat);
-//           }
-//         });
-
-//         // 🔔 Listen to unread count
-//         const sub = this.firebaseChatService
-//           .listenToUnreadCount(roomId, currentSenderId)
-//           .subscribe((count: number) => {
-//             chat.unreadCount = count;
-//             chat.unread = count > 0;
-//           });
-
-//         this.unreadSubs.push(sub);
-//       });
-//     });
-//   });
-// }
+onAvatarError(chat: any): void {
+  const id = chat.group ? chat.receiver_Id : chat.receiver_Id;
+  if (id) this.avatarErrorIds.add(String(id));
+}
 
   checkUserInRooms(userId: string): Observable<boolean> {
     return new Observable(observer => {

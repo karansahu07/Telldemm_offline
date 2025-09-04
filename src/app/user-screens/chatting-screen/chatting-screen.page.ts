@@ -153,6 +153,8 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   displayedMessages: Message[] = []; // Messages currently shown
   private lastMessageKey: string | null = null;
 
+   receiverProfile: string | null = null;
+
   async ngOnInit() {
     // Enable proper keyboard scrolling
     Keyboard.setScroll({ isDisabled: false });
@@ -205,6 +207,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     setTimeout(() => this.scrollToBottom(), 100);
 
      await this.loadInitialMessages();
+     this.loadReceiverProfile();
   }
 
   async ionViewWillEnter() {
@@ -255,7 +258,65 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     }
 
     console.log("this.attachmentPath", this.attachmentPath);
+
+    this.loadReceiverProfile();
   }
+
+  //   loadReceiverProfile() {
+  //   if (!this.receiverId) return;
+
+  //   this.service.getUserProfilebyId(this.receiverId).subscribe({
+  //     next: (res: any) => {
+  //       this.receiverProfile = res?.profile || null;
+  //     },
+  //     error: (err) => {
+  //       console.error("Error loading receiver profile:", err);
+  //       this.receiverProfile = null;
+  //     }
+  //   });
+  // }
+
+loadReceiverProfile() {
+  this.receiverId = this.route.snapshot.queryParamMap.get('receiverId') || '';
+  //  console.log("this group",this.chatType);
+  //   console.log("this receiver",this.receiverId);
+  if (!this.receiverId) return;
+
+  if (this.chatType === 'group') {
+    // console.log("this group",this.isGroup);
+    // console.log("this group",this.receiverId);
+    // 👇 Group DP fetch with receiverId (as groupId)
+    this.service.getGroupDp(this.receiverId).subscribe({
+      next: (res: any) => {
+        this.receiverProfile = res?.group_dp_url || null;
+      },
+      error: (err) => {
+        console.error("❌ Error loading group profile:", err);
+        this.receiverProfile = null;
+      }
+    });
+  } else {
+    // 👇 User DP fetch
+    this.service.getUserProfilebyId(this.receiverId).subscribe({
+      next: (res: any) => {
+        this.receiverProfile = res?.profile || null;
+      },
+      error: (err) => {
+        console.error("❌ Error loading user profile:", err);
+        this.receiverProfile = null;
+      }
+    });
+  }
+}
+
+setDefaultAvatar(event: Event) {
+  (event.target as HTMLImageElement).src = 'assets/images/user.jfif';
+}
+
+
+  // setDefaultAvatar(event: Event) {
+  //   (event.target as HTMLImageElement).src = 'assets/images/user.jfif';
+  // }
 
   //this is menu option in header of right side
   async openOptions(ev: any) {
@@ -614,10 +675,16 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   getRepliedMessage(replyToMessageId: string): Message | null {
-    return this.messages.find(msg => msg.message_id === replyToMessageId) || null;
+    const msg =  this.allMessages.find(msg => {
+      // console.log(msg.message_id, msg.message_id == replyToMessageId);
+      return msg.message_id == replyToMessageId;
+    }) || null;
+    // console.log("messages fron get reply", msg);
+    return msg;
   }
 
   getReplyPreviewText(message: Message): string {
+    // console.log("messaedsfd",message);
     if (message.text) {
       // Limit reply preview to 50 characters
       return message.text.length > 50 ?
@@ -644,7 +711,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     const messageElements = document.querySelectorAll('[data-msg-key]');
 
     // Loop through messages and find the matching DOM element
-    this.messages.forEach((msg) => {
+    this.allMessages.forEach((msg) => {
       if (msg.message_id === replyToMessageId) {
         const element = Array.from(messageElements).find(el =>
           el.getAttribute('data-msg-key') === msg.key

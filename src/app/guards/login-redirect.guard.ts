@@ -41,7 +41,7 @@ export class LoginRedirectGuard implements CanActivate {
   constructor(private authService: AuthService, private router: Router) {}
 
   async canActivate(): Promise<boolean> {
-    // ✅ Auth hydration ensure करें
+    
     if (!this.authService.isAuthenticated) {
       await this.authService.hydrateAuth();
     }

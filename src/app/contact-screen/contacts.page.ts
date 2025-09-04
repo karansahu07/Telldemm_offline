@@ -220,6 +220,7 @@ import { ContactSyncService } from '../services/contact-sync.service';
 import { SecureStorageService } from '../services/secure-storage/secure-storage.service';
 import { ApiService } from '../services/api/api.service';
 import { AuthService } from '../auth/auth.service';
+import { Contact } from 'src/types';
 
 @Component({
   selector: 'app-contacts',
@@ -232,7 +233,8 @@ export class ContactsPage implements OnInit {
   @ViewChild('searchInput', { static: false }) searchInput!: IonInput;
 
   allUsers: any[] = [];
-  filteredContacts: any[] = [];
+filteredContacts: Contact[] = [];
+
 
   showSearchBar = false;
   searchTerm: string = '';
@@ -240,6 +242,7 @@ export class ContactsPage implements OnInit {
 
   creatingGroup = false;
   newGroupName: string = '';
+  userProfile:  any;
 
   isLoading = true;
 
@@ -258,13 +261,28 @@ export class ContactsPage implements OnInit {
     this.loadDeviceMatchedContacts();
     const currentUserName = this.authService.authData?.name;
     console.log("username", currentUserName);
+    const userId = this.authService.authData?.userId;
+  if (!userId) return;
+
+   this.api.getAllUsers().subscribe({
+    next: (users) => {
+     this.filteredContacts = users.map((u: any): Contact => ({
+  userId: u.user_id,
+  name: u.name,
+  profile: u.profile_picture_url || null,
+}));
+    },
+    error: (err) => {
+      console.error("Error fetching users:", err);
+    }
+  });
   }
 
   async loadDeviceMatchedContacts() {
     // const currentUserPhone = localStorage.getItem('phone_number');
     const currentUserPhone = this.authService.authData?.phone_number;
     this.allUsers = [];
-    this.isLoading = true; // show loader
+    this.isLoading = true;
 
     try {
       const matchedUsers = await this.contactSyncService.getMatchedUsers();
@@ -274,9 +292,9 @@ export class ContactsPage implements OnInit {
         if (user.phone_number !== currentUserPhone) {
           this.allUsers.push({
             ...user,
-            name: user.name || user.phone_number,
+            name: user.name,
             message: user.bio || '',
-            image: 'assets/images/user.jfif',
+            profile: user.profile_picture_url || null,
             receiver_Id: user.phone_number,
             selected: false,
           });

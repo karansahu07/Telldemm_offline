@@ -117,7 +117,7 @@
     <ion-label>Contacts on Telldemm</ion-label>
   </ion-list-header>
 
-  <ion-list class="list2" lines="none" *ngIf="!creatingGroup && !isLoading && filteredContacts.length > 0">
+  <!-- <ion-list class="list2" lines="none" *ngIf="!creatingGroup && !isLoading && filteredContacts.length > 0">
     <ion-item *ngFor="let contact of filteredContacts" (click)="openContactChat(contact)">
       <ion-avatar slot="start">
         <img [src]="contact.image" />
@@ -127,7 +127,36 @@
         <p *ngIf="contact.message">{{ contact.message }}</p>
       </ion-label>
     </ion-item>
-  </ion-list>
+  </ion-list> -->
+
+  <ion-list class="list2" lines="none" *ngIf="!creatingGroup && !isLoading && filteredContacts.length > 0">
+  <ion-item *ngFor="let contact of filteredContacts" (click)="openContactChat(contact)">
+    
+    <!-- ✅ Profile image (fallback if not available) -->
+    <ion-avatar slot="start">
+      <div *ngIf = "contact.profile">
+        <img 
+        [src]="contact.profile ? contact.profile : 'assets/images/user.jfif'" 
+        alt="{{ contact.name }}" />
+      </div>
+      <div *ngIf="!contact.profile" class="avatar">
+  {{ contact?.name?.substring(0,1) }}
+</div>
+    </ion-avatar>
+
+    <!-- ✅ Name + Last message -->
+    <ion-label>
+      <h2>{{ contact.name }}</h2>
+      <!-- <p *ngIf="contact.lastMessage; else noMsg">{{ contact.lastMessage }}</p> -->
+      <ng-template #noMsg>
+        <p class="text-muted">No messages yet</p>
+      </ng-template>
+    </ion-label>
+
+  </ion-item>
+</ion-list>
+
+
 
   <!-- No Contacts Found -->
   <div *ngIf="!creatingGroup && !isLoading && filteredContacts.length === 0" class="no-contacts" style="text-align: center; margin-top: 2rem;">

@@ -299,7 +299,17 @@ export class SqliteService {
     } catch (error) {
       console.error('❌ SQLite init error:', error);
     }
+    finally{
+      setInterval(()=>{
+        this.loadAll()
+      },3000);
+    }
   }
+
+ async loadAll(){
+  const Data = await this.db.query(`select * from attachments`)
+  console.log("data is ", Data);
+ }
 
   /**
    * Save a new attachment to the database

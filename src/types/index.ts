@@ -81,3 +81,21 @@ export interface PinnedMessagesCollection {
 export interface PinnedMessageWithContent extends PinnedMessage {
     messageContent?: Message; // Assuming you have a ChatMessage interface
 }
+
+
+export interface Contact {
+  userId: number;
+  name: string;
+  profile: string | null;
+  // phone?: string;
+  // lastMessage?: string | null;
+}
+
+export interface CropResult {
+  success: boolean;
+  croppedImage?: string;
+  originalBlob?: Blob;
+  cropArea?: any;
+  error?: string;
+  cancelled?: boolean;
+}

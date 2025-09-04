@@ -11,9 +11,15 @@
     </ion-button>
 
     <div class="profile-container">
-      <ion-avatar class="profile-avatar" (click)="openProfileDp()">
+      <!-- <ion-avatar class="profile-avatar" (click)="openProfileDp()">
         <img src="assets/images/user.jfif" alt="Profile Picture" />
-      </ion-avatar>
+      </ion-avatar> -->
+      <ion-avatar class="profile-avatar" (click)="openProfileDp()">
+  <img [src]="receiverProfile || 'assets/images/user.jfif'" 
+       alt="Profile Picture" 
+       (error)="setDefaultAvatar($event)" />
+</ion-avatar>
+
       <ion-label class="profile-name"> {{ isGroup ? groupName : receiver_name }}</ion-label>
     </div>
 

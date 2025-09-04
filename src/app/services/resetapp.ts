@@ -165,6 +165,8 @@ import { Injectable } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { SecureStoragePlugin } from 'capacitor-secure-storage-plugin';
+import { AuthService } from '../auth/auth.service';
+import { FcmService } from './fcm-service';
 // import { App } from '@capacitor/app';
 // import { CapacitorSQLite } from '@capacitor-community/sqlite';
 
@@ -173,7 +175,10 @@ import { SecureStoragePlugin } from 'capacitor-secure-storage-plugin';
 })
 export class Resetapp {
 
-  constructor() {}
+  constructor(
+    private authService : AuthService,
+    private fcmService : FcmService
+  ) {}
 
   /** Clear LocalStorage */
   private clearLocalStorage() {
@@ -225,18 +230,35 @@ export class Resetapp {
     if (typeof window !== 'undefined') {
       window.location.href = '/';
     }
-    // Or:
-    // App.exitApp();
   }
 
   /** Reset everything */
-  async resetApp() {
+   async resetApp() {
+    // const userId = await this.authService.authData?.userId;
+
+    // if (userId) {
+    //   try {
+    //     await this.fcmService.deleteFcmToken(userId);
+    //   } catch (err) {
+    //     console.warn('Failed to delete FCM token', err);
+    //   }
+    //   try {
+    //     await this.fcmService.setUserOffline(userId);
+    //   } catch (err) {
+    //     console.warn('Failed to set user offline', err);
+    //   }
+    // } else {
+    //   console.log('No userId found before reset; skipping FCM token delete');
+    // }
+
+    // 2) Clear storages/files
     this.clearLocalStorage();
     await this.clearCapacitorStorage();
     await this.clearSecureStorage();
     await this.clearSQLite();
     await this.clearFileSystem();
 
+    // 3) Reload
     this.reloadApp();
   }
 }

@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { PushNotifications, Token, PushNotificationSchema, ActionPerformed } from '@capacitor/push-notifications';
 import { LocalNotifications, LocalNotificationActionPerformed } from '@capacitor/local-notifications';
-import { getDatabase, ref, set } from 'firebase/database';
+import { getDatabase, ref, remove, set } from 'firebase/database';
 import { Router } from '@angular/router';
 import { Platform, ToastController } from '@ionic/angular';
 import { App } from '@capacitor/app';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,8 @@ export class FcmService {
   constructor(
     private router: Router,
     private platform: Platform,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private authService : AuthService
   ) { }
 
   async initializePushNotifications(): Promise<boolean> {
@@ -94,36 +96,45 @@ export class FcmService {
     }
   }
 
-  // ✅ UNIFIED notification tap handler
-  private handleNotificationTap(data: any) {
-    console.log('🎯 Handling notification tap with data:', data);
-
-    if (!data || Object.keys(data).length === 0) {
-      console.log('No notification data available, navigating to home');
-      this.router.navigate(['/home-screen']);
-      return;
-    }
-
-    const route = data.route || '/home-screen';
-    const queryParams: any = {};
-
-    // ✅ Build query params from notification data
-    if (data.roomId) queryParams.roomId = data.roomId;
-    if (data.senderId) queryParams.senderId = data.senderId;
-    if (data.receiverId) queryParams.receiverId = data.receiverId;
-    if (data.chatType) queryParams.chatType = data.chatType;
-    if (data.messageId) queryParams.messageId = data.messageId;
-
-    console.log('🚀 Navigating to:', route, 'with params:', queryParams);
-
-    // ✅ Navigate with a slight delay to ensure app is ready
-    setTimeout(() => {
-      this.router.navigate([route], {
-        queryParams: Object.keys(queryParams).length > 0 ? queryParams : undefined,
-        replaceUrl: true
-      });
-    }, 100);
+ // ✅ UNIFIED notification tap handler
+private handleNotificationTap(data: any) {
+  console.log('🎯 Handling notification tap with data:', data);
+ 
+  const userid = this.authService.authData?.userId;
+  console.log("userid", userid);
+ 
+  if (!data || Object.keys(data).length === 0) {
+    console.log('No notification data available, navigating to home');
+    this.router.navigate(['/home-screen']);
+    return;
   }
+ 
+ 
+ 
+  const receivedID = data.receiverId;
+ 
+  if (receivedID) {
+   
+ 
+    this.router.navigate(['/chatting-screen'], {
+  queryParams: { receivedID },
+  state: { fromNotification: true }
+});
+ 
+// this.router.navigate(['/chatting-screen'], {
+//   queryParams: { receiverId },
+//   state: { fromNotification: true }
+// });
+ 
+// Persist flag for later reloads
+localStorage.setItem('fromNotification', 'true');
+ 
+ 
+  } else {
+    console.log('Could not resolve receiverId, navigating to home');
+    this.router.navigate(['/home-screen']);
+  }
+}
 
   // ✅ Check for pending notifications (when app becomes active)
   private async checkForPendingNotifications() {
@@ -188,9 +199,11 @@ await toast.present();
       console.error('❌ Error scheduling local notification or toast:', error);
     }
   }
+  
 
   // ✅ Save FCM token & user info to Firebase
   async saveFcmTokenToDatabase(userId: string, userName: string, userPhone: string) {
+    // console.log("fcm service",userId, userName, userPhone );
     try {
       if (!this.fcmToken) {
         console.log('⚠️ FCM Token not available yet, retrying...');
@@ -234,6 +247,27 @@ await toast.present();
   getFcmToken(): string {
     return this.fcmToken;
   }
+
+  // ✅ Delete FCM token
+async deleteFcmToken(userId: string) {
+  try {
+    if (!userId) {
+      console.warn('⚠️ deleteUser: userId is required');
+      return;
+    }
+
+    const db = getDatabase();
+    const userRef = ref(db, `users/${userId}`);
+
+    await remove(userRef);
+
+    console.log('🗑️ User deleted successfully:', userId);
+
+  } catch (error) {
+    console.error('❌ Error deleting user:', error);
+  }
+}
+
 
   async setUserOffline(userId: string) {
     try {

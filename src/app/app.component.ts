@@ -54,44 +54,80 @@ export class AppComponent implements OnInit{
     // this.listenToNetwork();
     this.initializeApp();
   }
+  // async ngOnInit() {
+  //   await this.fcmService.initializePushNotifications();
+  //   // await this.FirebasePushService.initPush();
+  //   await this.sqliteService.init();
+  //   await this.FileSystemService.init();
+
+  //   await this.platform.ready();
+    
+    
+  //   await this.authService.hydrateAuth();
+
+    
+  //   if (this.authService.isAuthenticated) {
+  //     this.router.navigateByUrl('/home-screen', { replaceUrl: true });
+  //   } else {
+  //     this.router.navigateByUrl('/welcome-screen', { replaceUrl: true });
+  //   }
+
+  //   }
+
   async ngOnInit() {
     await this.fcmService.initializePushNotifications();
     // await this.FirebasePushService.initPush();
     await this.sqliteService.init();
     await this.FileSystemService.init();
-
+ 
     await this.platform.ready();
-    
-    
+   
+   
     await this.authService.hydrateAuth();
-
-    
+ 
+   // ----------------------------
+    let fromNotification = false;
+ 
+    const navigation = this.router.getCurrentNavigation();
+    if (navigation?.extras?.state?.['fromNotification']) {
+      fromNotification = true;
+    } else if (localStorage.getItem('fromNotification') === 'true') {
+      fromNotification = true;
+    }
+ 
+    console.log("fromNotification (AppComponent):", fromNotification);
+ 
     if (this.authService.isAuthenticated) {
-      this.router.navigateByUrl('/home-screen', { replaceUrl: true });
+      if (fromNotification) {
+        console.log("✅ Opened via notification, skipping welcome redirect");
+        return; // 🚫 Skip, splash will handle clearing
+      } else {
+        console.log("🟢 Normal launch → go home");
+        this.router.navigateByUrl('/home-screen', { replaceUrl: true });
+      }
     } else {
+      console.log("🔒 Not authenticated → go welcome");
       this.router.navigateByUrl('/welcome-screen', { replaceUrl: true });
     }
-
+    // ----------------------------
+ 
+   
+    // if (this.authService.isAuthenticated) {
+    //   this.router.navigateByUrl('/home-screen', { replaceUrl: true });
+    // } else {
+    //   this.router.navigateByUrl('/welcome-screen', { replaceUrl: true });
+    // }
+ 
     }
 
     async initializeApp() {
+      //for status bar code
     await this.platform.ready();
    
     if (this.platform.is('capacitor')) {
       await StatusBar.setBackgroundColor({ color: '#ffffff' });
  
-      // await StatusBar.setStyle({ style: Style.Dark }); // For light text
-      // await StatusBar.setStyle({ style: Style.Custom, color: '#333333' });
- 
       await StatusBar.setStyle({ style: Style.Light });
- 
-      // / Set the status bar text color based on the platform
-      // if (this.platform.is('ios')) {
-      //   // On iOS, set the style to light content (dark text)
-      //   await StatusBar.setStyle({ style: Style.Dark });
-      // } else {
-      //   // On Android, the text color will automatically adjust based on the background color
-      // }
     }
   }
 

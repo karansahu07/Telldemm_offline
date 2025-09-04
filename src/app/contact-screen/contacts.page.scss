@@ -162,3 +162,22 @@ ion-header {
 .toolbar_screen {
   padding-top: 20px;
 }
+ion-avatar{
+display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #2c2a2a;
+    background-color: #f5afaf;
+    border-radius: 50%;
+    border-width: 0px;
+    overflow: hidden;
+    object-fit: contain;
+}
+
+ion-avatar img{
+  // max-width: 100%;
+    height: 100%;
+    width: 100%;
+    border-radius: 50%;
+    object-fit: contain;
+}

@@ -19,7 +19,11 @@
 
 <ion-content fullscreen class="dp-view-content">
   <div class="dp-wrapper">
-    <img [src]="imageUrl" alt="Profile Picture" class="dp-image" />
+    <!-- <img [src]="imageUrl" alt="Profile Picture" class="dp-image" /> -->
+     <img [src]="imageUrl" 
+     alt="Profile Picture" 
+     class="dp-image"
+     (error)="onImageError()" />
   </div>
 </ion-content>
 

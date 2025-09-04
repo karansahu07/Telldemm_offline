@@ -98,7 +98,7 @@
   </ion-list>
 
   <!-- ✅ Real chats once loaded -->
-  <ion-list *ngIf="!isLoading">
+  <!-- <ion-list *ngIf="!isLoading">
     <ion-item *ngFor="let chat of filteredChats" (click)="openChat(chat)">
       <ion-avatar
         slot="start"
@@ -129,7 +129,51 @@
         </ion-badge>
       </div>
     </ion-item>
-  </ion-list>
+  </ion-list> -->
+
+<ion-list *ngIf="!isLoading">
+  <ion-item *ngFor="let chat of filteredChats" (click)="openChat(chat)">
+
+    <!-- Avatar -->
+    <ion-avatar
+      slot="start"
+      (click)="openImagePopup(getChatAvatarUrl(chat) || 'assets/images/user.jfif'); $event.stopPropagation()"
+    >
+      <!-- Agar valid image hai to show -->
+      <ng-container *ngIf="getChatAvatarUrl(chat) as img; else initialsTpl">
+        <img [src]="img" alt="{{ getChatAlt(chat) }}" (error)="onAvatarError(chat)" />
+      </ng-container>
+
+      <!-- Agar image nahi to initials -->
+      <ng-template #initialsTpl>
+        <div class="avatar">
+          {{ getChatInitial(chat) }}
+        </div>
+      </ng-template>
+    </ion-avatar>
+
+    <!-- Name + Message -->
+    <ion-label>
+      <p class="chat-message">{{ chat.group ? (chat.group_name || chat.name) : chat.name }}</p>
+      <p [style.color]="chat.unread ? '#FF1414' : '#444343'">
+        <ng-container [ngSwitch]="chat.messageStatus">
+          <img *ngSwitchCase="'sent'" src="assets/images/read.svg" class="tick-icon" />
+          <img *ngSwitchCase="'seen'" src="assets/images/double-tick.svg" class="tick-seen" />
+        </ng-container>
+        {{ chat.message }}
+      </p>
+    </ion-label>
+
+    <!-- Time + Unread -->
+    <div slot="end" class="chat-meta">
+      <p class="time">{{ chat.time }}</p>
+      <ion-badge *ngIf="chat.unreadCount > 0" color="danger" class="unread-badge">
+        {{ chat.unreadCount }}
+      </ion-badge>
+    </div>
+  </ion-item>
+</ion-list>
+
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <div class="icon-image" (click)="goToContact()">
