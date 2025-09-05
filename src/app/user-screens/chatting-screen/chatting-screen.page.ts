@@ -8,10 +8,10 @@ import {
   AfterViewInit,
   QueryList
 } from '@angular/core';
-import { 
-  query, 
-  orderByKey, 
-  endBefore, 
+import {
+  query,
+  orderByKey,
+  endBefore,
   limitToLast,
   startAfter
 } from 'firebase/database';
@@ -42,6 +42,10 @@ import { Message, PinnedMessage } from 'src/types';
 import { AuthService } from 'src/app/auth/auth.service';
 import { ApiService } from 'src/app/services/api/api.service';
 import { SqliteService } from 'src/app/services/sqlite.service';
+import { TypingService } from 'src/app/services/typing.service';
+import { Subject, Subscription as RxSub } from 'rxjs';
+import { throttleTime } from 'rxjs/operators';
+import { ref as dbRef, onValue, onDisconnect } from 'firebase/database';
 
 
 @Component({
@@ -106,8 +110,10 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     private clipboard: Clipboard,
     private authService: AuthService,
     private service: ApiService,
-    private sqliteService : SqliteService,
-    private alertCtrl: AlertController, 
+    private sqliteService: SqliteService,
+    private alertCtrl: AlertController,
+    // private alertCtrl: AlertController,
+    private typingService: TypingService,
   ) { }
 
   roomId = '';
@@ -153,7 +159,15 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   displayedMessages: Message[] = []; // Messages currently shown
   private lastMessageKey: string | null = null;
 
-   receiverProfile: string | null = null;
+  receiverProfile: string | null = null;
+
+  // --- Typing indicator related ---
+  private typingInput$ = new Subject<void>();
+  private typingRxSubs: RxSub[] = [];   // rx subscriptions for typing throttling
+  typingCount = 0;                      // number of other users typing
+  typingFrom: string | null = null;     // single user name who is typing
+  private localTypingTimer: any = null; // inactivity timer to auto stop typing
+  private typingUnsubscribe: (() => void) | null = null; // to stop onValue listener
 
   async ngOnInit() {
     // Enable proper keyboard scrolling
@@ -196,6 +210,78 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     await this.chatService.resetUnreadCount(this.roomId, this.senderId);
     await this.markMessagesAsRead();
 
+    try {
+      const db = getDatabase();
+
+      // Setup onDisconnect removal for safety
+      try {
+        const myTypingRef = dbRef(db, `typing/${this.roomId}/${this.senderId}`);
+        onDisconnect(myTypingRef).remove();
+      } catch (err) {
+        // ignore if not supported
+        console.warn('onDisconnect setup failed', err);
+      }
+
+      // Listen to typing nodes in this room
+            this.typingUnsubscribe = onValue(dbRef(db, `typing/${this.roomId}`), (snap) => {
+        const val = snap.val() || {};
+        const now = Date.now();
+        const entries = Object.keys(val).map(k => ({
+          userId: k,
+          typing: val[k]?.typing ?? false,
+          lastUpdated: val[k]?.lastUpdated ?? 0
+        }));
+
+        // remove expired (>10s old)
+        const recent = entries.filter(e =>
+          e.userId !== this.senderId &&
+          e.typing &&
+          (now - (e.lastUpdated || 0)) < 10000
+        );
+
+        this.typingCount = recent.length;
+      });
+ 
+      //dont delete this block
+      // this.typingUnsubscribe = onValue(dbRef(db, `typing/${this.roomId}`), (snap) => {
+      //   const val = snap.val() || {};
+      //   const now = Date.now();
+
+      //   const entries = Object.keys(val).map(k => ({
+      //     userId: k,
+      //     typing: val[k]?.typing ?? false,
+      //     lastUpdated: val[k]?.lastUpdated ?? 0
+      //   }));
+
+      //   const recent = entries.filter(e =>
+      //     e.userId !== this.senderId &&
+      //     e.typing &&
+      //     (now - (e.lastUpdated || 0)) < 10000
+      //   );
+
+      //   this.typingCount = recent.length;
+
+      //   if (this.chatType === 'group' && this.typingCount === 1) {
+      //     const uid = recent[0].userId;
+      //     const member = this.groupMembers.find(m => m.user_id === uid);
+      //     this.typingFrom = member?.name || uid;
+      //   } else {
+      //     this.typingFrom = null;
+      //   }
+      // });
+
+
+      // Outgoing typing: throttle DB writes
+      const tsub = this.typingInput$.pipe(
+        throttleTime(1200, undefined, { leading: true, trailing: true })
+      ).subscribe(() => {
+        this.sendTypingSignal();
+      });
+      this.typingRxSubs.push(tsub);
+    } catch (err) {
+      console.warn('Typing setup error', err);
+    }
+
     // Load and render messages
     this.loadFromLocalStorage();
     this.listenForMessages();
@@ -206,8 +292,54 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     // Scroll to bottom after short delay
     setTimeout(() => this.scrollToBottom(), 100);
 
-     await this.loadInitialMessages();
-     this.loadReceiverProfile();
+    await this.loadInitialMessages();
+    this.loadReceiverProfile();
+  }
+
+  onInputTyping() {
+    // keep existing showSendButton logic
+    this.onInputChange();
+
+    // notify subject to throttle outgoing typing updates
+    this.typingInput$.next();
+
+    // reset local timer
+    if (this.localTypingTimer) {
+      clearTimeout(this.localTypingTimer);
+    }
+    this.localTypingTimer = setTimeout(() => {
+      this.stopTypingSignal();
+    }, 2500);
+  }
+
+  // call on blur to ensure immediate stop
+  onInputBlurTyping() {
+    this.stopTypingSignal();
+  }
+
+  private async sendTypingSignal() {
+    try {
+      await this.typingService.startTyping(this.roomId, this.senderId);
+      // schedule a safety stop after inactivity
+      if (this.localTypingTimer) clearTimeout(this.localTypingTimer);
+      this.localTypingTimer = setTimeout(() => {
+        this.stopTypingSignal();
+      }, 2500);
+    } catch (err) {
+      console.warn('startTyping failed', err);
+    }
+  }
+
+  private async stopTypingSignal() {
+    try {
+      if (this.localTypingTimer) {
+        clearTimeout(this.localTypingTimer);
+        this.localTypingTimer = null;
+      }
+      await this.typingService.stopTyping(this.roomId, this.senderId);
+    } catch (err) {
+      console.warn('stopTyping failed', err);
+    }
   }
 
   async ionViewWillEnter() {
@@ -276,42 +408,42 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   //   });
   // }
 
-loadReceiverProfile() {
-  this.receiverId = this.route.snapshot.queryParamMap.get('receiverId') || '';
-  //  console.log("this group",this.chatType);
-  //   console.log("this receiver",this.receiverId);
-  if (!this.receiverId) return;
+  loadReceiverProfile() {
+    this.receiverId = this.route.snapshot.queryParamMap.get('receiverId') || '';
+    //  console.log("this group",this.chatType);
+    //   console.log("this receiver",this.receiverId);
+    if (!this.receiverId) return;
 
-  if (this.chatType === 'group') {
-    // console.log("this group",this.isGroup);
-    // console.log("this group",this.receiverId);
-    // 👇 Group DP fetch with receiverId (as groupId)
-    this.service.getGroupDp(this.receiverId).subscribe({
-      next: (res: any) => {
-        this.receiverProfile = res?.group_dp_url || null;
-      },
-      error: (err) => {
-        console.error("❌ Error loading group profile:", err);
-        this.receiverProfile = null;
-      }
-    });
-  } else {
-    // 👇 User DP fetch
-    this.service.getUserProfilebyId(this.receiverId).subscribe({
-      next: (res: any) => {
-        this.receiverProfile = res?.profile || null;
-      },
-      error: (err) => {
-        console.error("❌ Error loading user profile:", err);
-        this.receiverProfile = null;
-      }
-    });
+    if (this.chatType === 'group') {
+      // console.log("this group",this.isGroup);
+      // console.log("this group",this.receiverId);
+      // 👇 Group DP fetch with receiverId (as groupId)
+      this.service.getGroupDp(this.receiverId).subscribe({
+        next: (res: any) => {
+          this.receiverProfile = res?.group_dp_url || null;
+        },
+        error: (err) => {
+          console.error("❌ Error loading group profile:", err);
+          this.receiverProfile = null;
+        }
+      });
+    } else {
+      // 👇 User DP fetch
+      this.service.getUserProfilebyId(this.receiverId).subscribe({
+        next: (res: any) => {
+          this.receiverProfile = res?.profile || null;
+        },
+        error: (err) => {
+          console.error("❌ Error loading user profile:", err);
+          this.receiverProfile = null;
+        }
+      });
+    }
   }
-}
 
-setDefaultAvatar(event: Event) {
-  (event.target as HTMLImageElement).src = 'assets/images/user.jfif';
-}
+  setDefaultAvatar(event: Event) {
+    (event.target as HTMLImageElement).src = 'assets/images/user.jfif';
+  }
 
 
   // setDefaultAvatar(event: Event) {
@@ -675,7 +807,7 @@ setDefaultAvatar(event: Event) {
   }
 
   getRepliedMessage(replyToMessageId: string): Message | null {
-    const msg =  this.allMessages.find(msg => {
+    const msg = this.allMessages.find(msg => {
       // console.log(msg.message_id, msg.message_id == replyToMessageId);
       return msg.message_id == replyToMessageId;
     }) || null;
@@ -754,37 +886,37 @@ setDefaultAvatar(event: Event) {
   }
 
   async onMore(ev?: Event) {
-  const hasText = !!this.lastPressedMessage?.text;
-  const hasAttachment = !!(
-    this.lastPressedMessage?.attachment ||
-    this.lastPressedMessage?.file ||
-    this.lastPressedMessage?.image ||
-    this.lastPressedMessage?.media
-  );
+    const hasText = !!this.lastPressedMessage?.text;
+    const hasAttachment = !!(
+      this.lastPressedMessage?.attachment ||
+      this.lastPressedMessage?.file ||
+      this.lastPressedMessage?.image ||
+      this.lastPressedMessage?.media
+    );
 
-  const isPinned = this.pinnedMessage?.key === this.lastPressedMessage?.key;
+    const isPinned = this.pinnedMessage?.key === this.lastPressedMessage?.key;
 
-  const popover = await this.popoverController.create({
-    component: MessageMorePopoverComponent,
-    event: ev,
-    translucent: true,
-    showBackdrop: true,
-    componentProps: {
-      hasText: hasText,
-      hasAttachment: hasAttachment,
-      isPinned: isPinned,
-      message: this.lastPressedMessage,   // ✅ pass current message
-      currentUserId: this.senderId        // ✅ pass logged-in user
+    const popover = await this.popoverController.create({
+      component: MessageMorePopoverComponent,
+      event: ev,
+      translucent: true,
+      showBackdrop: true,
+      componentProps: {
+        hasText: hasText,
+        hasAttachment: hasAttachment,
+        isPinned: isPinned,
+        message: this.lastPressedMessage,   // ✅ pass current message
+        currentUserId: this.senderId        // ✅ pass logged-in user
+      }
+    });
+
+    await popover.present();
+
+    const { data } = await popover.onDidDismiss();
+    if (data) {
+      this.handlePopoverAction(data);
     }
-  });
-
-  await popover.present();
-
-  const { data } = await popover.onDidDismiss();
-  if (data) {
-    this.handlePopoverAction(data);
   }
-}
 
   async handlePopoverAction(action: string) {
     switch (action) {
@@ -803,55 +935,55 @@ setDefaultAvatar(event: Event) {
       case 'unpin':
         this.unpinMessage();
         break;
-        case 'edit':
-      this.editMessage(this.lastPressedMessage);
-      break;
+      case 'edit':
+        this.editMessage(this.lastPressedMessage);
+        break;
     }
   }
 
-async editMessage(message: Message) {
-  // console.log("last message pressed", this.lastPressedMessage);
+  async editMessage(message: Message) {
+    // console.log("last message pressed", this.lastPressedMessage);
 
-  const alert = await this.alertCtrl.create({
-    header: 'Edit Message',
-    inputs: [
-      {
-        name: 'text',
-        type: 'text',
-        value: message.text,
-      }
-    ],
-    buttons: [
-      {
-        text: 'Cancel',
-        role: 'cancel'
-      },
-      {
-        text: 'Save',
-        handler: async (data: any) => {
-          if (data.text && data.text.trim() !== '') {
-            const encryptedText = await this.encryptionService.encrypt(data.text.trim());
+    const alert = await this.alertCtrl.create({
+      header: 'Edit Message',
+      inputs: [
+        {
+          name: 'text',
+          type: 'text',
+          value: message.text,
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        },
+        {
+          text: 'Save',
+          handler: async (data: any) => {
+            if (data.text && data.text.trim() !== '') {
+              const encryptedText = await this.encryptionService.encrypt(data.text.trim());
 
-            const db = getDatabase();
-            const msgRef = ref(db, `chats/${this.roomId}/${message.key}`);
+              const db = getDatabase();
+              const msgRef = ref(db, `chats/${this.roomId}/${message.key}`);
 
-            await update(msgRef, {
-              text: encryptedText,
-              isEdit: true
-            });
+              await update(msgRef, {
+                text: encryptedText,
+                isEdit: true
+              });
 
-            message.text = data.text.trim();
-            message.isEdit = true;
+              message.text = data.text.trim();
+              message.isEdit = true;
 
-            this.lastPressedMessage = { ...message };
+              this.lastPressedMessage = { ...message };
+            }
           }
         }
-      }
-    ]
-  });
+      ]
+    });
 
-  await alert.present();
-}
+    await alert.present();
+  }
 
 
 
@@ -949,15 +1081,15 @@ async editMessage(message: Message) {
     console.log('Opening chat info');
   }
 
-    async loadInitialMessages() {
+  async loadInitialMessages() {
     this.isLoadingMore = true;
     try {
       // Load from localStorage first for quick display
       await this.loadFromLocalStorage();
-      
+
       // Then load latest messages from Firebase
       await this.loadMessagesFromFirebase(false);
-      
+
     } catch (error) {
       console.error('Error loading initial messages:', error);
     } finally {
@@ -993,7 +1125,7 @@ async editMessage(message: Message) {
     }
   }
 
-   async ngAfterViewInit() {
+  async ngAfterViewInit() {
     if (this.ionContent) {
       this.ionContent.ionScroll.subscribe(async (event: any) => {
         // Check if user scrolled to top (for loading older messages)
@@ -1015,7 +1147,7 @@ async editMessage(message: Message) {
     try {
       // Load next batch of messages
       await this.loadMessagesFromFirebase(true);
-      
+
       // Maintain scroll position after loading new messages
       setTimeout(() => {
         if (this.scrollContainer?.nativeElement) {
@@ -1037,7 +1169,7 @@ async editMessage(message: Message) {
   }
 
 
-   async listenForMessages() {
+  async listenForMessages() {
     this.messageSub = this.chatService.listenForMessages(this.roomId).subscribe(async (newMessages) => {
       const decryptedMessages: Message[] = [];
 
@@ -1057,7 +1189,7 @@ async editMessage(message: Message) {
         ? new Date(this.displayedMessages[this.displayedMessages.length - 1].timestamp).getTime()
         : 0;
 
-      const newIncomingMessages = decryptedMessages.filter(msg => 
+      const newIncomingMessages = decryptedMessages.filter(msg =>
         new Date(msg.timestamp).getTime() > newestDisplayedTimestamp
       );
 
@@ -1065,13 +1197,13 @@ async editMessage(message: Message) {
         // Add new messages to our arrays
         this.allMessages = [...this.allMessages, ...newIncomingMessages];
         this.displayedMessages = [...this.displayedMessages, ...newIncomingMessages];
-        
+
         // Re-group messages
         this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
-        
+
         // Save to localStorage
         this.saveToLocalStorage();
-        
+
         // Scroll to bottom for new messages
         setTimeout(() => {
           this.scrollToBottom();
@@ -1082,7 +1214,7 @@ async editMessage(message: Message) {
   }
 
   private async markDisplayedMessagesAsRead() {
-    const unreadMessages = this.displayedMessages.filter(msg => 
+    const unreadMessages = this.displayedMessages.filter(msg =>
       !msg.read && msg.receiver_id === this.senderId
     );
 
@@ -1218,9 +1350,9 @@ async editMessage(message: Message) {
       this.lastMessageKey = null;
       this.allMessages = [];
       this.displayedMessages = [];
-      
+
       await this.loadInitialMessages();
-      
+
       if (event) {
         event.target.complete();
       }
@@ -1251,7 +1383,7 @@ async editMessage(message: Message) {
       this.allMessages = decryptedMessages;
       this.displayedMessages = decryptedMessages.slice(-this.limit); // Show only latest batch
       this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
-      
+
       if (decryptedMessages.length > 0) {
         this.lastMessageKey = decryptedMessages[0].key;
       }
@@ -1269,49 +1401,49 @@ async editMessage(message: Message) {
   }
 
   async pickAttachment() {
-  const result = await FilePicker.pickFiles({ readData: true });
+    const result = await FilePicker.pickFiles({ readData: true });
 
-  console.log("files result of pick", result);
-  if (result?.files?.length) {
-    const file = result.files[0];
-    const mimeType = file.mimeType;
-    const type = mimeType?.startsWith('image')
-      ? 'image'
-      : mimeType?.startsWith('video')
-        ? 'video'
-        : 'file';
+    console.log("files result of pick", result);
+    if (result?.files?.length) {
+      const file = result.files[0];
+      const mimeType = file.mimeType;
+      const type = mimeType?.startsWith('image')
+        ? 'image'
+        : mimeType?.startsWith('video')
+          ? 'video'
+          : 'file';
 
-    let blob = file.blob as Blob;
+      let blob = file.blob as Blob;
 
-    if (!blob && file.data) {
-      blob = this.FileService.convertToBlob(
-        `data:${mimeType};base64,${file.data}`,
-        mimeType
-      );
+      if (!blob && file.data) {
+        blob = this.FileService.convertToBlob(
+          `data:${mimeType};base64,${file.data}`,
+          mimeType
+        );
+      }
+
+      console.log("blob object is ::::", blob);
+
+      // ✅ Create preview URL
+      const previewUrl = URL.createObjectURL(blob);
+
+      this.selectedAttachment = {
+        type,
+        blob,
+        fileName: `${Date.now()}.${this.getFileExtension(file.name)}`,
+        mimeType,
+        fileSize: blob.size,
+        previewUrl,
+      };
+
+      this.showPreviewModal = true;
     }
-
-    console.log("blob object is ::::", blob);
-
-    // ✅ Create preview URL
-    const previewUrl = URL.createObjectURL(blob);
-
-    this.selectedAttachment = {
-      type,
-      blob,
-      fileName: `${Date.now()}.${this.getFileExtension(file.name)}`,
-      mimeType,
-      fileSize: blob.size,
-      previewUrl,
-    };
-
-    this.showPreviewModal = true;
   }
-}
 
- getFileExtension(fileName: string): string {
-  const parts = fileName.split('.');
-  return parts.length > 1 ? parts.pop()!.toLowerCase() : '';
-}
+  getFileExtension(fileName: string): string {
+    const parts = fileName.split('.');
+    return parts.length > 1 ? parts.pop()!.toLowerCase() : '';
+  }
 
 
   private async compressImage(blob: Blob): Promise<Blob> {
@@ -1346,89 +1478,90 @@ async editMessage(message: Message) {
 
   async sendMessage() {
 
-  if (this.isSending) {
-    return;
-  }
-
-  this.isSending = true;
-
-  try {
-    const plainText = this.messageText.trim();
-    const encryptedText = plainText ? await this.encryptionService.encrypt(plainText) : '';
-
-    const message: Message = {
-      sender_id: this.senderId,
-      text: encryptedText,
-      timestamp: new Date().toISOString(),
-      sender_phone: this.sender_phone,
-      sender_name: this.sender_name,
-      receiver_id: this.chatType === 'private' ? this.receiverId : '',
-      receiver_phone: this.receiver_phone,
-      delivered: false,
-      read: false,
-      message_id: uuidv4(),
-      isDeleted: false,
-      replyToMessageId: this.replyToMessage?.message_id || '',
-      isEdit: false,
-    };
-
-    // Handle attachment with S3 upload
-    if (this.selectedAttachment) {
-      try {
-        const mediaId = await this.uploadAttachmentToS3(this.selectedAttachment);
-        console.log("media id is dfksdfgs", mediaId);
-
-        message.attachment = {
-          type: this.selectedAttachment.type,
-          mediaId: mediaId,
-          fileName: this.selectedAttachment.fileName,
-          mimeType: this.selectedAttachment.mimeType,
-          fileSize: this.selectedAttachment.fileSize,
-          caption: plainText
-        };
-
-        // Also save locally for quick access
-        const file_path = await this.FileService.saveFileToSent(this.selectedAttachment.fileName, this.selectedAttachment.blob);
-
-        await this.sqliteService.saveAttachment(this.roomId, this.selectedAttachment.type, file_path, mediaId);
-
-      } catch (error) {
-        console.error('Failed to upload attachment:', error);
-        // Show error toast
-        const toast = await this.toastCtrl.create({
-          message: 'Failed to upload attachment. Please try again.',
-          duration: 3000,
-          color: 'danger'
-        });
-        await toast.present();
-        return; // Don't send message if attachment upload fails
-      }
+    if (this.isSending) {
+      return;
     }
 
-    await this.chatService.sendMessage(this.roomId, message, this.chatType, this.senderId);
+    this.isSending = true;
 
-    // Clear everything after sending
-    this.messageText = '';
-    this.selectedAttachment = null;
-    this.showPreviewModal = false;
-    this.replyToMessage = null;
+    try {
+      const plainText = this.messageText.trim();
+      const encryptedText = plainText ? await this.encryptionService.encrypt(plainText) : '';
 
-    this.scrollToBottom();
+      const message: Message = {
+        sender_id: this.senderId,
+        text: encryptedText,
+        timestamp: new Date().toISOString(),
+        sender_phone: this.sender_phone,
+        sender_name: this.sender_name,
+        receiver_id: this.chatType === 'private' ? this.receiverId : '',
+        receiver_phone: this.receiver_phone,
+        delivered: false,
+        read: false,
+        message_id: uuidv4(),
+        isDeleted: false,
+        replyToMessageId: this.replyToMessage?.message_id || '',
+        isEdit: false,
+      };
 
-  } catch (error) {
-    console.error('Error sending message:', error);
-    // Show error toast
-    const toast = await this.toastCtrl.create({
-      message: 'Failed to send message. Please try again.',
-      duration: 3000,
-      color: 'danger'
-    });
-    await toast.present();
-  } finally {
-    // Always reset sending state
-    this.isSending = false;
+      // Handle attachment with S3 upload
+      if (this.selectedAttachment) {
+        try {
+          const mediaId = await this.uploadAttachmentToS3(this.selectedAttachment);
+          console.log("media id is dfksdfgs", mediaId);
+
+          message.attachment = {
+            type: this.selectedAttachment.type,
+            mediaId: mediaId,
+            fileName: this.selectedAttachment.fileName,
+            mimeType: this.selectedAttachment.mimeType,
+            fileSize: this.selectedAttachment.fileSize,
+            caption: plainText
+          };
+
+          // Also save locally for quick access
+          const file_path = await this.FileService.saveFileToSent(this.selectedAttachment.fileName, this.selectedAttachment.blob);
+
+          await this.sqliteService.saveAttachment(this.roomId, this.selectedAttachment.type, file_path, mediaId);
+
+        } catch (error) {
+          console.error('Failed to upload attachment:', error);
+          // Show error toast
+          const toast = await this.toastCtrl.create({
+            message: 'Failed to upload attachment. Please try again.',
+            duration: 3000,
+            color: 'danger'
+          });
+          await toast.present();
+          return; // Don't send message if attachment upload fails
+        }
+      }
+
+      await this.chatService.sendMessage(this.roomId, message, this.chatType, this.senderId);
+
+      // Clear everything after sending
+      this.messageText = '';
+      this.selectedAttachment = null;
+      this.showPreviewModal = false;
+      this.replyToMessage = null;
+      await this.stopTypingSignal();
+
+      this.scrollToBottom();
+
+    } catch (error) {
+      console.error('Error sending message:', error);
+      // Show error toast
+      const toast = await this.toastCtrl.create({
+        message: 'Failed to send message. Please try again.',
+        duration: 3000,
+        color: 'danger'
+      });
+      await toast.present();
+    } finally {
+      // Always reset sending state
+      this.isSending = false;
+    }
   }
-}
 
   private async uploadAttachmentToS3(attachment: any): Promise<string> {
     try {
@@ -1613,9 +1746,9 @@ async editMessage(message: Message) {
     try {
       const db = getDatabase();
       const messagesRef = ref(db, `chats/${this.roomId}`);
-      
+
       let qry;
-      
+
       if (loadMore && this.lastMessageKey) {
         // Load older messages using pagination
         qry = query(
@@ -1634,18 +1767,18 @@ async editMessage(message: Message) {
       }
 
       const snapshot = await get(qry);
-      
+
       if (snapshot.exists()) {
         const newMessages: Message[] = [];
         const messagesData = snapshot.val();
-        
+
         // Convert to array and sort by timestamp
         const messageKeys = Object.keys(messagesData).sort();
-        
+
         for (const key of messageKeys) {
           const msg = messagesData[key];
           const decryptedText = await this.encryptionService.decrypt(msg.text || '');
-          
+
           newMessages.push({
             ...msg,
             key: key,
@@ -1677,7 +1810,7 @@ async editMessage(message: Message) {
 
         // Group messages by date
         this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
-        
+
         // Save to localStorage
         this.saveToLocalStorage();
 
@@ -1739,6 +1872,7 @@ async editMessage(message: Message) {
     setTimeout(() => {
       this.resetFooterPosition();
     }, 300);
+    this.onInputBlurTyping();
   }
 
   goToCallingScreen() {
@@ -1794,6 +1928,12 @@ async editMessage(message: Message) {
     if (this.pinnedMessageSubscription) {
       this.pinnedMessageSubscription();
     }
+    this.typingRxSubs.forEach(s => s.unsubscribe());
+    try {
+      if (this.typingUnsubscribe) this.typingUnsubscribe();
+    } catch (e) { /* ignore */ }
+    // ensure typing node removed
+    this.stopTypingSignal();
   }
 
   // ... keyboard adjustment methods (same as your existing implementation)

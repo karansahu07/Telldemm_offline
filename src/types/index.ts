@@ -99,3 +99,9 @@ export interface CropResult {
   error?: string;
   cancelled?: boolean;
 }
+
+export interface TypingEntry {
+  userId: string;
+  typing?: boolean;
+  lastUpdated?: number;
+}

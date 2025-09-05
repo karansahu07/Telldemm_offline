@@ -92,15 +92,46 @@
                 onError="this.src='assets/images/default-avatar.png'" />
             </ion-avatar> -->
             <ion-avatar slot="start">
-  <img [src]="receiverProfile || 'assets/images/default-avatar.png'" 
-       alt="User Avatar"
-       (error)="setDefaultAvatar($event)" />
-</ion-avatar>
+              <img [src]="receiverProfile || 'assets/images/default-avatar.png'" alt="User Avatar"
+                (error)="setDefaultAvatar($event)" />
+            </ion-avatar>
             <ion-label (click)="goToProfile()"
               style="width: auto; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;">
               <h2 style="margin: 0; font-size: 16px;">
                 {{ chatType === 'group' ? groupName : receiver_name }}
               </h2>
+
+
+              <div class="chat-status" *ngIf="typingCount > 0"
+                style="font-size:12px; color: var(--ion-color-medium); margin-top:4px;">
+                <!-- Private Chat -->
+                <ng-container *ngIf="chatType === 'private'">
+                  {{ receiver_name }} is typing...
+                </ng-container>
+
+                <!-- Group Chat -->
+                <ng-container *ngIf="chatType === 'group'">
+                  {{ typingCount }} people are typing...
+                </ng-container>
+              </div>
+              <!-- dont delete this block-->
+              <!-- <div class="chat-status" *ngIf="typingCount > 0"
+                style="font-size:12px; color: var(--ion-color-medium); margin-top:4px;">
+             
+                <ng-container *ngIf="chatType === 'private'">
+                  {{ receiver_name }} is typing...
+                </ng-container>
+
+               
+                <ng-container *ngIf="chatType === 'group'">
+                  <ng-container *ngIf="typingCount === 1">
+                    {{ typingFrom }} is typing...
+                  </ng-container>
+                  <ng-container *ngIf="typingCount > 1">
+                    {{ typingCount }} people are typing...
+                  </ng-container>
+                </ng-container>
+              </div> -->
             </ion-label>
           </ion-item>
         </ion-buttons>
@@ -387,21 +418,14 @@
       <!-- <ion-icon name="document-text-outline" class="icon-left"></ion-icon> -->
       <ion-icon name="document-text-outline" class="icon-left" (click)="openKeyboard()">
       </ion-icon>
-      <ion-textarea [autoGrow]="true" [(ngModel)]="messageText" placeholder="Message" (ionInput)="onInputChange()"
+      <!-- <ion-textarea [autoGrow]="true" [(ngModel)]="messageText" placeholder="Message" (ionInput)="onInputChange()"
+        (ionFocus)="onInputFocus()" (ionBlur)="onInputBlur()" (keyup.enter)="sendMessage()"
+        class="message-input"></ion-textarea> -->
+
+      <ion-textarea [autoGrow]="true" [(ngModel)]="messageText" placeholder="Message" (ionInput)="onInputTyping()"
         (ionFocus)="onInputFocus()" (ionBlur)="onInputBlur()" (keyup.enter)="sendMessage()"
         class="message-input"></ion-textarea>
 
-      <!-- <ion-textarea [(ngModel)]="messageText" placeholder="Type your message here..." class="pre-message"></ion-textarea> -->
-
-      <!-- Attachment Icon -->
-      <!-- <ion-icon name="attach-outline" class="icon-right"></ion-icon> -->
-
-      <!-- Attachment Icon -->
-      <!-- <ion-icon
-  name="attach-outline"
-  class="icon-right"
-  (click)="selectAttachment()"
-></ion-icon> -->
 
       <!-- <ion-button fill="clear" (click)="pickAttachment()"> -->
       <ion-icon name="attach-outline" (click)="pickAttachment()" class="icon-right"></ion-icon>

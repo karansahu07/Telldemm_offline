@@ -1004,3 +1004,12 @@ ion-datetime {
 .model-toll {
   --background: transparent;
 }
+
+.chat-status {
+  font-size: 12px;
+  color: var(--ion-color-medium);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

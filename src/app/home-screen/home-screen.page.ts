@@ -235,25 +235,69 @@ private async refreshHomeData() {
     this.showPopup = false;
   }
 
+  // async prepareAndNavigateToChat(chat: any) {
+  //   const receiverId = chat.receiver_Id;
+  //   const receiver_phone = chat.receiver_phone;
+  //   const receiver_name = chat.name;
+
+  //   await this.secureStorage.setItem('receiver_name', receiver_name);
+
+  //   if (chat.group) {
+  //     this.router.navigate(['/chatting-screen'], {
+  //       queryParams: { receiverId, isGroup: true }
+  //     });
+  //   } else {
+  //     const cleanPhone = receiverId.replace(/\D/g, '').slice(-10);
+  //     await this.secureStorage.setItem('receiver_phone', receiver_phone);
+  //     this.router.navigate(['/chatting-screen'], {
+  //       queryParams: { receiverId: cleanPhone, receiver_phone }
+  //     });
+  //   }
+  // }
+
   async prepareAndNavigateToChat(chat: any) {
-    const receiverId = chat.receiver_Id;
-    const receiver_phone = chat.receiver_phone;
-    const receiver_name = chat.name;
+  try {
+    // Guard
+    if (!chat) return;
 
-    await this.secureStorage.setItem('receiver_name', receiver_name);
+    const receiverIdRaw = chat.receiver_Id || chat.receiverId || '';
+    const isGroup = !!chat.group;
+    const backendPhoneRaw = chat.receiver_phone || chat.phone_number || chat.phone || '';
+    const deviceName = chat.name || '';
+    const backendName = chat.name || '';
+    const displayNameFromDeviceOrBackend = deviceName || backendPhoneRaw || backendName || 'Unknown';
 
-    if (chat.group) {
+    // For non-group chats, normalize phone to last 10 digits
+    const cleanPhone = !isGroup ? this.normalizePhone(backendPhoneRaw || receiverIdRaw) : null;
+
+    // Save receiver name (prefer device name; if not present, use backend phone or backend name)
+    const receiverNameToSave = deviceName && deviceName !== 'Unknown'
+      ? deviceName
+      : (backendPhoneRaw ? backendPhoneRaw : (backendName || 'Unknown'));
+
+    // Persist values to secure storage (await so values are stored before navigation)
+    if (isGroup) {
+      await this.secureStorage.setItem('receiver_name', chat.group_name || receiverNameToSave);
+      // For groups we store the groupId as receiver_phone as well for consistency (optional)
+      await this.secureStorage.setItem('receiver_phone', chat.receiver_Id);
+      // Navigate to group chat
       this.router.navigate(['/chatting-screen'], {
-        queryParams: { receiverId, isGroup: true }
+        queryParams: { receiverId: receiverIdRaw, isGroup: true }
       });
     } else {
-      const cleanPhone = receiverId.replace(/\D/g, '').slice(-10);
-      await this.secureStorage.setItem('receiver_phone', receiver_phone);
+      // Non-group: store normalized phone and name
+      const phoneToSave = cleanPhone || receiverIdRaw;
+      await this.secureStorage.setItem('receiver_name', receiverNameToSave);
+      await this.secureStorage.setItem('receiver_phone', phoneToSave);
+
       this.router.navigate(['/chatting-screen'], {
-        queryParams: { receiverId: cleanPhone, receiver_phone }
+        queryParams: { receiverId: phoneToSave, receiver_phone: phoneToSave }
       });
     }
+  } catch (err) {
+    console.error('Error preparing navigation to chat:', err);
   }
+}
 
 private normalizePhone(num?: string): string {
   if (!num) return '';
@@ -261,101 +305,12 @@ private normalizePhone(num?: string): string {
 }
 
 
-  // getAllUsers() {
-  //   const currentSenderId = this.senderUserId;
-  //   console.log("current sender id:", currentSenderId);
-  //   if (!currentSenderId) return;
-
-  //   this.service.getAllUsers().subscribe((users: any[]) => {
-  //     users.forEach(user => {
-  //       const receiverId = user.user_id.toString();
-
-  //       if (receiverId === currentSenderId) return;
-
-  //       this.checkUserInRooms(receiverId).subscribe((hasChat: boolean) => {
-  //         if (!hasChat) return;
-
-  //         let receiver_phone = user.phone_number.toString();
-  //         // receiver_phone = receiver_phone.replace(/^(\+91|91)/, '');
-
-  //         const roomId = this.getRoomId(currentSenderId, receiverId);
-  //         // console.log("fdkgdfkgdfgkdfgjfkgf",user.profile_picture_url);
-  //         // Skip duplicate
-  //         const existingChat = this.chatList.find(chat =>
-  //           chat.receiver_Id === receiverId && !chat.group
-  //         );
-  //         if (existingChat) return;
-
-  //         const chat = {
-  //           ...user,
-  //           name: user.name,
-  //           receiver_Id: receiverId,
-  //           profile_picture_url : user.profile_picture_url,
-  //           receiver_phone: receiver_phone,
-  //           group: false,
-  //           message: '',
-  //           time: '',
-  //           unreadCount: 0,
-  //           unread: false
-  //         };
-
-  //         this.chatList.push(chat);
-
-  //         // 🔔 Listen to last message
-  //         this.firebaseChatService.listenForMessages(roomId).subscribe(async (messages) => {
-  //           if (messages.length > 0) {
-  //             const lastMsg = messages[messages.length - 1];
-
-  //             if (lastMsg.receiver_id === currentSenderId && !lastMsg.delivered) {
-  //               this.firebaseChatService.markDelivered(roomId, lastMsg.key);
-  //             }
-
-  //             if (lastMsg.isDeleted) {
-  //               chat.message = 'This message was deleted';
-  //             } else if (lastMsg.attachment?.type && lastMsg.attachment.type !== 'text') {
-  //               switch (lastMsg.attachment.type) {
-  //                 case 'image': chat.message = '📷 Photo'; break;
-  //                 case 'video': chat.message = '🎥 Video'; break;
-  //                 case 'audio': chat.message = '🎵 Audio'; break;
-  //                 case 'file': chat.message = '📎 Attachment'; break;
-  //                 default: chat.message = '[Media]';
-  //               }
-  //             } else {
-  //               try {
-  //                 const decryptedText = await this.encryptionService.decrypt(lastMsg.text);
-  //                 chat.message = decryptedText;
-  //               } catch (e) {
-  //                 chat.message = '[Encrypted]';
-  //               }
-  //             }
-
-  //             if (lastMsg.timestamp) {
-  //               chat.time = this.formatTimestamp(lastMsg.timestamp);
-  //             }
-  //           }
-  //         });
-
-  //         // 🔔 Listen to unread count
-  //         const sub = this.firebaseChatService
-  //           .listenToUnreadCount(roomId, currentSenderId)
-  //           .subscribe((count: number) => {
-  //             chat.unreadCount = count;
-  //             chat.unread = count > 0;
-  //           });
-
-  //         this.unreadSubs.push(sub);
-  //       });
-  //     });
-  //   });
-  // }
-
-  getAllUsers() {
+getAllUsers() {
   const currentSenderId = this.senderUserId;
   console.log("current sender id:", currentSenderId);
   if (!currentSenderId) return;
 
-  // Build a map of phone(last10)
-  // We do this once before looping users
+  // Build a map of phone(last10) -> device contact name
   this.contactSyncService.getMatchedUsers().then((matched) => {
     const deviceNameMap = new Map<string, string>();
     (matched || []).forEach((m: any) => {
@@ -363,15 +318,23 @@ private normalizePhone(num?: string): string {
       if (key && m.name) deviceNameMap.set(key, m.name);
     });
 
-    //Fetch all backend users (as you already do)
+    // Fetch all backend users (as you already do)
     this.service.getAllUsers().subscribe((users: any[]) => {
       users.forEach((user) => {
         const receiverId = user.user_id?.toString();
         if (!receiverId || receiverId === currentSenderId) return;
 
-        //normalize phone number
+        // normalize backend phone number (last 10 digits)
         const phoneKey = this.normalizePhone(user.phone_number?.toString());
-        const displayName = deviceNameMap.get(phoneKey) || user.name || 'Unknown';
+
+        // Determine display name:
+        // 1) device contact (if exists)
+        // 2) backend phone (formatted) if device contact not present
+        // 3) backend user.name if available
+        // 4) 'Unknown' fallback
+        const deviceName = phoneKey ? deviceNameMap.get(phoneKey) : null;
+        const backendPhoneDisplay = phoneKey ? (phoneKey.replace(/^(\d{3})(\d{3})(\d{4})$/, '$1-$2-$3')) : null;
+        const displayName = deviceName || backendPhoneDisplay || user.name || 'Unknown';
 
         // Check existing 1:1 room with this user
         this.checkUserInRooms(receiverId).subscribe((hasChat: boolean) => {
@@ -383,13 +346,13 @@ private normalizePhone(num?: string): string {
           );
           if (existingChat) return;
 
-          // Create chat list item (name uses device name if available)
+          // Create chat list item (name uses device name if available else backend phone)
           const chat: any = {
             ...user,
             name: displayName,
             receiver_Id: receiverId,
             profile_picture_url: user.profile_picture_url || null,
-            receiver_phone: phoneKey,
+            receiver_phone: phoneKey,   // normalized last-10 digits (or '' if none)
             group: false,
             message: '',
             time: '',
@@ -432,6 +395,7 @@ private normalizePhone(num?: string): string {
                 chat.time = this.formatTimestamp(lastMsg.timestamp);
               }
 
+              // keep list sorted by latest
               this.chatList.sort((a: any, b: any) => {
                 const ta = a.time ? new Date(a.time).getTime() : 0;
                 const tb = b.time ? new Date(b.time).getTime() : 0;
@@ -453,6 +417,7 @@ private normalizePhone(num?: string): string {
     });
   });
 }
+
 
 getChatAvatarUrl(chat: any): string | null {
   const id = chat.group ? chat.receiver_Id : chat.receiver_Id;
@@ -491,7 +456,6 @@ onAvatarError(chat: any): void {
         let userFound = false;
 
         if (data) {
-          // Sirf roomId me current logged in user + given user ki presence check karo
           Object.keys(data).some((roomId: string) => {
             const userIds = roomId.split('_');
             if (userIds.includes(this.senderUserId as string) && userIds.includes(userId)) {
