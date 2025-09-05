@@ -257,7 +257,7 @@ async deleteFcmToken(userId: string) {
     }
 
     const db = getDatabase();
-    const userRef = ref(db, `users/${userId}`);
+    const userRef = ref(db, `users/${userId}/fcmToken`);
 
     await remove(userRef);
 

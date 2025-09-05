@@ -251,14 +251,12 @@ export class Resetapp {
     //   console.log('No userId found before reset; skipping FCM token delete');
     // }
 
-    // 2) Clear storages/files
     this.clearLocalStorage();
     await this.clearCapacitorStorage();
     await this.clearSecureStorage();
     await this.clearSQLite();
     await this.clearFileSystem();
 
-    // 3) Reload
     this.reloadApp();
   }
 }
