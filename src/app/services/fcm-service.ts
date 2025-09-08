@@ -111,20 +111,20 @@ private handleNotificationTap(data: any) {
  
  
  
-  const receivedID = data.receiverId;
+  const receiverId = data.receiverId;
  
-  if (receivedID) {
+  if (receiverId) {
    
  
-    this.router.navigate(['/chatting-screen'], {
-  queryParams: { receivedID },
-  state: { fromNotification: true }
-});
- 
-// this.router.navigate(['/chatting-screen'], {
-//   queryParams: { receiverId },
+//     this.router.navigate(['/chatting-screen'], {
+//   queryParams: { receivedID },
 //   state: { fromNotification: true }
 // });
+ //khusha
+this.router.navigate(['/chatting-screen'], {
+  queryParams: { receiverId },
+  state: { fromNotification: true }
+});
  
 // Persist flag for later reloads
 localStorage.setItem('fromNotification', 'true');

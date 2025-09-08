@@ -154,7 +154,7 @@ export class LoginScreenPage {
 
   try {
     console.log('📨 Sending OTP payload:', payload);
-    const res = await this.authService.sendOtp(payload);
+    const res = await this.authService.sendOtpDev(payload);
     console.log('📬 OTP API Response:', res);
 
     if (res.status) {

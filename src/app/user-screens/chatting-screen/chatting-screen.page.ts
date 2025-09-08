@@ -172,7 +172,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   async ngOnInit() {
     // Enable proper keyboard scrolling
     Keyboard.setScroll({ isDisabled: false });
-    await this.initKeyboardListeners();
+    // await this.initKeyboardListeners();
 
     // Load sender (current user) details
     this.senderId = this.authService.authData?.userId || '';
@@ -345,7 +345,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   async ionViewWillEnter() {
     // Enable proper keyboard scrolling
     Keyboard.setScroll({ isDisabled: false });
-    await this.initKeyboardListeners();
+    // await this.initKeyboardListeners();
 
     // Load sender (current user) details
     this.senderId = this.authService.authData?.userId || '';
@@ -1862,16 +1862,9 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onInputFocus() {
-    setTimeout(() => {
-      this.adjustFooterPosition();
-      this.scrollToBottom();
-    }, 300);
   }
 
   onInputBlur() {
-    setTimeout(() => {
-      this.resetFooterPosition();
-    }, 300);
     this.onInputBlurTyping();
   }
 
@@ -1902,26 +1895,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     }, 100);
   }
 
-  async initKeyboardListeners() {
-    if (this.platform.is('capacitor')) {
-      try {
-        const showListener = await Keyboard.addListener('keyboardWillShow', (info) => {
-          this.handleKeyboardShow(info.keyboardHeight);
-        });
-
-        const hideListener = await Keyboard.addListener('keyboardWillHide', () => {
-          this.handleKeyboardHide();
-        });
-
-        this.keyboardListeners.push(showListener, hideListener);
-      } catch (error) {
-        this.setupFallbackKeyboardDetection();
-      }
-    } else {
-      this.setupFallbackKeyboardDetection();
-    }
-  }
-
   ngOnDestroy() {
     this.keyboardListeners.forEach(listener => listener?.remove());
     this.messageSub?.unsubscribe();
@@ -1932,75 +1905,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     try {
       if (this.typingUnsubscribe) this.typingUnsubscribe();
     } catch (e) { /* ignore */ }
-    // ensure typing node removed
     this.stopTypingSignal();
-  }
-
-  // ... keyboard adjustment methods (same as your existing implementation)
-  private handleKeyboardShow(keyboardHeight: number) {
-    const footer = document.querySelector('.footer-fixed') as HTMLElement;
-    const chatMessages = document.querySelector('.chat-messages') as HTMLElement;
-    const ionContent = document.querySelector('ion-content') as HTMLElement;
-
-    if (footer) footer.style.bottom = `${keyboardHeight}px`;
-    if (chatMessages) chatMessages.style.paddingBottom = `${keyboardHeight + 80}px`;
-    if (ionContent) ionContent.style.paddingBottom = `${keyboardHeight}px`;
-
-    setTimeout(() => this.scrollToBottom(), 350);
-  }
-
-  private handleKeyboardHide() {
-    const footer = document.querySelector('.footer-fixed') as HTMLElement;
-    const chatMessages = document.querySelector('.chat-messages') as HTMLElement;
-    const ionContent = document.querySelector('ion-content') as HTMLElement;
-
-    if (footer) footer.style.bottom = '0px';
-    if (chatMessages) chatMessages.style.paddingBottom = '80px';
-    if (ionContent) ionContent.style.paddingBottom = '0px';
-  }
-
-  private setupFallbackKeyboardDetection() {
-    let initialViewportHeight = window.visualViewport?.height || window.innerHeight;
-    let initialChatPadding = 80;
-
-    const handleViewportChange = () => {
-      const currentHeight = window.visualViewport?.height || window.innerHeight;
-      const heightDifference = initialViewportHeight - currentHeight;
-
-      const footer = document.querySelector('.footer-fixed') as HTMLElement;
-      const chatMessages = document.querySelector('.chat-messages') as HTMLElement;
-      const ionContent = document.querySelector('ion-content') as HTMLElement;
-
-      if (heightDifference > 150) {
-        if (footer) footer.style.bottom = `${heightDifference}px`;
-        if (chatMessages) chatMessages.style.paddingBottom = `${heightDifference + initialChatPadding}px`;
-        if (ionContent) ionContent.style.paddingBottom = `${heightDifference}px`;
-        setTimeout(() => this.scrollToBottom(), 310);
-      } else {
-        if (footer) footer.style.bottom = '0px';
-        if (chatMessages) chatMessages.style.paddingBottom = `${initialChatPadding}px`;
-        if (ionContent) ionContent.style.paddingBottom = '0px';
-      }
-    };
-
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', handleViewportChange);
-    } else {
-      window.addEventListener('resize', handleViewportChange);
-    }
-  }
-
-  private adjustFooterPosition() {
-    const footer = document.querySelector('.footer-fixed') as HTMLElement;
-    const chatMessages = document.querySelector('.chat-messages') as HTMLElement;
-    if (footer) footer.classList.add('keyboard-active');
-    if (chatMessages) chatMessages.classList.add('keyboard-active');
-  }
-
-  private resetFooterPosition() {
-    const footer = document.querySelector('.footer-fixed') as HTMLElement;
-    const chatMessages = document.querySelector('.chat-messages') as HTMLElement;
-    if (footer) footer.classList.remove('keyboard-active');
-    if (chatMessages) chatMessages.classList.remove('keyboard-active');
   }
 }

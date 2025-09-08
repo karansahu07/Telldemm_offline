@@ -7,7 +7,7 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
-import {setGlobalOptions} from "firebase-functions";
+import { setGlobalOptions } from "firebase-functions";
 // import {onRequest} from "firebase-functions/https";
 // import * as logger from "firebase-functions/logger";
 
@@ -321,7 +321,7 @@ export const sendNotificationOnNewMessage = functions.database
     try {
       // ✅ Check if this is a group chat
       const isGroupChat = roomId.startsWith('group_');
-      
+
       if (isGroupChat) {
         console.log('👥 Group chat message detected:', { roomId, messageId });
         await handleGroupNotification(messageData, roomId, messageId);
@@ -384,19 +384,30 @@ async function handlePrivateNotification(messageData: any, roomId: string, messa
       android: {
         notification: {
           sound: 'default',
-          clickAction: 'FCM_PLUGIN_ACTIVITY',
-          icon: 'assets/icon/favicon.ico',
+          channelId: 'default',   // ✅ Make sure you create this channel in your app
+          icon: 'ic_launcher',    // ✅ Must be a valid resource name in Android (not path to .ico)
+        },
+      },
+      apns: {
+        payload: {
+          aps: {
+            sound: 'default',
+          },
         },
       },
       data: {
         roomId: roomId,
-        senderId: messageData.sender_id,
-        receiverId: messageData.receiver_id,
+        // senderId: messageData.sender_id,
+        // receiverId: messageData.receiver_id,
+         senderId: messageData.receiver_id,
+        receiverId: messageData.sender_id,
         messageId: messageId,
         chatType: 'private',
-        timestamp: messageData.timestamp.toString()
-      }
+        timestamp: messageData.timestamp.toString(),
+        route: `/chatting-screen?receiverId=${messageData.receiver_id}`,
+      },
     });
+
 
     console.log('✅ Private notification sent successfully:', response);
 
@@ -421,7 +432,7 @@ async function handleGroupNotification(messageData: any, roomId: string, message
 
     // ✅ Get all group members (excluding sender)
     const members = groupData.members || {};
-    const memberIds = Object.keys(members).filter(memberId => 
+    const memberIds = Object.keys(members).filter(memberId =>
       memberId !== messageData.sender_id
     );
 
@@ -437,7 +448,7 @@ async function handleGroupNotification(messageData: any, roomId: string, message
         const tokenSnapshot = await admin.database()
           .ref(`/users/${memberId}/fcmToken`)
           .once('value');
-        
+
         const token = tokenSnapshot.val();
         if (token) {
           memberTokens.push(token);
@@ -465,8 +476,8 @@ async function handleGroupNotification(messageData: any, roomId: string, message
     if (messageData.text) {
       // 🔑 Decrypt text before sending notification
       const decryptedText = await decryptText(messageData.text);
-      messageBody = decryptedText.length > 50 
-        ? `${decryptedText.substring(0, 50)}...` 
+      messageBody = decryptedText.length > 50
+        ? `${decryptedText.substring(0, 50)}...`
         : decryptedText;
     }
 
@@ -518,13 +529,13 @@ async function handleGroupNotification(messageData: any, roomId: string, message
         notificationResults.successCount++;
         notificationResults.responses.push({ success: true, messageId: response });
         console.log(`✅ Group notification sent to token: ${token.substring(0, 10)}...`);
-        
+
       } catch (error: any) {
         notificationResults.failureCount++;
-        notificationResults.responses.push({ 
-          success: false, 
+        notificationResults.responses.push({
+          success: false,
           error: error,
-          token: token 
+          token: token
         });
         console.error(`❌ Failed to send group notification to token ${token.substring(0, 10)}...:`, error.message);
       }
@@ -546,10 +557,10 @@ async function handleGroupNotification(messageData: any, roomId: string, message
         if (!resp.success) {
           const token = resp.token || memberTokens[idx];
           console.error(`❌ Failed to send to token ${token?.substring(0, 10)}...:`, resp.error?.message);
-          
+
           // Track invalid tokens
           if (resp.error?.code === 'messaging/registration-token-not-registered' ||
-              resp.error?.code === 'messaging/invalid-registration-token') {
+            resp.error?.code === 'messaging/invalid-registration-token') {
             failedTokens.push(token);
           }
         }

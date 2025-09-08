@@ -36,7 +36,9 @@ export class AuthService {
 
   /** Send OTP */
   sendOtp(payload: { phone_number: string; country_code: string }): Promise<any> {
-    return this.api.post('/api/auth/send-otp_mb', payload).toPromise();
+    // return this.api.post('/api/auth/send-otp_mb', payload).toPromise();
+    return this.api.post('/api/auth/send-otp_mb_dev_new', payload).toPromise();//khusha
+
   }
   
   sendOtpDev(payload: { phone_number: string; country_code: string }): Promise<any> {

@@ -396,6 +396,38 @@
 <!-- ✅ Message Input Footer -->
 <div class="footer-fixed">
 
+  <!-- ========================= -->
+<!-- Typing indicator (above keyboard) -->
+<!-- Paste this as FIRST child inside <div class="footer-fixed"> -->
+<div class="typing-indicator-wrapper" *ngIf="typingCount > 0">
+  <div class="typing-indicator-content">
+    <div class="typing-text">
+      <!-- Private -->
+      <!-- <ng-container *ngIf="chatType === 'private'">
+        {{ receiver_name }} is typing...
+      </ng-container> -->
+
+      <!-- Group -->
+      <ng-container *ngIf="chatType === 'group'">
+        <ng-container *ngIf="typingCount === 1">
+          {{ typingFrom || 'Someone' }} is typing...
+        </ng-container>
+        <ng-container *ngIf="typingCount > 1">
+          {{ typingCount }} people are typing...
+        </ng-container>
+      </ng-container>
+    </div>
+
+    <div class="typing-dots" aria-hidden="true">
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </div>
+  </div>
+</div>
+<!-- ========================= -->
+
+
   <!-- REPLY PREVIEW - Add this section -->
   <div class="reply-preview" *ngIf="replyToMessage">
     <div class="reply-header">
@@ -422,9 +454,14 @@
         (ionFocus)="onInputFocus()" (ionBlur)="onInputBlur()" (keyup.enter)="sendMessage()"
         class="message-input"></ion-textarea> -->
 
-      <ion-textarea [autoGrow]="true" [(ngModel)]="messageText" placeholder="Message" (ionInput)="onInputTyping()"
+      <!-- <ion-textarea [autoGrow]="true" [(ngModel)]="messageText" placeholder="Message" (ionInput)="onInputTyping()"
         (ionFocus)="onInputFocus()" (ionBlur)="onInputBlur()" (keyup.enter)="sendMessage()"
-        class="message-input"></ion-textarea>
+        class="message-input"></ion-textarea> -->
+
+        <ion-textarea [autoGrow]="true" [(ngModel)]="messageText" placeholder="Message"
+  (ionInput)="onInputTyping()" (ionFocus)="onInputFocus()" (ionBlur)="onInputBlur()" (keyup.enter)="sendMessage()"
+  class="message-input"></ion-textarea>
+
 
 
       <!-- <ion-button fill="clear" (click)="pickAttachment()"> -->
