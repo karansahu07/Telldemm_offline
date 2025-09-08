@@ -17,18 +17,19 @@
 import { Component, OnInit } from '@angular/core';
 import { ToastController } from '@ionic/angular';
 import { NetworkService } from './services/network-connection/network.service';
-import { distinctUntilChanged } from 'rxjs/operators';
+import { distinctUntilChanged, filter } from 'rxjs/operators';
 import { register } from 'swiper/element/bundle';
 import { FirebasePushService } from './services/push_notification/firebase-push.service';
 // import {AttachmentService} from './services/attachment-file/attachment.service'
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import {FileSystemService} from './services/file-system.service'
 import { AuthService } from './auth/auth.service';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { Platform } from '@ionic/angular';
 import { FcmService } from './services/fcm-service';
 import { SqliteService } from './services/sqlite.service';
 import { StatusBar, Style } from '@capacitor/status-bar';
+import { VersionCheck } from './services/version-check';
 
 register();
 
@@ -49,7 +50,8 @@ export class AppComponent implements OnInit{
     private router: Router,
     private platform: Platform,
     private fcmService: FcmService,
-    private sqliteService : SqliteService
+    private sqliteService : SqliteService,
+    private versionService: VersionCheck // 👈 inject here
   ) {
     // this.listenToNetwork();
     this.initializeApp();
@@ -84,6 +86,7 @@ export class AppComponent implements OnInit{
    
    
     await this.authService.hydrateAuth();
+      this.trackRouteChanges(); // 👈 listen to route changes
  
    // ----------------------------
     let fromNotification = false;
@@ -129,6 +132,19 @@ export class AppComponent implements OnInit{
  
       await StatusBar.setStyle({ style: Style.Light });
     }
+  }
+
+   private trackRouteChanges() {
+    this.router.events
+      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        console.log('➡️ Current route:', event.urlAfterRedirects);
+
+        if (event.urlAfterRedirects === '/home-screen') {
+          console.log('🔍 Running version check only on home-screen');
+          this.versionService.checkVersion();
+        }
+      });
   }
 
 }
