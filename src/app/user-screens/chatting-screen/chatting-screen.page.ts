@@ -6,14 +6,21 @@ import {
   ViewChild,
   ElementRef,
   AfterViewInit,
-  QueryList
+  QueryList,
+  Renderer2
 } from '@angular/core';
 import {
   query,
   orderByKey,
   endBefore,
   limitToLast,
-  startAfter
+  startAfter,
+  getDatabase,
+  ref,
+  get,
+  update,
+  set,
+  remove
 } from 'firebase/database';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -23,7 +30,6 @@ import { firstValueFrom, Subscription } from 'rxjs';
 import { Keyboard } from '@capacitor/keyboard';
 import { FirebaseChatService } from 'src/app/services/firebase-chat.service';
 import { EncryptionService } from 'src/app/services/encryption.service';
-import { getDatabase, ref, get, update, set, remove } from 'firebase/database';
 import { v4 as uuidv4 } from 'uuid';
 import { SecureStorageService } from '../../services/secure-storage/secure-storage.service';
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -47,7 +53,6 @@ import { Subject, Subscription as RxSub } from 'rxjs';
 import { throttleTime } from 'rxjs/operators';
 import { ref as dbRef, onValue, onDisconnect } from 'firebase/database';
 
-
 @Component({
   selector: 'app-chatting-screen',
   standalone: true,
@@ -63,7 +68,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('longPressEl') messageElements!: QueryList<ElementRef>;
 
   messages: Message[] = [];
-
   groupedMessages: { date: string; messages: Message[] }[] = [];
 
   messageText = '';
@@ -90,8 +94,9 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   selectedMessages: any[] = [];
   imageToSend: any;
   alertController: any;
-  // alertCtrl: any;
 
+  private resizeHandler = () => this.setDynamicPadding();
+  private intersectionObserver?: IntersectionObserver;
 
   constructor(
     private chatService: FirebaseChatService,
@@ -112,8 +117,9 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     private service: ApiService,
     private sqliteService: SqliteService,
     private alertCtrl: AlertController,
-    // private alertCtrl: AlertController,
     private typingService: TypingService,
+    private renderer: Renderer2,
+    private el: ElementRef,
   ) { }
 
   roomId = '';
@@ -124,18 +130,17 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   sender_name = '';
   groupMembers: {
     user_id: string;
-    name: string;
-    phone: string;
+    name?: string;
+    phone?: string;
     avatar?: string;
     role?: string;
     phone_number?: string;
+    publicKeyHex?: string | null;
   }[] = [];
   attachments: any[] = [];
-  // attachmentPath: string | null = null;
   selectedAttachment: any = null;
   showPreviewModal: boolean = false;
   attachmentPath: string = '';
-  // selectedMessages: any[] = [];
   lastPressedMessage: any = null;
   longPressTimeout: any;
   replyToMessage: Message | null = null;
@@ -168,11 +173,11 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   typingFrom: string | null = null;     // single user name who is typing
   private localTypingTimer: any = null; // inactivity timer to auto stop typing
   private typingUnsubscribe: (() => void) | null = null; // to stop onValue listener
+  typingUsers: { userId: string; name: string | null; avatar: string | null }[] = [];
 
   async ngOnInit() {
     // Enable proper keyboard scrolling
     Keyboard.setScroll({ isDisabled: false });
-    // await this.initKeyboardListeners();
 
     // Load sender (current user) details
     this.senderId = this.authService.authData?.userId || '';
@@ -188,23 +193,37 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     const phoneFromQuery = this.route.snapshot.queryParamMap.get('receiver_phone');
 
     // Determine chat type
-    this.chatType = chatTypeParam === 'true' ? 'group' : 'private';
+    // Determine chat type
+this.chatType = chatTypeParam === 'true' ? 'group' : 'private';
 
-    if (this.chatType === 'group') {
-      // Group chat
-      this.roomId = decodeURIComponent(rawId);
-      await this.fetchGroupName(this.roomId);
-    } else {
-      // Individual chat
-      this.receiverId = decodeURIComponent(rawId);
-      this.roomId = this.getRoomId(this.senderId, this.receiverId);
-      console.log("sadjklghdjagdfg", this.roomId)
+if (this.chatType === 'group') {
+  // Group chat
+  this.roomId = decodeURIComponent(rawId);
 
-      // Use receiver_phone from query or fallback to localStorage
-      this.receiver_phone = phoneFromQuery || localStorage.getItem('receiver_phone') || '';
-      // Store for reuse when navigating to profile
-      localStorage.setItem('receiver_phone', this.receiver_phone);
-    }
+  // Use service to fetch group name + enriched members (profiles)
+  try {
+    const { groupName, groupMembers } = await this.chatService.fetchGroupWithProfiles(this.roomId);
+    this.groupName = groupName;
+    this.groupMembers = groupMembers;
+  } catch (err) {
+    console.warn('Failed to fetch group with profiles', err);
+    this.groupName = 'Group';
+    this.groupMembers = [];
+  }
+} else {
+  // Individual chat
+  this.receiverId = decodeURIComponent(rawId);
+  this.roomId = this.getRoomId(this.senderId, this.receiverId);
+
+  // Use receiver_phone from query or fallback to localStorage
+  this.receiver_phone = phoneFromQuery || localStorage.getItem('receiver_phone') || '';
+  // Store for reuse when navigating to profile
+  localStorage.setItem('receiver_phone', this.receiver_phone);
+}
+
+// IMPORTANT: attach typing listener for BOTH group and private now
+this.setupTypingListener();
+
 
     // Reset unread count and mark messages as read
     await this.chatService.resetUnreadCount(this.roomId, this.senderId);
@@ -221,55 +240,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
         // ignore if not supported
         console.warn('onDisconnect setup failed', err);
       }
-
-      // Listen to typing nodes in this room
-            this.typingUnsubscribe = onValue(dbRef(db, `typing/${this.roomId}`), (snap) => {
-        const val = snap.val() || {};
-        const now = Date.now();
-        const entries = Object.keys(val).map(k => ({
-          userId: k,
-          typing: val[k]?.typing ?? false,
-          lastUpdated: val[k]?.lastUpdated ?? 0
-        }));
-
-        // remove expired (>10s old)
-        const recent = entries.filter(e =>
-          e.userId !== this.senderId &&
-          e.typing &&
-          (now - (e.lastUpdated || 0)) < 10000
-        );
-
-        this.typingCount = recent.length;
-      });
- 
-      //dont delete this block
-      // this.typingUnsubscribe = onValue(dbRef(db, `typing/${this.roomId}`), (snap) => {
-      //   const val = snap.val() || {};
-      //   const now = Date.now();
-
-      //   const entries = Object.keys(val).map(k => ({
-      //     userId: k,
-      //     typing: val[k]?.typing ?? false,
-      //     lastUpdated: val[k]?.lastUpdated ?? 0
-      //   }));
-
-      //   const recent = entries.filter(e =>
-      //     e.userId !== this.senderId &&
-      //     e.typing &&
-      //     (now - (e.lastUpdated || 0)) < 10000
-      //   );
-
-      //   this.typingCount = recent.length;
-
-      //   if (this.chatType === 'group' && this.typingCount === 1) {
-      //     const uid = recent[0].userId;
-      //     const member = this.groupMembers.find(m => m.user_id === uid);
-      //     this.typingFrom = member?.name || uid;
-      //   } else {
-      //     this.typingFrom = null;
-      //   }
-      // });
-
 
       // Outgoing typing: throttle DB writes
       const tsub = this.typingInput$.pipe(
@@ -345,7 +315,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   async ionViewWillEnter() {
     // Enable proper keyboard scrolling
     Keyboard.setScroll({ isDisabled: false });
-    // await this.initKeyboardListeners();
 
     // Load sender (current user) details
     this.senderId = this.authService.authData?.userId || '';
@@ -365,11 +334,21 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
 
     if (this.chatType === 'group') {
       this.roomId = decodeURIComponent(rawId);
-      await this.fetchGroupName(this.roomId);
+
+      try {
+        const { groupName, groupMembers } = await this.chatService.fetchGroupWithProfiles(this.roomId);
+        this.groupName = groupName;
+        this.groupMembers = groupMembers;
+      } catch (err) {
+        console.warn('Failed to fetch group with profiles', err);
+        this.groupName = 'Group';
+        this.groupMembers = [];
+      }
+
+      this.setupTypingListener();
     } else {
       this.receiverId = decodeURIComponent(rawId);
       this.roomId = this.getRoomId(this.senderId, this.receiverId);
-      // console.log("view after inint", this.roomId)
       this.receiver_phone = phoneFromQuery || localStorage.getItem('receiver_phone') || '';
       localStorage.setItem('receiver_phone', this.receiver_phone);
     }
@@ -394,30 +373,11 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     this.loadReceiverProfile();
   }
 
-  //   loadReceiverProfile() {
-  //   if (!this.receiverId) return;
-
-  //   this.service.getUserProfilebyId(this.receiverId).subscribe({
-  //     next: (res: any) => {
-  //       this.receiverProfile = res?.profile || null;
-  //     },
-  //     error: (err) => {
-  //       console.error("Error loading receiver profile:", err);
-  //       this.receiverProfile = null;
-  //     }
-  //   });
-  // }
-
   loadReceiverProfile() {
     this.receiverId = this.route.snapshot.queryParamMap.get('receiverId') || '';
-    //  console.log("this group",this.chatType);
-    //   console.log("this receiver",this.receiverId);
     if (!this.receiverId) return;
 
     if (this.chatType === 'group') {
-      // console.log("this group",this.isGroup);
-      // console.log("this group",this.receiverId);
-      // 👇 Group DP fetch with receiverId (as groupId)
       this.service.getGroupDp(this.receiverId).subscribe({
         next: (res: any) => {
           this.receiverProfile = res?.group_dp_url || null;
@@ -428,7 +388,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
         }
       });
     } else {
-      // 👇 User DP fetch
       this.service.getUserProfilebyId(this.receiverId).subscribe({
         next: (res: any) => {
           this.receiverProfile = res?.profile || null;
@@ -445,12 +404,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     (event.target as HTMLImageElement).src = 'assets/images/user.jfif';
   }
 
-
-  // setDefaultAvatar(event: Event) {
-  //   (event.target as HTMLImageElement).src = 'assets/images/user.jfif';
-  // }
-
-  //this is menu option in header of right side
   async openOptions(ev: any) {
     const popover = await this.popoverCtrl.create({
       component: ChatOptionsPopoverComponent,
@@ -538,16 +491,10 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
           ...memberData,
           status: 'inactive',
           removedAt: new Date().toLocaleString()
-
         };
 
-        // First update the member's status in members path
         await update(ref(db, memberPath), { status: 'inactive' });
-
-        // Then store full info in pastmembers
         await set(ref(db, pastMemberPath), updatedMemberData);
-
-        // Finally remove from current members
         await remove(ref(db, memberPath));
 
         const toast = await this.toastCtrl.create({
@@ -574,7 +521,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   onSearchInput() {
     const elements = Array.from(document.querySelectorAll('.message-text')) as HTMLElement[];
 
-    // Clear previous highlights
     elements.forEach(el => {
       el.innerHTML = el.textContent || '';
       el.style.backgroundColor = 'transparent';
@@ -599,10 +545,8 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       }
     });
 
-    // Reset index
     this.currentSearchIndex = this.matchedMessages.length ? 0 : -1;
 
-    // Scroll to first match (optional)
     if (this.currentSearchIndex >= 0) {
       this.matchedMessages[this.currentSearchIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
@@ -619,7 +563,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   highlightMessage(index: number) {
-    // Remove existing highlights from all matched messages
     this.matchedMessages.forEach(el => {
       const originalText = el.textContent || '';
       el.innerHTML = originalText;
@@ -632,18 +575,15 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
 
     this.matchedMessages.forEach((el, i) => {
       const originalText = el.textContent || '';
-      // Wrap matched text in <mark>
       const highlightedText = originalText.replace(regex, `<mark style="background: yellow;">$1</mark>`);
       el.innerHTML = highlightedText;
     });
 
-    // Scroll to current match
     const target = this.matchedMessages[index];
     if (target) {
       target.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }
-
 
   cancelSearch() {
     this.searchText = '';
@@ -660,7 +600,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     this.showPopover = true;
   }
 
-
   onDateSelected(event: any) {
     const selectedDateObj = new Date(event.detail.value);
 
@@ -674,7 +613,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     this.showPopover = false; // Close the popover
     this.showDateModal = false; // In case you're also using modal variant
 
-    // Smooth scroll to that date's section
     setTimeout(() => {
       const el = document.getElementById('date-group-' + formattedDate);
       if (el) {
@@ -693,9 +631,9 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   onMessagePress(message: any) {
     const index = this.selectedMessages.findIndex(m => m.key === message.key);
     if (index > -1) {
-      this.selectedMessages.splice(index, 1); // Unselect if already selected
+      this.selectedMessages.splice(index, 1);
     } else {
-      this.selectedMessages.push(message); // Select
+      this.selectedMessages.push(message);
     }
   }
 
@@ -710,11 +648,10 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  //selection mode
   startLongPress(msg: any) {
     this.longPressTimeout = setTimeout(() => {
       this.onLongPress(msg);
-    }, 1000); // 500ms for long press
+    }, 1000);
   }
 
   cancelLongPress() {
@@ -741,7 +678,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       this.selectedMessages.push(msg);
     }
 
-    // Update lastPressedMessage to last toggled one (optional)
     this.lastPressedMessage = msg;
   }
 
@@ -788,12 +724,9 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
 
   setReplyToMessage(message: Message) {
     this.replyToMessage = message;
-
-    // Clear selection after setting reply
     this.selectedMessages = [];
     this.lastPressedMessage = null;
 
-    // Focus on input field after a short delay
     setTimeout(() => {
       const inputElement = document.querySelector('ion-textarea') as HTMLIonTextareaElement;
       if (inputElement) {
@@ -808,22 +741,17 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
 
   getRepliedMessage(replyToMessageId: string): Message | null {
     const msg = this.allMessages.find(msg => {
-      // console.log(msg.message_id, msg.message_id == replyToMessageId);
       return msg.message_id == replyToMessageId;
     }) || null;
-    // console.log("messages fron get reply", msg);
     return msg;
   }
 
   getReplyPreviewText(message: Message): string {
-    // console.log("messaedsfd",message);
     if (message.text) {
-      // Limit reply preview to 50 characters
       return message.text.length > 50 ?
         message.text.substring(0, 50) + '...' :
         message.text;
     } else if (message.attachment) {
-      // Show attachment type in reply preview
       const type = message.attachment.type;
       switch (type) {
         case 'image': return '📷 Photo';
@@ -837,12 +765,10 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   scrollToRepliedMessage(replyToMessageId: string) {
-
     let targetElement: HTMLElement | any;
 
     const messageElements = document.querySelectorAll('[data-msg-key]');
 
-    // Loop through messages and find the matching DOM element
     this.allMessages.forEach((msg) => {
       if (msg.message_id === replyToMessageId) {
         const element = Array.from(messageElements).find(el =>
@@ -905,8 +831,8 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
         hasText: hasText,
         hasAttachment: hasAttachment,
         isPinned: isPinned,
-        message: this.lastPressedMessage,   // ✅ pass current message
-        currentUserId: this.senderId        // ✅ pass logged-in user
+        message: this.lastPressedMessage,
+        currentUserId: this.senderId
       }
     });
 
@@ -942,8 +868,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   async editMessage(message: Message) {
-    // console.log("last message pressed", this.lastPressedMessage);
-
     const alert = await this.alertCtrl.create({
       header: 'Edit Message',
       inputs: [
@@ -985,9 +909,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     await alert.present();
   }
 
-
-
-
   async copyMessage() {
     if (this.lastPressedMessage?.text) {
       await Clipboard.write({ string: this.lastPressedMessage.text });
@@ -998,16 +919,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   shareMessage() {
-    // if (this.lastPressedMessage?.attachment ||
-    //   this.lastPressedMessage?.file ||
-    //   this.lastPressedMessage?.image ||
-    //   this.lastPressedMessage?.media) {
     console.log('Share clicked for attachment:', this.lastPressedMessage);
-    //   // Add your share logic here
-    //   this.selectedMessages = [];
-    //   this.lastPressedMessage = null;
-    // }
-    //Todo implement this
   }
 
   pinMessage() {
@@ -1017,7 +929,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       pinnedAt: Date.now(),
       pinnedBy: this.senderId,
       roomId: this.roomId,
-      scope: 'global' // Always global now
+      scope: 'global'
     };
     this.chatService.pinMessage(pin);
 
@@ -1032,7 +944,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       (pinnedMessage) => {
         this.pinnedMessage = pinnedMessage;
         if (pinnedMessage) {
-          // Find the actual message details from your messages array
           this.findPinnedMessageDetails(pinnedMessage.key);
         } else {
           this.pinnedMessageDetails = null;
@@ -1042,7 +953,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   findPinnedMessageDetails(messageId: string) {
-    // Search through all grouped messages to find the pinned message
     for (const group of this.groupedMessages) {
       const foundMessage = group.messages.find(msg => msg.message_id === messageId);
       if (foundMessage) {
@@ -1065,7 +975,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       const element = document.querySelector(`[data-msg-key="${this.pinnedMessageDetails.key}"]`);
       if (element) {
         element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        // Optional: Add highlight effect
         element.classList.add('highlighted');
         setTimeout(() => element.classList.remove('highlighted'), 2000);
       }
@@ -1077,19 +986,14 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   openChatInfo() {
-    // Implement your chat info functionality
     console.log('Opening chat info');
   }
 
   async loadInitialMessages() {
     this.isLoadingMore = true;
     try {
-      // Load from localStorage first for quick display
       await this.loadFromLocalStorage();
-
-      // Then load latest messages from Firebase
       await this.loadMessagesFromFirebase(false);
-
     } catch (error) {
       console.error('Error loading initial messages:', error);
     } finally {
@@ -1107,32 +1011,119 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  async fetchGroupName(groupId: string) {
-    try {
-      const db = getDatabase();
-      const groupRef = ref(db, `groups/${groupId}`);
-      const snapshot = await get(groupRef);
+  /**
+   * Attach a typing listener that resolves names/avatars using this.groupMembers.
+   * Called after groupMembers are populated by the service.
+   */
+  /**
+ * Attach a typing listener that resolves names/avatars using this.groupMembers.
+ * Works for both group and private chats.
+ */
+private setupTypingListener() {
+  try {
+    const db = getDatabase();
 
-      if (snapshot.exists()) {
-        const groupData = snapshot.val();
-        this.groupName = groupData.name || 'Group';
-      } else {
-        this.groupName = 'Group';
+    // detach existing listener if any
+    try { if (this.typingUnsubscribe) this.typingUnsubscribe(); } catch (e) { /* ignore */ }
+
+    this.typingUnsubscribe = onValue(dbRef(db, `typing/${this.roomId}`), (snap) => {
+      const val = snap.val() || {};
+      const now = Date.now();
+
+      const entries = Object.keys(val).map(k => ({
+        userId: k,
+        typing: val[k]?.typing ?? false,
+        lastUpdated: val[k]?.lastUpdated ?? 0,
+        name: val[k]?.name ?? null
+      }));
+
+      // recent typing entries (exclude self)
+      const recent = entries.filter(e =>
+        e.userId !== this.senderId &&
+        e.typing &&
+        (now - (e.lastUpdated || 0)) < 10000
+      );
+
+      // set the count quickly (used by your *ngIf="typingCount > 0")
+      this.typingCount = recent.length;
+
+      // If private: we only need the count (three dots). Optionally keep a single typingUsers entry.
+      if (this.chatType === 'private') {
+        if (recent.length === 0) {
+          this.typingUsers = [];
+          this.typingFrom = null;
+          return;
+        }
+
+        // pick first typing user (there should usually be at most one in a direct chat)
+        const other = recent[0];
+
+        // Keep a minimal typingUsers entry (private template doesn't use it, but safe to have)
+        this.typingUsers = [{
+          userId: other.userId,
+          name: other.name || `User ${other.userId}`,
+          avatar: 'assets/images/default-avatar.png'
+        }];
+
+        this.typingFrom = this.typingUsers[0].name || null;
+        return;
       }
-    } catch (error) {
-      console.error('Error fetching group name:', error);
-      this.groupName = 'Group';
-    }
+
+      // -------------------------------
+      // GROUP chat handling
+      // -------------------------------
+      const usersForDisplay: { userId: string; name: string | null; avatar: string | null }[] = [];
+
+      recent.forEach(e => {
+        let member = this.groupMembers.find(m => String(m.user_id) === String(e.userId));
+        if (!member) {
+          // fallback by phone_number if stored that way
+          member = this.groupMembers.find(m => m.phone_number && String(m.phone_number) === String(e.userId));
+        }
+
+        const avatar = member?.avatar || null;
+        const displayName = member?.name || e.name || e.userId;
+
+        usersForDisplay.push({
+          userId: e.userId,
+          name: displayName,
+          avatar: avatar || 'assets/images/default-avatar.png'
+        });
+      });
+
+      // Deduplicate preserving order
+      const uniq: { [k: string]: boolean } = {};
+      this.typingUsers = usersForDisplay.filter(u => {
+        if (uniq[u.userId]) return false;
+        uniq[u.userId] = true;
+        return true;
+      });
+
+      this.typingFrom = this.typingUsers.length ? this.typingUsers[0].name : null;
+    });
+  } catch (err) {
+    console.warn('setupTypingListener error', err);
   }
+}
 
   async ngAfterViewInit() {
     if (this.ionContent) {
       this.ionContent.ionScroll.subscribe(async (event: any) => {
-        // Check if user scrolled to top (for loading older messages)
         if (event.detail.scrollTop < 100 && this.hasMoreMessages && !this.isLoadingMore) {
           await this.loadMoreMessages();
         }
       });
+    }
+
+    this.setDynamicPadding();
+
+    window.addEventListener('resize', this.resizeHandler);
+
+    const footer = this.el.nativeElement.querySelector('.footer-fixed') as HTMLElement;
+    if (footer && ('ResizeObserver' in window)) {
+      const ro = new (window as any).ResizeObserver(() => this.setDynamicPadding());
+      ro.observe(footer);
+      (this as any)._ro = ro;
     }
   }
 
@@ -1145,10 +1136,8 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     const currentScrollHeight = this.scrollContainer?.nativeElement?.scrollHeight || 0;
 
     try {
-      // Load next batch of messages
       await this.loadMessagesFromFirebase(true);
 
-      // Maintain scroll position after loading new messages
       setTimeout(() => {
         if (this.scrollContainer?.nativeElement) {
           const newScrollHeight = this.scrollContainer.nativeElement.scrollHeight;
@@ -1168,7 +1157,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     return userA < userB ? `${userA}_${userB}` : `${userB}_${userA}`;
   }
 
-
   async listenForMessages() {
     this.messageSub = this.chatService.listenForMessages(this.roomId).subscribe(async (newMessages) => {
       const decryptedMessages: Message[] = [];
@@ -1178,13 +1166,11 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
         const processedMessage = { ...msg, text: decryptedText };
         decryptedMessages.push(processedMessage);
 
-        // Mark as delivered if current user is receiver
         if (msg.receiver_id === this.senderId && !msg.delivered) {
           this.chatService.markDelivered(this.roomId, msg.key);
         }
       }
 
-      // Check if we have new messages that aren't in our current display
       const newestDisplayedTimestamp = this.displayedMessages.length > 0
         ? new Date(this.displayedMessages[this.displayedMessages.length - 1].timestamp).getTime()
         : 0;
@@ -1194,17 +1180,13 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       );
 
       if (newIncomingMessages.length > 0) {
-        // Add new messages to our arrays
         this.allMessages = [...this.allMessages, ...newIncomingMessages];
         this.displayedMessages = [...this.displayedMessages, ...newIncomingMessages];
 
-        // Re-group messages
         this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
 
-        // Save to localStorage
         this.saveToLocalStorage();
 
-        // Scroll to bottom for new messages
         setTimeout(() => {
           this.scrollToBottom();
           this.observeVisibleMessages();
@@ -1238,7 +1220,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
         const observer = new IntersectionObserver(entries => {
           entries.forEach(entry => {
             if (entry.isIntersecting) {
-              // ✅ Mark as read when visible
               this.chatService.markRead(this.roomId, msgKey);
               observer.unobserve(entry.target);
             }
@@ -1261,7 +1242,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     for (const msg of messages) {
       const timestamp = new Date(msg.timestamp);
 
-      // Format time
       const hours = timestamp.getHours();
       const minutes = timestamp.getMinutes();
       const ampm = hours >= 12 ? 'PM' : 'AM';
@@ -1269,7 +1249,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
       msg.time = `${formattedHours}:${formattedMinutes} ${ampm}`;
 
-      // Handle attachments
       if (msg.attachment) {
         const currentUserId = this.authService.authData?.userId;
         const receiverId = msg.receiver_id;
@@ -1303,7 +1282,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
         );
       }
 
-      // Date labeling logic
       const isToday =
         timestamp.getDate() === today.getDate() &&
         timestamp.getMonth() === today.getMonth() &&
@@ -1342,7 +1320,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     return this.isLoadingMore;
   }
 
-  // Method to refresh messages (pull to refresh)
   async refreshMessages(event?: any) {
     try {
       this.page = 0;
@@ -1372,8 +1349,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       const rawMessages = JSON.parse(cached);
       const decryptedMessages = [];
 
-      // Load only the latest messages from cache (limit to recent ones)
-      const recentMessages = rawMessages.slice(-this.limit * 3); // Keep 3 pages worth in memory
+      const recentMessages = rawMessages.slice(-this.limit * 3);
 
       for (const msg of recentMessages) {
         const decryptedText = await this.encryptionService.decrypt(msg.text || '');
@@ -1381,7 +1357,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       }
 
       this.allMessages = decryptedMessages;
-      this.displayedMessages = decryptedMessages.slice(-this.limit); // Show only latest batch
+      this.displayedMessages = decryptedMessages.slice(-this.limit);
       this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
 
       if (decryptedMessages.length > 0) {
@@ -1424,7 +1400,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
 
       console.log("blob object is ::::", blob);
 
-      // ✅ Create preview URL
       const previewUrl = URL.createObjectURL(blob);
 
       this.selectedAttachment = {
@@ -1445,7 +1420,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     return parts.length > 1 ? parts.pop()!.toLowerCase() : '';
   }
 
-
   private async compressImage(blob: Blob): Promise<Blob> {
     if (!blob.type.startsWith('image/')) {
       return blob;
@@ -1464,7 +1438,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       return blob;
     }
   }
-
 
   cancelAttachment() {
     this.selectedAttachment = null;
@@ -1504,7 +1477,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
         isEdit: false,
       };
 
-      // Handle attachment with S3 upload
       if (this.selectedAttachment) {
         try {
           const mediaId = await this.uploadAttachmentToS3(this.selectedAttachment);
@@ -1519,27 +1491,24 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
             caption: plainText
           };
 
-          // Also save locally for quick access
           const file_path = await this.FileService.saveFileToSent(this.selectedAttachment.fileName, this.selectedAttachment.blob);
 
           await this.sqliteService.saveAttachment(this.roomId, this.selectedAttachment.type, file_path, mediaId);
 
         } catch (error) {
           console.error('Failed to upload attachment:', error);
-          // Show error toast
           const toast = await this.toastCtrl.create({
             message: 'Failed to upload attachment. Please try again.',
             duration: 3000,
             color: 'danger'
           });
           await toast.present();
-          return; // Don't send message if attachment upload fails
+          return;
         }
       }
 
       await this.chatService.sendMessage(this.roomId, message, this.chatType, this.senderId);
 
-      // Clear everything after sending
       this.messageText = '';
       this.selectedAttachment = null;
       this.showPreviewModal = false;
@@ -1550,7 +1519,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
 
     } catch (error) {
       console.error('Error sending message:', error);
-      // Show error toast
       const toast = await this.toastCtrl.create({
         message: 'Failed to send message. Please try again.',
         duration: 3000,
@@ -1558,7 +1526,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       });
       await toast.present();
     } finally {
-      // Always reset sending state
       this.isSending = false;
     }
   }
@@ -1582,7 +1549,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
         throw new Error('Failed to get upload URL');
       }
 
-
       const uploadResult = await firstValueFrom(
         this.service.uploadToS3(uploadResponse.upload_url, this.blobToFile(attachment.blob, attachment.fileName, attachment.mimeType))
       );
@@ -1595,14 +1561,12 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-
   async openAttachmentModal(msg: any) {
     if (!msg.attachment) return;
 
     let attachmentUrl = '';
 
     try {
-      // First try to get from local storage for quick access
       const localUrl = await this.FileService.getFilePreview(
         `${msg.sender_id === this.senderId ? 'sent' : 'received'}/${msg.attachment.fileName}`
       );
@@ -1610,13 +1574,11 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       if (localUrl) {
         attachmentUrl = localUrl;
       } else {
-        // If not available locally, get download URL from S3
         const downloadResponse = await this.service.getDownloadUrl(msg.attachment.mediaId).toPromise();
 
         if (downloadResponse?.status && downloadResponse.downloadUrl) {
           attachmentUrl = downloadResponse.downloadUrl;
 
-          // Optionally save to local storage for future use
           if (msg.sender_id !== this.senderId) {
             this.downloadAndSaveLocally(downloadResponse.downloadUrl, msg.attachment.fileName);
           }
@@ -1628,7 +1590,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
         componentProps: {
           attachment: {
             ...msg.attachment,
-            url: attachmentUrl // Pass the URL to modal
+            url: attachmentUrl
           },
           message: msg
         },
@@ -1653,7 +1615,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  // 6. Helper method to download and save files locally
   private async downloadAndSaveLocally(url: string, fileName: string) {
     try {
       const response = await fetch(url);
@@ -1664,7 +1625,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  // 7. Updated attachment preview in chat (for thumbnails)
   getAttachmentPreview(attachment: any): string {
     if (attachment.caption) {
       return attachment.caption.length > 30 ?
@@ -1680,7 +1640,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       default: return '📎 Attachment';
     }
   }
-
 
   async showAttachmentPreviewPopup() {
     const alert = await this.alertController.create({
@@ -1706,7 +1665,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     await alert.present();
   }
 
-
   getAttachmentPreviewHtml(): string {
     if (!this.selectedAttachment) return '';
 
@@ -1727,8 +1685,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-
-  // Guess mime from file name
   getMimeTypeFromName(name: string): string {
     const ext = name.split('.').pop()?.toLowerCase();
     switch (ext) {
@@ -1737,7 +1693,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       case 'png': return 'image/png';
       case 'pdf': return 'application/pdf';
       case 'docx': return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-      // Add more if needed
       default: return '';
     }
   }
@@ -1750,7 +1705,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       let qry;
 
       if (loadMore && this.lastMessageKey) {
-        // Load older messages using pagination
         qry = query(
           messagesRef,
           orderByKey(),
@@ -1758,7 +1712,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
           limitToLast(this.limit)
         );
       } else {
-        // Load latest messages
         qry = query(
           messagesRef,
           orderByKey(),
@@ -1772,7 +1725,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
         const newMessages: Message[] = [];
         const messagesData = snapshot.val();
 
-        // Convert to array and sort by timestamp
         const messageKeys = Object.keys(messagesData).sort();
 
         for (const key of messageKeys) {
@@ -1787,16 +1739,13 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
         }
 
         if (loadMore) {
-          // Prepend older messages to the beginning
           this.allMessages = [...newMessages, ...this.allMessages];
           this.displayedMessages = [...newMessages, ...this.displayedMessages];
         } else {
-          // Replace with latest messages
           this.allMessages = newMessages;
           this.displayedMessages = newMessages;
         }
 
-        // Update pagination tracking
         if (newMessages.length > 0) {
           if (loadMore) {
             this.lastMessageKey = newMessages[0].key;
@@ -1805,16 +1754,12 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
           }
         }
 
-        // Check if we have more messages to load
         this.hasMoreMessages = newMessages.length === this.limit;
 
-        // Group messages by date
         this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
 
-        // Save to localStorage
         this.saveToLocalStorage();
 
-        // Mark messages as read
         await this.markDisplayedMessagesAsRead();
 
       } else {
@@ -1837,17 +1782,14 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     this.router.navigate(['/profile-screen'], { queryParams });
   }
 
-
   saveToLocalStorage() {
     try {
-      // Save all messages but limit to recent ones to prevent localStorage bloat
       const messagesToSave = this.allMessages.slice(-100);
       localStorage.setItem(this.roomId, JSON.stringify(messagesToSave));
     } catch (error) {
       console.error('Error saving to localStorage:', error);
     }
   }
-
 
   scrollToBottom() {
     if (this.ionContent) {
@@ -1862,10 +1804,12 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onInputFocus() {
+    this.setDynamicPadding();
   }
 
   onInputBlur() {
     this.onInputBlurTyping();
+    this.setDynamicPadding();
   }
 
   goToCallingScreen() {
@@ -1880,7 +1824,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
         resultType: CameraResultType.Uri
       });
       this.capturedImage = image.webPath!;
-      // console.log("camera checking:",this.capturedImage);
     } catch (error) {
       console.error('Camera error:', error);
     }
@@ -1906,5 +1849,61 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       if (this.typingUnsubscribe) this.typingUnsubscribe();
     } catch (e) { /* ignore */ }
     this.stopTypingSignal();
+
+    window.removeEventListener('resize', this.resizeHandler);
+    if ((this as any)._ro) {
+      (this as any)._ro.disconnect();
+    }
+  }
+
+  // -------------------------
+  // dynamic padding logic
+  // -------------------------
+  private isGestureNavigation(): boolean {
+    const screenHeight = window.screen.height || 0;
+    const innerHeight = window.innerHeight || 0;
+    const diff = screenHeight - innerHeight;
+    return diff < 40;
+  }
+
+  private isTransparentButtonNav(): boolean {
+    const screenHeight = window.screen.height || 0;
+    const innerHeight = window.innerHeight || 0;
+    const diff = screenHeight - innerHeight;
+    return diff < 5;
+  }
+
+  setDynamicPadding() {
+    const footerEl = this.el.nativeElement.querySelector('.footer-fixed') as HTMLElement;
+    if (!footerEl) return;
+
+    if (this.platform.is('ios')) {
+      const safeAreaBottom = parseInt(
+        getComputedStyle(document.documentElement).getPropertyValue('--ion-safe-area-bottom')
+      ) || 0;
+
+      if (safeAreaBottom > 0) {
+        this.renderer.setStyle(footerEl, 'padding-bottom', '16px');
+        console.log('chat: ✅ Gesture Navigation detected (iOS) — padding 16px');
+      } else {
+        this.renderer.setStyle(footerEl, 'padding-bottom', '6px');
+        console.log('chat: 🔘 Buttons Navigation detected (iOS) — padding 6px');
+      }
+    } else {
+      if (this.isGestureNavigation()) {
+        this.renderer.setStyle(footerEl, 'padding-bottom', '35px');
+        console.log('chat: ✅ Gesture Navigation detected (Android) — padding 35px');
+      } else if (this.isTransparentButtonNav()) {
+        this.renderer.setStyle(footerEl, 'padding-bottom', '35px');
+        console.log('chat: ✨ Transparent Button Navigation detected (Android) — padding 35px');
+      } else {
+        this.renderer.setStyle(footerEl, 'padding-bottom', '6px');
+        console.log('chat: 🔘 Buttons Navigation detected (Android) — padding 6px');
+      }
+    }
+  }
+
+  onKeyboardOrInputChange() {
+    this.setDynamicPadding();
   }
 }

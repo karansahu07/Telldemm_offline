@@ -9,18 +9,22 @@ import {
   child,
   runTransaction
 } from '@angular/fire/database';
-import { Observable } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
 import { getDatabase, remove, update } from 'firebase/database';
 // import { getStorage, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { Message, PinnedMessage } from 'src/types';
 import { CLOSING } from 'ws';
+import { ApiService } from './api/api.service';
 
 @Injectable({ providedIn: 'root' })
 export class FirebaseChatService {
 
   private forwardMessages: any[] = [];
 
-  constructor(private db: Database) { }
+  constructor(
+    private db: Database,
+    private service : ApiService
+  ) { }
 
   getRoomId(senderId: string, arg1: string): string {
     throw new Error('Method not implemented.');
@@ -60,33 +64,6 @@ export class FirebaseChatService {
       });
     });
   }
-
-  // async pinMessage(message: PinnedMessage) {
-  //   console.log("messages dsgsd", message)
-  //   const { roomId, pinnedBy, scope } = message;
-  //   const key = scope === 'private' ? `${roomId}_${pinnedBy}` : roomId;
-  //   const pinRef = ref(this.db, `pinnedMessages/${key}`);
-  //   const snapshot = await get(pinRef);
-
-  //   if (snapshot.exists()) {
-  //     await update(pinRef, {
-  //       key: message.key,
-  //       messageId: message.messageId,
-  //       pinnedAt: Date.now(),
-  //       pinnedBy: message.pinnedBy,
-  //       scope: message.scope
-  //     });
-  //   } else {
-  //     await set(pinRef, {
-  //       key: message.key,
-  //       roomId: message.roomId,
-  //       messageId: message.messageId,
-  //       pinnedBy: message.pinnedBy,
-  //       pinnedAt: Date.now(),
-  //       scope: message.scope
-  //     });
-  //   }
-  // }
 
   async pinMessage(message: PinnedMessage) {
     console.log("messages dsgsd", message);
@@ -148,53 +125,6 @@ export class FirebaseChatService {
   }
 
 
-  // Get pinned message for current chat
-  // async getPinnedMessage(roomId: string, userId: string, chatType: string): Promise<PinnedMessage | null> {
-  //   try {
-  //     const scope = chatType === 'group' ? 'global' : 'private';
-  //     const key = scope === 'private' ? `${roomId}_${userId}` : roomId;
-  //     const pinRef = ref(this.db, `pinnedMessages/${key}`);
-  //     const snapshot = await get(pinRef);
-
-  //     if (snapshot.exists()) {
-  //       return snapshot.val() as PinnedMessage;
-  //     }
-  //     return null;
-  //   } catch (error) {
-  //     console.error('Error getting pinned message:', error);
-  //     return null;
-  //   }
-  // }
-
-  // // Listen to pinned message changes
-  // listenToPinnedMessage(roomId: string, userId: string, chatType: string, callback: (pinnedMessage: PinnedMessage | null) => void) {
-  //   const scope = chatType === 'group' ? 'global' : 'private';
-  //   const key = scope === 'private' ? `${roomId}_${userId}` : roomId;
-  //   const pinRef = ref(this.db, `pinnedMessages/${key}`);
-
-  //   return onValue(pinRef, (snapshot) => {
-  //     if (snapshot.exists()) {
-  //       callback(snapshot.val() as PinnedMessage);
-  //     } else {
-  //       callback(null);
-  //     }
-  //   });
-  // }
-
-  // // Unpin message
-  // async unpinMessage(roomId: string, userId: string, chatType: string) {
-  //   try {
-  //     const scope = chatType === 'group' ? 'global' : 'private';
-  //     const key = scope === 'private' ? `${roomId}_${userId}` : roomId;
-  //     const pinRef = ref(this.db, `pinnedMessages/${key}`);
-  //     await remove(pinRef);
-  //     console.log("Message unpinned");
-  //   } catch (error) {
-  //     console.error('Error unpinning message:', error);
-  //   }
-  // }
-
-
   async createGroup(groupId: string, groupName: string, members: any[], currentUserId: string) {
     const db = getDatabase();
     const groupRef = ref(db, `groups/${groupId}`);
@@ -235,39 +165,6 @@ export class FirebaseChatService {
 
 
 
-  // async createGroup(groupId: string, groupName: string, members: any[], currentUserId: string) {
-  //   const db = getDatabase();
-  //   const groupRef = ref(db, `groups/${groupId}`);
-
-  //   const currentUser = members.find(m => m.user_id === currentUserId);
-  //   const currentUserName = currentUser?.name || 'Unknown';
-
-  //   console.log("currentUser", currentUserName);
-
-  //   const groupData = {
-  //     name: groupName,
-  //     groupId,
-  //     description: 'Hey I am using Telldemm',
-  //     createdBy: currentUserId,
-  //     createdByName: currentUserName,                 
-  //     createdAt: new Date().toLocaleString(),
-  //     backend_group_id: null, // ✅ Placeholder, updated after backend responds
-  //     members: members.reduce((acc, member) => {
-  //       acc[member.user_id] = {
-  //         name: member.name,
-  //         phone_number: member.phone_number,
-  //         status: "active",
-  //         role: member.user_id === currentUserId ? "admin" : "member"
-  //       };
-  //       return acc;
-  //     }, {})
-  //   };
-
-  //   await set(groupRef, groupData);
-  // }
-
-
-
   async getGroupInfo(groupId: string): Promise<any> {
     const snapshot = await get(child(ref(this.db), `groups/${groupId}`));
     return snapshot.exists() ? snapshot.val() : null;
@@ -299,6 +196,53 @@ export class FirebaseChatService {
       createdBy,
       groups: {}
     });
+  }
+
+  async fetchGroupWithProfiles(groupId: string): Promise<{ groupName: string; groupMembers: any[] }> {
+    try {
+      const db = getDatabase();
+      const groupRef = ref(db, `groups/${groupId}`);
+      const snapshot = await get(groupRef);
+
+      if (!snapshot.exists()) {
+        return { groupName: 'Group', groupMembers: [] };
+      }
+
+      const groupData = snapshot.val();
+      const groupName = groupData.name || 'Group';
+
+      // Build members array from RTDB node
+      const rawMembers = groupData.members || {};
+      const members: any[] = Object.entries(rawMembers).map(([userId, userData]: [string, any]) => ({
+        user_id: userId,
+        phone_number: userData?.phone_number,
+        ...userData
+      }));
+
+      // Enrich members by calling API in parallel
+      const membersWithProfiles = await Promise.all(members.map(async (m) => {
+        try {
+          const res: any = await firstValueFrom(this.service.getUserProfilebyId(String(m.user_id)));
+          // API response example:
+          // { name, profile, publicKeyHex, phone_number }
+
+          m.avatar = res?.profile || m.avatar || 'assets/images/default-avatar.png';
+          m.name = m.name || res?.name || `User ${m.user_id}`;
+          m.publicKeyHex = res?.publicKeyHex || m.publicKeyHex || null;
+          m.phone_number = m.phone_number || res?.phone_number || m.phone_number;
+        } catch (err) {
+          console.warn(`fetchGroupWithProfiles: failed to fetch profile for ${m.user_id}`, err);
+          m.avatar = m.avatar || 'assets/images/default-avatar.png';
+          m.name = m.name || `User ${m.user_id}`;
+        }
+        return m;
+      }));
+
+      return { groupName, groupMembers: membersWithProfiles };
+    } catch (err) {
+      console.error('fetchGroupWithProfiles error', err);
+      return { groupName: 'Group', groupMembers: [] };
+    }
   }
 
   // ✅ Add user to community

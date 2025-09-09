@@ -398,33 +398,54 @@
 
   <!-- ========================= -->
 <!-- Typing indicator (above keyboard) -->
-<!-- Paste this as FIRST child inside <div class="footer-fixed"> -->
+<!-- Typing indicator wrapper (unchanged position) -->
 <div class="typing-indicator-wrapper" *ngIf="typingCount > 0">
-  <div class="typing-indicator-content">
+  <!-- GROUP layout: avatars on left, dots to the right -->
+  <div *ngIf="chatType === 'group'" class="typing-indicator-content group">
     <div class="typing-text">
-      <!-- Private -->
-      <!-- <ng-container *ngIf="chatType === 'private'">
-        {{ receiver_name }} is typing...
-      </ng-container> -->
+      <div class="typing-avatars">
+        <!-- single -->
+        <ng-container *ngIf="typingCount === 1 && typingUsers.length >= 1">
+          <img
+            class="typing-avatar single"
+            [src]="typingUsers[0].avatar"
+            (error)="setDefaultAvatar($event)"
+            [alt]="typingUsers[0].name || 'User'">
+          <span class="typing-label">{{ typingUsers[0].name || 'Someone' }} is typing...</span>
+        </ng-container>
 
-      <!-- Group -->
-      <ng-container *ngIf="chatType === 'group'">
-        <ng-container *ngIf="typingCount === 1">
-          {{ typingFrom || 'Someone' }} is typing...
+        <!-- multiple -->
+        <ng-container *ngIf="typingCount >= 2">
+          <div class="avatar-stack">
+            <img *ngFor="let u of typingUsers.slice(0,3); let i = index"
+                 class="typing-avatar stacked idx-{{i}}"
+                 [src]="u.avatar"
+                 (error)="setDefaultAvatar($event)"
+                 [alt]="u.name || 'User'">
+            <div class="more-badge" *ngIf="typingCount > 3">+{{ typingCount - 3 }}</div>
+          </div>
         </ng-container>
-        <ng-container *ngIf="typingCount > 1">
-          {{ typingCount }} people are typing...
-        </ng-container>
-      </ng-container>
+      </div>
     </div>
 
-    <div class="typing-dots" aria-hidden="true">
+    <!-- dots aligned to the right of the content -->
+    <div class="typing-dots" aria-hidden="true" role="status" aria-label="typing">
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </div>
+  </div>
+
+  <!-- PRIVATE layout: only centered dots -->
+  <div *ngIf="chatType === 'private'" class="typing-indicator-content private">
+    <div class="typing-dots center-only" aria-hidden="true" role="status" aria-label="typing">
       <span class="dot"></span>
       <span class="dot"></span>
       <span class="dot"></span>
     </div>
   </div>
 </div>
+
 <!-- ========================= -->
 
 
@@ -468,36 +489,6 @@
       <ion-icon name="attach-outline" (click)="pickAttachment()" class="icon-right"></ion-icon>
       <!-- </ion-button> -->
 
-      <!-- Show attachment -->
-      <!-- <ion-list *ngIf="attachment.length > 0">
-  <ion-item *ngFor="let att of attachment">
-    <ion-thumbnail slot="start" *ngIf="att.type === 'image'">
-      <img [src]="att.filePath" />
-    </ion-thumbnail>
-    <ion-label>
-      <p>{{ att.type }} - {{ att.createdAt | date:'short' }}</p>
-    </ion-label>
-  </ion-item>
-</ion-list> -->
-
-      <!-- <div *ngFor="let message of messages">
-    <div *ngIf="message.type === 'image'">
-      <img [src]="message.url" style="max-width: 200px;" />
-    </div>
-    <div *ngIf="message.type === 'text'">{{ message.text }}</div>
-  </div> -->
-
-      <!-- <ion-list *ngIf="attachment.length > 0">
-        <ion-item *ngFor="let att of attachment">
-          <ion-thumbnail slot="start" *ngIf="att.type === 'image'">
-            <img [src]="att.filePath" />
-          </ion-thumbnail>
-          <ion-label>
-            <p>{{ att.type }} - {{ att.createdAt | date:'short' }}</p>
-          </ion-label>
-        </ion-item>
-      </ion-list> -->
-
       <ion-icon name="camera-outline" class="icon-right" (click)="openCamera()"></ion-icon>
     </ion-col>
 
@@ -511,15 +502,6 @@
     </ion-col>
   </ion-row>
 </div>
-
-<!-- <ion-modal [isOpen]="showDateModal" (didDismiss)="showDateModal = false">
-  <ng-template>
-    <ion-content>
-      <ion-datetime presentation="date" [showDefaultButtons]="true" (ionChange)="onDateSelected($event)">
-      </ion-datetime>
-    </ion-content>
-  </ng-template>
-</ion-modal> -->
 
 <ion-popover [isOpen]="showPopover" [event]="popoverEvent" (didDismiss)="showPopover = false"
   style="--width: 300px; --height: 400px">

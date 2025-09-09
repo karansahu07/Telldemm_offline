@@ -61,7 +61,7 @@ import {
   OnChanges,
   SimpleChanges,
   AfterViewChecked,
-  ElementRef
+  ElementRef   // ✅ add
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -83,8 +83,9 @@ export class FooterTabsComponent implements AfterViewInit, OnChanges, AfterViewC
     private router: Router,
     private platform: Platform,
     private renderer: Renderer2,
-    private el: ElementRef
+    private el: ElementRef   // ✅ add
   ) {
+    // Router navigation par recalc
     this.router.events.subscribe(() => {
       this.activePath = this.router.url;
       this.setDynamicPadding();
@@ -110,9 +111,18 @@ export class FooterTabsComponent implements AfterViewInit, OnChanges, AfterViewC
     const screenHeight = window.screen.height;
     const innerHeight = window.innerHeight;
     const diff = screenHeight - innerHeight;
-    console.log(`screenHeight: ${screenHeight}, innerHeight: ${innerHeight}, diff: ${diff}`);
+    // console.log(`screenHeight: ${screenHeight}, innerHeight: ${innerHeight}, diff: ${diff}`);
     return diff < 40;
   }
+  private isTransparentButtonNav(): boolean {
+  const screenHeight = window.screen.height;
+  const innerHeight = window.innerHeight;
+  const diff = screenHeight - innerHeight;
+ 
+  // Transparent button nav usually => diff < 5
+  return diff < 5;
+}
+ 
  
   setDynamicPadding() {
     // ✅ sirf iss component ka mineclass select kar
@@ -126,18 +136,22 @@ export class FooterTabsComponent implements AfterViewInit, OnChanges, AfterViewC
  
       if (safeAreaBottom > 0) {
         this.renderer.setStyle(mineclassEl, 'padding-bottom', '16px');
-        console.log('✅ Gesture Navigation detected (iOS)');
+        // console.log('✅ Gesture Navigation detected (iOS)');
       } else {
         this.renderer.setStyle(mineclassEl, 'padding-bottom', '6px');
-        console.log('🔘 Buttons Navigation detected (iOS)');
+        // console.log('🔘 Buttons Navigation detected (iOS)');
       }
     } else {
       if (this.isGestureNavigation()) {
-        this.renderer.setStyle(mineclassEl, 'padding-bottom', '16px');
-        console.log('✅ Gesture Navigation detected (Android)');
-      } else {
+        this.renderer.setStyle(mineclassEl, 'padding-bottom', '35px');
+        // console.log('✅ Gesture Navigation detected (Android)');
+      }  else if (this.isTransparentButtonNav()) {
+    this.renderer.setStyle(mineclassEl, 'padding-bottom', '35px');
+    // console.log('✨ Transparent Button Navigation detected (Android)');
+  }
+      else {
         this.renderer.setStyle(mineclassEl, 'padding-bottom', '6px');
-        console.log('🔘 Buttons Navigation detected (Android)');
+        // console.log('🔘 Buttons Navigation detected (Android)');
       }
     }
   }
