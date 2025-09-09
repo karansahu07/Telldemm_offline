@@ -184,6 +184,14 @@ const routes: Routes = [
     path: 'profile-dp-view',
     loadChildren: () => import('./pages/profile-dp-view/profile-dp-view.module').then( m => m.ProfileDpViewPageModule)
   },
+  {
+    path: 'update-username',
+    loadChildren: () => import('./pages/update-username/update-username.module').then( m => m.UpdateUsernamePageModule)
+  },
+  {
+    path: 'update-status',
+    loadChildren: () => import('./pages/update-status/update-status.module').then( m => m.UpdateStatusPageModule)
+  },
 
 
 ];

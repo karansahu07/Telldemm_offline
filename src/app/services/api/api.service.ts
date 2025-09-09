@@ -226,4 +226,21 @@ getGroupDp(firebase_group_id: string): Observable<{ status: boolean; group_dp: s
   }> {
     return this.get(`/api/media/download-url/${media_id}`);
   }
+
+   // ----------------- ✏️ USER UPDATES -----------------
+
+  /**
+   * Update user name
+   */
+  updateUserName(user_id: number, name: string): Observable<any> {
+    return this.post('/api/users/update-name', { user_id, name });
+  }
+
+  /**
+ * Update user status
+ */
+updateUserStatus(user_id: number, status: string): Observable<any> {
+  return this.post('/api/users/update-status', { user_id, status });
+}
+
 }
