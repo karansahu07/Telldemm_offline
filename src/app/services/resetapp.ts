@@ -234,22 +234,22 @@ export class Resetapp {
 
   /** Reset everything */
    async resetApp() {
-    // const userId = await this.authService.authData?.userId;
+    const userId = await this.authService.authData?.userId;
 
-    // if (userId) {
-    //   try {
-    //     await this.fcmService.deleteFcmToken(userId);
-    //   } catch (err) {
-    //     console.warn('Failed to delete FCM token', err);
-    //   }
-    //   try {
-    //     await this.fcmService.setUserOffline(userId);
-    //   } catch (err) {
-    //     console.warn('Failed to set user offline', err);
-    //   }
-    // } else {
-    //   console.log('No userId found before reset; skipping FCM token delete');
-    // }
+    if (userId) {
+      try {
+        await this.fcmService.deleteFcmToken(userId);
+      } catch (err) {
+        console.warn('Failed to delete FCM token', err);
+      }
+      try {
+        await this.fcmService.setUserOffline(userId);
+      } catch (err) {
+        console.warn('Failed to set user offline', err);
+      }
+    } else {
+      console.log('No userId found before reset; skipping FCM token delete');
+    }
 
     this.clearLocalStorage();
     await this.clearCapacitorStorage();

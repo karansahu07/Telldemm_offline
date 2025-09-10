@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Preferences } from '@capacitor/preferences';
 import { SecureStorageService } from '../../services/secure-storage/secure-storage.service';
-import { Database } from '@angular/fire/database';
+import { Database, get, getDatabase } from '@angular/fire/database';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { onValue, ref } from '@angular/fire/database';
 import { AuthService } from 'src/app/auth/auth.service';
@@ -408,25 +408,118 @@ export class ProfileSetupPage implements OnInit, OnDestroy {
   /**
    * Save additional data (FCM token, profile URL, etc.)
    */
-  private async saveAdditionalData(): Promise<void> {
-    try {
-      // Save FCM token
+//   private async saveAdditionalData(): Promise<void> {
+//   try {
+//     const db = getDatabase();
+//     const userRef = ref(db, `users/${this.userID}`);
+
+//     // read current user record
+//     const snapshot = await get(userRef);
+
+//     if (!snapshot.exists()) {
+//       // user does not exist in DB yet -> use existing save flow for new users
+//       console.log('User not found in DB — saving as new user and storing FCM token');
+//       await this.fcmService.saveFcmTokenToDatabase(
+//         this.userID,
+//         this.name,
+//         this.phoneNumber
+//       );
+//     } else {
+//       // user exists — check if fcmToken is present
+//       const userData: any = snapshot.val();
+//       if (!userData || !userData.fcmToken) {
+//         console.log('User exists but no fcmToken found — refreshing token');
+//         // updateFcmToken will actively request a fresh token and write it to DB
+//         await this.fcmService.updateFcmToken(this.userID);
+//       } else {
+//         console.log('User exists and fcmToken is already present — skipping token update');
+//       }
+//     }
+
+//     // Update name in AuthService (keep this regardless of token state)
+//     await this.authService.updateUserName(this.name);
+
+//     // Save profile image if present
+//     if (this.imageData) {
+//       await this.secureStorage.setItem('profile_url', this.imageData);
+//     }
+
+//     console.log('Additional data saved successfully');
+//   } catch (error) {
+//     console.error('Error saving additional data:', error);
+//   }
+// }
+
+private async saveAdditionalData(): Promise<void> {
+  try {
+    const db = getDatabase();
+    const userRef = ref(db, `users/${this.userID}`);
+
+    // read current user record
+    const snapshot = await get(userRef);
+
+    let finalFcmToken: string | null = null;
+
+    if (!snapshot.exists()) {
+      // user does not exist in DB yet -> use existing save flow for new users
+      console.log('User not found in DB — saving as new user and storing FCM token');
       await this.fcmService.saveFcmTokenToDatabase(
         this.userID,
         this.name,
         this.phoneNumber
       );
 
-      // Update name in AuthService
-      await this.authService.updateUserName(this.name);
+      // after saving to DB, get token from service
+      finalFcmToken = this.fcmService.getFcmToken();
+    } else {
+      // user exists — check if fcmToken is present
+      const userData: any = snapshot.val();
+      if (!userData || !userData.fcmToken) {
+        console.log('User exists but no fcmToken found — refreshing token');
+        // updateFcmToken will actively request a fresh token and write it to DB
+        await this.fcmService.updateFcmToken(this.userID);
 
-      if (this.imageData) {
-        await this.secureStorage.setItem('profile_url', this.imageData);
+        // fetch refreshed token from service
+        finalFcmToken = this.fcmService.getFcmToken();
+      } else {
+        console.log('User exists and fcmToken is already present — using existing token');
+        finalFcmToken = userData.fcmToken || this.fcmService.getFcmToken();
       }
-    } catch (error) {
-      console.error('Error saving additional data:', error);
     }
+
+    // If we have a token, call admin API to save/update it
+    if (finalFcmToken) {
+      // Ensure userId is a number for your API (adjust if backend accepts strings)
+      const UserId = Number(this.userID);
+      if (!Number.isNaN(UserId)) {
+        this.service.pushFcmToAdmin(UserId, finalFcmToken).subscribe({
+          next: (res) => {
+            console.log('✅ pushFcmToAdmin success', res);
+          },
+          error: (err) => {
+            console.error('❌ pushFcmToAdmin failed', err);
+          }
+        });
+      } else {
+        console.warn('UserID is not numeric — skipping pushFcmToAdmin. If backend accepts strings, change call accordingly.');
+      }
+    } else {
+      console.warn('No FCM token available to send to admin.');
+    }
+
+    // Update name in AuthService (keep this regardless of token state)
+    await this.authService.updateUserName(this.name);
+
+    // Save profile image if present
+    if (this.imageData) {
+      await this.secureStorage.setItem('profile_url', this.imageData);
+    }
+
+    console.log('Additional data saved successfully');
+  } catch (error) {
+    console.error('Error saving additional data:', error);
   }
+}
 
   /**
    * Handle navigation based on user rooms

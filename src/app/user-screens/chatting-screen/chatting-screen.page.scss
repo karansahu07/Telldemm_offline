@@ -699,7 +699,7 @@ ion-datetime {
   position: absolute;
   left: 12px;
   right: 12px;
-  bottom: 72px;
+  bottom: 100px;
   display: flex;
   justify-content: flex-start;
   pointer-events: none;
@@ -849,7 +849,7 @@ ion-datetime {
 @media (max-width: 420px) {
   .typing-indicator-content { padding: 6px 10px; border-radius: 18px; }
   .typing-text { max-width: 160px; font-size: 12px; }
-  .typing-indicator-wrapper { bottom: 65px; }
+  .typing-indicator-wrapper { bottom: 105px; }
   .typing-label { max-width: 90px; font-size: 13px; }
   .typing-avatar.single { width: 30px; height: 30px; }
   .typing-avatar.stacked { width: 26px; height: 26px; margin-left: -8px; }
