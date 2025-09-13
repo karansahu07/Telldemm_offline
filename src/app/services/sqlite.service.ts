@@ -363,7 +363,7 @@ export class SqliteService {
         }
       }
     }
-      console.log("media id", mediaId)
+      // console.log("media id", mediaId)
 
       // ❌ 2. File missing → get presigned download URL
       const apiResponse = await firstValueFrom(this.service.getDownloadUrl(mediaId));

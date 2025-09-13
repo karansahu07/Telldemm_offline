@@ -161,15 +161,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { ApiService } from 'src/app/services/api/api.service';
 import { ImageCropperModalComponent } from '../../components/image-cropper-modal/image-cropper-modal.component';
 import { Subject, takeUntil } from 'rxjs';
-
-interface CropResult {
-  success: boolean;
-  croppedImage?: string;
-  originalBlob?: Blob;
-  cropArea?: any;
-  error?: string;
-  cancelled?: boolean;
-}
+import { CropResult } from 'src/types';
 
 @Component({
   selector: 'app-profile-dp-view',

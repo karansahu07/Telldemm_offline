@@ -38,6 +38,35 @@ export class ApiService {
     return this.http.post(`${this.baseUrl}/api/users/update-dp`, formData);
   }
 
+  /**
+ * Mark user as online
+ */
+markUserOnline(user_id: number): Observable<any> {
+  return this.post('/api/users/markuser_online', { user_id });
+}
+
+/**
+ * Mark user as offline
+ */
+markUserOffline(user_id: number): Observable<any> {
+  return this.post('/api/users/markuser_offline', { user_id });
+}
+
+/**
+ * Get user online status
+ */
+getUserStatus(user_id: number): Observable<{ status: boolean; data: { is_online: number; last_seen: string } }> {
+  return this.get(`/api/users/status/${user_id}`);
+}
+
+
+/**
+ * Check if backend forces logout for a user
+ */
+checkUserLogout(user_id: number): Observable<{ status: boolean; force_logout: number }> {
+  return this.get(`/api/users/check-logout/${user_id}`);
+}
+
   // ----------------- 🔐 push fcm to admin APIs -----------------
 
     /**

@@ -81,6 +81,7 @@
     <ng-template #defaultHeader>
       <ion-buttons *ngIf="!showSearchBar" slot="start" style="color: black; width: 8%; margin-top: 15px;">
         <ion-back-button defaultHref="/home-screen"></ion-back-button>
+        <!-- <ion-icon name="arrow-back-outline" class="back-icon"></ion-icon> -->
       </ion-buttons>
 
       <ng-container *ngIf="!showSearchBar; else searchBar">
@@ -101,7 +102,20 @@
                 {{ chatType === 'group' ? groupName : receiver_name }}
               </h2>
 
+              <!-- ---- Presence (Online / Last seen) ---- -->
+              <div
+                style="font-size:12px; color: var(--ion-color-medium); margin-top:4px; display:flex; align-items:center; gap:8px;">
+                <ng-container *ngIf="receiverOnline; else lastSeenTpl">
+                  <span class="online-dot" aria-hidden="true"></span>
+                  <span>Online</span>
+                </ng-container>
 
+                <ng-template #lastSeenTpl>
+                  <span *ngIf="receiverLastSeen">Last seen at {{ receiverLastSeen }}</span>
+                </ng-template>
+              </div>
+
+              <!-- ---- Typing indicator (kept as-is, will show only when typingCount > 0) ---- -->
               <div class="chat-status" *ngIf="typingCount > 0"
                 style="font-size:12px; color: var(--ion-color-medium); margin-top:4px;">
                 <!-- Private Chat -->
@@ -114,25 +128,8 @@
                   {{ typingCount }} people are typing...
                 </ng-container>
               </div>
-              <!-- dont delete this block-->
-              <!-- <div class="chat-status" *ngIf="typingCount > 0"
-                style="font-size:12px; color: var(--ion-color-medium); margin-top:4px;">
-             
-                <ng-container *ngIf="chatType === 'private'">
-                  {{ receiver_name }} is typing...
-                </ng-container>
-
-               
-                <ng-container *ngIf="chatType === 'group'">
-                  <ng-container *ngIf="typingCount === 1">
-                    {{ typingFrom }} is typing...
-                  </ng-container>
-                  <ng-container *ngIf="typingCount > 1">
-                    {{ typingCount }} people are typing...
-                  </ng-container>
-                </ng-container>
-              </div> -->
             </ion-label>
+
           </ion-item>
         </ion-buttons>
       </ng-container>
@@ -178,6 +175,19 @@
   </ion-toolbar>
 </ion-header>
 
+<!-- BLOCK BANNERS -->
+<!-- <div *ngIf="chatType === 'private'">
+  <div *ngIf="iBlocked" class="blocked-banner" style="padding:8px; text-align:center; background:#fff3f3; color:#b00020;">
+    You have blocked {{ receiver_name }}. Messages won't be sent.
+    <button ion-button (click)="unblockFromChat()" style="margin-left:8px; border:none; background:transparent; color: #0a66ff;">Unblock</button>
+  </div>
+
+  <div *ngIf="!iBlocked && theyBlocked" class="blocked-banner" style="padding:8px; text-align:center; background:#fff7e6; color:#b36b00;">
+    You cannot send messages to {{ receiver_name }} — they have blocked you.
+  </div>
+</div> -->
+
+
 
 <ion-content class="chat-background" [fullscreen]="true" [scrollEvents]="true">
 
@@ -208,7 +218,22 @@
     </div>
   </div>
 
-  <div #scrollContainer class="chat-messages" style="padding: 10px 10px 80px 10px; overflow-y: auto; min-height: 100%;">
+  <div #scrollContainer class="chat-messages" style="padding: 10px 10px 10px 10px; overflow-y: auto; min-height: 100%;">
+
+    <!-- System block/unblock bubbles (only visible to blocker) -->
+    <div *ngIf="showBlockBubble" class="system-bubble-wrapper"
+      style="display:flex; justify-content:center; margin:10px 0;">
+      <div class="system-bubble" (click)="unblockFromChat()">
+        You blocked this contact. Tap to unblock.
+      </div>
+    </div>
+
+    <div *ngIf="showUnblockBubble" class="system-bubble-wrapper"
+      style="display:flex; justify-content:center; margin:10px 0;">
+      <div class="system-bubble system-bubble-success">
+        You unblocked this contact.
+      </div>
+    </div>
 
     <ion-spinner name="dots" *ngIf="isLoadingMore" style="margin: 8px auto; display: block;"></ion-spinner>
 
@@ -394,114 +419,106 @@
 
 
 <!-- ✅ Message Input Footer -->
+<!-- ========================= -->
+<!-- Message Input Footer (updated) -->
 <div class="footer-fixed">
 
-  <!-- ========================= -->
-<!-- Typing indicator (above keyboard) -->
-<!-- Typing indicator wrapper (unchanged position) -->
-<div class="typing-indicator-wrapper" *ngIf="typingCount > 0">
-  <!-- GROUP layout: avatars on left, dots to the right -->
-  <div *ngIf="chatType === 'group'" class="typing-indicator-content group">
-    <div class="typing-text">
-      <div class="typing-avatars">
-        <!-- single -->
-        <ng-container *ngIf="typingCount === 1 && typingUsers.length >= 1">
-          <img
-            class="typing-avatar single"
-            [src]="typingUsers[0].avatar"
-            (error)="setDefaultAvatar($event)"
-            [alt]="typingUsers[0].name || 'User'">
-          <!-- <span class="typing-label">{{ typingUsers[0].name || 'Someone' }} is typing...</span> -->
-        </ng-container>
+  <!-- If current user has blocked the contact, show action footer -->
+  <div *ngIf="iBlocked" class="blocked-action-footer"
+    style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; background:#fff; border-top:1px solid #eee;">
+    <button (click)="deleteChat()"
+      style="display:flex; align-items:center; gap:8px; border:none; background:transparent; color:#d32f2f; font-weight:600;">
+      <ion-icon name="trash-outline"></ion-icon>
+      Delete chat
+    </button>
 
-        <!-- multiple -->
-        <ng-container *ngIf="typingCount >= 2">
-          <div class="avatar-stack">
-            <img *ngFor="let u of typingUsers.slice(0,3); let i = index"
-                 class="typing-avatar stacked idx-{{i}}"
-                 [src]="u.avatar"
-                 (error)="setDefaultAvatar($event)"
-                 [alt]="u.name || 'User'">
-            <div class="more-badge" *ngIf="typingCount > 3">+{{ typingCount - 3 }}</div>
+    <button (click)="unblockFromChat()"
+      style="display:flex; align-items:center; gap:8px; border:none; background:transparent; color:#138000; font-weight:600;">
+      <ion-icon name="ban-outline"></ion-icon>
+      Unblock
+    </button>
+  </div>
+
+  <!-- Normal footer: typing indicator, reply preview, input row -->
+  <div *ngIf="!iBlocked">
+
+    <!-- Typing indicator (above keyboard) -->
+    <div class="typing-indicator-wrapper" *ngIf="typingCount > 0">
+      <!-- GROUP layout -->
+      <div *ngIf="chatType === 'group'" class="typing-indicator-content group">
+        <div class="typing-text">
+          <div class="typing-avatars">
+            <ng-container *ngIf="typingCount === 1 && typingUsers.length >= 1">
+              <img class="typing-avatar single" [src]="typingUsers[0].avatar" (error)="setDefaultAvatar($event)"
+                [alt]="typingUsers[0].name || 'User'">
+            </ng-container>
+            <ng-container *ngIf="typingCount >= 2">
+              <div class="avatar-stack">
+                <img *ngFor="let u of typingUsers.slice(0,3); let i = index" class="typing-avatar stacked idx-{{i}}"
+                  [src]="u.avatar" (error)="setDefaultAvatar($event)" [alt]="u.name || 'User'">
+                <div class="more-badge" *ngIf="typingCount > 3">+{{ typingCount - 3 }}</div>
+              </div>
+            </ng-container>
           </div>
-        </ng-container>
+        </div>
+
+        <div class="typing-dots" aria-hidden="true" role="status" aria-label="typing">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        </div>
+      </div>
+
+      <!-- PRIVATE layout -->
+      <div *ngIf="chatType === 'private'" class="typing-indicator-content private">
+        <div class="typing-dots center-only" aria-hidden="true" role="status" aria-label="typing">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        </div>
+      </div>
+    </div>
+    <!-- ========================= -->
+
+    <!-- REPLY PREVIEW -->
+    <div class="reply-preview" *ngIf="replyToMessage">
+      <div class="reply-header">
+        <span class="reply-to-text">Replying to {{ replyToMessage.sender_name }}</span>
+        <ion-button fill="clear" size="small" (click)="cancelReply()">
+          <ion-icon name="close" slot="icon-only"></ion-icon>
+        </ion-button>
+      </div>
+      <div class="reply-content">
+        <div class="reply-line"></div>
+        <div class="reply-message">{{ getReplyPreviewText(replyToMessage) }}</div>
       </div>
     </div>
 
-    <!-- dots aligned to the right of the content -->
-    <div class="typing-dots" aria-hidden="true" role="status" aria-label="typing">
-      <span class="dot"></span>
-      <span class="dot"></span>
-      <span class="dot"></span>
-    </div>
-  </div>
+    <!-- INPUT ROW -->
+    <ion-row class="footer-row" style="align-items:center;">
+      <ion-col class="message-input-container" style="display:flex; align-items:center; gap:8px;">
+        <ion-icon name="document-text-outline" class="icon-left" (click)="openKeyboard()"></ion-icon>
 
-  <!-- PRIVATE layout: only centered dots -->
-  <div *ngIf="chatType === 'private'" class="typing-indicator-content private">
-    <div class="typing-dots center-only" aria-hidden="true" role="status" aria-label="typing">
-      <span class="dot"></span>
-      <span class="dot"></span>
-      <span class="dot"></span>
-    </div>
+        <ion-textarea [disabled]="iBlocked" [autoGrow]="true" [(ngModel)]="messageText" placeholder="Message"
+          (ionInput)="onInputTyping()" (ionFocus)="onInputFocus()" (ionBlur)="onInputBlur()"
+          (keyup.enter)="sendMessage()" class="message-input">
+        </ion-textarea>
+
+        <ion-icon name="attach-outline" (click)="pickAttachment()" class="icon-right" [hidden]="iBlocked"></ion-icon>
+        <ion-icon name="camera-outline" class="icon-right" (click)="openCamera()" [hidden]="iBlocked"></ion-icon>
+      </ion-col>
+
+      <ion-col size="auto" style="display:flex; align-items:center;">
+        <ion-button *ngIf="!showSendButton" class="mic-button" shape="round" [disabled]="iBlocked">
+          <ion-icon slot="icon-only" name="mic"></ion-icon>
+        </ion-button>
+
+        <ion-button *ngIf="showSendButton" fill="clear" class="send-btn" shape="round" (click)="sendMessage()"
+          [disabled]="iBlocked">
+          <ion-icon slot="icon-only" name="send"></ion-icon>
+        </ion-button>
+      </ion-col>
+    </ion-row>
   </div>
 </div>
-
 <!-- ========================= -->
 
-
-  <!-- REPLY PREVIEW - Add this section -->
-  <div class="reply-preview" *ngIf="replyToMessage">
-    <div class="reply-header">
-      <span class="reply-to-text">Replying to {{ replyToMessage.sender_name }}</span>
-      <ion-button fill="clear" size="small" (click)="cancelReply()">
-        <ion-icon name="close" slot="icon-only"></ion-icon>
-      </ion-button>
-    </div>
-    <div class="reply-content">
-      <div class="reply-line"></div>
-      <div class="reply-message">
-        {{ getReplyPreviewText(replyToMessage) }}
-      </div>
-    </div>
-  </div>
-
-
-  <ion-row class="footer-row">
-    <ion-col class="message-input-container">
-      <!-- <ion-icon name="document-text-outline" class="icon-left"></ion-icon> -->
-      <ion-icon name="document-text-outline" class="icon-left" (click)="openKeyboard()">
-      </ion-icon>
-      <!-- <ion-textarea [autoGrow]="true" [(ngModel)]="messageText" placeholder="Message" (ionInput)="onInputChange()"
-        (ionFocus)="onInputFocus()" (ionBlur)="onInputBlur()" (keyup.enter)="sendMessage()"
-        class="message-input"></ion-textarea> -->
-
-      <!-- <ion-textarea [autoGrow]="true" [(ngModel)]="messageText" placeholder="Message" (ionInput)="onInputTyping()"
-        (ionFocus)="onInputFocus()" (ionBlur)="onInputBlur()" (keyup.enter)="sendMessage()"
-        class="message-input"></ion-textarea> -->
-
-        <ion-textarea [autoGrow]="true" [(ngModel)]="messageText" placeholder="Message"
-  (ionInput)="onInputTyping()" (ionFocus)="onInputFocus()" (ionBlur)="onInputBlur()" (keyup.enter)="sendMessage()"
-  class="message-input"></ion-textarea>
-
-
-
-      <!-- <ion-button fill="clear" (click)="pickAttachment()"> -->
-      <ion-icon name="attach-outline" (click)="pickAttachment()" class="icon-right"></ion-icon>
-      <!-- </ion-button> -->
-
-      <ion-icon name="camera-outline" class="icon-right" (click)="openCamera()"></ion-icon>
-    </ion-col>
-
-    <ion-col size="auto">
-      <ion-button *ngIf="!showSendButton" class="mic-button" shape="round">
-        <ion-icon slot="icon-only" name="mic"></ion-icon>
-      </ion-button>
-      <ion-button *ngIf="showSendButton" fill="clear" class="send-btn" shape="round" (click)="sendMessage()">
-        <ion-icon slot="icon-only" name="send"></ion-icon>
-      </ion-button>
-    </ion-col>
-  </ion-row>
-</div>
 
 <ion-popover [isOpen]="showPopover" [event]="popoverEvent" (didDismiss)="showPopover = false"
   style="--width: 300px; --height: 400px">

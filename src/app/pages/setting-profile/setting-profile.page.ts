@@ -7,15 +7,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { ImageCropperModalComponent } from '../../components/image-cropper-modal/image-cropper-modal.component';
 import { Subject, takeUntil } from 'rxjs';
 import { Router } from '@angular/router';
-
-interface CropResult {
-  success: boolean;
-  croppedImage?: string;
-  originalBlob?: Blob;
-  cropArea?: any;
-  error?: string;
-  cancelled?: boolean;
-}
+import { CropResult } from 'src/types';
 
 @Component({
   selector: 'app-setting-profile',
@@ -38,7 +30,7 @@ export class SettingProfilePage implements OnInit, OnDestroy {
   currentUserId: number | null = null;
 
   // Constants
-  private readonly MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+  private readonly MAX_FILE_SIZE = 5 * 1024 * 1024;
   private readonly ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
   
   // Cleanup

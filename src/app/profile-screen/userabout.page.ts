@@ -2,7 +2,7 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, PopoverController, ActionSheetController, ToastController, AlertController } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
-import { getDatabase, ref, get, remove, set, update, child } from 'firebase/database';
+import { getDatabase, ref, get, remove, set, update, child, off } from 'firebase/database';
 import { UseraboutMenuComponent } from '../components/userabout-menu/userabout-menu.component';
 import { ActionSheetButton } from '@ionic/angular';
 import { FirebaseChatService } from '../services/firebase-chat.service';
@@ -56,6 +56,13 @@ export class UseraboutPage implements OnInit {
   showPastMembersButton: boolean = false;
 
   isBlocked: boolean = false;
+
+  iBlocked = false;      // I blocked them
+theyBlocked = false;   // They blocked me
+
+// to keep refs so we can detach listeners later
+private iBlockedRef: any = null;
+private theyBlockedRef: any = null;
 
   constructor(
     private router: Router,
@@ -597,73 +604,167 @@ export class UseraboutPage implements OnInit {
     }
   }
 
+  // async checkIfBlocked() {  //need some change
+  //   const db = getDatabase();
+  //   const blockRef = ref(db, `blockedContacts/${this.currentUserId}/${this.receiverId}`);
+  //   onValue(blockRef, (snapshot) => {
+  //     this.isBlocked = snapshot.exists();
+  //   });
+  // }
+
+  // async blockUser() {
+  //   const alert = await this.alertCtrl.create({
+  //     header: 'Block Contact',
+  //     message: `You will no longer receive messages or calls from ${this.receiver_name}.`,
+  //     buttons: [
+  //       { text: 'Cancel', role: 'cancel' },
+  //       {
+  //         text: 'Block',
+  //         handler: async () => {
+  //           const db = getDatabase();
+  //           const blockRef = ref(db, `blockedContacts/${this.currentUserId}/${this.receiverId}`);
+  //           await set(blockRef, true);
+
+  //           this.isBlocked = true;
+
+  //           const toast = await this.toastCtrl.create({
+  //             message: `${this.receiver_name} has been blocked.`,
+  //             duration: 2000,
+  //             color: 'danger'
+  //           });
+  //           toast.present();
+  //         }
+  //       }
+  //     ]
+  //   });
+  //   await alert.present();
+  // }
+
+  // async unblockUser() {
+  //   const alert = await this.alertCtrl.create({
+  //     header: 'Unblock Contact',
+  //     message: `Are you sure you want to unblock ${this.receiver_name}?`,
+  //     buttons: [
+  //       {
+  //         text: 'Cancel',
+  //         role: 'cancel',
+  //       },
+  //       {
+  //         text: 'OK',
+  //         handler: async () => {
+  //           const db = getDatabase();
+  //           const blockRef = ref(db, `blockedContacts/${this.currentUserId}/${this.receiverId}`);
+  //           await remove(blockRef);
+
+  //           this.isBlocked = false;
+
+  //           const toast = await this.toastCtrl.create({
+  //             message: `${this.receiver_name} has been unblocked.`,
+  //             duration: 2000,
+  //             color: 'success'
+  //           });
+  //           toast.present();
+  //         }
+  //       }
+  //     ]
+  //   });
+
+  //   await alert.present();
+  // }
+
   async checkIfBlocked() {
-    const db = getDatabase();
-    const blockRef = ref(db, `blockedContacts/${this.currentUserId}/${this.receiverId}`);
-    onValue(blockRef, (snapshot) => {
-      this.isBlocked = snapshot.exists();
-    });
+  // make sure we have both IDs
+  if (!this.receiverId) return;
+
+  // ensure currentUserId is set (try authService first, then fallback to secureStorage)
+  this.currentUserId = this.authService.authData?.userId || (await this.secureStorage.getItem('userId')) || this.currentUserId;
+  if (!this.currentUserId) {
+    console.warn('checkIfBlocked: no currentUserId available yet');
+    return;
   }
 
-  async blockUser() {
-    const alert = await this.alertCtrl.create({
-      header: 'Block Contact',
-      message: `You will no longer receive messages or calls from ${this.receiver_name}.`,
-      buttons: [
-        { text: 'Cancel', role: 'cancel' },
-        {
-          text: 'Block',
-          handler: async () => {
-            const db = getDatabase();
-            const blockRef = ref(db, `blockedContacts/${this.currentUserId}/${this.receiverId}`);
-            await set(blockRef, true);
+  const db = getDatabase();
 
-            this.isBlocked = true;
+  // detach old listeners (if any)
+  try {
+    if (this.iBlockedRef) off(this.iBlockedRef);
+    if (this.theyBlockedRef) off(this.theyBlockedRef);
+  } catch (e) { /* ignore if nothing to off */ }
 
-            const toast = await this.toastCtrl.create({
-              message: `${this.receiver_name} has been blocked.`,
-              duration: 2000,
-              color: 'danger'
-            });
-            toast.present();
-          }
+  // set up new refs
+  this.iBlockedRef = ref(db, `blockedContacts/${this.currentUserId}/${this.receiverId}`);
+  this.theyBlockedRef = ref(db, `blockedContacts/${this.receiverId}/${this.currentUserId}`);
+
+  onValue(this.iBlockedRef, (snapshot) => {
+    this.zone.run(() => {
+      this.iBlocked = snapshot.exists();
+      // keep boolean used by templates
+      // console.log('iBlocked ->', this.iBlocked);
+    });
+  });
+
+  onValue(this.theyBlockedRef, (snapshot) => {
+    this.zone.run(() => {
+      this.theyBlocked = snapshot.exists();
+      // console.log('theyBlocked ->', this.theyBlocked);
+    });
+  });
+}
+
+async blockUser() {
+  const alert = await this.alertCtrl.create({
+    header: 'Block Contact',
+    message: `You will no longer receive messages or calls from ${this.receiver_name}.`,
+    buttons: [
+      { text: 'Cancel', role: 'cancel' },
+      {
+        text: 'Block',
+        handler: async () => {
+          const db = getDatabase();
+          const blockRef = ref(db, `blockedContacts/${this.currentUserId}/${this.receiverId}`);
+          await set(blockRef, true);
+
+          this.iBlocked = true; // <-- update this flag
+          const toast = await this.toastCtrl.create({
+            message: `${this.receiver_name} has been blocked.`,
+            duration: 2000,
+            color: 'danger'
+          });
+          toast.present();
         }
-      ]
-    });
-    await alert.present();
-  }
+      }
+    ]
+  });
+  await alert.present();
+}
 
-  async unblockUser() {
-    const alert = await this.alertCtrl.create({
-      header: 'Unblock Contact',
-      message: `Are you sure you want to unblock ${this.receiver_name}?`,
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel',
-        },
-        {
-          text: 'OK',
-          handler: async () => {
-            const db = getDatabase();
-            const blockRef = ref(db, `blockedContacts/${this.currentUserId}/${this.receiverId}`);
-            await remove(blockRef);
+async unblockUser() {
+  const alert = await this.alertCtrl.create({
+    header: 'Unblock Contact',
+    message: `Are you sure you want to unblock ${this.receiver_name}?`,
+    buttons: [
+      { text: 'Cancel', role: 'cancel' },
+      {
+        text: 'OK',
+        handler: async () => {
+          const db = getDatabase();
+          const blockRef = ref(db, `blockedContacts/${this.currentUserId}/${this.receiverId}`);
+          await remove(blockRef);
 
-            this.isBlocked = false;
-
-            const toast = await this.toastCtrl.create({
-              message: `${this.receiver_name} has been unblocked.`,
-              duration: 2000,
-              color: 'success'
-            });
-            toast.present();
-          }
+          this.iBlocked = false; // <-- update this flag
+          const toast = await this.toastCtrl.create({
+            message: `${this.receiver_name} has been unblocked.`,
+            duration: 2000,
+            color: 'success'
+          });
+          toast.present();
         }
-      ]
-    });
+      }
+    ]
+  });
 
-    await alert.present();
-  }
+  await alert.present();
+}
 
   async reportUser() {
     const alert = await this.alertCtrl.create({

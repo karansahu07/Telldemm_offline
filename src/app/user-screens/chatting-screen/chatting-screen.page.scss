@@ -855,3 +855,41 @@ ion-datetime {
   .typing-avatar.stacked { width: 26px; height: 26px; margin-left: -8px; }
   .more-badge { min-width: 24px; height: 24px; font-size: 11px; }
 }
+
+
+/* system bubble centered like WhatsApp */
+.system-bubble {
+  background: #ffffff;
+  color: #222;
+  padding: 8px 14px;
+  border-radius: 18px;
+  max-width: 85%;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.08);
+  font-size: 14px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.system-bubble-success {
+  background: #f0fff4;
+  color: #106a37;
+}
+
+/* blocked action footer */
+.blocked-action-footer {
+  border-top: 1px solid #eee;
+}
+
+/* delete / unblock buttons minimal style */
+.delete-chat-btn ion-icon, .unblock-btn ion-icon {
+  font-size: 20px;
+}
+
+.online-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #34c759; /* iOS green */
+  display: inline-block;
+  box-shadow: 0 0 0 3px rgba(52,199,89,0.15);
+}
