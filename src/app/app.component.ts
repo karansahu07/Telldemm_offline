@@ -327,7 +327,7 @@ export class AppComponent implements OnInit {
     private platform: Platform,
     private fcmService: FcmService,
     private sqliteService: SqliteService,
-    private versionService: VersionCheck,
+    // private versionService: VersionCheck,
     private modalCtrl: ModalController,
     private popoverCtrl: PopoverController,
     private actionSheetCtrl: ActionSheetController,
@@ -346,7 +346,7 @@ export class AppComponent implements OnInit {
     await this.platform.ready();
 
     await this.authService.hydrateAuth();
-    this.trackRouteChanges();
+    // this.trackRouteChanges();
 
     // ----------------------------
     let fromNotification = false;
@@ -479,18 +479,18 @@ export class AppComponent implements OnInit {
     });
   }
 
-  private trackRouteChanges() {
-    this.router.events
-      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
-      .subscribe((event: NavigationEnd) => {
-        console.log('➡️ Current route:', event.urlAfterRedirects);
+  // private trackRouteChanges() {
+  //   this.router.events
+  //     .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+  //     .subscribe((event: NavigationEnd) => {
+  //       console.log('➡️ Current route:', event.urlAfterRedirects);
 
-        if (event.urlAfterRedirects === '/home-screen') {
-          console.log('🔍 Running version check only on home-screen');
-          this.versionService.checkVersion();
-        }
-      });
-  }
+  //       if (event.urlAfterRedirects === '/home-screen') {
+  //         console.log('🔍 Running version check only on home-screen');
+  //         this.versionService.checkVersion();
+  //       }
+  //     });
+  // }
 
   private isHomeRoute(url: string): boolean {
     return this.homeRoutes.includes(url);

@@ -72,27 +72,28 @@ ion-content {
 }
 
 .camera-main {
-    display: flex;
-    justify-content: center;
+  display: flex;
+  justify-content: center;
+  margin: 20px 0; /* add some spacing from text */
 }
 
 .camera-inner {
-    border-radius: 50%;
-    background-color: gray;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    object-fit: contain;
-    border-width: 0px;
+  width: 120px;       /* fixed size like WhatsApp */
+  height: 120px;
+  border-radius: 50%;
+  background-color: #f0f0f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  border: 2px solid #ddd; /* subtle border */
 }
 
 .camera-inner img {
-     width: 100%;
-    height: 100%;
-    object-fit: contain;
-    border-radius: 50%;
-    max-width: 100%;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;   /* cover instead of contain → fills circle properly */
+  border-radius: 50%;
 }
 
 .line-main {

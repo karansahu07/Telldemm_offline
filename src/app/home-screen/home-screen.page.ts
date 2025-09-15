@@ -19,11 +19,14 @@ import { Observable } from 'rxjs';
 import { onValue } from '@angular/fire/database';
 import { Database } from '@angular/fire/database';
 import { ContactSyncService } from '../services/contact-sync.service';
+import { NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 
 // Firebase modular imports
 import { getDatabase, ref as rtdbRef, onValue as rtdbOnValue, off as rtdbOff } from 'firebase/database';
 import { TypingService } from '../services/typing.service';
 import { Resetapp } from '../services/resetapp';
+import { VersionCheck } from '../services/version-check';
 
 @Component({
   selector: 'app-home-screen',
@@ -67,7 +70,8 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     private contactSyncService : ContactSyncService,
     private typingService: TypingService,
     private alertCtrl: AlertController,
-    private resetapp: Resetapp
+    private resetapp: Resetapp,
+    private versionService: VersionCheck,
   ) { }
 
   async ngOnInit() {
@@ -75,6 +79,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     this.senderUserId = this.authService.authData?.userId || '';
 
     await this.loadData();
+    this.trackRouteChanges();
   }
 
   // async ionViewWillEnter() {
@@ -597,6 +602,19 @@ export class HomeScreenPage implements OnInit, OnDestroy {
 
       this.unreadSubs.push(sub);
     }
+  }
+
+  private trackRouteChanges() {
+    this.router.events
+      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        console.log('➡️ Current route:', event.urlAfterRedirects);
+
+        if (event.urlAfterRedirects === '/home-screen') {
+          console.log('🔍 Running version check only on home-screen');
+          this.versionService.checkVersion();
+        }
+      });
   }
 
   formatTimestamp(timestamp: string): string {

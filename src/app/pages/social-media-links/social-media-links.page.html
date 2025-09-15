@@ -1,0 +1,33 @@
+<ion-header [translucent]="true" class="header-red">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Links</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="content-red">
+  <div class="intro">
+    <p>Adding links to your profile helps your contacts easily visit your other profiles.</p>
+  </div>
+
+  <ion-list lines="none">
+    <ion-item button (click)="openAddInstagram()">
+      <ion-icon name="logo-instagram" slot="start" class="platform-icon"></ion-icon>
+      <ion-label>
+        <h2>Instagram</h2>
+        <p *ngIf="instagramUsername; else noLink">{{ '@' + instagramUsername }}</p>
+        <ng-template #noLink><p class="empty-text">Add your Instagram</p></ng-template>
+      </ion-label>
+
+      <ion-button slot="end" fill="clear" (click)="openAddInstagram()">
+        <ion-icon [name]="instagramUsername ? 'create-outline' : 'add-outline'"></ion-icon>
+      </ion-button>
+    </ion-item>
+  </ion-list>
+
+  <div class="privacy-note">
+    <p>To manage who can see your links, go to <a class="privacy-link">privacy settings</a>.</p>
+  </div>
+</ion-content>

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { from, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { GetSocialMediaResponse } from 'src/types';
 
 
 
@@ -126,6 +127,26 @@ logoutUser(userId: number) {
   getAllUsers(): Observable<any[]> {
     return this.get<any[]>('/api/users');
   }
+
+  /**
+ * Update social media link (e.g. Instagram)
+ */
+updateSocialMedia(user_id: number, social_media_id: number, profile_url: string): Observable<any> {
+  const payload = {
+    user_id,
+    social_media_id,
+    profile_url
+  };
+  return this.post('/api/users/update-social-media', payload);
+}
+
+/**
+ * Fetch social media links for a user
+ */
+getSocialMedia(user_id: number): Observable<GetSocialMediaResponse> {
+  return this.post<GetSocialMediaResponse>('/api/users/get-social-media', { user_id });
+}
+
 
   // ----------------- 👥 GROUP APIs -----------------
 

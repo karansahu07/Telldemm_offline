@@ -893,3 +893,24 @@ ion-datetime {
   display: inline-block;
   box-shadow: 0 0 0 3px rgba(52,199,89,0.15);
 }
+.last-seen-scroll {
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 150px;    /* adjust width as needed */
+}
+
+.last-seen-scroll span {
+  display: inline-block;
+  padding-left: 100%;   /* start from right */
+  animation: scroll-left 6s linear infinite; /* adjust speed */
+}
+
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}

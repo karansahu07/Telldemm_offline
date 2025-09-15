@@ -5124,12 +5124,102 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  deleteSelectedMessages() {
-    this.selectedMessages.forEach(msg => {
-      this.chatService.deleteMessage(this.roomId, msg.key);
-    });
-    this.selectedMessages = [];
+  // deleteSelectedMessages() {
+  //   this.selectedMessages.forEach(msg => {
+  //     this.chatService.deleteMessage(this.roomId, msg.key);
+  //   });
+  //   this.selectedMessages = [];
+  // }
+
+  async deleteSelectedMessages() {
+  if (!this.selectedMessages || this.selectedMessages.length === 0) {
+    return;
   }
+
+  const count = this.selectedMessages.length;
+
+  // Prepare a small preview (first message text or attachment label)
+  let preview = '';
+  if (count === 1) {
+    const m = this.selectedMessages[0];
+    if (m.text && m.text.trim()) {
+      preview = m.text.length > 120 ? m.text.substring(0, 120) + '...' : m.text;
+    } else if (m.attachment) {
+      preview = this.getAttachmentPreview(m.attachment);
+    } else {
+      preview = 'This message';
+    }
+  } else {
+    preview = `${count} messages`;
+  }
+
+  const alert = await this.alertCtrl.create({
+    header: 'Delete messages?',
+    // you can tweak the message text to anything you want
+    message: `Are you sure you want to delete this message. This message is delete for everyone`,
+    cssClass: 'delete-confirm-alert',
+    buttons: [
+      {
+        text: 'Cancel',
+        role: 'cancel',
+        handler: () => {
+        }
+      },
+      {
+        text: 'Delete',
+        cssClass: 'danger',
+        handler: async () => {
+          // Perform deletion. Try calling with forEveryone flag first (if your chatService supports it),
+          // otherwise fall back to the existing 2-arg call.
+          try {
+            // Copy selectedMessages to avoid mutation during deletion loop
+            const toDelete = [...this.selectedMessages];
+
+            for (const msg of toDelete) {
+              try {
+                // Preferred: chatService supports a third param or option for "delete for everyone"
+                // (adjust according to your actual chatService API)
+                // e.g. deleteMessage(roomId, messageKey, true) or deleteMessage(roomId, messageKey, {forEveryone:true})
+                // Try boolean flag first:
+                // @ts-ignore
+                await this.chatService.deleteMessage(this.roomId, msg.key, true);
+              } catch (errFlag) {
+                // Fallback: try the old 2-arg signature
+                try {
+                  await this.chatService.deleteMessage(this.roomId, msg.key);
+                } catch (err2) {
+                  console.warn('Failed to delete message key:', msg.key, err2);
+                }
+              }
+            }
+
+            // Clear selection and last pressed message
+            this.selectedMessages = [];
+            this.lastPressedMessage = null;
+
+            const toast = await this.toastCtrl.create({
+              message: `${count} message${count > 1 ? 's' : ''} deleted`,
+              duration: 1500,
+              color: 'danger'
+            });
+            toast.present();
+          } catch (e) {
+            console.error('deleteSelectedMessages handler error', e);
+            const toast = await this.toastCtrl.create({
+              message: 'Failed to delete messages. Try again.',
+              duration: 2000,
+              color: 'danger'
+            });
+            toast.present();
+          }
+        }
+      }
+    ]
+  });
+
+  await alert.present();
+}
+
 
   onForward() {
     this.chatService.setForwardMessages(this.selectedMessages);

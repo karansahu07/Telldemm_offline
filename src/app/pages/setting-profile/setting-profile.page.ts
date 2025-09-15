@@ -112,30 +112,6 @@ goToUpdateStatus() {
 
     try {
       this.isLoadingProfile = true;
-      
-      // this.service.getUserProfilebyId(userId)
-      //   .pipe(takeUntil(this.destroy$))
-      //   .subscribe({
-      //     next: (response: any) => {
-      //       console.log('Profile response:', response);
-            
-      //       if (response?.profile || response?.image_url) {
-      //         this.profileImageUrl = response.profile || response.image_url;
-      //       }
-            
-      //       // Update user data if available
-      //       if (response?.name) {
-      //         this.user.name = response.name;
-      //       }
-            
-      //       this.isLoadingProfile = false;
-      //     },
-      //     error: (error: any) => {
-      //       console.error('Error loading profile:', error);
-      //       this.isLoadingProfile = false;
-      //       this.showToast('Failed to load profile image', 'danger');
-      //     }
-      //   });
 
       this.service.getUserProfilebyId(userId)
   .pipe(takeUntil(this.destroy$))
@@ -413,10 +389,9 @@ goToUpdateStatus() {
   /**
    * Add links functionality (placeholder)
    */
-  addLinks() {
-    console.log('Add links clicked');
-    // Implement your add links functionality here
-  }
+ addLinks() {
+  this.router.navigate(['/social-media-links']);
+}
 
   /**
    * Get display image URL with loading state

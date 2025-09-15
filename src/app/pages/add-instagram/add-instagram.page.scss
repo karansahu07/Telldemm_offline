@@ -1,0 +1,92 @@
+/* header */
+.header-red ion-toolbar {
+  --background: #b71c1c; /* deep red */
+  --color: #fff;
+}
+
+/* page content */
+.add-instagram-content {
+  --background: #fff;
+  padding: 20px 16px 90px; /* bottom padding so Save button doesn't overlap content */
+}
+
+/* label */
+.input-label {
+  color: #b71c1c; /* red label */
+  margin-bottom: 10px;
+  display: block;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+/* input row: at icon + input with red underline */
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid #b71c1c; /* red underline */
+  padding: 8px 6px;
+  margin-bottom: 18px;
+  gap: 8px;
+}
+
+/* @ circle */
+.at-icon {
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  border-radius: 50%;
+  background: rgba(183, 28, 28, 0.06); /* subtle red bg */
+  color: #b71c1c;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+/* ion-input styles */
+ion-input {
+  --padding-start: 0;
+  flex: 1;
+  font-size: 18px;
+  color: #111;
+}
+
+/* hint text */
+.hint {
+  margin-top: 6px;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* "Learn more" link (blue like screenshot) */
+.learn-more {
+  color: #0b6ef9;
+  text-decoration: none;
+  font-weight: 600;
+  margin-left: 6px;
+}
+
+/* Save button fixed at bottom — green like your screenshot */
+.save-bar {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: 18px;
+  z-index: 20;
+}
+
+.save-bar ion-button {
+  --background: #b71c1c;
+  --color: #fff;
+  height: 52px;
+  font-size: 16px;
+  --border-radius: 999px;
+  box-shadow: 0 6px 18px rgba(16,185,129,0.12);
+}
+
+/* Responsive small-screen adjustments */
+@media (max-width: 420px) {
+  .at-icon { width: 36px; height: 36px; line-height: 36px; font-size: 16px; }
+  .input-wrapper { padding: 6px 4px; }
+  .save-bar ion-button { height: 50px; font-size: 15px; }
+}

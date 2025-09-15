@@ -74,3 +74,14 @@ export interface TypingEntry {
   typing?: boolean;
   lastUpdated?: number;
 }
+
+export interface SocialMediaEntry {
+  user_social_id: number;
+  profile_url: string;
+  platform: string;
+}
+
+export interface GetSocialMediaResponse {
+  success: boolean;
+  data: SocialMediaEntry[];
+}

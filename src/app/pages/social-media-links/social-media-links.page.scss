@@ -1,0 +1,51 @@
+.header-red ion-toolbar {
+  --background: #b71c1c;
+  --color: #fff;
+}
+
+.content-red {
+  --background: #fff;
+  padding: 0;
+}
+
+.intro {
+  padding: 18px 16px;
+  color: #444;
+  font-size: 15px;
+}
+
+.platform-icon {
+  font-size: 28px;
+  color: #b71c1c;
+}
+
+ion-label h2 {
+  margin: 0;
+  font-size: 16px;
+  color: #111;
+}
+
+ion-label p {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.empty-text {
+  color: rgba(0,0,0,0.35);
+  font-style: italic;
+}
+
+.privacy-note {
+  margin-top: 22px;
+  padding: 18px 16px;
+  color: #666;
+  font-size: 14px;
+  border-top: 1px solid rgba(0,0,0,0.04);
+}
+
+.privacy-link {
+  color: #15803d;
+  font-weight: 600;
+  text-decoration: none;
+}

@@ -192,6 +192,14 @@ const routes: Routes = [
     path: 'update-status',
     loadChildren: () => import('./pages/update-status/update-status.module').then( m => m.UpdateStatusPageModule)
   },
+  {
+    path: 'social-media-links',
+    loadChildren: () => import('./pages/social-media-links/social-media-links.module').then( m => m.SocialMediaLinksPageModule)
+  },
+  {
+    path: 'add-instagram',
+    loadChildren: () => import('./pages/add-instagram/add-instagram.module').then( m => m.AddInstagramPageModule)
+  },
 
 
 ];

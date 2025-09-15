@@ -43,6 +43,7 @@ export class UseraboutPage implements OnInit {
   }[] = [];
   commonGroups: any[] = [];
   receiverAbout: string = '';
+  statusTime: string = '';
   receiverAboutUpdatedAt: string = '';
 
   groupDescription: string = '';
@@ -63,6 +64,7 @@ theyBlocked = false;   // They blocked me
 // to keep refs so we can detach listeners later
 private iBlockedRef: any = null;
 private theyBlockedRef: any = null;
+socialMediaLinks: { platform: string; profile_url: string }[] = [];
 
   constructor(
     private router: Router,
@@ -107,7 +109,7 @@ private theyBlockedRef: any = null;
 
         await this.fetchGroupMeta(this.receiverId);
       } else {
-        await this.fetchReceiverAbout(this.receiverId);
+        // await this.fetchReceiverAbout(this.receiverId);
       }
     });
 
@@ -142,7 +144,7 @@ private theyBlockedRef: any = null;
 
         await this.fetchGroupMeta(this.receiverId);
       } else {
-        await this.fetchReceiverAbout(this.receiverId);
+        // await this.fetchReceiverAbout(this.receiverId);
       }
     });
 
@@ -150,34 +152,87 @@ private theyBlockedRef: any = null;
     this.findCommonGroups(this.currentUserId, this.receiverId);
   }
 
-  loadReceiverProfile() {
-    if (!this.receiverId) return;
+  // loadReceiverProfile() {
+  //   if (!this.receiverId) return;
 
-    if (this.chatType === 'group') {
-      // Group DP API call with groupId (jo receiverId me aa raha hai)
-      this.service.getGroupDp(this.receiverId).subscribe({
-        next: (res: any) => {
-          this.receiverProfile = res?.group_dp_url || 'assets/images/user.jfif';
-        },
-        error: (err) => {
-          console.error("❌ Error loading group profile:", err);
-          this.receiverProfile = 'assets/images/user.jfif';
-        }
-      });
-    } else {
-      // User DP API call with userId (receiverId)
-      this.service.getUserProfilebyId(this.receiverId).subscribe({
-        next: (res: any) => {
-          this.receiverProfile = res?.profile || 'assets/images/user.jfif';
-          this.receiverAbout = res?.dp_status;
-        },
-        error: (err) => {
-          console.error("❌ Error loading user profile:", err);
-          this.receiverProfile = 'assets/images/user.jfif';
-        }
-      });
-    }
+  //   if (this.chatType === 'group') {
+  //     // Group DP API call with groupId (jo receiverId me aa raha hai)
+  //     this.service.getGroupDp(this.receiverId).subscribe({
+  //       next: (res: any) => {
+  //         this.receiverProfile = res?.group_dp_url || 'assets/images/user.jfif';
+  //       },
+  //       error: (err) => {
+  //         console.error("❌ Error loading group profile:", err);
+  //         this.receiverProfile = 'assets/images/user.jfif';
+  //       }
+  //     });
+  //   } else {
+  //     // User DP API call with userId (receiverId)
+  //     this.service.getUserProfilebyId(this.receiverId).subscribe({
+  //       next: (res: any) => {
+  //         this.receiverProfile = res?.profile || 'assets/images/user.jfif';
+  //         this.receiverAbout = res?.dp_status;
+  //       },
+  //       error: (err) => {
+  //         console.error("❌ Error loading user profile:", err);
+  //         this.receiverProfile = 'assets/images/user.jfif';
+  //       }
+  //     });
+  //   }
+  // }
+
+  loadReceiverProfile() {
+  if (!this.receiverId) return;
+
+  if (this.chatType === 'group') {
+    // Group DP API call
+    this.service.getGroupDp(this.receiverId).subscribe({
+      next: (res: any) => {
+        this.receiverProfile = res?.group_dp_url || 'assets/images/user.jfif';
+      },
+      error: (err) => {
+        console.error("❌ Error loading group profile:", err);
+        this.receiverProfile = 'assets/images/user.jfif';
+      }
+    });
+  } else {
+    // User DP API call
+    this.service.getUserProfilebyId(this.receiverId).subscribe({
+      next: (res: any) => {
+        this.receiverProfile = res?.profile || 'assets/images/user.jfif';
+        this.receiverAbout = res?.dp_status;
+        this.statusTime = res?.dp_status_updated_on;
+
+        // 👇 call social media links here
+        this.loadReceiverSocialMedia(this.receiverId);
+      },
+      error: (err) => {
+        console.error("❌ Error loading user profile:", err);
+        this.receiverProfile = 'assets/images/user.jfif';
+      }
+    });
   }
+}
+
+loadReceiverSocialMedia(userId: string) {
+  this.service.getSocialMedia(Number(userId)).subscribe({
+    next: (res: any) => {
+      if (res?.success && Array.isArray(res.data)) {
+        this.socialMediaLinks = res.data;
+      }
+    },
+    error: (err) => {
+      console.error("❌ Error loading social media links:", err);
+      this.socialMediaLinks = [];
+    }
+  });
+}
+
+openExternalLink(url: string) {
+  if (!url) return;
+  window.open(url, '_blank');
+}
+
 
   setDefaultAvatar(event: Event) {
     (event.target as HTMLImageElement).src = 'assets/images/user.jfif';
@@ -588,21 +643,22 @@ private theyBlockedRef: any = null;
     }
   }
 
-  async fetchReceiverAbout(userId: string) {
-    const db = getDatabase();
-    const userRef = ref(db, `users/${userId}`);
+  //yeh delete nhi krna
+  // async fetchReceiverAbout(userId: string) {
+  //   const db = getDatabase();
+  //   const userRef = ref(db, `users/${userId}`);
 
-    try {
-      const snapshot = await get(userRef);
-      if (snapshot.exists()) {
-        const userData = snapshot.val();
-        this.receiverAbout = userData.about || 'Hey there! I am using WhatsApp.';
-        this.receiverAboutUpdatedAt = userData.updatedAt || '';
-      }
-    } catch (error) {
-      console.error('Error fetching receiver about info:', error);
-    }
-  }
+  //   try {
+  //     const snapshot = await get(userRef);
+  //     if (snapshot.exists()) {
+  //       const userData = snapshot.val();
+  //       this.receiverAbout = userData.about || 'Hey there! I am using WhatsApp.';
+  //       this.receiverAboutUpdatedAt = userData.updatedAt || '';
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching receiver about info:', error);
+  //   }
+  // }
 
   // async checkIfBlocked() {  //need some change
   //   const db = getDatabase();
