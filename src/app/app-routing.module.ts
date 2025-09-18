@@ -221,7 +221,8 @@ const routes: Routes = [
   {
     path: 'add-group-community',
     loadChildren: () => import('./community/pages/add-group-community/add-group-community.module').then( m => m.AddGroupCommunityPageModule)
-  },  {
+  },
+  {
     path: 'add-existing-groups',
     loadChildren: () => import('./community/pages/add-existing-groups/add-existing-groups.module').then( m => m.AddExistingGroupsPageModule)
   },
@@ -244,6 +245,55 @@ const routes: Routes = [
   {
     path: 'community-chat',
     loadChildren: () => import('./community/pages/community-chat/community-chat.module').then( m => m.CommunityChatPageModule)
+  },
+  {
+    path: 'account',
+    canActivate: [AuthGuard],
+    loadChildren: () => import('./pages/settings/account/account.module').then( m => m.AccountPageModule)
+  },
+  {
+    path: 'privacy',
+    loadChildren: () => import('./pages/settings/privacy/privacy.module').then( m => m.PrivacyPageModule)
+  },
+  {
+    path: 'avatar',
+    loadChildren: () => import('./pages/settings/avatar/avatar.module').then( m => m.AvatarPageModule)
+  },
+  {
+    path: 'chats',
+    loadChildren: () => import('./pages/settings/chats/chats.module').then( m => m.ChatsPageModule)
+  },
+  {
+    path: 'accessibility',
+    loadChildren: () => import('./pages/settings/accessibility/accessibility.module').then( m => m.AccessibilityPageModule)
+  },
+  {
+    path: 'notification',
+    loadChildren: () => import('./pages/settings/notification/notification.module').then( m => m.NotificationPageModule)
+  },
+  {
+    path: 'storage-data',
+    loadChildren: () => import('./pages/settings/storage-data/storage-data.module').then( m => m.StorageDataPageModule)
+  },
+  {
+    path: 'app-language',
+    loadChildren: () => import('./pages/settings/app-language/app-language.module').then( m => m.AppLanguagePageModule)
+  },
+  {
+    path: 'help-feedback',
+    loadChildren: () => import('./pages/settings/help-feedback/help-feedback.module').then( m => m.HelpFeedbackPageModule)
+  },
+  {
+    path: 'app-updates',
+    loadChildren: () => import('./pages/settings/app-updates/app-updates.module').then( m => m.AppUpdatesPageModule)
+  },
+  {
+    path: 'invite-friend',
+    loadChildren: () => import('./pages/settings/invite-friend/invite-friend.module').then( m => m.InviteFriendPageModule)
+  },
+  {
+    path: 'email-edit',
+    loadChildren: () => import('./pages/settings/email-edit/email-edit.module').then( m => m.EmailEditPageModule)
   },
 
 

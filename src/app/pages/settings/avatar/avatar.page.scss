@@ -1,0 +1,26 @@
+page-avatar {
+  .avatar-container {
+    text-align: center;
+    margin: 20px 0;
+  }
+  ion-img {
+    width: 300px;
+    height: 200px;
+    margin: 0 auto;
+  }
+  ion-button {
+    margin: 20px 0;
+    border-radius: 20px;
+  }
+  @media (prefers-color-scheme: dark) {
+    ion-content {
+      --background: #1a1a1a;
+    }
+    ion-text[color="medium"] {
+      color: #cccccc;
+    }
+    ion-text[color="primary"] a {
+      color: #4a90e2;
+    }
+  }
+}

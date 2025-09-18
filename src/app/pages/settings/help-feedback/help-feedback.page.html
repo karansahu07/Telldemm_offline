@@ -1,0 +1,48 @@
+<ion-header>
+  <ion-toolbar style="--background: #f0f0f0; --color: #000000;">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/settings"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Help</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" style="--background: #ffffff;">
+  <ion-list lines="inset">
+    <!-- Help Center -->
+    <ion-item button detail (click)="openHelpCenter()">
+      <ion-icon slot="start" name="help-circle-outline"></ion-icon>
+      <ion-label>
+        <h2>Help Center</h2>
+        <p>Get help, FAQs, and contact options</p>
+      </ion-label>
+    </ion-item>
+
+    <!-- Terms & Privacy -->
+    <ion-item button detail (click)="openTerms()">
+      <ion-icon slot="start" name="document-outline"></ion-icon>
+      <ion-label>
+        <h2>Terms & Privacy Policy</h2>
+        <p>Read our terms and data policy</p>
+      </ion-label>
+    </ion-item>
+
+    <!-- Channel Reports -->
+    <ion-item button detail (click)="openChannelReports()">
+      <ion-icon slot="start" name="alert-outline"></ion-icon>
+      <ion-label>
+        <h2>Channel Reports</h2>
+        <p>Manage and view reports</p>
+      </ion-label>
+    </ion-item>
+
+    <!-- App Info -->
+    <ion-item button detail (click)="openAppInfo()">
+      <ion-icon slot="start" name="information-circle-outline"></ion-icon>
+      <ion-label>
+        <h2>App Info</h2>
+        <p>Version, legal, and technical details</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>

@@ -1,0 +1,40 @@
+<ion-header>
+  <ion-toolbar style="--background: #f0f0f0; --color: #000000;">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/settings"></ion-back-button>
+    </ion-buttons>
+    <ion-title>App Updates</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" style="--background: #ffffff;">
+  <ion-list lines="inset">
+    <!-- Current version -->
+    <ion-item>
+      <ion-icon slot="start" name="information-circle-outline"></ion-icon>
+      <ion-label>
+        <h2>Version</h2>
+      </ion-label>
+      <ion-note slot="end" class="version">2.24.17.76</ion-note>
+    </ion-item>
+
+    <!-- Manual check -->
+    <ion-item button detail (click)="checkForUpdates()">
+      <ion-icon slot="start" name="download-outline"></ion-icon>
+      <ion-label>
+        <h2>Check for Updates</h2>
+        <p>Manually check if a new version is available</p>
+      </ion-label>
+    </ion-item>
+
+    <!-- Auto-update toggle -->
+    <ion-item>
+      <ion-icon slot="start" name="sync-outline"></ion-icon>
+      <ion-label>
+        <h2>Auto Update</h2>
+        <p>Install updates automatically</p>
+      </ion-label>
+      <ion-toggle slot="end" [(ngModel)]="autoUpdate"></ion-toggle>
+    </ion-item>
+  </ion-list>
+</ion-content>

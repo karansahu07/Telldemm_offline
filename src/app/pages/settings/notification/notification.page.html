@@ -1,0 +1,48 @@
+<ion-header>
+  <ion-toolbar style="--background: #f0f0f0; --color: #000000;">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/settings"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Notifications</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" style="--background: #ffffff;">
+  <ion-list lines="inset">
+    <!-- High priority notifications -->
+    <ion-item>
+      <ion-label>
+        <h2>Use high priority notifications</h2>
+        <p>Get notifications with sound and preview even when Do Not Disturb is on</p>
+      </ion-label>
+      <ion-toggle slot="end" [(ngModel)]="highPriority"></ion-toggle>
+    </ion-item>
+
+    <!-- Message notifications -->
+    <ion-item button detail (click)="openMessageNotifications()">
+      <ion-icon slot="start" name="chatbubble-ellipses-outline"></ion-icon>
+      <ion-label>
+        <h2>Message notifications</h2>
+        <p>Customize alerts for messages</p>
+      </ion-label>
+    </ion-item>
+
+    <!-- Group chat notifications -->
+    <ion-item button detail (click)="openGroupNotifications()">
+      <ion-icon slot="start" name="people-outline"></ion-icon>
+      <ion-label>
+        <h2>Group chat notifications</h2>
+        <p>Manage notifications for group chats</p>
+      </ion-label>
+    </ion-item>
+
+    <!-- Call notifications -->
+    <ion-item button detail (click)="openCallNotifications()">
+      <ion-icon slot="start" name="call-outline"></ion-icon>
+      <ion-label>
+        <h2>Call notifications</h2>
+        <p>Ringtones and vibration settings</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>

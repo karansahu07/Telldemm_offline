@@ -1,0 +1,59 @@
+<ion-header>
+ 
+   <ion-toolbar style="--background: #ffffff; --color: #000000;">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/settings"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Accessibility</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" style="--background: #ffffff;">
+  <ion-list lines="inset">
+    <ion-list-header>
+      <ion-label>Display & motion</ion-label>
+    </ion-list-header>
+
+    <ion-item>
+      <ion-icon slot="start" name="contrast-outline"></ion-icon>
+      <ion-label>
+        <h2>Increase contrast</h2>
+        <p>Darken key colors to improve readability in light mode.</p>
+      </ion-label>
+      <ion-toggle slot="end" [(ngModel)]="increaseContrast" (ionChange)="onToggle('increaseContrast', $event)"></ion-toggle>
+    </ion-item>
+
+    <ion-item>
+      <ion-icon slot="start" name="play-back-outline"></ion-icon>
+      <ion-label>
+        <h2>Reduce motion</h2>
+        <p>Minimize animated stickers, GIFs and transitions.</p>
+      </ion-label>
+      <ion-toggle slot="end" [(ngModel)]="reduceMotion" (ionChange)="onToggle('reduceMotion', $event)"></ion-toggle>
+    </ion-item>
+
+    <ion-item>
+      <ion-icon slot="start" name="text-outline"></ion-icon>
+      <ion-label>
+        <h2>Large text</h2>
+        <p>Increase system font scale for easier reading.</p>
+      </ion-label>
+      <ion-toggle slot="end" [(ngModel)]="largeText" (ionChange)="onToggle('largeText', $event)"></ion-toggle>
+    </ion-item>
+  </ion-list>
+
+  <ion-list lines="inset">
+    <ion-list-header>
+      <ion-label>Interaction</ion-label>
+    </ion-list-header>
+
+    <ion-item>
+      <ion-icon slot="start" name="hand-left-outline"></ion-icon>
+      <ion-label>
+        <h2>Simplified animations</h2>
+        <p>Reduce complex animations for easier interaction.</p>
+      </ion-label>
+      <ion-toggle slot="end" [(ngModel)]="simpleAnimations" (ionChange)="onToggle('simpleAnimations', $event)"></ion-toggle>
+    </ion-item>
+  </ion-list>
+</ion-content>

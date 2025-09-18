@@ -79,6 +79,53 @@ export class SettingScreenPage implements OnInit {
   this.router.navigateByUrl('/setting-profile');
 }
 
+
+
+ // Sections
+goToAccount() {
+  this.router.navigateByUrl('account');
+}
+
+goToPrivacy() {
+  this.router.navigateByUrl('privacy');
+}
+
+goToAvatar() {
+  this.router.navigateByUrl('avatar');
+}
+
+goToChats() {
+  this.router.navigateByUrl('chats');
+}
+
+goToAccessibility() {
+  this.router.navigateByUrl('accessibility');
+}
+
+goToNotifications() {
+  this.router.navigateByUrl('notification');
+}
+
+goToStorageData() {
+  this.router.navigateByUrl('storage-data');
+}
+
+goToAppLanguage() {
+  this.router.navigateByUrl('app-language');
+}
+
+goToHelpFeedback() {
+  this.router.navigateByUrl('help-feedback');
+}
+
+goToAppUpdates() {
+  this.router.navigateByUrl('app-updates');
+}
+
+goToInviteFriend() {
+  this.router.navigateByUrl('invite-friend');
+}
+
   async loadUserProfile() {
   try {
     const userId = this.authService.authData?.userId;

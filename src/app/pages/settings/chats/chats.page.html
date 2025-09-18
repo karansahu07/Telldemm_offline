@@ -1,0 +1,115 @@
+<ion-header>
+  <ion-toolbar class="chats-toolbar" color="light">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/settings"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Chats</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="chats-content">
+  <!-- Appearance -->
+  <ion-list>
+    <ion-list-header>Appearance</ion-list-header>
+
+    <ion-item button lines="inset" detail (click)="openTheme()">
+      <ion-icon slot="start" name="color-palette-outline" class="item-icon"></ion-icon>
+      <ion-label>
+        <div class="label-title">Theme</div>
+        <ion-note class="label-sub">System default</ion-note>
+      </ion-label>
+      
+    </ion-item>
+
+    <ion-item button lines="inset" detail (click)="openChatTheme()">
+      <ion-icon slot="start" name="brush-outline" class="item-icon"></ion-icon>
+      <ion-label>
+        <div class="label-title">Default chat theme</div>
+        <ion-note class="label-sub">Choose wallpaper or theme</ion-note>
+      </ion-label>
+      
+    </ion-item>
+
+    <ion-item button lines="inset" detail (click)="openFontSize()">
+      <ion-icon slot="start" name="text-outline" class="item-icon"></ion-icon>
+      <ion-label>
+        <div class="label-title">Font size</div>
+        <ion-note class="label-sub">Medium</ion-note>
+      </ion-label>
+      
+    </ion-item>
+  </ion-list>
+
+  <!-- Message behavior -->
+  <ion-list>
+    <ion-list-header>Message behavior</ion-list-header>
+
+    <ion-item lines="inset">
+      <ion-icon slot="start" name="enter-outline" class="item-icon"></ion-icon>
+      <ion-label>
+        <div class="label-title">Enter is send</div>
+        <ion-note class="label-sub">Press Enter to send messages</ion-note>
+      </ion-label>
+      <ion-toggle slot="end" [(ngModel)]="enterToSend"></ion-toggle>
+    </ion-item>
+
+    <ion-item lines="inset">
+      <ion-icon slot="start" name="image-outline" class="item-icon"></ion-icon>
+      <ion-label>
+        <div class="label-title">Media visibility</div>
+        <ion-note class="label-sub">Show newly downloaded media in your gallery</ion-note>
+      </ion-label>
+      <ion-toggle slot="end" [(ngModel)]="mediaVisibility"></ion-toggle>
+    </ion-item>
+
+    <ion-item lines="inset">
+      <ion-icon slot="start" name="archive-outline" class="item-icon"></ion-icon>
+      <ion-label>
+        <div class="label-title">Keep chats archived</div>
+        <ion-note class="label-sub">Archived chats stay archived when new messages arrive</ion-note>
+      </ion-label>
+      <ion-toggle slot="end" [(ngModel)]="keepArchived"></ion-toggle>
+    </ion-item>
+
+    <ion-item button lines="inset" detail (click)="toggleVoiceMessageTranscripts()">
+      <ion-icon slot="start" name="mic-outline" class="item-icon"></ion-icon>
+      <ion-label>
+        <div class="label-title">Voice message transcripts</div>
+        <ion-note class="label-sub">Automatically transcribe new voice messages</ion-note>
+      </ion-label>
+      
+    </ion-item>
+  </ion-list>
+
+  <!-- Chats management -->
+  <ion-list>
+    <ion-list-header>Chat management</ion-list-header>
+
+    <ion-item button lines="inset" detail (click)="openChatBackup()">
+      <ion-icon slot="start" name="cloud-outline" class="item-icon"></ion-icon>
+      <ion-label>
+        <div class="label-title">Chat backup</div>
+        <ion-note class="label-sub">Back up messages to cloud storage</ion-note>
+      </ion-label>
+      
+    </ion-item>
+
+    <ion-item button lines="inset" detail (click)="openTransferChats()">
+      <ion-icon slot="start" name="swap-horizontal-outline" class="item-icon"></ion-icon>
+      <ion-label>
+        <div class="label-title">Transfer chats</div>
+        <ion-note class="label-sub">Move chats between devices</ion-note>
+      </ion-label>
+      
+    </ion-item>
+
+    <ion-item button lines="inset" detail (click)="openChatHistory()">
+      <ion-icon slot="start" name="refresh-outline" class="item-icon"></ion-icon>
+      <ion-label>
+        <div class="label-title">Chat history</div>
+        <ion-note class="label-sub">Export, archive, clear or delete all chats</ion-note>
+      </ion-label>
+      
+    </ion-item>
+  </ion-list>
+</ion-content>

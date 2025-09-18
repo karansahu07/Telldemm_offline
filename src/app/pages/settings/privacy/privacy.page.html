@@ -1,0 +1,83 @@
+<ion-header>
+  
+   <ion-toolbar style="--background: #ffffff; --color: #000000;">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/settings"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Privacy</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" style="--background: #f8f8f8;">
+  <ion-list lines="full">
+    <ion-list-header>
+      <ion-label>Who can see my info</ion-label>
+    </ion-list-header>
+
+    <!-- Last Seen -->
+    <ion-item>
+      <ion-icon slot="start" name="time-outline"></ion-icon>
+      <ion-label>
+        <h2>Last Seen & Online</h2>
+        <p>Control who can see your last seen and online status</p>
+      </ion-label>
+      <ion-select slot="end" [(ngModel)]="lastSeen" interface="action-sheet">
+        <ion-select-option value="everyone">Everyone</ion-select-option>
+        <ion-select-option value="contacts">My Contacts</ion-select-option>
+        <ion-select-option value="nobody">Nobody</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <!-- Profile Photo -->
+    <ion-item>
+      <ion-icon slot="start" name="person-circle-outline"></ion-icon>
+      <ion-label>
+        <h2>Profile Photo</h2>
+        <p>Choose who can view your photo</p>
+      </ion-label>
+      <ion-select slot="end" [(ngModel)]="profilePhoto" interface="action-sheet">
+        <ion-select-option value="everyone">Everyone</ion-select-option>
+        <ion-select-option value="contacts">My Contacts</ion-select-option>
+        <ion-select-option value="nobody">Nobody</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <!-- About -->
+    <ion-item>
+      <ion-icon slot="start" name="information-circle-outline"></ion-icon>
+      <ion-label>
+        <h2>About</h2>
+        <p>Control who can see your about info</p>
+      </ion-label>
+      <ion-select slot="end" [(ngModel)]="about" interface="action-sheet">
+        <ion-select-option value="everyone">Everyone</ion-select-option>
+        <ion-select-option value="contacts">My Contacts</ion-select-option>
+        <ion-select-option value="nobody">Nobody</ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-list>
+
+  <ion-list lines="full">
+    <ion-list-header>
+      <ion-label>Other</ion-label>
+    </ion-list-header>
+
+    <!-- Status -->
+    <ion-item button detail (click)="goToStatusPrivacy()">
+      <ion-icon slot="start" name="ellipse-outline"></ion-icon>
+      <ion-label>
+        <h2>Status</h2>
+        <p>Manage who can see your status updates</p>
+      </ion-label>
+    </ion-item>
+
+    <!-- Blocked Contacts -->
+    <ion-item button detail (click)="goToBlockedContacts()">
+      <ion-icon slot="start" name="ban-outline"></ion-icon>
+      <ion-label>
+        <h2>Blocked Contacts</h2>
+        <p>View and manage blocked users</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>
