@@ -139,8 +139,13 @@ const routes: Routes = [
   {
     path: 'community-screen',
     canActivate: [AuthGuard],  
-    loadComponent: () => import('./community-screen/community.page').then(m => m.CommunityPage)
+    loadComponent: () => import('./community/community-screen/community.page').then(m => m.CommunityPage)
   },
+  // {
+  //   path: 'community-new',
+  //   // canActivate: [AuthGuard],  
+  //   loadComponent: () => import('./community-new/community-1.page').then(m => m.Community1Page)
+  // },
   {
     path: 'profile-screen',
     canActivate: [AuthGuard],
@@ -180,7 +185,8 @@ const routes: Routes = [
     path: 'setting-profile',
     canActivate: [AuthGuard],
     loadChildren: () => import('./pages/setting-profile/setting-profile.module').then( m => m.SettingProfilePageModule)
-  },  {
+  },
+  {
     path: 'profile-dp-view',
     loadChildren: () => import('./pages/profile-dp-view/profile-dp-view.module').then( m => m.ProfileDpViewPageModule)
   },
@@ -200,6 +206,47 @@ const routes: Routes = [
     path: 'add-instagram',
     loadChildren: () => import('./pages/add-instagram/add-instagram.module').then( m => m.AddInstagramPageModule)
   },
+  {
+    path: 'new-community-form',
+    loadChildren: () => import('./community/pages/new-community-form/new-community-form.module').then( m => m.NewCommunityFormPageModule)
+  },
+  {
+    path: 'new-community',
+    loadChildren: () => import('./community/pages/new-community/new-community.module').then( m => m.NewCommunityPageModule)
+  },
+  {
+    path: 'community-detail',
+    loadChildren: () => import('./community/pages/community-detail/community-detail.module').then( m => m.CommunityDetailPageModule)
+  },
+  {
+    path: 'add-group-community',
+    loadChildren: () => import('./community/pages/add-group-community/add-group-community.module').then( m => m.AddGroupCommunityPageModule)
+  },  {
+    path: 'add-existing-groups',
+    loadChildren: () => import('./community/pages/add-existing-groups/add-existing-groups.module').then( m => m.AddExistingGroupsPageModule)
+  },
+  {
+    path: 'confirm-add-existing-groups',
+    loadChildren: () => import('./community/pages/confirm-add-existing-groups/confirm-add-existing-groups.module').then( m => m.ConfirmAddExistingGroupsPageModule)
+  },
+  {
+    path: 'create-new-group',
+    loadChildren: () => import('./community/pages/create-new-group/create-new-group.module').then( m => m.CreateNewGroupPageModule)
+  },
+  {
+    path: 'load-all-members',
+    loadChildren: () => import('./community/pages/load-all-members/load-all-members.module').then( m => m.LoadAllMembersPageModule)
+  },
+  {
+    path: 'community-info',
+    loadChildren: () => import('./community/pages/community-info/community-info.module').then( m => m.CommunityInfoPageModule)
+  },
+  {
+    path: 'community-chat',
+    loadChildren: () => import('./community/pages/community-chat/community-chat.module').then( m => m.CommunityChatPageModule)
+  },
+
+
 
 
 ];

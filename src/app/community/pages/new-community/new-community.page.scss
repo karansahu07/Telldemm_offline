@@ -1,0 +1,71 @@
+ion-header {
+  ion-toolbar {
+    --background: white;
+    ion-button {
+      color: black;
+      font-size: 22px;
+    }
+  }
+}
+
+ion-header, 
+ion-toolbar {
+  box-shadow: none !important;
+}
+
+.illustration {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+
+  img {
+    width: 220px;
+    height: auto;
+  }
+}
+
+.title {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 600;
+  margin-top: 30px;
+  color: #000;
+}
+
+.description {
+  text-align: center;
+  font-size: 16px;
+  color: #666;
+  margin: 15px 20px;
+}
+
+.example-link {
+  text-align: center;
+  margin-top: 10px;
+
+  a {
+    color: #0a66c2; // blue like WhatsApp link
+    text-decoration: none;
+    font-weight: 500;
+  }
+}
+
+ion-footer {
+  ion-toolbar {
+    --background: white;
+    padding: 10px;
+
+    ion-button {
+      font-size: 18px;
+    }
+  }
+}
+
+ion-footer, 
+ion-toolbar {
+  box-shadow: none !important;
+}
+
+.start {
+  --background: #FF1414;
+}

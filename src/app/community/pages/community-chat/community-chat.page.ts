@@ -4301,16 +4301,16 @@ import { Keyboard } from '@capacitor/keyboard';
 import { FirebaseChatService } from 'src/app/services/firebase-chat.service';
 import { EncryptionService } from 'src/app/services/encryption.service';
 import { v4 as uuidv4 } from 'uuid';
-import { SecureStorageService } from '../../services/secure-storage/secure-storage.service';
-import { FileUploadService } from '../../services/file-upload/file-upload.service';
+import { SecureStorageService } from '../../../services/secure-storage/secure-storage.service';
+import { FileUploadService } from '../../../services/file-upload/file-upload.service';
 import { ChatOptionsPopoverComponent } from 'src/app/components/chat-options-popover/chat-options-popover.component';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { NavController } from '@ionic/angular';
 import { FilePicker } from '@capawesome/capacitor-file-picker';
 import { FileSystemService } from 'src/app/services/file-system.service';
 import imageCompression from 'browser-image-compression';
-import { AttachmentPreviewModalComponent } from '../../components/attachment-preview-modal/attachment-preview-modal.component';
-import { MessageMorePopoverComponent } from '../../components/message-more-popover/message-more-popover.component';
+import { AttachmentPreviewModalComponent } from '../../../components/attachment-preview-modal/attachment-preview-modal.component';
+import { MessageMorePopoverComponent } from '../../../components/message-more-popover/message-more-popover.component';
 import { Clipboard } from '@capacitor/clipboard';
 import { Message, PinnedMessage } from 'src/types';
 import { AuthService } from 'src/app/auth/auth.service';
@@ -4323,13 +4323,13 @@ import { PresenceService } from 'src/app/services/presence.service';
 import { switchMap } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-chatting-screen',
+  selector: 'app-community-chat',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule],
-  templateUrl: './chatting-screen.page.html',
-  styleUrls: ['./chatting-screen.page.scss']
+  imports: [IonicModule, CommonModule, FormsModule],
+  templateUrl: './community-chat.page.html',
+  styleUrls: ['./community-chat.page.scss']
 })
-export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
+export class CommunityChatPage implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('scrollContainer', { static: false }) scrollContainer!: ElementRef;
   @ViewChild(IonContent, { static: false }) ionContent!: IonContent;
   @ViewChild('fileInput', { static: false }) fileInput!: ElementRef<HTMLInputElement>;
@@ -4442,6 +4442,8 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   // store unsubscribes for firebase onValue
   private onValueUnsubs: Array<() => void> = [];
 
+  communityId: string = '';
+
   constructor(
     private chatService: FirebaseChatService,
     private route: ActivatedRoute,
@@ -4469,74 +4471,81 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   ) { }
 
   async ngOnInit() {
-    Keyboard.setScroll({ isDisabled: false });
+  Keyboard.setScroll({ isDisabled: false });
 
-    this.senderId = this.authService.authData?.userId || '';
-    this.sender_phone = this.authService.authData?.phone_number || '';
-    this.sender_name = this.authService.authData?.name || '';
+  this.senderId = this.authService.authData?.userId || '';
+  this.sender_phone = this.authService.authData?.phone_number || '';
+  this.sender_name = this.authService.authData?.name || '';
 
-    const nameFromQuery = this.route.snapshot.queryParamMap.get('receiver_name');
-    this.receiver_name = nameFromQuery || await this.secureStorage.getItem('receiver_name') || '';
+  const nameFromQuery = this.route.snapshot.queryParamMap.get('receiver_name');
+  this.receiver_name =
+    nameFromQuery || (await this.secureStorage.getItem('receiver_name')) || '';
 
-    const rawId = this.route.snapshot.queryParamMap.get('receiverId') || '';
-    const chatTypeParam = this.route.snapshot.queryParamMap.get('isGroup');
-    const phoneFromQuery = this.route.snapshot.queryParamMap.get('receiver_phone');
+  const rawId = this.route.snapshot.queryParamMap.get('receiverId') || '';
+  const chatTypeParam = this.route.snapshot.queryParamMap.get('isGroup');
+  const phoneFromQuery = this.route.snapshot.queryParamMap.get('receiver_phone');
 
-    this.chatType = chatTypeParam === 'true' ? 'group' : 'private';
+  // 👇 communityId nikal lo
+  this.communityId = this.route.snapshot.queryParamMap.get('communityId') || '';
 
-    if (this.chatType === 'group') {
-      this.roomId = decodeURIComponent(rawId);
+  this.chatType = chatTypeParam === 'true' ? 'group' : 'private';
 
-      try {
-        const { groupName, groupMembers } = await this.chatService.fetchGroupWithProfiles(this.roomId);
-        this.groupName = groupName;
-        this.groupMembers = groupMembers;
-      } catch (err) {
-        console.warn('Failed to fetch group with profiles', err);
-        this.groupName = 'Group';
-        this.groupMembers = [];
-      }
-    } else {
-      this.receiverId = decodeURIComponent(rawId);
-      this.roomId = this.getRoomId(this.senderId, this.receiverId);
-      this.receiver_phone = phoneFromQuery || localStorage.getItem('receiver_phone') || '';
-      localStorage.setItem('receiver_phone', this.receiver_phone);
-    }
-
-    this.setupTypingListener();
-
-    await this.chatService.resetUnreadCount(this.roomId, this.senderId);
-    await this.markMessagesAsRead();
+  if (this.chatType === 'group') {
+    this.roomId = decodeURIComponent(rawId);
 
     try {
-      const db = getDatabase();
-      try {
-        const myTypingRef = dbRef(db, `typing/${this.roomId}/${this.senderId}`);
-        onDisconnect(myTypingRef).remove();
-      } catch (err) {
-        console.warn('onDisconnect setup failed', err);
-      }
-
-      const tsub = this.typingInput$.pipe(
-        throttleTime(1200, undefined, { leading: true, trailing: true })
-      ).subscribe(() => {
-        this.sendTypingSignal();
-      });
-      this.typingRxSubs.push(tsub);
+      const { groupName, groupMembers } = await this.chatService.fetchGroupWithProfiles(this.roomId);
+      this.groupName = groupName;
+      this.groupMembers = groupMembers;
     } catch (err) {
-      console.warn('Typing setup error', err);
+      console.warn('Failed to fetch group with profiles', err);
+      this.groupName = 'Group';
+      this.groupMembers = [];
+    }
+  } else {
+    this.receiverId = decodeURIComponent(rawId);
+    this.roomId = this.getRoomId(this.senderId, this.receiverId);
+    this.receiver_phone =
+      phoneFromQuery || localStorage.getItem('receiver_phone') || '';
+    localStorage.setItem('receiver_phone', this.receiver_phone);
+  }
+
+  this.setupTypingListener();
+
+  await this.chatService.resetUnreadCount(this.roomId, this.senderId);
+  await this.markMessagesAsRead();
+
+  try {
+    const db = getDatabase();
+    try {
+      const myTypingRef = dbRef(db, `typing/${this.roomId}/${this.senderId}`);
+      onDisconnect(myTypingRef).remove();
+    } catch (err) {
+      console.warn('onDisconnect setup failed', err);
     }
 
-    await this.loadFromLocalStorage();
-    this.listenForMessages();
-    this.setupPinnedMessageListener();
-    this.checkMobileView();
-    setTimeout(() => this.scrollToBottom(), 100);
-    await this.loadInitialMessages();
-    this.loadReceiverProfile();
-    await this.checkIfBlocked();
-    this.startReceiverStatusPoll();
+    const tsub = this.typingInput$
+      .pipe(throttleTime(1200, undefined, { leading: true, trailing: true }))
+      .subscribe(() => {
+        this.sendTypingSignal();
+      });
+    this.typingRxSubs.push(tsub);
+  } catch (err) {
+    console.warn('Typing setup error', err);
   }
+
+  await this.loadFromLocalStorage();
+  this.listenForMessages();
+  this.setupPinnedMessageListener();
+  this.checkMobileView();
+  setTimeout(() => this.scrollToBottom(), 100);
+  await this.loadInitialMessages();
+  this.loadReceiverProfile();
+  await this.checkIfBlocked();
+  this.startReceiverStatusPoll();
+
+  console.log('✅ Community ID:', this.communityId);
+}
 
   onInputTyping() {
     this.onInputChange();
@@ -4590,6 +4599,8 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     const rawId = this.route.snapshot.queryParamMap.get('receiverId') || '';
     const chatTypeParam = this.route.snapshot.queryParamMap.get('isGroup');
     const phoneFromQuery = this.route.snapshot.queryParamMap.get('receiver_phone');
+
+    this.communityId = this.route.snapshot.queryParamMap.get('communityId') || '';
 
     this.chatType = chatTypeParam === 'true' ? 'group' : 'private';
 
@@ -6742,7 +6753,8 @@ formatLastSeen(ts: string | null) {
       receiverId: this.chatType === 'group' ? this.roomId : this.receiverId,
       receiver_phone: this.receiver_phone,
       receiver_name: this.receiver_name,
-      isGroup: this.chatType === 'group'
+      isGroup: this.chatType === 'group',
+      communityId: this.communityId
     };
 
     this.router.navigate(['/profile-screen'], { queryParams });
@@ -6880,6 +6892,12 @@ formatLastSeen(ts: string | null) {
   // ---------- small helpers ----------
   private escapeRegExp(s: string) {
     return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  backToCommunity(){
+    this.router.navigate(['/community-detail'], {
+      queryParams: { communityId: this.communityId }
+    });
   }
 }
 

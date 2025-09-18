@@ -65,6 +65,7 @@ theyBlocked = false;   // They blocked me
 private iBlockedRef: any = null;
 private theyBlockedRef: any = null;
 socialMediaLinks: { platform: string; profile_url: string }[] = [];
+ communityId: string = '';
 
   constructor(
     private router: Router,
@@ -94,6 +95,8 @@ socialMediaLinks: { platform: string; profile_url: string }[] = [];
       console.log("isGroup:", this.isGroup);
 
       this.loadReceiverProfile();
+
+      this.communityId = this.route.snapshot.queryParamMap.get('communityId') || '';
 
       if (this.chatType === 'group') {
         // use shared service to fetch group + member profiles
@@ -130,6 +133,8 @@ socialMediaLinks: { platform: string; profile_url: string }[] = [];
       this.groupId = this.route.snapshot.queryParamMap.get('receiverId') || '';
 
       this.loadReceiverProfile();
+
+      this.communityId = this.route.snapshot.queryParamMap.get('communityId') || '';
 
       if (this.chatType === 'group') {
         try {
@@ -248,7 +253,8 @@ openExternalLink(url: string) {
       queryParams: {
         receiverId: this.receiverId,
         receiver_phone: this.receiver_phone,
-        isGroup: this.isGroup
+        isGroup: this.isGroup,
+        communityId: this.communityId
       }
     });
   }

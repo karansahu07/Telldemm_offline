@@ -1,0 +1,88 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+    <!-- <ion-buttons slot="end">
+      <ion-button fill="clear">
+        <ion-icon name="ellipsis-vertical"></ion-icon>
+      </ion-button>
+    </ion-buttons> -->
+    <ion-buttons slot="end">
+  <ion-button fill="clear" (click)="presentPopover($event)">
+    <ion-icon name="ellipsis-vertical"></ion-icon>
+  </ion-button>
+</ion-buttons>
+  </ion-toolbar>
+
+  <!-- Community Info -->
+  <div class="community-header" *ngIf="community">
+    <ion-avatar class="community-icon">
+      <img [src]="community.icon || 'assets/images/multiple-users-silhouette (1).png'" />
+    </ion-avatar>
+    <div class="community-info">
+      <h2>{{ community.name }}</h2>
+      <p>Community · {{ memberCount }} members · {{ groupCount }} groups</p>
+    </div>
+  </div>
+</ion-header>
+
+<ion-content>
+  <ion-list *ngIf="loading === false">
+    <!-- Announcement card -->
+    <ion-item *ngIf="announcementGroup" lines="full" button (click)="openGroupChat(announcementGroup.id)">
+      <ion-avatar class="band">
+        <ion-icon name="megaphone-outline"></ion-icon>
+      </ion-avatar>
+      <ion-label class="community">
+        <h3>{{ announcementGroup.name }}</h3>
+        <p>{{ announcementGroup.lastMessage?.text || 'No announcements yet' }}</p>
+      </ion-label>
+      <ion-note slot="end">{{ announcementGroup.lastMessage?.time || '' }}</ion-note>
+    </ion-item>
+
+    <!-- Groups you are in -->
+    <ion-list *ngIf="groups.length > 0">
+      <ion-list-header>Groups</ion-list-header>
+      <ion-item *ngFor="let g of groups" button >
+        <ion-avatar class="band">
+          <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+        </ion-avatar>
+        <ion-label class="community" (click)="openGroupChat(g.id)">
+          <h3>{{ g.name }}</h3>
+          <p>{{ g.membersCount }} members</p>
+        </ion-label>
+        <ion-note slot="end"></ion-note>
+      </ion-item>
+    </ion-list>
+
+    <!-- Empty state -->
+    <div class="empty-text" *ngIf="!announcementGroup && groups.length === 0">
+      <p>
+        Other groups added to the community will appear here.<br />
+        Community members can join these groups.
+      </p>
+    </div>
+  </ion-list>
+
+  <ion-list *ngIf="loading">
+    <ion-item>
+      <ion-label>Loading community...</ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>
+
+<!-- Footer Button -->
+<ion-footer>
+  <ion-toolbar>
+    <ion-button
+      expand="block"
+      shape="round"
+      class="add-btn"
+      (click)="goToaddgroupcommunity()"
+    >
+      <ion-icon name="add" slot="start"></ion-icon>
+      Add group
+    </ion-button>
+  </ion-toolbar>
+</ion-footer>

@@ -1,0 +1,62 @@
+/* Remove padding and margin from ion-title */
+.no-padding {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Group count style */
+.group-count {
+  margin: 0;
+  color: gray;
+  font-size: 14px;
+}
+
+/* Avatar styles */
+.avatar-green {
+  background: #e6f9ec;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.avatar-gray {
+  background: #f0f0f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Info text */
+.info-text {
+  font-size: 14px;
+  color: gray;
+  margin: 15px 0;
+}
+
+/* Highlighted link text */
+.link-text {
+  color: green;
+  font-weight: 500;
+}
+
+/* Divider line */
+.divider {
+  border: 1px solid black;
+  margin: 10px 0;
+}
+
+
+.custom-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #e6f9ec;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.multiple{
+    font-size: 26px ;
+}

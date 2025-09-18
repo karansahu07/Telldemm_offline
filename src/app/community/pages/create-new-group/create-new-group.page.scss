@@ -1,0 +1,39 @@
+:host {
+  --ion-background-color: #fff;
+}
+
+.red-header ion-toolbar {
+  --background: #c62828; /* red */
+  color: white;
+}
+
+.red-theme-content {
+  --background: #fff;
+  padding: 0 16px;
+}
+
+.form-top {
+  padding: 16px 0;
+}
+
+.avatar-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.add-avatar {
+  background: #e9f5ee;
+  color: #0a8a4a;
+}
+.muted {
+  color: #7a7a7a;
+}
+.community-line {
+  padding: 8px 12px;
+  background: rgba(0,0,0,0.03);
+}
+.community-name {
+  font-size: 14px;
+  color: rgba(255,255,255,0.9);
+}

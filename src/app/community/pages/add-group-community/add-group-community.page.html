@@ -1,0 +1,90 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="no-padding">Manage groups</ion-title>
+    <p class="group-count">{{ groupsInCommunity.length }} groups</p>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- Create new group -->
+  <!-- <ion-item button detail="false" lines="none">
+    <div slot="start" class="custom-icon">
+      <ion-icon name="people-outline" class="multiple"></ion-icon>
+    </div>
+    <ion-label>
+      <h2>Create new group</h2>
+    </ion-label>
+  </ion-item> -->
+
+  <ion-item button detail="false" lines="none" (click)="goToCreateNewGroup()">
+  <div slot="start" class="custom-icon">
+    <ion-icon name="people-outline" class="multiple"></ion-icon>
+  </div>
+  <ion-label>
+    <h2>Create new group</h2>
+  </ion-label>
+</ion-item>
+
+  <!-- Add existing group -->
+  <!-- <ion-item button detail="false" lines="none">
+    <div slot="start" class="custom-icon">
+      <ion-icon name="add-outline" color="success"></ion-icon>
+    </div>
+    <ion-label>
+      <h2>Add existing groups</h2>
+    </ion-label>
+  </ion-item> -->
+
+  <!-- Add existing group -->
+<ion-item button detail="false" lines="none" (click)="goToAddExistingGroups()">
+  <div slot="start" class="custom-icon">
+    <ion-icon name="add-outline" color="success"></ion-icon>
+  </div>
+  <ion-label>
+    <h2>Add existing groups</h2>
+  </ion-label>
+</ion-item>
+
+
+  <!-- Info text -->
+  <p class="info-text">
+    Members can suggest existing groups for admin approval and add new groups
+    directly. View in <span class="link-text">Community settings</span>
+  </p>
+
+  <p class="divider"></p>
+
+  <!-- Groups in this community -->
+  <ion-list>
+    <ion-list-header>
+      <ion-label>Groups in this community</ion-label>
+    </ion-list-header>
+
+    <!-- Loading state -->
+    <ion-item *ngIf="loading">
+      <ion-label>Loading groups...</ion-label>
+    </ion-item>
+
+    <!-- If no groups -->
+    <ion-item *ngIf="!loading && groupsInCommunity.length === 0">
+      <ion-label>No groups found for this community</ion-label>
+    </ion-item>
+
+    <!-- Dynamic groups -->
+    <ion-item *ngFor="let g of groupsInCommunity" lines="none">
+      <ion-avatar slot="start" [ngClass]="{'avatar-green': g.type === 'announcement','avatar-gray': g.type !== 'announcement'}">
+        <ion-icon [name]="g.type === 'announcement' ? 'megaphone-outline' : 'chatbubble-ellipses-outline'"></ion-icon>
+      </ion-avatar>
+      <ion-label>
+        <h2><strong>{{ g.name }}</strong></h2>
+        <p *ngIf="g.membersCount"> {{ g.membersCount }} members</p>
+      </ion-label>
+      <ion-button fill="clear" slot="end" (click)="removeGroupFromCommunity(g.id)">
+        <ion-icon name="close-outline" color="dark"></ion-icon>
+      </ion-button>
+    </ion-item>
+  </ion-list>
+</ion-content>

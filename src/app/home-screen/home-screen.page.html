@@ -100,78 +100,69 @@
 <ion-list *ngIf="!isLoading">
   <ion-item *ngFor="let chat of filteredChats" (click)="openChat(chat)">
 
-    <!-- Avatar -->
+    <!-- Avatar (unchanged) -->
     <ion-avatar
       slot="start"
       (click)="openImagePopup(getChatAvatarUrl(chat) || 'assets/images/user.jfif'); $event.stopPropagation()"
     >
-      <!-- Agar valid image hai to show -->
       <ng-container *ngIf="getChatAvatarUrl(chat) as img; else initialsTpl">
         <img [src]="img" alt="{{ getChatAlt(chat) }}" (error)="onAvatarError(chat)" />
       </ng-container>
-
-      <!-- Agar image nahi to initials -->
       <ng-template #initialsTpl>
-        <div class="avatar">
-          {{ getChatInitial(chat) }}
-        </div>
+        <div class="avatar">{{ getChatInitial(chat) }}</div>
       </ng-template>
     </ion-avatar>
 
-    <!-- Name + Message -->
-    <!-- <ion-label>
-      <p class="chat-message">{{ chat.group ? (chat.group_name || chat.name) : chat.name }}</p>
-      <p [style.color]="chat.unread ? '#FF1414' : '#444343'">
-        <ng-container [ngSwitch]="chat.messageStatus">
-          <img *ngSwitchCase="'sent'" src="assets/images/read.svg" class="tick-icon" />
-          <img *ngSwitchCase="'seen'" src="assets/images/double-tick.svg" class="tick-seen" />
-        </ng-container>
-        {{ chat.message }}
-      </p>
-    </ion-label> -->
-
+    <!-- UPDATED Label: first line = (chat.name) ; second line = preview group name › preview message -->
     <ion-label>
-        <p class="chat-message">{{ chat.group ? (chat.group_name || chat.name) : chat.name }}</p>
+      <!-- Title row: for community show community name, else show chat/group name -->
+      <p class="chat-message" style="font-weight:600; margin:0;">
+        {{ chat.name }}
+      </p>
 
-        <!-- MESSAGE / TYPING line -->
-        <p [ngClass]="chat.isTyping ? 'typing-text' : ''" style="margin:0;">
-          <ng-container *ngIf="chat.isTyping; else normalMsg">
-            <!-- Group -->
-            <ng-container *ngIf="chat.group">
-              <ng-container *ngIf="chat.typingCount === 1">
-                {{ chat.typingText ? (chat.typingText + ' is typing...') : 'Someone is typing...' }}
-              </ng-container>
-              <ng-container *ngIf="chat.typingCount > 1">
-                {{ chat.typingCount }} people are typing...
-              </ng-container>
-            </ng-container>
+      <!-- Preview row: show preview group name (if exists) then chevron and the last message -->
+      <p [ngClass]="chat.isTyping ? 'typing-text' : ''" style="margin:0; display:flex; align-items:center; gap:6px;">
+        <!-- If community (or group) has preview group name, show it -->
+        <ng-container *ngIf="chat.group_name; else justMessage">
+          <span style="font-weight:600; color: #666;">{{ chat.group_name }}</span>
+          <ion-icon name="caret-forward-outline" style="font-size:10px; color:#999;"></ion-icon>
+          <span style="color:#666; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+            {{ chat.message }}
+          </span>
+        </ng-container>
 
-            <!-- Private -->
-            <ng-container *ngIf="!chat.group">
-              {{'typing...'}}
-            </ng-container>
+        <ng-template #justMessage>
+          <!-- fallback for plain private chat -->
+          <ng-container [ngSwitch]="chat.isTyping">
+            <span *ngSwitchCase="true" style="color:#666;">{{chat.typingText || 'typing...'}}</span>
+            <span *ngSwitchDefault style="color:#666; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+              <ng-container [ngSwitch]="chat.messageStatus">
+                <img *ngSwitchCase="'sent'" src="assets/images/read.svg" class="tick-icon" />
+                <img *ngSwitchCase="'seen'" src="assets/images/double-tick.svg" class="tick-seen" />
+              </ng-container>
+              &nbsp;{{ chat.message }}
+            </span>
           </ng-container>
+        </ng-template>
+      </p>
+    </ion-label>
 
-          <ng-template #normalMsg>
-            <ng-container [ngSwitch]="chat.messageStatus">
-              <img *ngSwitchCase="'sent'" src="assets/images/read.svg" class="tick-icon" />
-              <img *ngSwitchCase="'seen'" src="assets/images/double-tick.svg" class="tick-seen" />
-            </ng-container>
-            &nbsp;{{ chat.message }}
-          </ng-template>
-        </p>
-      </ion-label>
-
-    <!-- Time + Unread -->
+    <!-- Time + Unread (unchanged) -->
     <div slot="end" class="chat-meta">
       <p class="time">{{ chat.time }}</p>
       <ion-badge *ngIf="chat.unreadCount > 0" color="danger" class="unread-badge">
         {{ chat.unreadCount }}
       </ion-badge>
+
+      <!-- small chevron to show next -->
+       <ion-icon
+    *ngIf="chat.isCommunity"
+    name="chevron-forward-outline"
+    style="color:#bdbdbd; margin-left:8px;"
+  ></ion-icon>
     </div>
   </ion-item>
 </ion-list>
-
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <div class="icon-image" (click)="goToContact()">

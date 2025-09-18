@@ -80,7 +80,7 @@
     <!-- 🔁 Default Chat Header -->
     <ng-template #defaultHeader>
       <ion-buttons *ngIf="!showSearchBar" slot="start" style="color: black; width: 8%; margin-top: 15px;">
-        <ion-back-button defaultHref="/home-screen"></ion-back-button>
+        <ion-back-button (click)="backToCommunity()"></ion-back-button>
         <!-- <ion-icon name="arrow-back-outline" class="back-icon"></ion-icon> -->
       </ion-buttons>
 

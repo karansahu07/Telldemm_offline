@@ -85,3 +85,33 @@ export interface GetSocialMediaResponse {
   success: boolean;
   data: SocialMediaEntry[];
 }
+
+export interface GroupMember {
+user_id: string;
+name?: string;
+phone_number?: string;
+avatar?: string;
+publicKeyHex?: string | null;
+status?: 'active' | 'left' | 'removed';
+role?: 'admin' | 'member';
+[k: string]: any;
+}
+
+
+export interface GroupData {
+name: string;
+groupId: string;
+description?: string;
+createdBy: string;
+createdByName?: string;
+createdAt?: string | number;
+members: Record<string, Partial<GroupMember>>;
+}
+
+
+export interface Community {
+name: string;
+description?: string;
+createdBy: string;
+groups?: Record<string, boolean> | {};
+}

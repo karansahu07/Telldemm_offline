@@ -1,0 +1,153 @@
+/* red header theme */
+.red-header {
+  --background: #ffffff;
+  --ion-toolbar-background: #ffffff;
+  --ion-color-primary: #c62828; /* red */
+}
+
+.community-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 16px 8px 16px;
+  background: white;
+}
+
+.community-avatar {
+  width: 84px;
+  height: 84px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #f3f3f3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.community-meta {
+  flex: 1;
+}
+
+.community-name {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.community-sub {
+  margin: 2px 0 0 0;
+  color: var(--ion-color-medium);
+  font-size: 13px;
+}
+
+/* actions row under header */
+.action-row {
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 16px 16px 16px;
+  background: white;
+  gap: 8px;
+}
+
+.action-btn {
+  --padding-start: 8px;
+  --padding-end: 8px;
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+  flex-direction: column;
+  align-items: center;
+  min-width: 86px;
+  border-radius: 12px;
+  --background: transparent;
+}
+
+.action-btn ion-icon {
+  font-size: 22px;
+  color: #1b8e4a; /* green icon like whatsapp */
+  margin-bottom: 4px;
+}
+
+.action-btn .label {
+  font-size: 13px;
+  color: #1b8e4a;
+}
+
+/* segment styles */
+.tabs-toolbar {
+  --background: white;
+  padding: 6px 12px;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+}
+
+ion-segment {
+  --indicator-color: #1b8e4a;
+}
+
+/* content sections */
+.red-theme-content {
+  --background: #fff;
+}
+
+.section {
+  padding-bottom: 12px;
+}
+
+/* card for description */
+.comm-desc {
+  margin: 12px;
+  border-radius: 10px;
+  --background: #fafafa;
+  color: #222;
+}
+
+ion-list ion-item {
+  --min-height: 56px;
+}
+
+/* muted text */
+.muted {
+  color: var(--ion-color-medium);
+  font-size: 13px;
+}
+
+/* avatar initial style */
+.initial-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #ffdce0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #a61a22;
+  font-weight: 600;
+}
+
+/* green avatar for add */
+.green-avatar {
+  --background: #1b8e4a;
+  color: white;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* danger label */
+.item .danger,
+ion-item .danger {
+  color: #d32f2f;
+}
+
+/* keep some space at bottom so last items can scroll above navbars */
+.bottom-space {
+  height: 120px;
+}
+
+/* small top gap so header area does not overlap content */
+.scroll-padding {
+  height: 6px;
+}

@@ -23,7 +23,7 @@ import { NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 
 // Firebase modular imports
-import { getDatabase, ref as rtdbRef, onValue as rtdbOnValue, off as rtdbOff } from 'firebase/database';
+import { getDatabase, ref as rtdbRef, onValue as rtdbOnValue, off as rtdbOff, get } from 'firebase/database';
 import { TypingService } from '../services/typing.service';
 import { Resetapp } from '../services/resetapp';
 import { VersionCheck } from '../services/version-check';
@@ -57,6 +57,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
 
   // typing listeners: map roomId -> unsubscribe fn
   private typingUnsubs: Map<string, () => void> = new Map();
+  private communityUnreadSubs: Map<string, any> = new Map();
 
   constructor(
     private router: Router,
@@ -202,7 +203,8 @@ export class HomeScreenPage implements OnInit, OnDestroy {
 
       await Promise.all([
         this.getAllUsers(),
-        this.loadUserGroups()
+        this.loadUserGroups(),
+        this.loadUserCommunitiesForHome()
       ]);
 
       // sort by time descending
@@ -223,7 +225,8 @@ export class HomeScreenPage implements OnInit, OnDestroy {
       this.isLoading = true;
       await Promise.all([
         this.getAllUsers(),
-        this.loadUserGroups()
+        this.loadUserGroups(),
+        this.loadUserCommunitiesForHome()
       ]);
       this.isLoading = false;
     } catch (err) {
@@ -495,126 +498,248 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     });
   }
 
-  async loadUserGroups() {
-    const userid = this.senderUserId;
-    console.log("sender user id:", userid);
-    if (!userid) return;
+  // async loadUserGroups() {
+  //   const userid = this.senderUserId;
+  //   console.log("sender user id:", userid);
+  //   if (!userid) return;
 
-    const groupIds = await this.firebaseChatService.getGroupsForUser(userid);
-    console.log("group ids:", groupIds);
+  //   const groupIds = await this.firebaseChatService.getGroupsForUser(userid);
+  //   console.log("group ids:", groupIds);
 
-    for (const groupId of groupIds) {
-      const existingGroup = this.chatList.find(chat =>
-        chat.receiver_Id === groupId && chat.group
-      );
-      if (existingGroup) {
-        console.log('Group already exists:', groupId);
-        continue;
-      }
+  //   for (const groupId of groupIds) {
+  //     const existingGroup = this.chatList.find(chat =>
+  //       chat.receiver_Id === groupId && chat.group
+  //     );
+  //     if (existingGroup) {
+  //       console.log('Group already exists:', groupId);
+  //       continue;
+  //     }
 
-      const groupInfo = await this.firebaseChatService.getGroupInfo(groupId);
-      if (!groupInfo || !groupInfo.members || !groupInfo.members[userid]) continue;
+  //     const groupInfo = await this.firebaseChatService.getGroupInfo(groupId);
+  //     if (!groupInfo || !groupInfo.members || !groupInfo.members[userid]) continue;
 
-      const groupName = groupInfo.name || 'Unnamed Group';
-      let groupDp = 'assets/images/user.jfif';
+  //     const groupName = groupInfo.name || 'Unnamed Group';
+  //     let groupDp = 'assets/images/user.jfif';
 
-      this.service.getGroupDp(groupId).subscribe({
-        next: (res: any) => {
-          if (res?.group_dp_url) {
-            const targetGroup = this.chatList.find(chat => chat.receiver_Id === groupId);
-            if (targetGroup) {
-              targetGroup.dp = res.group_dp_url;
-            }
-          }
-        },
-        error: (err: any) => {
-          console.error('❌ Failed to fetch group DP:', err);
-        }
-      });
+  //     this.service.getGroupDp(groupId).subscribe({
+  //       next: (res: any) => {
+  //         if (res?.group_dp_url) {
+  //           const targetGroup = this.chatList.find(chat => chat.receiver_Id === groupId);
+  //           if (targetGroup) {
+  //             targetGroup.dp = res.group_dp_url;
+  //           }
+  //         }
+  //       },
+  //       error: (err: any) => {
+  //         console.error('❌ Failed to fetch group DP:', err);
+  //       }
+  //     });
 
-      const groupChat: any = {
-        name: groupName,
-        receiver_Id: groupId,
-        group: true,
-        message: '',
-        time: '',
-        unread: false,
-        unreadCount: 0,
-        dp: groupDp,
-        // typing fields
-        isTyping: false,
-        typingText: null,
-        typingCount: 0,
-        // optionally keep members if you want to resolve names locally
-        members: groupInfo.members || {}
-      };
+  //     const groupChat: any = {
+  //       name: groupName,
+  //       receiver_Id: groupId,
+  //       group: true,
+  //       message: '',
+  //       time: '',
+  //       unread: false,
+  //       unreadCount: 0,
+  //       dp: groupDp,
+  //       // typing fields
+  //       isTyping: false,
+  //       typingText: null,
+  //       typingCount: 0,
+  //       // optionally keep members if you want to resolve names locally
+  //       members: groupInfo.members || {}
+  //     };
 
-      this.chatList.push(groupChat);
+  //     this.chatList.push(groupChat);
 
-      // start typing listener for this group
-      this.startTypingListenerForChat(groupChat);
+  //     // start typing listener for this group
+  //     this.startTypingListenerForChat(groupChat);
 
-      // Listen for latest message in group
-      this.firebaseChatService.listenForMessages(groupId).subscribe(async (messages) => {
-        if (messages.length > 0) {
-          const lastMsg = messages[messages.length - 1];
+  //     // Listen for latest message in group
+  //     this.firebaseChatService.listenForMessages(groupId).subscribe(async (messages) => {
+  //       if (messages.length > 0) {
+  //         const lastMsg = messages[messages.length - 1];
 
-          if (lastMsg.isDeleted) {
-            groupChat.message = 'This message was deleted';
-          } else if (lastMsg.attachment?.type && lastMsg.attachment.type !== 'text') {
-            switch (lastMsg.attachment.type) {
-              case 'image':
-                groupChat.message = '📷 Photo';
-                break;
-              case 'video':
-                groupChat.message = '🎥 Video';
-                break;
-              case 'audio':
-                groupChat.message = '🎵 Audio';
-                break;
-              case 'file':
-                groupChat.message = '📎 Attachment';
-                break;
-              default:
-                groupChat.message = '[Media]';
-            }
-          } else {
-            try {
-              const decryptedText = await this.encryptionService.decrypt(lastMsg.text);
-              groupChat.message = decryptedText;
-            } catch (e) {
-              groupChat.message = '[Encrypted]';
-            }
-          }
+  //         if (lastMsg.isDeleted) {
+  //           groupChat.message = 'This message was deleted';
+  //         } else if (lastMsg.attachment?.type && lastMsg.attachment.type !== 'text') {
+  //           switch (lastMsg.attachment.type) {
+  //             case 'image':
+  //               groupChat.message = '📷 Photo';
+  //               break;
+  //             case 'video':
+  //               groupChat.message = '🎥 Video';
+  //               break;
+  //             case 'audio':
+  //               groupChat.message = '🎵 Audio';
+  //               break;
+  //             case 'file':
+  //               groupChat.message = '📎 Attachment';
+  //               break;
+  //             default:
+  //               groupChat.message = '[Media]';
+  //           }
+  //         } else {
+  //           try {
+  //             const decryptedText = await this.encryptionService.decrypt(lastMsg.text);
+  //             groupChat.message = decryptedText;
+  //           } catch (e) {
+  //             groupChat.message = '[Encrypted]';
+  //           }
+  //         }
 
-          if (lastMsg.timestamp) {
-            groupChat.time = this.formatTimestamp(lastMsg.timestamp);
-          }
-        }
-      });
+  //         if (lastMsg.timestamp) {
+  //           groupChat.time = this.formatTimestamp(lastMsg.timestamp);
+  //         }
+  //       }
+  //     });
 
-      const sub = this.firebaseChatService
-        .listenToUnreadCount(groupId, userid)
-        .subscribe((count: number) => {
-          groupChat.unreadCount = count;
-          groupChat.unread = count > 0;
-        });
+  //     const sub = this.firebaseChatService
+  //       .listenToUnreadCount(groupId, userid)
+  //       .subscribe((count: number) => {
+  //         groupChat.unreadCount = count;
+  //         groupChat.unread = count > 0;
+  //       });
 
-      this.unreadSubs.push(sub);
+  //     this.unreadSubs.push(sub);
+  //   }
+  // }
+
+async loadUserGroups() {
+  const userid = this.senderUserId;
+  console.log("sender user id:", userid);
+  if (!userid) return;
+
+  const groupIds = await this.firebaseChatService.getGroupsForUser(userid);
+  console.log("group ids:", groupIds);
+
+  for (const groupId of groupIds) {
+    // --- FILTER: skip community groups whose id/name prefix is "comm_group_" ---
+    if (typeof groupId === 'string' && groupId.startsWith('comm_group_')) {
+      console.log('Skipping community-linked group by prefix:', groupId);
+      continue;
     }
-  }
 
-  private trackRouteChanges() {
-    this.router.events
-      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
-      .subscribe((event: NavigationEnd) => {
-        console.log('➡️ Current route:', event.urlAfterRedirects);
+    const existingGroup = this.chatList.find(chat =>
+      chat.receiver_Id === groupId && chat.group
+    );
+    if (existingGroup) {
+      console.log('Group already exists in chatList:', groupId);
+      continue;
+    }
 
-        if (event.urlAfterRedirects === '/home-screen') {
-          console.log('🔍 Running version check only on home-screen');
-          this.versionService.checkVersion();
+    const groupInfo = await this.firebaseChatService.getGroupInfo(groupId);
+
+    // NEW: skip groups that are already assigned to a community
+    if (!groupInfo) {
+      console.log('No groupInfo for', groupId);
+      continue;
+    }
+    if (groupInfo.communityId) {
+      console.log('Skipping group already in a community:', groupId, 'communityId=', groupInfo.communityId);
+      continue;
+    }
+
+    if (!groupInfo.members || !groupInfo.members[userid]) {
+      // user is not member -> skip
+      continue;
+    }
+
+    const groupName = groupInfo.name || 'Unnamed Group';
+    let groupDp = 'assets/images/user.jfif';
+
+    this.service.getGroupDp(groupId).subscribe({
+      next: (res: any) => {
+        if (res?.group_dp_url) {
+          const targetGroup = this.chatList.find(chat => chat.receiver_Id === groupId);
+          if (targetGroup) {
+            targetGroup.dp = res.group_dp_url;
+          }
         }
+      },
+      error: (err: any) => {
+        console.error('❌ Failed to fetch group DP:', err);
+      }
+    });
+
+    const groupChat: any = {
+      name: groupName,
+      receiver_Id: groupId,
+      group: true,
+      message: '',
+      time: '',
+      unread: false,
+      unreadCount: 0,
+      dp: groupDp,
+      // typing fields
+      isTyping: false,
+      typingText: null,
+      typingCount: 0,
+      // optionally keep members if you want to resolve names locally
+      members: groupInfo.members || {}
+    };
+
+    this.chatList.push(groupChat);
+
+    // start typing listener for this group
+    this.startTypingListenerForChat(groupChat);
+
+    // Listen for latest message in group
+    this.firebaseChatService.listenForMessages(groupId).subscribe(async (messages) => {
+      if (messages.length > 0) {
+        const lastMsg = messages[messages.length - 1];
+
+        if (lastMsg.isDeleted) {
+          groupChat.message = 'This message was deleted';
+        } else if (lastMsg.attachment?.type && lastMsg.attachment.type !== 'text') {
+          switch (lastMsg.attachment.type) {
+            case 'image':
+              groupChat.message = '📷 Photo';
+              break;
+            case 'video':
+              groupChat.message = '🎥 Video';
+              break;
+            case 'audio':
+              groupChat.message = '🎵 Audio';
+              break;
+            case 'file':
+              groupChat.message = '📎 Attachment';
+              break;
+            default:
+              groupChat.message = '[Media]';
+          }
+        } else {
+          try {
+            const decryptedText = await this.encryptionService.decrypt(lastMsg.text);
+            groupChat.message = decryptedText;
+          } catch (e) {
+            groupChat.message = '[Encrypted]';
+          }
+        }
+
+        if (lastMsg.timestamp) {
+          groupChat.time = this.formatTimestamp(lastMsg.timestamp);
+        }
+      }
+    });
+
+    const sub = this.firebaseChatService
+      .listenToUnreadCount(groupId, userid)
+      .subscribe((count: number) => {
+        groupChat.unreadCount = count;
+        groupChat.unread = count > 0;
       });
+
+    this.unreadSubs.push(sub);
+  }
+}
+
+
+
+ private trackRouteChanges() {
+    this.versionService.checkVersion();
   }
 
   formatTimestamp(timestamp: string): string {
@@ -673,25 +798,184 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     this.selectedFilter = filter;
   }
 
+  // async openChat(chat: any) {
+  //   const receiverId = chat.receiver_Id;
+  //   const receiver_phone = chat.receiver_phone;
+  //   const receiver_name = chat.name;
+
+  //   await this.secureStorage.setItem('receiver_name', receiver_name);
+
+  //   if (chat.group) {
+  //     this.router.navigate(['/chatting-screen'], {
+  //       queryParams: { receiverId, isGroup: true }
+  //     });
+  //   } else {
+  //     const cleanPhone = receiverId;
+  //     await this.secureStorage.setItem('receiver_phone', receiver_phone);
+  //     this.router.navigate(['/chatting-screen'], {
+  //       queryParams: { receiverId: cleanPhone, receiver_phone }
+  //     });
+  //   }
+  // }
+
   async openChat(chat: any) {
-    const receiverId = chat.receiver_Id;
-    const receiver_phone = chat.receiver_phone;
-    const receiver_name = chat.name;
+  const receiverId = chat.receiver_Id;
+  const receiver_phone = chat.receiver_phone;
+  const receiver_name = chat.name;
 
-    await this.secureStorage.setItem('receiver_name', receiver_name);
+  await this.secureStorage.setItem('receiver_name', receiver_name);
 
-    if (chat.group) {
-      this.router.navigate(['/chatting-screen'], {
-        queryParams: { receiverId, isGroup: true }
-      });
-    } else {
-      const cleanPhone = receiverId;
-      await this.secureStorage.setItem('receiver_phone', receiver_phone);
-      this.router.navigate(['/chatting-screen'], {
-        queryParams: { receiverId: cleanPhone, receiver_phone }
-      });
-    }
+  // If this is a community row -> open community detail page
+  if (chat.isCommunity) {
+    // navigate to community-detail page with communityId
+    this.router.navigate(['/community-detail'], {
+      queryParams: { communityId: receiverId }
+    });
+    return;
   }
+
+  // existing behavior for group or private
+  if (chat.group) {
+    this.router.navigate(['/chatting-screen'], {
+      queryParams: { receiverId, isGroup: true }
+    });
+  } else {
+    const cleanPhone = receiverId;
+    await this.secureStorage.setItem('receiver_phone', receiver_phone);
+    this.router.navigate(['/chatting-screen'], {
+      queryParams: { receiverId: cleanPhone, receiver_phone }
+    });
+  }
+}
+
+async loadUserCommunitiesForHome() {
+  try {
+    const userid = this.senderUserId;
+    if (!userid) return;
+
+    const communityIds = await this.firebaseChatService.getUserCommunities(userid);
+    console.log('communities for user:', communityIds);
+
+    for (const cid of communityIds || []) {
+      // avoid duplicates
+      const exists = this.chatList.find(c => c.receiver_Id === cid && c.isCommunity);
+      if (exists) continue;
+
+      // fetch community meta
+      const commSnap = await get(rtdbRef(getDatabase(), `communities/${cid}`));
+      if (!commSnap.exists()) continue;
+      const comm = commSnap.val();
+
+      // fetch groups list under community
+      const groupIds = await this.firebaseChatService.getGroupsInCommunity(cid);
+
+      // choose preview group: announcement -> general -> first
+      let previewGroupId: string | null = null;
+      let previewGroupName = '';
+      if (groupIds && groupIds.length > 0) {
+        // try announcement
+        for (const gid of groupIds) {
+          const g = await this.firebaseChatService.getGroupInfo(gid);
+          if (!g) continue;
+          if (g.type === 'announcement') {
+            previewGroupId = gid;
+            previewGroupName = g.name || 'Announcements';
+            break;
+          }
+        }
+        // fallback to General
+        if (!previewGroupId) {
+          for (const gid of groupIds) {
+            const g = await this.firebaseChatService.getGroupInfo(gid);
+            if (!g) continue;
+            if ((g.name || '').toLowerCase() === 'general') {
+              previewGroupId = gid;
+              previewGroupName = g.name || 'General';
+              break;
+            }
+          }
+        }
+        // final fallback use first group id
+        if (!previewGroupId) {
+          previewGroupId = groupIds[0];
+          const g = await this.firebaseChatService.getGroupInfo(previewGroupId);
+          previewGroupName = g?.name || 'Group';
+        }
+      }
+
+      // fetch last message for previewGroup (one-time)
+      let previewText = '';
+      let previewTime = '';
+      if (previewGroupId) {
+        try {
+          const chatsSnap = await get(rtdbRef(getDatabase(), `chats/${previewGroupId}`));
+          const chatsVal = chatsSnap.val();
+          if (chatsVal) {
+            const msgs = Object.entries(chatsVal).map(([k, v]: any) => ({ key: k, ...(v as any) }));
+            const last = msgs[msgs.length - 1];
+            if (last) {
+              // derive preview text similar to other code
+              if (last.isDeleted) previewText = 'This message was deleted';
+              else if (last.attachment?.type && last.attachment.type !== 'text') {
+                switch (last.attachment.type) {
+                  case 'image': previewText = '📷 Photo'; break;
+                  case 'video': previewText = '🎥 Video'; break;
+                  case 'audio': previewText = '🎵 Audio'; break;
+                  case 'file': previewText = '📎 Attachment'; break;
+                  default: previewText = '[Media]';
+                }
+              } else {
+                try {
+                  const dec = await this.encryptionService.decrypt(last.text);
+                  previewText = dec;
+                } catch {
+                  previewText = '[Encrypted]';
+                }
+              }
+              if (last.timestamp) previewTime = this.formatTimestamp(last.timestamp);
+            }
+          }
+        } catch (err) {
+          console.warn('failed to fetch last message for previewGroup', previewGroupId, err);
+        }
+      }
+
+      // create chat-like object for community row
+      const communityChat: any = {
+        name: comm.name || 'Community',
+        receiver_Id: cid,
+        group: true,           // visually treated like a group
+        isCommunity: true,     // special flag to open community-detail
+        group_name: previewGroupName || '',
+        message: previewText || '',
+        time: previewTime || '',
+        unread: false,
+        unreadCount: 0,
+        dp: comm.icon || 'assets/images/multiple-users-silhouette (1).png',
+      };
+
+      this.chatList.push(communityChat);
+
+      // subscribe to unread count for previewGroup (if exists)
+      if (previewGroupId) {
+        const sub = this.firebaseChatService.listenToUnreadCount(previewGroupId, userid)
+          .subscribe((count: number) => {
+            communityChat.unreadCount = count;
+            communityChat.unread = count > 0;
+          });
+        this.unreadSubs.push(sub);
+        // keep a reference too if you want to cancel separately later
+        this.communityUnreadSubs.set(cid, sub);
+      }
+    }
+
+    // sort chatList same as other lists (by unread/time etc.)
+    this.chatList.sort((a: any, b: any) => b.unreadCount - a.unreadCount);
+
+  } catch (err) {
+    console.error('loadUserCommunitiesForHome error', err);
+  }
+}
 
   async presentPopover(ev: any) {
     const popover = await this.popoverCtrl.create({

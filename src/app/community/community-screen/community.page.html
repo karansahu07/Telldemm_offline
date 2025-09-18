@@ -96,80 +96,68 @@
         <span class="highlight">Add communities list</span>
       </p>
     </div>
-  </div>
+  </div> -->
 
-  <ion-content class="light-theme">
-    
-    <ion-item lines="none" class="new-community" button (click)="createCommunityPrompt()">
-      <ion-avatar slot="start">
-        <img src="assets/images/profile.png" />
-        <ion-icon name="add-circle" class="add-icon"></ion-icon>
-      </ion-avatar>
-      <ion-label>
-        <h2>New community</h2>
-      </ion-label>
-    </ion-item>
+  <ion-content>
 
-    <ion-item
-      *ngFor="let community of joinedCommunities"
-      lines="none"
-      class="community-card"
-      button
-      (click)="openCommunityGroups(community)"
-    >
+  <!-- New community button -->
+  <ion-item lines="none" class="new-community" button (click)="createCommunityPrompt()">
+    <ion-avatar slot="start">
+      <img src="assets/images/profile.png" />
+      <ion-icon name="add-circle" class="add-icon"></ion-icon>
+    </ion-avatar>
+    <ion-label>
+      <h2>New community</h2>
+    </ion-label>
+  </ion-item>
+
+  <!-- Communities list -->
+  <ng-container *ngFor="let community of joinedCommunities">
+
+    <!-- Community header -->
+    <ion-item class="community-item">
       <ion-avatar slot="start">
         <img [src]="community.icon" />
       </ion-avatar>
-
       <ion-label>
-        <h2 class="community-title">{{ community.name }}</h2>
-        <div class="announcement-line">
-          <span class="message-preview">~ You:</span>
-          <ion-icon name="image-outline" class="icon-red"></ion-icon>
-          <span class="message-preview">Photo</span>
-        </div>
+        <h2>{{ community.name }}</h2>
       </ion-label>
-
-      <div class="right-info">
-        <span class="timestamp">now</span>
-        <ion-icon name="chevron-forward-outline"></ion-icon>
-      </div>
     </ion-item>
 
-  
-    <ion-item lines="none" class="view-all-row" button detail="false">
-      <ion-icon name="chevron-forward-outline" class="view-all-icon"></ion-icon>
-      <span class="view-all-text">View all</span>
-    </ion-item>
+    <!-- Groups inside this community -->
+    <ion-list lines="none" class="group-list">
+      <ion-item *ngFor="let group of community.groups" button (click)="goToGroupChat(group.id)">
+        <ion-icon
+          slot="start"
+          [name]="group.type === 'announcement' ? 'megaphone-outline' : 'chatbox-outline'">
+        </ion-icon>
+        <ion-label>
+          <h3>{{ group.name }}</h3>
+          <p>{{ group.type | titlecase }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
 
-    <ion-card *ngIf="selectedCommunity">
-      <ion-card-header>
-        <ion-card-title>{{ selectedCommunity.name }} Groups</ion-card-title>
-        <ion-button size="small" fill="outline" (click)="createGroupInCommunityPrompt()">
-          + New Group
-        </ion-button>
-      </ion-card-header>
+    <!-- Optional: View all -->
+    <!-- <ion-item lines="none" button detail="false">
+      <ion-label color="primary">View all</ion-label>
+    </ion-item> -->
 
-      <ion-list>
-        <ion-item
-          *ngFor="let group of communityGroups"
-          button
-          (click)="goToGroupChat(group.id)">
-          <ion-icon
-            slot="start"
-            [name]="group.type === 'announcement' ? 'megaphone-outline' : 'chatbox-outline'"
-          ></ion-icon>
-          <ion-label>
-            <h2>{{ group.name }}</h2>
-            <p>{{ group.type | titlecase }}</p>
-          </ion-label>
-          <ion-icon name="arrow-forward-outline" slot="end"></ion-icon>
-        </ion-item>
-      </ion-list> 
-    </ion-card>
-  </ion-content> -->
+    <!-- Optional: View all -->
+<ion-item 
+  lines="none" 
+  button 
+  detail="false" 
+  (click)="goToAddGroupCommunity(community)">
+  <ion-label color="primary">View all</ion-label>
+</ion-item>
 
-  <h1>Work In Progress....</h1>
+
+  </ng-container>
+
+</ion-content>
+
+
 </ion-content>
 
 <app-footer-tabs></app-footer-tabs>
