@@ -414,13 +414,8 @@ export class HomeScreenPage implements OnInit, OnDestroy {
 
                 if (lastMsg.timestamp) {
                   chat.time = this.formatTimestamp(lastMsg.timestamp);
+                  chat.timestamp = lastMsg.timestamp;
                 }
-
-                this.chatList.sort((a: any, b: any) => {
-                  const ta = a.time ? new Date(a.time).getTime() : 0;
-                  const tb = b.time ? new Date(b.time).getTime() : 0;
-                  return tb - ta;
-                });
               }
             });
 
@@ -722,6 +717,7 @@ async loadUserGroups() {
         if (lastMsg.timestamp) {
           groupChat.time = this.formatTimestamp(lastMsg.timestamp);
         }
+        groupChat.timestamp = lastMsg.timestamp;
       }
     });
 
@@ -768,6 +764,17 @@ async loadUserGroups() {
   }
 
   get filteredChats() {
+    // this.chatList.sort((a: any, b: any) => {
+    //               const ta = a.chat.time ? new Date(a.chat.time).getTime() : 0;
+    //               const tb = b.chat.time ? new Date(b.chat.time).getTime() : 0;
+    //               return tb - ta;
+    //             });
+  console.log(this.chatList?.[0],"dsgfhghjgbfb")
+  this.chatList.sort((a: any, b: any) => {
+                  const ta = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+                  const tb = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+                  return tb - ta;
+                });
     let filtered = this.chatList;
 
     if (this.selectedFilter === 'read') {

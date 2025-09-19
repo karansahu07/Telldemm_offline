@@ -8,22 +8,21 @@ export interface Message {
   receiver_id: string;
   receiver_phone: string;
   receiver_name?: string;
-  // delivered: boolean;
-  // deliveredAt?: string | undefined;  
-  // read: boolean;
-  // readAt?: string | undefined; 
-   delivered: boolean;
-  // use number | null so you know when not set
+
+  delivered: boolean;
   deliveredAt?: number | '';
 
   read: boolean;
-  readAt?: number | '';     
-  isDeleted?: boolean;
+  readAt?: number | '';
+
+  isDeleted?: boolean;      // optional placeholder flag (true = message is replaced with "deleted" placeholder)
   message_id: string;
   isEdit?: boolean;
   time?: string;
   type?: string;
   isForwarded?: boolean;
+
+  // attachment unchanged:
   attachment?: {
     type: 'image' | 'video' | 'audio' | 'file';
     fileName?: string;
@@ -35,10 +34,33 @@ export interface Message {
     caption?: string;
     previewUrl?: string | null;
   };
+
   replyToMessageId?: string | undefined;
-  reactions?: {
-    [userId: string]: string;
-  }
+  reactions?: { [userId: string]: string };
+
+  // --------------- NEW FIELDS FOR DELETION ---------------
+  /**
+   * Per-user deletion marker. If deletedFor[currentUserId] === true
+   * then current user must NOT see this message.
+   */
+  deletedFor?: { [userId: string]: boolean };
+
+  /**
+   * Convenience flag for "deleted for everyone".
+   * If true => message is deleted for everyone.
+   */
+  deletedForEveryone?: boolean;
+
+  /**
+   * Who performed delete-for-everyone action (userId).
+   */
+  deletedBy?: string | null;
+
+  /**
+   * Timestamp (ms) when deletion was performed.
+   */
+  deletedAt?: number | null;
+  // -------------------------------------------------------
 }
 
 

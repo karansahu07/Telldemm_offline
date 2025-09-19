@@ -972,6 +972,37 @@ async setPath(path: string, value: any) {
     update(messageRef, { isDeleted: true });
   }
 
+  async deleteMessageForMe(roomId: string, key: string, userId: string): Promise<void> {
+  const db = getDatabase();
+  const updates: any = {};
+  updates[`/chats/${roomId}/${key}/deletedFor/${userId}`] = true;
+  await update(ref(db), updates);
+}
+
+async deleteMessageForEveryone(roomId: string, key: string, performedBy: string, participantIds?: string[]): Promise<void> {
+  const db = getDatabase();
+  const updates: any = {};
+
+  // set convenience flags
+  updates[`/chats/${roomId}/${key}/deletedForEveryone`] = true;
+  updates[`/chats/${roomId}/${key}/deletedBy`] = performedBy;
+  updates[`/chats/${roomId}/${key}/deletedAt`] = Date.now();
+
+  // optionally mark deletedFor for each participant
+  if (Array.isArray(participantIds)) {
+    for (const uid of participantIds) {
+      updates[`/chats/${roomId}/${key}/deletedFor/${uid}`] = true;
+    }
+  }
+
+  // OPTIONALLY: clear text/attachment if you want to remove content from DB
+  // updates[`/chats/${roomId}/${key}/text`] = '';
+  // updates[`/chats/${roomId}/${key}/attachment`] = null;
+  // updates[`/chats/${roomId}/${key}/isDeleted`] = true;
+
+  await update(ref(db), updates);
+}
+
   setForwardMessages(messages: any[]) {
     this.forwardMessages = messages;
   }
