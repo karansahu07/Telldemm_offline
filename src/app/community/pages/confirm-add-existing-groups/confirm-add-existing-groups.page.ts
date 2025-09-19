@@ -1,161 +1,3 @@
-// import { Component, OnInit } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-// import { IonicModule, NavController, ToastController } from '@ionic/angular';
-// import { ActivatedRoute, Router } from '@angular/router';
-// import { FirebaseChatService } from 'src/app/services/firebase-chat.service';
-// import { AuthService } from 'src/app/auth/auth.service';
-
-// @Component({
-//   selector: 'app-confirm-add-existing-groups',
-//   templateUrl: './confirm-add-existing-groups.page.html',
-//   styleUrls: ['./confirm-add-existing-groups.page.scss'],
-//   standalone: true,
-//   imports: [IonicModule, CommonModule]
-// })
-// export class ConfirmAddExistingGroupsPage implements OnInit {
-//   communityId: string | null = null;
-//   communityName: string | null = null;
-//   userId: string | null = null;
-
-//   // groups: array of { id, name, dp, visibility, permissionsSummary, membersCount, raw }
-//   groups: any[] = [];
-
-//   loading = false;
-//   adding = false;
-
-//   constructor(
-//     private route: ActivatedRoute,
-//     private router: Router,
-//     private navCtrl: NavController,
-//     private toastCtrl: ToastController,
-//     private firebaseService: FirebaseChatService,
-//     private authService: AuthService
-//   ) {}
-
-//   ngOnInit() {
-//     this.userId = this.authService?.authData?.userId ?? null;
-
-//     // 1) read communityId from query params (if passed)
-//     this.route.queryParams.subscribe(async params => {
-//       this.communityId = params['communityId'] || params['id'] || null;
-//       if (params['communityName']) this.communityName = params['communityName'];
-
-//       // 2) read selected group ids either from query param "ids" (comma separated)
-//       //    or from navigation state (preferred, since arrays encode nicely)
-//       let ids: string[] = [];
-//       if (params['ids']) {
-//         ids = String(params['ids']).split(',').map(s => s.trim()).filter(Boolean);
-//       } else {
-//         // try navigation state (when you navigate with this.router.navigate([...], { state: { selected: [...] } }))
-//         const navState: any = this.router.getCurrentNavigation()?.extras?.state;
-//         if (navState && Array.isArray(navState.selected)) {
-//           ids = navState.selected;
-//         }
-//       }
-
-//       // If no IDs, check route snapshot state as fallback
-//       if (!ids || ids.length === 0) {
-//         const state = window.history.state;
-//         if (state && Array.isArray(state.selected)) ids = state.selected;
-//       }
-
-//       if (ids && ids.length) {
-//         await this.loadGroupsByIds(ids);
-//       } else {
-//         // nothing selected; go back
-//         console.warn('No selected group IDs passed to confirm page.');
-//       }
-//     });
-//   }
-
-//   // fetch each group's info from /groups/<id>
-//   async loadGroupsByIds(ids: string[]) {
-//     this.loading = true;
-//     this.groups = [];
-
-//     try {
-//       for (const id of ids) {
-//         try {
-//           const g = await this.firebaseService.getGroupInfo(id);
-//           if (!g) continue;
-//           // build minimal view model
-//           this.groups.push({
-//             id,
-//             name: g.name || 'Unnamed group',
-//             dp: g.dp || g.groupDp || '', // adapt key if you store group image under another key
-//             visibility: g.visibility || 'Visible',
-//             permissionsSummary: g.permissionsSummary || (g.type === 'announcement' ? 'Announcement group' : 'Members can send messages'),
-//             membersCount: g.membersCount || (g.members ? Object.keys(g.members).length : 0),
-//             raw: g
-//           });
-//         } catch (e) {
-//           console.warn('Failed to fetch group', id, e);
-//         }
-//       }
-//     } catch (err) {
-//       console.error('loadGroupsByIds error', err);
-//     } finally {
-//       this.loading = false;
-//     }
-//   }
-
-//   // Add selected groups to community (atomic if bulkUpdate exists in service)
-//   async addToCommunity() {
-//     if (!this.communityId) {
-//       const t = await this.toastCtrl.create({ message: 'Community id missing', duration: 2000, color: 'danger' });
-//       await t.present();
-//       return;
-//     }
-
-//     const ids = this.groups.map(g => g.id);
-//     if (!ids.length) {
-//       const t = await this.toastCtrl.create({ message: 'No groups to add', duration: 1500 });
-//       await t.present();
-//       return;
-//     }
-
-//     this.adding = true;
-//     try {
-//       const updates: any = {};
-//       const now = Date.now();
-
-//       for (const gid of ids) {
-//         // link group under community
-//         updates[`/communities/${this.communityId}/groups/${gid}`] = true;
-//         // add field on group pointing to community (optional)
-//         updates[`/groups/${gid}/communityId`] = this.communityId;
-//         // optionally ensure group has createdBy/admins etc - not modifying those here
-//       }
-
-//       // use bulkUpdate on service if available
-//       if (typeof (this.firebaseService as any).bulkUpdate === 'function') {
-//         await (this.firebaseService as any).bulkUpdate(updates);
-//       } else if (typeof (this.firebaseService as any).setPath === 'function') {
-//         // fallback: set each path (not atomic)
-//         const promises = Object.keys(updates).map(p => (this.firebaseService as any).setPath(p, updates[p]));
-//         await Promise.all(promises);
-//       } else {
-//         // last fallback: create bulkUpdate helper inline using getDatabase/update
-//         // (avoid directly importing firebase modules in the page — recommended to add helper in service).
-//         throw new Error('bulkUpdate or setPath not found on FirebaseChatService; add helper to service.');
-//       }
-
-//       const toast = await this.toastCtrl.create({ message: 'Groups added to community', duration: 2000, color: 'success' });
-//       await toast.present();
-
-//       // after success navigate back to community detail (or wherever you want)
-//       this.navCtrl.navigateBack('/community-detail'); // or this.navCtrl.back();
-//     } catch (err : any) {
-//       console.error('addToCommunity failed', err);
-//       const t = await this.toastCtrl.create({ message: 'Failed to add groups: ' + (err?.message || ''), duration: 4000, color: 'danger' });
-//       await t.present();
-//     } finally {
-//       this.adding = false;
-//     }
-//   }
-// }
-
-
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, NavController, ToastController } from '@ionic/angular';
@@ -209,68 +51,169 @@ export class ConfirmAddExistingGroupsPage implements OnInit {
   }
 
   // Final commit: link groups into the community
+  // async addToCommunity() {
+  //   if (!this.communityId) {
+  //     const t = await this.toastCtrl.create({
+  //       message: 'Community id missing',
+  //       duration: 2000,
+  //       color: 'danger'
+  //     });
+  //     await t.present();
+  //     return;
+  //   }
+
+  //   const ids = this.groups.map(g => g.id).filter(Boolean);
+  //   if (!ids.length) {
+  //     const t = await this.toastCtrl.create({
+  //       message: 'No groups to add',
+  //       duration: 1500
+  //     });
+  //     await t.present();
+  //     return;
+  //   }
+
+  //   this.adding = true;
+  //   try {
+  //     const updates: any = {};
+
+  //     for (const gid of ids) {
+  //       updates[`/communities/${this.communityId}/groups/${gid}`] = true;
+  //       updates[`/groups/${gid}/communityId`] = this.communityId;
+  //     }
+
+  //     if (typeof (this.firebaseService as any).bulkUpdate === 'function') {
+  //       await (this.firebaseService as any).bulkUpdate(updates);
+  //     } else if (typeof (this.firebaseService as any).setPath === 'function') {
+  //       const promises = Object.keys(updates).map(p =>
+  //         (this.firebaseService as any).setPath(p, updates[p])
+  //       );
+  //       await Promise.all(promises);
+  //     } else {
+  //       // last resort: throw with helpful message for dev
+  //       throw new Error('bulkUpdate or setPath not found on FirebaseChatService. Add helper to perform atomic update.');
+  //     }
+
+  //     const toast = await this.toastCtrl.create({
+  //       message: 'Groups added to community',
+  //       duration: 2000,
+  //       color: 'success'
+  //     });
+  //     await toast.present();
+
+  //     // after success, navigate back to community detail or wherever appropriate
+  //     this.navCtrl.navigateBack('/community-detail');
+  //   } catch (err: any) {
+  //     console.error('addToCommunity failed', err);
+  //     const msg = err && (err.message || err.code) ? (err.message || err.code) : String(err);
+  //     const t = await this.toastCtrl.create({
+  //       message: `Failed to add groups: ${msg}`,
+  //       duration: 4000,
+  //       color: 'danger'
+  //     });
+  //     await t.present();
+  //   } finally {
+  //     this.adding = false;
+  //   }
+  // }
+
   async addToCommunity() {
-    if (!this.communityId) {
-      const t = await this.toastCtrl.create({
-        message: 'Community id missing',
-        duration: 2000,
-        color: 'danger'
-      });
-      await t.present();
-      return;
-    }
-
-    const ids = this.groups.map(g => g.id).filter(Boolean);
-    if (!ids.length) {
-      const t = await this.toastCtrl.create({
-        message: 'No groups to add',
-        duration: 1500
-      });
-      await t.present();
-      return;
-    }
-
-    this.adding = true;
-    try {
-      const updates: any = {};
-
-      for (const gid of ids) {
-        updates[`/communities/${this.communityId}/groups/${gid}`] = true;
-        updates[`/groups/${gid}/communityId`] = this.communityId;
-      }
-
-      if (typeof (this.firebaseService as any).bulkUpdate === 'function') {
-        await (this.firebaseService as any).bulkUpdate(updates);
-      } else if (typeof (this.firebaseService as any).setPath === 'function') {
-        const promises = Object.keys(updates).map(p =>
-          (this.firebaseService as any).setPath(p, updates[p])
-        );
-        await Promise.all(promises);
-      } else {
-        // last resort: throw with helpful message for dev
-        throw new Error('bulkUpdate or setPath not found on FirebaseChatService. Add helper to perform atomic update.');
-      }
-
-      const toast = await this.toastCtrl.create({
-        message: 'Groups added to community',
-        duration: 2000,
-        color: 'success'
-      });
-      await toast.present();
-
-      // after success, navigate back to community detail or wherever appropriate
-      this.navCtrl.navigateBack('/community-detail');
-    } catch (err: any) {
-      console.error('addToCommunity failed', err);
-      const msg = err && (err.message || err.code) ? (err.message || err.code) : String(err);
-      const t = await this.toastCtrl.create({
-        message: `Failed to add groups: ${msg}`,
-        duration: 4000,
-        color: 'danger'
-      });
-      await t.present();
-    } finally {
-      this.adding = false;
-    }
+  if (!this.communityId) {
+    const t = await this.toastCtrl.create({
+      message: 'Community id missing',
+      duration: 2000,
+      color: 'danger'
+    });
+    await t.present();
+    return;
   }
+
+  const ids = this.groups.map(g => g.id).filter(Boolean);
+  if (!ids.length) {
+    const t = await this.toastCtrl.create({
+      message: 'No groups to add',
+      duration: 1500
+    });
+    await t.present();
+    return;
+  }
+
+  this.adding = true;
+
+  try {
+    const updates: any = {};
+    const newMemberIds = new Set<string>();
+
+    // 1) Collect members from each selected group
+    for (const gid of ids) {
+      // link group under community and set group's communityId
+      updates[`/communities/${this.communityId}/groups/${gid}`] = true;
+      updates[`/groups/${gid}/communityId`] = this.communityId;
+
+      try {
+        const g = await this.firebaseService.getGroupInfo(gid);
+        if (g && g.members) {
+          const membersObj = g.members;
+          Object.keys(membersObj).forEach((mid) => {
+            if (mid) newMemberIds.add(mid);
+          });
+        }
+      } catch (err) {
+        console.warn('Failed to load group members for', gid, err);
+      }
+    }
+
+    // 2) Also fetch existing community members (to compute final membersCount)
+    let existingMembersObj: any = null;
+    try {
+      const comm = await this.firebaseService.getCommunityInfo(this.communityId);
+      existingMembersObj = comm?.members || {};
+      // add existing to set too so count is accurate
+      Object.keys(existingMembersObj || {}).forEach(k => newMemberIds.add(k));
+    } catch (err) {
+      console.warn('Failed to load existing community members', err);
+    }
+
+    // 3) For each member ensure community membership references + usersInCommunity index
+    newMemberIds.forEach((uid) => {
+      updates[`/communities/${this.communityId}/members/${uid}`] = true;
+      updates[`/usersInCommunity/${uid}/joinedCommunities/${this.communityId}`] = true;
+    });
+
+    // 4) Update membersCount to new size
+    updates[`/communities/${this.communityId}/membersCount`] = newMemberIds.size;
+
+    // 5) Commit via helper on firebaseService (bulkUpdate preferred)
+    if (typeof (this.firebaseService as any).bulkUpdate === 'function') {
+      await (this.firebaseService as any).bulkUpdate(updates);
+    } else if (typeof (this.firebaseService as any).setPath === 'function') {
+      // fallback: set each path separately (not fully atomic)
+      const promises = Object.keys(updates).map(p =>
+        (this.firebaseService as any).setPath(p, updates[p])
+      );
+      await Promise.all(promises);
+    } else {
+      throw new Error('bulkUpdate or setPath not found on FirebaseChatService. Add helper to perform atomic update.');
+    }
+
+    const toast = await this.toastCtrl.create({
+      message: 'Groups and their members added to community',
+      duration: 2000,
+      color: 'success'
+    });
+    await toast.present();
+
+    this.navCtrl.navigateBack('/community-detail');
+  } catch (err: any) {
+    console.error('addToCommunity failed', err);
+    const msg = err && (err.message || err.code) ? (err.message || err.code) : String(err);
+    const t = await this.toastCtrl.create({
+      message: `Failed to add groups: ${msg}`,
+      duration: 4000,
+      color: 'danger'
+    });
+    await t.present();
+  } finally {
+    this.adding = false;
+  }
+}
 }

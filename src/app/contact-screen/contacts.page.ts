@@ -547,4 +547,7 @@ filteredContacts: Contact[] = [];
   getRoomId(a: string, b: string): string {
     return a < b ? `${a}_${b}` : `${b}_${a}`;
   }
+  goToCommunity() {
+    this.router.navigate(['/community-screen']);
+  }
 }

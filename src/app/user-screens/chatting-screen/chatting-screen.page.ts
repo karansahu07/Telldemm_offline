@@ -976,10 +976,10 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
 
   // Build inputs for alert (Ionic checkboxes)
   const inputs: any[] = [
-    { name: 'forMe', type: 'checkbox', label: 'Delete for me', value: 'forMe', checked: true }
+    { name: 'forMe', type: 'radio', label: 'Delete for me', value: 'forMe', checked: false }
   ];
   if (canDeleteForEveryone) {
-    inputs.push({ name: 'forEveryone', type: 'checkbox', label: 'Delete for everyone', value: 'forEveryone', checked: false });
+    inputs.push({ name: 'forEveryone', type: 'radio', label: 'Delete for everyone', value: 'forEveryone', checked: false });
   }
 
   const alert = await this.alertCtrl.create({
