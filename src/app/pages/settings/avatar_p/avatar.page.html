@@ -1,0 +1,20 @@
+<ion-header>
+  <ion-toolbar style="--background: #ffffff; --color: #000000;">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/settings"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Avatar</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding" style="--background: #ffffff;">
+  <div class="avatar-container">
+    <ion-img src="https://via.placeholder.com/300x200" alt="Avatar Preview"></ion-img>
+  </div>
+  <ion-text color="medium">
+    <p>Say more with Avatars now on WhatsApp</p>
+  </ion-text>
+  <ion-button expand="block" fill="solid" color="success" (click)="openActionSheet()">Create your Avatar</ion-button>
+  <ion-text color="primary">
+    <p><a>Learn more</a></p>
+  </ion-text>
+</ion-content>

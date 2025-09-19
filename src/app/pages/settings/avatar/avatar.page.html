@@ -1,20 +1,79 @@
 <ion-header>
-  <ion-toolbar style="--background: #ffffff; --color: #000000;">
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/settings"></ion-back-button>
-    </ion-buttons>
-    <ion-title>Avatar</ion-title>
+  <ion-toolbar>
+    <ion-title>Create your Avatar</ion-title>
   </ion-toolbar>
 </ion-header>
-<ion-content class="ion-padding" style="--background: #ffffff;">
-  <div class="avatar-container">
-    <ion-img src="https://via.placeholder.com/300x200" alt="Avatar Preview"></ion-img>
+
+<ion-content class="ion-padding">
+  <div class="preview" style="display:flex;justify-content:center;margin:18px 0;">
+    <ion-avatar>
+      <img [src]="avatarUrl" alt="Avatar preview" />
+    </ion-avatar>
   </div>
-  <ion-text color="medium">
-    <p>Say more with Avatars now on WhatsApp</p>
-  </ion-text>
-  <ion-button expand="block" fill="solid" color="success" (click)="openActionSheet()">Create your Avatar</ion-button>
-  <ion-text color="primary">
-    <p><a>Learn more</a></p>
-  </ion-text>
+
+  <ion-list>
+    <ion-item>
+      <ion-label>Hair</ion-label>
+      <ion-select [(ngModel)]="options.topType" (ionChange)="refresh()">
+        <ion-select-option *ngFor="let t of avatarService.topTypes" [value]="t">{{ t }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Accessories</ion-label>
+      <ion-select [(ngModel)]="options.accessoriesType" (ionChange)="refresh()">
+        <ion-select-option *ngFor="let t of avatarService.accessoriesTypes" [value]="t">{{ t }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Hair color</ion-label>
+      <ion-select [(ngModel)]="options.hairColor" (ionChange)="refresh()">
+        <ion-select-option *ngFor="let c of avatarService.hairColors" [value]="c">{{ c }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Eyes</ion-label>
+      <ion-select [(ngModel)]="options.eyeType" (ionChange)="refresh()">
+        <ion-select-option *ngFor="let e of avatarService.eyeTypes" [value]="e">{{ e }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Mouth</ion-label>
+      <ion-select [(ngModel)]="options.mouthType" (ionChange)="refresh()">
+        <ion-select-option *ngFor="let m of avatarService.mouthTypes" [value]="m">{{ m }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Clothes</ion-label>
+      <ion-select [(ngModel)]="options.clotheType" (ionChange)="refresh()">
+        <ion-select-option *ngFor="let c of avatarService.clotheTypes" [value]="c">{{ c }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Skin</ion-label>
+      <ion-select [(ngModel)]="options.skinColor" (ionChange)="refresh()">
+        <ion-select-option *ngFor="let s of avatarService.skinColors" [value]="s">{{ s }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-list>
+
+  <ion-row class="ion-padding">
+    <ion-col size="6">
+      <ion-button expand="block" color="primary" (click)="downloadFromServerless()" [disabled]="isDownloading">
+        <ion-icon slot="start" name="download-outline"></ion-icon>
+        {{ isDownloading ? 'Downloading...' : 'Download PNG' }}
+      </ion-button>
+    </ion-col>
+    <ion-col size="6">
+      <ion-button expand="block" color="secondary" (click)="saveOptions()">
+        <ion-icon slot="start" name="save-outline"></ion-icon>
+        Save
+      </ion-button>
+    </ion-col>
+  </ion-row>
 </ion-content>
