@@ -8,8 +8,16 @@ export interface Message {
   receiver_id: string;
   receiver_phone: string;
   receiver_name?: string;
-  delivered: boolean;
+  // delivered: boolean;
+  // deliveredAt?: string | undefined;  
+  // read: boolean;
+  // readAt?: string | undefined; 
+   delivered: boolean;
+  // use number | null so you know when not set
+  deliveredAt?: number | '';
+
   read: boolean;
+  readAt?: number | '';     
   isDeleted?: boolean;
   message_id: string;
   isEdit?: boolean;
@@ -18,20 +26,21 @@ export interface Message {
   isForwarded?: boolean;
   attachment?: {
     type: 'image' | 'video' | 'audio' | 'file';
-    fileName?: string;           
-    mimeType?: string;           
-    base64Data?: string;         
-    mediaId?: string;            
-    fileSize?: number;           
-    filePath?: string;           
-    caption?: string;  
-    previewUrl?: string | null;       
+    fileName?: string;
+    mimeType?: string;
+    base64Data?: string;
+    mediaId?: string;
+    fileSize?: number;
+    filePath?: string;
+    caption?: string;
+    previewUrl?: string | null;
   };
-  replyToMessageId?: string | undefined;    
+  replyToMessageId?: string | undefined;
   reactions?: {
-    [userId: string]: string;     
+    [userId: string]: string;
   }
 }
+
 
 
 

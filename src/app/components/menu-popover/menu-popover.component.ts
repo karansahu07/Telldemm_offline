@@ -25,11 +25,12 @@ export class MenuPopoverComponent implements OnInit {
 
     if (this.currentUrl.includes('/home-screen')) {
       this.menuOptions = [
-        { label: 'Advertise wip' },
         { label: 'New group',  route: '/contact-screen' },
+        { label: 'New Community',  route: '/community-screen' },
         { label: 'New broadcast wip' },
-        { label: 'Labels wip' },
+        { label: 'Linked Devices wip' },
         { label: 'Starred wip' },
+        { label: 'Read all wip' },
         { label: 'Settings', route: '/setting-screen' }
       ];
     } else if (this.currentUrl.includes('/status')) {

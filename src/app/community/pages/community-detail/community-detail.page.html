@@ -28,6 +28,7 @@
 </ion-header>
 
 <ion-content>
+  <!-- Actual content -->
   <ion-list *ngIf="loading === false">
     <!-- Announcement card -->
     <ion-item *ngIf="announcementGroup" lines="full" button (click)="openGroupChat(announcementGroup.id)">
@@ -44,7 +45,7 @@
     <!-- Groups you are in -->
     <ion-list *ngIf="groups.length > 0">
       <ion-list-header>Groups</ion-list-header>
-      <ion-item *ngFor="let g of groups" button >
+      <ion-item *ngFor="let g of groups" button>
         <ion-avatar class="band">
           <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
         </ion-avatar>
@@ -52,7 +53,6 @@
           <h3>{{ g.name }}</h3>
           <p>{{ g.membersCount }} members</p>
         </ion-label>
-        <ion-note slot="end"></ion-note>
       </ion-item>
     </ion-list>
 
@@ -65,12 +65,24 @@
     </div>
   </ion-list>
 
-  <ion-list *ngIf="loading">
-    <ion-item>
-      <ion-label>Loading community...</ion-label>
+  <!-- Skeleton Loader -->
+  <ion-list *ngIf="loading === true">
+    <ion-item *ngFor="let i of [1,2,3,4]">
+      <ion-avatar slot="start">
+        <ion-skeleton-text animated style="width:40px; height:40px; border-radius:50%;"></ion-skeleton-text>
+      </ion-avatar>
+      <ion-label>
+        <h3>
+          <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+        </h3>
+        <p>
+          <ion-skeleton-text animated style="width: 40%"></ion-skeleton-text>
+        </p>
+      </ion-label>
     </ion-item>
   </ion-list>
 </ion-content>
+
 
 <!-- Footer Button -->
 <ion-footer>

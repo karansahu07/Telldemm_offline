@@ -340,7 +340,8 @@ import {
   child,
   runTransaction
 } from '@angular/fire/database';
-import { ref as rtdbRef, update as rtdbUpdate, set as rtdbSet } from 'firebase/database';
+import { ref as rtdbRef, update as rtdbUpdate, set as rtdbSet, get as rtdbGet } from 'firebase/database';
+import { runTransaction as rtdbRunTransaction } from 'firebase/database';
 import { firstValueFrom, Observable } from 'rxjs';
 import { getDatabase, remove, update } from 'firebase/database';
 // import { getStorage, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -352,6 +353,7 @@ import { ApiService } from './api/api.service';
 export class FirebaseChatService {
 
   private forwardMessages: any[] = [];
+  private _selectedMessageInfo: any = null;
 
   constructor(
     private db: Database,
@@ -363,6 +365,7 @@ export class FirebaseChatService {
   }
 
   async sendMessage(roomId: string, message: Message, chatType: string, senderId: string) {
+    console.log("message from chat screen",message);
     const messagesRef = ref(this.db, `chats/${roomId}`);
     await push(messagesRef, message);
     console.log("messages is forwards id ", message);
@@ -871,14 +874,97 @@ async setPath(path: string, value: any) {
   markDelivered(roomId: string, messageKey: string) {
     const messageRef = ref(this.db, `chats/${roomId}/${messageKey}`);
     // console.log("sdffsdd",messageRef);
-    update(messageRef, { delivered: true });
+    update(messageRef, { delivered: true, deliveredAt : Date.now() });
   }
 
   // 👇 Call only when message is visibly seen
   markRead(roomId: string, messageKey: string) {
     const messageRef = ref(this.db, `chats/${roomId}/${messageKey}`);
-    update(messageRef, { read: true });
+    update(messageRef, { read: true, readAt : Date.now() });
   }
+
+  
+// async markDelivered(roomId: string, messageKey: string) {
+//   try {
+//     if (!roomId || !messageKey) return;
+//     const db = getDatabase();
+//     const msgRef = rtdbRef(db, `chats/${roomId}/${messageKey}`);
+//     await rtdbRunTransaction(msgRef, (current) => {
+//       if (current === null) return; // node removed / not exist => abort
+//       // set delivered true always, but set deliveredAt only if falsy
+//       return {
+//         ...current,
+//         delivered: true,
+//         deliveredAt: new Date().toISOString()
+//       };
+//     }, { applyLocally: false });
+//     console.log('markDelivered: transaction complete for', messageKey);
+//   } catch (err) {
+//     console.error('markDelivered transaction error', err);
+//   }
+// }
+
+// async markRead(roomId: string, messageKey: string) {
+//   try {
+//     if (!roomId || !messageKey) return;
+//     const db = getDatabase();
+//     const msgRef = rtdbRef(db, `chats/${roomId}/${messageKey}`);
+//     await rtdbRunTransaction(msgRef, (current) => {
+//       if (current === null) return;
+//       return {
+//         ...current,
+//         read: true,
+//         readAt: new Date().toISOString()
+//       };
+//     }, { applyLocally: false });
+//     console.log('markRead: transaction complete for', messageKey);
+//   } catch (err) {
+//     console.error('markRead transaction error', err);
+//   }
+// }
+
+
+
+// markDelivered(roomId: string, messageKey: string, forUserId?: string) {
+//   try {
+//     const now = Date.now();
+//     const db = getDatabase();
+
+//     if (forUserId) {
+//       // safe update to deliveredBy map
+//       const path = `chats/${roomId}/${messageKey}/deliveredBy/${forUserId}`;
+//       return rtdbUpdate(rtdbRef(db, path), now) // or set single path
+//         .catch(err => console.error('markDelivered(forUser) error', err));
+//     } else {
+//       // fallback: set top-level delivered flag + deliveredAt (for private chat usage)
+//       const messageRef = ref(this.db, `chats/${roomId}/${messageKey}`);
+//       return update(messageRef, { delivered: true, deliveredAt: now });
+//     }
+//   } catch (err) {
+//     console.error('markDelivered error', err);
+//   }
+// }
+
+// // markRead: record readBy/<userId> = timestamp
+// markRead(roomId: string, messageKey: string, forUserId?: string) {
+//   try {
+//     const now = Date.now();
+//     const db = getDatabase();
+
+//     if (forUserId) {
+//       // set readBy/userId timestamp
+//       const path = `chats/${roomId}/${messageKey}/readBy/${forUserId}`;
+//       return rtdbUpdate(rtdbRef(db, path), now)
+//         .catch(err => console.error('markRead(forUser) error', err));
+//     } else {
+//       // fallback: set top-level read flag + readAt
+//       const messageRef = ref(this.db, `chats/${roomId}/${messageKey}`);
+//       return update(messageRef, { read: true, readAt: now });
+//     }
+//   } catch (err) {
+//     console.error('markRead error', err);
+//   }
+// }
 
   //delete msg
   deleteMessage(roomId: string, messageKey: string) {
@@ -897,5 +983,23 @@ async setPath(path: string, value: any) {
   clearForwardMessages() {
     this.forwardMessages = [];
   }
+
+  /**
+ * Store the currently selected message for the Message Info page.
+ * Accepts a message object (the same shape used elsewhere).
+ */
+setSelectedMessageInfo(msg: any) {
+  this._selectedMessageInfo = msg;
+}
+
+/**
+ * Retrieve and optionally clear the stored selected message.
+ * If clearAfterRead=true, stored message is removed after reading.
+ */
+getSelectedMessageInfo(clearAfterRead = false): any {
+  const m = this._selectedMessageInfo;
+  if (clearAfterRead) this._selectedMessageInfo = null;
+  return m;
+}
 
 }

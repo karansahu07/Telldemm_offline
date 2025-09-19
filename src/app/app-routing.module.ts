@@ -294,7 +294,11 @@ const routes: Routes = [
   {
     path: 'email-edit',
     loadChildren: () => import('./pages/settings/email-edit/email-edit.module').then( m => m.EmailEditPageModule)
+  },  {
+    path: 'message-info',
+    loadChildren: () => import('./pages/message-info/message-info.module').then( m => m.MessageInfoPageModule)
   },
+
 
 
 

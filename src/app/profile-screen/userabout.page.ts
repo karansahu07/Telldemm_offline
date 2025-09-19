@@ -248,8 +248,21 @@ openExternalLink(url: string) {
     this.isScrolled = scrollTop > 10;
   }
 
+  // goBackToChat() {
+  //   this.router.navigate(['/chatting-screen'], {
+  //     queryParams: {
+  //       receiverId: this.receiverId,
+  //       receiver_phone: this.receiver_phone,
+  //       isGroup: this.isGroup,
+  //       communityId: this.communityId
+  //     }
+  //   });
+  // }
+
   goBackToChat() {
-    this.router.navigate(['/chatting-screen'], {
+  if (this.communityId) {
+    // 👈 agar communityId present hai
+    this.router.navigate(['/community-chat'], {
       queryParams: {
         receiverId: this.receiverId,
         receiver_phone: this.receiver_phone,
@@ -257,7 +270,18 @@ openExternalLink(url: string) {
         communityId: this.communityId
       }
     });
+  } else {
+    // 👈 normal chat screen
+    this.router.navigate(['/chatting-screen'], {
+      queryParams: {
+        receiverId: this.receiverId,
+        receiver_phone: this.receiver_phone,
+        isGroup: this.isGroup
+      }
+    });
   }
+}
+
 
   openProfileDp() {
     const profileToShow = this.receiverProfile || 'assets/images/user.jfif';

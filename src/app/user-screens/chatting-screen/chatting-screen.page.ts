@@ -5263,7 +5263,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   async handlePopoverAction(action: string) {
     switch (action) {
       case 'info':
-        console.log('Info clicked');
+        this.messageInfo();
         break;
       case 'copy':
         this.copyMessage();
@@ -5282,6 +5282,49 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
         break;
     }
   }
+
+  async messageInfo() {
+  // pick the message: prefer lastPressedMessage then fallback to first selectedMessages
+  const msg = this.lastPressedMessage || (this.selectedMessages && this.selectedMessages[0]);
+  if (!msg) {
+    const t = await this.toastCtrl.create({
+      message: 'No message selected',
+      duration: 1500,
+      color: 'medium'
+    });
+    await t.present();
+    return;
+  }
+
+  try {
+    // store selected message in the chat service (mirror of forward behaviour)
+    // Implement setSelectedMessageInfo in FirebaseChatService (see snippet below)
+    this.chatService.setSelectedMessageInfo(msg);
+
+    // clear UI selection state
+    this.selectedMessages = [];
+    this.lastPressedMessage = null;
+
+    // navigate to message-info page — you can choose queryParams or router state.
+    // I'll use the same approach you used for forward (route path), but pass the messageId/key
+    // so message-info page can fetch or read from chatService.
+    this.router.navigate(['/message-info'], {
+      queryParams: {
+        // pass a small identifier; page can request the full object from chatService
+        messageKey: msg.key || msg.message_id || ''
+      }
+    });
+  } catch (err) {
+    console.error('messageInfo error', err);
+    const t = await this.toastCtrl.create({
+      message: 'Failed to open message info',
+      duration: 1500,
+      color: 'danger'
+    });
+    await t.present();
+  }
+}
+
 
   async editMessage(message: Message) {
     const alert = await this.alertCtrl.create({
@@ -6249,22 +6292,25 @@ async listenForMessages() {
     }
 
     const localMessage: any = {
-      sender_id: this.senderId,
-      text: plainText, // keep human-readable in localMessage for UI; storage uses encrypted fields below
-      timestamp: new Date().toISOString(),
-      sender_phone: this.sender_phone,
-      sender_name: this.sender_name,
-      receiver_id: this.chatType === 'private' ? this.receiverId : '',
-      receiver_phone: this.receiver_phone,
-      delivered: false,
-      read: false,
-      message_id: uuidv4(),
-      isDeleted: false,
-      replyToMessageId: this.replyToMessage?.message_id || '',
-      isEdit: false,
-      localOnly: false,
-      key: localKey
-    };
+  sender_id: this.senderId,
+  text: plainText, // keep human-readable in localMessage for UI; storage uses encrypted fields below
+  timestamp: new Date().toISOString(),
+  sender_phone: this.sender_phone,
+  sender_name: this.sender_name,
+  receiver_id: this.chatType === 'private' ? this.receiverId : '',
+  receiver_phone: this.receiver_phone,
+  delivered: false,
+  deliveredAt: null,   // <-- new
+  read: false,
+  readAt: null,        // <-- new
+  message_id: uuidv4(),
+  isDeleted: false,
+  replyToMessageId: this.replyToMessage?.message_id || '',
+  isEdit: false,
+  localOnly: false,
+  key: localKey
+};
+
 
     // If THEY have blocked me -> save locally and DO NOT send to server
     if (this.theyBlocked) {
@@ -6317,20 +6363,23 @@ async listenForMessages() {
 
     // Build server message. If there is an attachment, keep text empty and put encrypted caption inside attachment.
     const serverMessage: Message = {
-      sender_id: this.senderId,
-      text: this.selectedAttachment ? '' : encryptedText, // empty when attachment used
-      timestamp: new Date().toISOString(),
-      sender_phone: this.sender_phone,
-      sender_name: this.sender_name,
-      receiver_id: this.chatType === 'private' ? this.receiverId : '',
-      receiver_phone: this.receiver_phone,
-      delivered: false,
-      read: false,
-      message_id: uuidv4(),
-      isDeleted: false,
-      replyToMessageId: this.replyToMessage?.message_id || '',
-      isEdit: false
-    };
+  sender_id: this.senderId,
+  text: this.selectedAttachment ? '' : encryptedText,
+  timestamp: new Date().toISOString(),
+  sender_phone: this.sender_phone,
+  sender_name: this.sender_name,
+  receiver_id: this.chatType === 'private' ? this.receiverId : '',
+  receiver_phone: this.receiver_phone,
+  delivered: false,
+  deliveredAt: '',   // empty string instead of null
+  read: false,
+  readAt: '',        // empty string instead of null
+  message_id: uuidv4(),
+  isDeleted: false,
+  replyToMessageId: this.replyToMessage?.message_id || '',
+  isEdit: false
+};
+
 
     if (this.selectedAttachment) {
       try {
@@ -6360,6 +6409,7 @@ async listenForMessages() {
       }
     }
 
+    console.log('>>> serverMessage to send:', serverMessage);
     // finally send
     await this.chatService.sendMessage(this.roomId, serverMessage, this.chatType, this.senderId);
 

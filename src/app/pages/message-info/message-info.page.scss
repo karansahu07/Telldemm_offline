@@ -1,0 +1,62 @@
+.red-header {
+  --background: #ff1414;
+  --color: #fff;
+}
+
+.red-theme-content {
+  --background: #fefefe;
+}
+
+.message-bubble {
+  margin: 16px;
+  padding: 12px 16px;
+  border-radius: 18px;
+  max-width: 75%;
+  display: inline-block;
+  font-size: 15px;
+  position: relative;
+}
+
+.message-bubble.sender {
+  background: #ffd4d4;
+  align-self: flex-end;
+}
+
+.message-bubble .text {
+  margin: 0;
+  color: #000;
+}
+
+.message-bubble .time {
+  font-size: 12px;
+  color: #666;
+  margin-left: 8px;
+}
+
+.status-icon {
+  font-size: 20px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.status-icon.sent {
+  color: gray;
+}
+
+.status-icon.delivered {
+  color: gray;
+}
+
+.status-icon.read {
+  color: #ff1414;
+}
+
+ion-item h2 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+ion-item p {
+  font-size: 14px;
+  color: #666;
+}
