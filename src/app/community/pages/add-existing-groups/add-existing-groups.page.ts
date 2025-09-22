@@ -387,6 +387,7 @@ export class AddExistingGroupsPage implements OnInit {
         if (role === 'admin' || role === 'owner' || role === 'creator') {
           const memberKeys = Object.keys(g.members || {}).slice(0, 4);
           const previewNames = memberKeys.map(k => g.members[k]?.name || k).join(', ');
+          // console.log("preview names", previewNames);
 
           this.groups.push({
             id: gid,

@@ -125,7 +125,7 @@ downloadFromUrl(url: string, filename: string) {
 // inside your AvatarPage component (TypeScript)
 async downloadFromServerless() {
   try {
-    const serverlessEndpoint = 'https://your-app.vercel.app/api/avatar'; // <- replace
+    const serverlessEndpoint = 'https://avatarserverlesstwo.vercel.app/api/avatar'; // <- replace
 
     // Use the same options object you use to generate preview
     const params = new URLSearchParams({

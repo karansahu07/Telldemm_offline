@@ -953,7 +953,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   //   await alert.present();
   // }
 
-  async deleteSelectedMessages() {
+async deleteSelectedMessages() {
   if (!this.selectedMessages || this.selectedMessages.length === 0) {
     return;
   }
@@ -974,17 +974,17 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     preview = `${count} messages`;
   }
 
-  // Build inputs for alert (Ionic checkboxes)
+  // Build inputs for alert (Ionic radio buttons)
   const inputs: any[] = [
-    { name: 'forMe', type: 'radio', label: 'Delete for me', value: 'forMe', checked: false }
+    { name: 'choice', type: 'radio', label: 'Delete for me', value: 'forMe', checked: true }
   ];
   if (canDeleteForEveryone) {
-    inputs.push({ name: 'forEveryone', type: 'radio', label: 'Delete for everyone', value: 'forEveryone', checked: false });
+    inputs.push({ name: 'choice', type: 'radio', label: 'Delete for everyone', value: 'forEveryone', checked: false });
   }
 
   const alert = await this.alertCtrl.create({
     header: 'Delete messages?',
-    message: `Confirm Delete?`,
+    // message: `<div style="text-align:left;">${preview}</div>`,
     cssClass: 'delete-confirm-alert',
     inputs,
     buttons: [
@@ -994,20 +994,23 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       },
       {
         text: 'OK',
-        handler: async (data: any) => {
-          // Normalize selection across Ionic versions
-          let selectedValues: string[] = [];
-          if (Array.isArray(data)) {
-            selectedValues = data;
-          } else if (typeof data === 'object' && data !== null) {
-            // older ionic versions might return object with keys
-            selectedValues = Object.keys(data).filter(k => data[k]);
+        handler: async (selectedValue: any) => {
+          // For radio, Ionic often returns the value directly (string). Normalize anyway.
+          let choice: string = '';
+          if (typeof selectedValue === 'string') {
+            choice = selectedValue;
+          } else if (Array.isArray(selectedValue) && selectedValue.length > 0) {
+            choice = selectedValue[0];
+          } else if (selectedValue && typeof selectedValue === 'object') {
+            // older ionic versions may return object of truthy keys
+            const keys = Object.keys(selectedValue).filter(k => selectedValue[k]);
+            choice = keys[0] || '';
           }
 
-          const doForMe = selectedValues.includes('forMe');
-          const doForEveryone = selectedValues.includes('forEveryone');
+          const doForMe = choice === 'forMe';
+          const doForEveryone = choice === 'forEveryone';
 
-          if (!doForMe && !doForEveryone) return; // nothing to do
+          if (!doForMe && !doForEveryone) return; // nothing chosen
 
           try {
             const db = getDatabase();
@@ -1036,7 +1039,12 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
                 try {
                   if (this.chatService.deleteMessageForEveryone) {
                     // Best: chatService will set flags in db and optionally wipe text/attachment
-                    await this.chatService.deleteMessageForEveryone(this.roomId, key, currentUserId, this.chatType === 'group' ? this.groupMembers.map(g => String(g.user_id)) : [this.receiverId, this.senderId]);
+                    await this.chatService.deleteMessageForEveryone(
+                      this.roomId,
+                      key,
+                      currentUserId,
+                      this.chatType === 'group' ? this.groupMembers.map(g => String(g.user_id)) : [this.receiverId, this.senderId]
+                    );
                   } else {
                     // fallback: set convenience flags (deletedForEveryone + deletedBy + deletedAt)
                     const updates: any = {};
@@ -1056,7 +1064,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
 
             // Update UI: remove locally-hidden messages
             if (doForMe || doForEveryone) {
-              // For simplicity: filter displayed/all messages if applyDeletionFilters now hides them
+              // Filter displayed/all messages according to the new deletion flags
               this.allMessages = this.allMessages.filter(m => !this.applyDeletionFilters(m));
               this.displayedMessages = this.displayedMessages.filter(m => !this.applyDeletionFilters(m));
               this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
@@ -1084,6 +1092,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
 
   await alert.present();
 }
+
 
 
   private applyDeletionFilters(dm: Message): boolean {
