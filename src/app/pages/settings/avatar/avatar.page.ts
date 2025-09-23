@@ -166,11 +166,28 @@ async downloadFromServerless() {
 }
 
 
+async downloadAvatar() {
+  const params = new URLSearchParams({
+    avatarStyle: 'Circle',
+    topType: this.options.topType || 'ShortHairShortFlat',
+    accessoriesType: this.options.accessoriesType || 'Blank',
+    hairColor: this.options.hairColor || 'BrownDark',
+    eyeType: this.options.eyeType || 'Default',
+    mouthType: this.options.mouthType || 'Smile',
+    clotheType: this.options.clotheType || 'ShirtCrewNeck',
+    skinColor: this.options.skinColor || 'Light',
+    width: '1024',
+    height: '1024'
+  });
+
+  const url = `https://avatarserverlesstwo.vercel.app/api/avatar?${params.toString()}`;
+
+  // ✅ Open the URL in a new browser tab/window → should trigger download
+  window.open(url, '_blank');
+}
 
 
-  /**
-   * Save chosen options to localStorage (or send to backend).
-   */
+ 
   saveOptions() {
     localStorage.setItem(`avatar_opts:${this.userId}`, JSON.stringify(this.options));
     // If you have an API, you could upload the PNG or options there.

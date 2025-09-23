@@ -19,7 +19,7 @@ android {
     }
   signingConfigs {
     release {
-      storeFile file("D://telldemm/Telldemm_group/telldemm-release-key.jks")  // fixed path with forward slashes
+      storeFile file("C://Users//KARAN//Desktop//11Aug//Telldemm_group/telldemm-release-key.jks")  // fixed path with forward slashes
       storePassword "telldemm123"                                  // your actual keystore password
       keyAlias "telldemm-key-alias"                                        // your key alias
       keyPassword "telldemm123"                                   // your key password

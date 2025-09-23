@@ -8,3 +8,65 @@ ion-avatar {
   width: 200px;
   height: 200px;
 }
+
+
+/* unified button styles */
+.buttons-row {
+  /* adjust vertical spacing if you need */
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.unified-btn {
+  --border-radius: 10px;
+  height: 48px;               /* consistent touch target */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  text-transform: none;       /* keep text as-is */
+  box-shadow: none;
+  --padding-start: 14px;
+  --padding-end: 14px;
+}
+
+/* icon spacing and visual weight */
+.unified-btn .btn-icon {
+  font-size: 20px;
+  margin-right: 8px;
+  opacity: 0.98;
+}
+
+/* text alignment in case icons are swapped */
+.unified-btn .btn-text {
+  display: inline-block;
+  line-height: 1;
+}
+
+/* distinct coloring but same structure:
+   keep primary for download, secondary for save (customizable) */
+.unified-btn.download {
+  --background: var(--ion-color-primary, #3880ff);
+  --color: var(--ion-color-primary-contrast, #fff);
+  --background-focused: color-mix(in srgb, var(--ion-color-primary) 90%, black 10%);
+  --box-shadow: none;
+}
+
+.unified-btn.save {
+  /* either use secondary color or custom tint */
+  --background: var(--ion-color-secondary, #3dc2ff);
+  --color: var(--ion-color-secondary-contrast, #fff);
+}
+
+/* disabled state consistent look */
+.unified-btn[disabled] {
+  opacity: 0.6;
+  transform: none;
+}
+
+/* small screens: keep spacing */
+@media (max-width: 400px) {
+  .unified-btn { height: 44px; font-size: 14px; }
+  .unified-btn .btn-icon { font-size: 18px; margin-right: 6px; }
+}
