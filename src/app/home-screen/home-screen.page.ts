@@ -83,19 +83,6 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     this.trackRouteChanges();
   }
 
-  // async ionViewWillEnter() {
-  //   const shouldRefresh = localStorage.getItem('shouldRefreshHome');
-
-  //   if (shouldRefresh === 'true') {
-  //     console.log('Refreshing home page after group creation...');
-  //     localStorage.removeItem('shouldRefreshHome');
-  //     this.clearChatData();
-  //     await this.refreshHomeData();
-  //     await this.loadData();
-  //     this.sender_name = this.authService.authData?.name || '';
-  //   }
-  // }
-
     async ionViewWillEnter() {
     // 1) First check server for force-logout decision every time user revisits home
     try {
@@ -109,7 +96,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     const shouldRefresh = localStorage.getItem('shouldRefreshHome');
 
     if (shouldRefresh === 'true') {
-      console.log('Refreshing home page after group creation...');
+      // console.log('Refreshing home page after group creation...');
       localStorage.removeItem('shouldRefreshHome');
       this.clearChatData();
       await this.refreshHomeData();
@@ -206,13 +193,6 @@ export class HomeScreenPage implements OnInit, OnDestroy {
         this.loadUserGroups(),
         this.loadUserCommunitiesForHome()
       ]);
-
-      // sort by time descending
-      this.chatList.sort((a, b) => {
-        const ta = a.time ? new Date(a.time).getTime() : 0;
-        const tb = b.time ? new Date(b.time).getTime() : 0;
-        return tb - ta;
-      });
 
       console.log('Home page refreshed successfully');
     } catch (error) {
@@ -331,7 +311,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
    */
   getAllUsers() {
     const currentSenderId = this.senderUserId;
-    console.log("current sender id:", currentSenderId);
+    // console.log("current sender id:", currentSenderId);
     if (!currentSenderId) return;
 
     this.contactSyncService.getMatchedUsers().then((matched) => {
@@ -359,7 +339,10 @@ export class HomeScreenPage implements OnInit, OnDestroy {
             const existingChat = this.chatList.find(
               (c: any) => c.receiver_Id === receiverId && !c.group
             );
+            // console.log("existingChat",existingChat);
             if (existingChat) return;
+
+            
 
             const chat: any = {
               ...user,
@@ -377,8 +360,9 @@ export class HomeScreenPage implements OnInit, OnDestroy {
               typingText: null,
               typingCount: 0
             };
-
+            // console.log("existingChat",chat);
             this.chatList.push(chat);
+
 
             // start typing listener for this chat
             this.startTypingListenerForChat(chat);
@@ -427,6 +411,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
                 chat.unread = count > 0;
               });
             this.unreadSubs.push(sub);
+            // console.log("dsfgdg", this.chatList);
           });
         });
       });
@@ -493,127 +478,18 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     });
   }
 
-  // async loadUserGroups() {
-  //   const userid = this.senderUserId;
-  //   console.log("sender user id:", userid);
-  //   if (!userid) return;
-
-  //   const groupIds = await this.firebaseChatService.getGroupsForUser(userid);
-  //   console.log("group ids:", groupIds);
-
-  //   for (const groupId of groupIds) {
-  //     const existingGroup = this.chatList.find(chat =>
-  //       chat.receiver_Id === groupId && chat.group
-  //     );
-  //     if (existingGroup) {
-  //       console.log('Group already exists:', groupId);
-  //       continue;
-  //     }
-
-  //     const groupInfo = await this.firebaseChatService.getGroupInfo(groupId);
-  //     if (!groupInfo || !groupInfo.members || !groupInfo.members[userid]) continue;
-
-  //     const groupName = groupInfo.name || 'Unnamed Group';
-  //     let groupDp = 'assets/images/user.jfif';
-
-  //     this.service.getGroupDp(groupId).subscribe({
-  //       next: (res: any) => {
-  //         if (res?.group_dp_url) {
-  //           const targetGroup = this.chatList.find(chat => chat.receiver_Id === groupId);
-  //           if (targetGroup) {
-  //             targetGroup.dp = res.group_dp_url;
-  //           }
-  //         }
-  //       },
-  //       error: (err: any) => {
-  //         console.error('❌ Failed to fetch group DP:', err);
-  //       }
-  //     });
-
-  //     const groupChat: any = {
-  //       name: groupName,
-  //       receiver_Id: groupId,
-  //       group: true,
-  //       message: '',
-  //       time: '',
-  //       unread: false,
-  //       unreadCount: 0,
-  //       dp: groupDp,
-  //       // typing fields
-  //       isTyping: false,
-  //       typingText: null,
-  //       typingCount: 0,
-  //       // optionally keep members if you want to resolve names locally
-  //       members: groupInfo.members || {}
-  //     };
-
-  //     this.chatList.push(groupChat);
-
-  //     // start typing listener for this group
-  //     this.startTypingListenerForChat(groupChat);
-
-  //     // Listen for latest message in group
-  //     this.firebaseChatService.listenForMessages(groupId).subscribe(async (messages) => {
-  //       if (messages.length > 0) {
-  //         const lastMsg = messages[messages.length - 1];
-
-  //         if (lastMsg.isDeleted) {
-  //           groupChat.message = 'This message was deleted';
-  //         } else if (lastMsg.attachment?.type && lastMsg.attachment.type !== 'text') {
-  //           switch (lastMsg.attachment.type) {
-  //             case 'image':
-  //               groupChat.message = '📷 Photo';
-  //               break;
-  //             case 'video':
-  //               groupChat.message = '🎥 Video';
-  //               break;
-  //             case 'audio':
-  //               groupChat.message = '🎵 Audio';
-  //               break;
-  //             case 'file':
-  //               groupChat.message = '📎 Attachment';
-  //               break;
-  //             default:
-  //               groupChat.message = '[Media]';
-  //           }
-  //         } else {
-  //           try {
-  //             const decryptedText = await this.encryptionService.decrypt(lastMsg.text);
-  //             groupChat.message = decryptedText;
-  //           } catch (e) {
-  //             groupChat.message = '[Encrypted]';
-  //           }
-  //         }
-
-  //         if (lastMsg.timestamp) {
-  //           groupChat.time = this.formatTimestamp(lastMsg.timestamp);
-  //         }
-  //       }
-  //     });
-
-  //     const sub = this.firebaseChatService
-  //       .listenToUnreadCount(groupId, userid)
-  //       .subscribe((count: number) => {
-  //         groupChat.unreadCount = count;
-  //         groupChat.unread = count > 0;
-  //       });
-
-  //     this.unreadSubs.push(sub);
-  //   }
-  // }
-
 async loadUserGroups() {
   const userid = this.senderUserId;
-  console.log("sender user id:", userid);
+  // console.log("sender user id:", userid);
   if (!userid) return;
 
   const groupIds = await this.firebaseChatService.getGroupsForUser(userid);
-  console.log("group ids:", groupIds);
+  // console.log("group ids:", groupIds);
 
   for (const groupId of groupIds) {
     // --- FILTER: skip community groups whose id/name prefix is "comm_group_" ---
     if (typeof groupId === 'string' && groupId.startsWith('comm_group_')) {
-      console.log('Skipping community-linked group by prefix:', groupId);
+      // console.log('Skipping community-linked group by prefix:', groupId);
       continue;
     }
 
@@ -621,7 +497,7 @@ async loadUserGroups() {
       chat.receiver_Id === groupId && chat.group
     );
     if (existingGroup) {
-      console.log('Group already exists in chatList:', groupId);
+      // console.log('Group already exists in chatList:', groupId);
       continue;
     }
 
@@ -629,11 +505,11 @@ async loadUserGroups() {
 
     // NEW: skip groups that are already assigned to a community
     if (!groupInfo) {
-      console.log('No groupInfo for', groupId);
+      // console.log('No groupInfo for', groupId);
       continue;
     }
     if (groupInfo.communityId) {
-      console.log('Skipping group already in a community:', groupId, 'communityId=', groupInfo.communityId);
+      // console.log('Skipping group already in a community:', groupId, 'communityId=', groupInfo.communityId);
       continue;
     }
 
@@ -729,6 +605,11 @@ async loadUserGroups() {
       });
 
     this.unreadSubs.push(sub);
+    // this.chatList.sort((a: any, b: any) => {
+    //               const ta = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+    //               const tb = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+    //               return tb - ta;
+    //             });
   }
 }
 
@@ -764,12 +645,6 @@ async loadUserGroups() {
   }
 
   get filteredChats() {
-    // this.chatList.sort((a: any, b: any) => {
-    //               const ta = a.chat.time ? new Date(a.chat.time).getTime() : 0;
-    //               const tb = b.chat.time ? new Date(b.chat.time).getTime() : 0;
-    //               return tb - ta;
-    //             });
-  console.log(this.chatList?.[0],"dsgfhghjgbfb")
   this.chatList.sort((a: any, b: any) => {
                   const ta = a.timestamp ? new Date(a.timestamp).getTime() : 0;
                   const tb = b.timestamp ? new Date(b.timestamp).getTime() : 0;
@@ -793,8 +668,10 @@ async loadUserGroups() {
       );
     }
 
+    // console.log("filtered",filtered);
+    return filtered;
     // Sort by unread count (highest first)
-    return filtered.sort((a, b) => b.unreadCount - a.unreadCount);
+    // return filtered.sort((a, b) => b.unreadCount - a.unreadCount);
   }
 
   get totalUnreadCount(): number {
@@ -861,7 +738,7 @@ async loadUserCommunitiesForHome() {
     if (!userid) return;
 
     const communityIds = await this.firebaseChatService.getUserCommunities(userid);
-    console.log('communities for user:', communityIds);
+    // console.log('communities for user:', communityIds);
 
     for (const cid of communityIds || []) {
       // avoid duplicates
@@ -1030,7 +907,7 @@ async loadUserCommunitiesForHome() {
       const result = await BarcodeScanner.startScan();
 
       if (result?.hasContent) {
-        console.log('Scanned Result:', result.content);
+        // console.log('Scanned Result:', result.content);
         this.scannedText = result.content;
       } else {
         alert('No barcode found.');

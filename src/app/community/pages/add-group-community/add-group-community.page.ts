@@ -766,16 +766,74 @@ async removeGroupFromCommunity(groupId: string) {
       });
 
       // mark each group member entry for deletion & remove user's group index
-      toRemoveFromGroup.forEach(uid => {
-        // updates[`/groups/${groupId}/members/${uid}`] = null;
-        updates[`/users/${uid}/groups/${groupId}`] = null;
-        // updates[`/groups/`]
-      });
+      // toRemoveFromGroup.forEach(uid => {
+      //   // updates[`/groups/${groupId}/members/${uid}`] = null;
+      //   updates[`/users/${uid}/groups/${groupId}`] = null;
+      //   // updates[`/groups/`]
+      // });
 
+      // --- find announcement group id for this community (if any) ---
+let announcementGroupId: string | null = null;
+try {
+  const groupIdsInCommunity = await this.firebaseService.getGroupsInCommunity(this.communityId);
+  if (Array.isArray(groupIdsInCommunity)) {
+    for (const gid of groupIdsInCommunity) {
+      try {
+        const ginfo = await this.firebaseService.getGroupInfo(gid);
+        if (ginfo && ginfo.type === 'announcement') {
+          announcementGroupId = gid;
+          break;
+        }
+      } catch (e) {
+        console.warn('Failed to load group info while searching announcement group', gid, e);
+      }
+    }
+  }
+} catch (e) {
+  console.warn('Failed to fetch groups for community to find announcement group', e);
+}
+
+// --- Determine which members must be removed from the specific group (toRemoveFromGroup computed earlier) ---
+// (Assume toRemoveFromGroup: string[] already computed)
+toRemoveFromGroup.forEach(uid => {
+  // 1) remove user from this group's members node
+  // updates[`/groups/${groupId}/members/${uid}`] = null;
+
+  // 2) remove user's index for this group
+  updates[`/users/${uid}/groups/${groupId}`] = null;
+
+  // 3) Also remove from announcement group (if announcementGroupId exists)
+  if (announcementGroupId) {
+    updates[`/groups/${announcementGroupId}/members/${uid}`] = null;
+    updates[`/users/${uid}/groups/${announcementGroupId}`] = null;
+  }
+});
+
+// --- adjust announcement group's membersCount if we removed people from it ---
+if (announcementGroupId && toRemoveFromGroup.length > 0) {
+  try {
+    const annInfo = await this.firebaseService.getGroupInfo(announcementGroupId);
+    const annCurrentCount = annInfo?.membersCount || (annInfo?.members ? Object.keys(annInfo.members).length : 0);
+    // compute how many of `toRemoveFromGroup` were actually present in announcement group
+    let actuallyRemovedFromAnn = 0;
+    if (annInfo && annInfo.members) {
+      for (const uid of toRemoveFromGroup) {
+        if (annInfo.members[uid]) actuallyRemovedFromAnn++;
+      }
+    } else {
+      // fallback: assume all removed from group might have been in announcement group
+      actuallyRemovedFromAnn = toRemoveFromGroup.length;
+    }
+    const newAnnCount = Math.max(0, annCurrentCount - actuallyRemovedFromAnn);
+    updates[`/groups/${announcementGroupId}/membersCount`] = newAnnCount;
+  } catch (e) {
+    console.warn('Failed to update announcement group count', e);
+  }
+}
       // adjust group's membersCount (subtract removedFromGroup count, ensure >= 0)
       const decrement = toRemoveFromGroup.length;
       const newGroupCount = Math.max(0, (removedGroupCurrentCount || 0) - decrement);
-      updates[`/groups/${groupId}/membersCount`] = newGroupCount;
+      // updates[`/groups/${groupId}/membersCount`] = newGroupCount;
     }
 
     // commit updates atomically (use helper if available)

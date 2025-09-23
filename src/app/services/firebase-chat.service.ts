@@ -395,13 +395,14 @@ export class FirebaseChatService {
       onValue(messagesRef, snapshot => {
         const data = snapshot.val();
         const messages = data ? Object.entries(data).map(([key, val]) => ({ key, ...(val as any) })) : [];
+        console.log("messages dsgsd", messages);
         observer.next(messages);
       });
     });
   }
 
   async pinMessage(message: PinnedMessage) {
-    console.log("messages dsgsd", message);
+    // console.log("messages dsgsd", message);
     const key = message.roomId; // Always roomId, since scope is always global
     const pinRef = ref(this.db, `pinnedMessages/${key}`);
     const snapshot = await get(pinRef);

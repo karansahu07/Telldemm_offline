@@ -165,6 +165,16 @@ export class CommunityDetailPage implements OnInit {
       this.loadCommunityDetail();
     });
   }
+  // ionViewWillEnter() {
+  //   this.route.queryParams.subscribe(params => {
+  //     const cid = params['communityId'] || params['id'];
+  //     if (!cid) {
+  //       return;
+  //     }
+  //     this.communityId = cid;
+  //     this.loadCommunityDetail();
+  //   });
+  // }
 
   async loadCommunityDetail() {
     if (!this.communityId) return;
