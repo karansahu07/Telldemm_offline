@@ -3,16 +3,12 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/"></ion-back-button>
     </ion-buttons>
-    <!-- <ion-buttons slot="end">
-      <ion-button fill="clear">
+
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="presentPopover($event)">
         <ion-icon name="ellipsis-vertical"></ion-icon>
       </ion-button>
-    </ion-buttons> -->
-    <ion-buttons slot="end">
-  <ion-button fill="clear" (click)="presentPopover($event)">
-    <ion-icon name="ellipsis-vertical"></ion-icon>
-  </ion-button>
-</ion-buttons>
+    </ion-buttons>
   </ion-toolbar>
 
   <!-- Community Info -->
@@ -28,7 +24,6 @@
 </ion-header>
 
 <ion-content>
-  <!-- Actual content -->
   <ion-list *ngIf="loading === false">
     <!-- Announcement card -->
     <ion-item *ngIf="announcementGroup" lines="full" button (click)="openGroupChat(announcementGroup.id)">
@@ -42,22 +37,36 @@
       <ion-note slot="end">{{ announcementGroup.lastMessage?.time || '' }}</ion-note>
     </ion-item>
 
-    <!-- Groups you are in -->
-    <ion-list *ngIf="groups.length > 0">
-      <ion-list-header>Groups</ion-list-header>
-      <ion-item *ngFor="let g of groups" button>
+    <!-- Groups you're in -->
+    <ion-list *ngIf="groupsIn && groupsIn.length > 0">
+      <ion-list-header>Groups you're in</ion-list-header>
+      <ion-item *ngFor="let g of groupsIn" button (click)="openGroupChat(g.id, g.name)">
         <ion-avatar class="band">
           <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
         </ion-avatar>
-        <ion-label class="community" (click)="openGroupChat(g.id)">
+        <ion-label class="community">
           <h3>{{ g.name }}</h3>
           <p>{{ g.membersCount }} members</p>
         </ion-label>
       </ion-item>
     </ion-list>
 
+    <!-- Groups you can join -->
+    <ion-list *ngIf="groupsAvailable && groupsAvailable.length > 0">
+      <ion-list-header>Groups you can join</ion-list-header>
+      <ion-item *ngFor="let g of groupsAvailable" button (click)="openGroupPreview(g)">
+        <ion-avatar class="band">
+          <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+        </ion-avatar>
+        <ion-label class="community">
+          <h3>{{ g.name }}</h3>
+          <p>Tap to view & join</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
     <!-- Empty state -->
-    <div class="empty-text" *ngIf="!announcementGroup && groups.length === 0">
+    <div class="empty-text" *ngIf="!announcementGroup && (!groupsIn || groupsIn.length === 0) && (!groupsAvailable || groupsAvailable.length === 0)">
       <p>
         Other groups added to the community will appear here.<br />
         Community members can join these groups.
@@ -83,16 +92,10 @@
   </ion-list>
 </ion-content>
 
-
 <!-- Footer Button -->
 <ion-footer>
   <ion-toolbar>
-    <ion-button
-      expand="block"
-      shape="round"
-      class="add-btn"
-      (click)="goToaddgroupcommunity()"
-    >
+    <ion-button expand="block" shape="round" class="add-btn" (click)="goToaddgroupcommunity()">
       <ion-icon name="add" slot="start"></ion-icon>
       Add group
     </ion-button>

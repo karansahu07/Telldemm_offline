@@ -1,0 +1,47 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button fill="clear" (click)="close()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title></ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div style="text-align:center; margin-top:8px;">
+    <ion-avatar class="big-avatar">
+      <ion-icon name="people-outline"></ion-icon>
+    </ion-avatar>
+
+    <h2 style="margin-top:12px;">{{ group?.name }}</h2>
+    <p class="muted">{{ createdByText }}</p>
+    <p class="muted" style="margin-top:6px;">Community: {{ communityName }}</p>
+  </div>
+
+  <div style="margin-top:18px;">
+    <h3>Members</h3>
+    <div class="members-list">
+      <ng-container *ngIf="memberKeys?.length; else noMembers">
+        <div *ngFor="let k of memberKeys | slice:0:8" class="member-avatar-wrap">
+          <ion-avatar class="small-avatar">
+            <div class="avatar-initials">{{ initialsFor(memberObj(k)) }}</div>
+          </ion-avatar>
+        </div>
+        <div *ngIf="memberKeys.length > 8" class="more-badge">+{{memberKeys.length - 8}}</div>
+      </ng-container>
+      <ng-template #noMembers>
+        <p class="muted">No members yet</p>
+      </ng-template>
+    </div>
+  </div>
+
+  <div style="margin-top:20px;">
+    <p class="muted">By joining you become a member immediately.</p>
+  </div>
+
+  <div class="join-wrap">
+    <ion-button expand="block" shape="round" (click)="join()">Join</ion-button>
+  </div>
+</ion-content>

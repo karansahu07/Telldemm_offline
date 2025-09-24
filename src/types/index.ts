@@ -21,6 +21,7 @@ export interface Message {
   time?: string;
   type?: string;
   isForwarded?: boolean;
+  fadeOut?: boolean;
 
   // attachment unchanged:
   attachment?: {

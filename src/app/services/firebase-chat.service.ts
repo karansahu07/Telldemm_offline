@@ -523,90 +523,158 @@ export class FirebaseChatService {
     return userGroups;
   }
 
-  // ✅ Create a community (atomic): creates community node + default announcement + general groups and links everything
-  // async createCommunity(communityId: string, name: string, description: string, createdBy: string): Promise<void> {
-  //   try {
-  //     const rawDb = getDatabase();
-
-  //     const now = Date.now();
-  //     const annGroupId = `group_${now}_ann`;
-  //     const generalGroupId = `group_${now}_gen`;
-
-  //     const communityPath = `/communities/${communityId}`;
-  //     const annGroupPath = `/groups/${annGroupId}`;
-  //     const genGroupPath = `/groups/${generalGroupId}`;
-  //     const communityGroupsAnnPath = `/communities/${communityId}/groups/${annGroupId}`;
-  //     const communityGroupsGenPath = `/communities/${communityId}/groups/${generalGroupId}`;
-  //     const userInCommunityPath = `/usersInCommunity/${createdBy}/joinedCommunities/${communityId}`;
-  //     const userGroupAnnPath = `/users/${createdBy}/groups/${annGroupId}`;
-  //     const userGroupGenPath = `/users/${createdBy}/groups/${generalGroupId}`;
-  //     const communityMembersPath = `/communities/${communityId}/members/${createdBy}`;
-
-  //     const updates: any = {};
-
-  //     // community meta
-  //     updates[communityPath] = {
-  //       id: communityId,
-  //       name,
-  //       description: description || '',
-  //       icon: '',
-  //       createdBy,
-  //       createdAt: now,
-  //       privacy: 'invite_only',
-  //       settings: {
-  //         whoCanCreateGroups: 'admins',
-  //         announcementPosting: 'adminsOnly'
-  //       },
-  //       admins: { [createdBy]: true },
-  //       membersCount: 1,
-  //       // groups will be linked below via communityGroups paths
-  //     };
-
-  //     // link groups under community
-  //     updates[communityGroupsAnnPath] = true;
-  //     updates[communityGroupsGenPath] = true;
-
-  //     // announcement group
-  //     updates[annGroupPath] = {
-  //       id: annGroupId,
-  //       name: 'Announcements',
-  //       type: 'announcement',
-  //       communityId: communityId,
-  //       createdBy,
-  //       createdAt: now,
-  //       admins: { [createdBy]: true },
-  //       members: { [createdBy]: true },
-  //       membersCount: 1
-  //     };
-
-  //     // general group
-  //     updates[genGroupPath] = {
-  //       id: generalGroupId,
-  //       name: 'General',
-  //       type: 'general',
-  //       communityId: communityId,
-  //       createdBy,
-  //       createdAt: now,
-  //       admins: { [createdBy]: true },
-  //       members: { [createdBy]: true },
-  //       membersCount: 1
-  //     };
-
-  //     // user membership references
-  //     updates[userInCommunityPath] = true;
-  //     updates[userGroupAnnPath] = true;
-  //     updates[userGroupGenPath] = true;
-  //     updates[communityMembersPath] = true;
-
-  //     // commit all at once
-  //     await update(ref(rawDb), updates);
-  //   } catch (err) {
-  //     console.error('createCommunity error', err);
-  //     throw err;
-  //   }
-  // }
-
+  
   // ✅ Fixed createCommunity (no ancestor/descendant collision in updates)
+// async createCommunity(communityId: string, name: string, description: string, createdBy: string): Promise<void> {
+//   try {
+//     const rawDb = getDatabase();
+//     const now = Date.now();
+//     const annGroupId = `comm_group_${now}_ann`;
+//     const generalGroupId = `comm_group_${now}_gen`;
+
+//     // Build community object including child nodes (groups, members) so we only set /communities/<cid> once
+//     const communityObj: any = {
+//       id: communityId,
+//       name,
+//       description: description || '',
+//       icon: '',
+//       createdBy,
+//       createdAt: now,
+//       privacy: 'invite_only',
+//       settings: {
+//         whoCanCreateGroups: 'admins',
+//         announcementPosting: 'adminsOnly'
+//       },
+//       admins: { [createdBy]: true },
+//       membersCount: 1,
+//       // include child objects here instead of setting them as separate update keys
+//       groups: {
+//         [annGroupId]: true,
+//         [generalGroupId]: true
+//       },
+//       members: {
+//         [createdBy]: true
+//       }
+//     };
+
+//     // Prepare atomic updates. NOTE: do NOT include both '/communities/<cid>' and its subpaths.
+//     const updates: any = {};
+
+//     // 1) Set full community object at once (includes groups and members)
+//     updates[`/communities/${communityId}`] = communityObj;
+
+//     // 2) Create the two group nodes under /groups (these are separate top-level paths — OK)
+//     updates[`/groups/${annGroupId}`] = {
+//       id: annGroupId,
+//       name: 'Announcements',
+//       type: 'announcement',
+//       communityId: communityId,
+//       createdBy,
+//       createdAt: now,
+//       admins: { [createdBy]: true },
+//       members: { [createdBy]: true },
+//       membersCount: 1
+//     };
+
+//     updates[`/groups/${generalGroupId}`] = {
+//       id: generalGroupId,
+//       name: 'General',
+//       type: 'general',
+//       communityId: communityId,
+//       createdBy,
+//       createdAt: now,
+//       admins: { [createdBy]: true },
+//       members: { [createdBy]: true },
+//       membersCount: 1
+//     };
+
+//     // 3) Add user->community mapping and user->group indexes (safe separate paths)
+//     updates[`/usersInCommunity/${createdBy}/joinedCommunities/${communityId}`] = true;
+//     updates[`/users/${createdBy}/groups/${annGroupId}`] = true;
+//     updates[`/users/${createdBy}/groups/${generalGroupId}`] = true;
+
+//     // commit the multi-path update atomically
+//     await update(ref(rawDb), updates);
+//   } catch (err) {
+//     console.error('createCommunity error', err);
+//     throw err;
+//   }
+// }
+
+// async createCommunity(communityId: string, name: string, description: string, createdBy: string): Promise<void> {
+//   try {
+//     const rawDb = getDatabase();
+//     const now = Date.now();
+//     const annGroupId = `comm_group_${now}_ann`;
+//     const generalGroupId = `comm_group_${now}_gen`;
+
+//     // Build community object including child nodes (groups, members)
+//     const communityObj: any = {
+//       id: communityId,
+//       name,
+//       description: description || '',
+//       icon: '',
+//       createdBy,
+//       createdAt: now,
+//       privacy: 'invite_only',
+//       settings: {
+//         whoCanCreateGroups: 'admins',
+//         announcementPosting: 'adminsOnly'
+//       },
+//       admins: { [createdBy]: true },
+//       membersCount: 0,
+//       groups: {
+//         [annGroupId]: true,
+//         [generalGroupId]: true
+//       },
+//       members: {
+//         [createdBy]: true
+//       }
+//     };
+
+//     // Build group objects that ALREADY contain their members (so we don't add child paths separately)
+//     const annGroupObj = {
+//       id: annGroupId,
+//       name: 'Announcements',
+//       type: 'announcement',
+//       communityId: communityId,
+//       createdBy,
+//       createdAt: now,
+//       admins: { [createdBy]: true },
+//       members: { [createdBy]: true },   // include members here
+//       membersCount: 0
+//     };
+
+//     const genGroupObj = {
+//       id: generalGroupId,
+//       name: 'General',
+//       type: 'general',
+//       communityId: communityId,
+//       createdBy,
+//       createdAt: now,
+//       admins: { [createdBy]: true },
+//       members: { [createdBy]: true },
+//       membersCount: 0
+//     };
+
+//     // Prepare updates — NOTE: do NOT include both `/groups/<gid>` and `/groups/<gid>/members/<uid>`
+//     const updates: any = {};
+//     updates[`/communities/${communityId}`] = communityObj;
+//     updates[`/groups/${annGroupId}`] = annGroupObj;
+//     updates[`/groups/${generalGroupId}`] = genGroupObj;
+
+//     // separate index paths (these are different branches — OK)
+//     updates[`/usersInCommunity/${createdBy}/joinedCommunities/${communityId}`] = true;
+//     // updates[`/users/${createdBy}/groups/${annGroupId}`] = true;
+//     // updates[`/users/${createdBy}/groups/${generalGroupId}`] = true;
+
+//     await update(ref(rawDb), updates);
+//   } catch (err) {
+//     console.error('createCommunity error', err);
+//     throw err;
+//   }
+// }
+
 async createCommunity(communityId: string, name: string, description: string, createdBy: string): Promise<void> {
   try {
     const rawDb = getDatabase();
@@ -614,39 +682,57 @@ async createCommunity(communityId: string, name: string, description: string, cr
     const annGroupId = `comm_group_${now}_ann`;
     const generalGroupId = `comm_group_${now}_gen`;
 
-    // Build community object including child nodes (groups, members) so we only set /communities/<cid> once
+    // Try to fetch creator details from /users/<createdBy> (best-effort)
+    let creatorProfile: { name?: string; phone_number?: string } = {};
+    try {
+      const userSnap = await get(ref(rawDb, `users/${createdBy}`));
+      if (userSnap.exists()) {
+        const u = userSnap.val();
+        creatorProfile.name = u.name || u.fullName || u.displayName || '';
+        creatorProfile.phone_number = u.phone_number || u.mobile || u.phone || '';
+      }
+    } catch (err) {
+      console.warn('Failed to fetch creator profile, proceeding with fallback values', err);
+    }
+
+    // Build member object with details (creator will be an ADMIN)
+    const memberDetails = {
+      name: creatorProfile.name || '',
+      phone_number: creatorProfile.phone_number || '',
+      role: 'admin',    // <-- creator is admin by default
+      status: 'active',
+      joinedAt: now
+    };
+
+    // Build community object including child nodes (groups, members) — members now store objects not booleans
     const communityObj: any = {
       id: communityId,
       name,
       description: description || '',
       icon: '',
       createdBy,
+      createdByName : creatorProfile.name,
       createdAt: now,
       privacy: 'invite_only',
       settings: {
         whoCanCreateGroups: 'admins',
         announcementPosting: 'adminsOnly'
       },
+      // admins map (quick lookup)
       admins: { [createdBy]: true },
-      membersCount: 1,
-      // include child objects here instead of setting them as separate update keys
+      membersCount: 0, // creator included
       groups: {
         [annGroupId]: true,
         [generalGroupId]: true
       },
+      // store detailed member object under members/<uid>
       members: {
-        [createdBy]: true
+        [createdBy]: memberDetails
       }
     };
 
-    // Prepare atomic updates. NOTE: do NOT include both '/communities/<cid>' and its subpaths.
-    const updates: any = {};
-
-    // 1) Set full community object at once (includes groups and members)
-    updates[`/communities/${communityId}`] = communityObj;
-
-    // 2) Create the two group nodes under /groups (these are separate top-level paths — OK)
-    updates[`/groups/${annGroupId}`] = {
+    // Build group objects that already contain their members (so we don't add child paths separately)
+    const annGroupObj = {
       id: annGroupId,
       name: 'Announcements',
       type: 'announcement',
@@ -654,11 +740,13 @@ async createCommunity(communityId: string, name: string, description: string, cr
       createdBy,
       createdAt: now,
       admins: { [createdBy]: true },
-      members: { [createdBy]: true },
-      membersCount: 1
+      members: {
+        [createdBy]: memberDetails
+      },
+      membersCount: 0
     };
-
-    updates[`/groups/${generalGroupId}`] = {
+    console.log("memberDetails",memberDetails);
+    const genGroupObj = {
       id: generalGroupId,
       name: 'General',
       type: 'general',
@@ -666,16 +754,21 @@ async createCommunity(communityId: string, name: string, description: string, cr
       createdBy,
       createdAt: now,
       admins: { [createdBy]: true },
-      members: { [createdBy]: true },
-      membersCount: 1
+      members: {
+        [createdBy]: memberDetails
+      },
+      membersCount: 0
     };
 
-    // 3) Add user->community mapping and user->group indexes (safe separate paths)
-    updates[`/usersInCommunity/${createdBy}/joinedCommunities/${communityId}`] = true;
-    updates[`/users/${createdBy}/groups/${annGroupId}`] = true;
-    updates[`/users/${createdBy}/groups/${generalGroupId}`] = true;
+    // Prepare updates (atomic multi-path update)
+    const updates: any = {};
+    updates[`/communities/${communityId}`] = communityObj;
+    updates[`/groups/${annGroupId}`] = annGroupObj;
+    updates[`/groups/${generalGroupId}`] = genGroupObj;
 
-    // commit the multi-path update atomically
+    // Index paths for quick lookups
+    updates[`/usersInCommunity/${createdBy}/joinedCommunities/${communityId}`] = true;
+
     await update(ref(rawDb), updates);
   } catch (err) {
     console.error('createCommunity error', err);

@@ -28,7 +28,7 @@ export class MenuPopoverComponent implements OnInit {
         { label: 'New group',  route: '/contact-screen' },
         { label: 'New Community',  route: '/community-screen' },
         { label: 'New broadcast wip' },
-        { label: 'Linked Devices wip' },
+        // { label: 'Linked Devices wip' },
         { label: 'Starred wip' },
         { label: 'Read all wip' },
         { label: 'Settings', route: '/setting-screen' }

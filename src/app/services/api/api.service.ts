@@ -60,6 +60,22 @@ getUserStatus(user_id: number): Observable<{ status: boolean; data: { is_online:
   return this.get(`/api/users/status/${user_id}`);
 }
 
+/**
+ * Update user's timezone on backend
+ */
+setUserTimezone(user_id: number, timezone: string): Observable<any> {
+  return this.post('/api/users/users/status_timezone', { user_id, timezone });
+}
+
+/** Get user email by ID */
+  getUserEmail(userId: number): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/api/users/email/${userId}`);
+  }
+ 
+  /** Update user email */
+  updateUserEmail(userId: number, email: string): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/api/users/update-email`, { user_id: userId, email });
+  }
 
 /**
  * Check if backend forces logout for a user

@@ -269,16 +269,8 @@
 
       <ion-badge *ngIf="member.role === 'admin'" class="admin-badge"
         style="margin-left: 6px;font-size: 10px;color: red; background-color: #FFD4D4;">
-        admin
+        Group admin
       </ion-badge>
-
-
-      <!-- Show 3-dot menu ONLY if it's NOT the current user -->
-      <!-- <ion-buttons slot="end" *ngIf="member.user_id !== currentUserId">
-        <ion-button fill="clear" (click)="openActionSheet(member)">
-          <ion-icon name="ellipsis-vertical"></ion-icon>
-        </ion-button>
-      </ion-buttons> -->
     </ion-item>
 
 
