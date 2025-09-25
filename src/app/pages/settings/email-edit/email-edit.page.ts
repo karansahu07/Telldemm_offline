@@ -24,7 +24,7 @@ export class EmailEditPage implements OnInit {
     private fb: FormBuilder,
     private toastCtrl: ToastController,
     private router: Router,
-    private service: ApiService
+    private userService: ApiService   // ✅ inject service
   ) {
     this.emailForm = this.fb.group({
       email: ['', [Validators.required, Validators.email, Validators.maxLength(254)]],
@@ -41,7 +41,7 @@ export class EmailEditPage implements OnInit {
 
   /** ✅ Load email from service */
   loadEmail() {
-    this.service.getUserEmail(USER_ID).subscribe({
+    this.userService.getUserEmail(USER_ID).subscribe({
       next: (res) => {
         this.originalEmail = res.email;
         this.emailForm.patchValue({ email: res.email });
@@ -67,7 +67,7 @@ export class EmailEditPage implements OnInit {
     if (this.emailForm.invalid) return;
     const newEmail = this.emailForm.value.email;
 
-    this.service.updateUserEmail(USER_ID, newEmail).subscribe({
+    this.userService.updateUserEmail(USER_ID, newEmail).subscribe({
       next: async (res) => {
         this.originalEmail = res.email;
         this.isEditing = false;
