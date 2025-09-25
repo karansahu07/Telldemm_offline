@@ -20,5 +20,24 @@
       "invalid": "Veuillez saisir une adresse e-mail valide.",
       "maxlength": "L’e-mail est trop long (254 caractères maximum)."
     }
+  },
+  "helpPage": {
+    "title": "Aide",
+    "helpCenter": {
+      "title": "Centre d'aide",
+      "description": "Obtenez de l'aide, FAQ et options de contact."
+    },
+    "terms": {
+      "title": "Conditions & Politique de confidentialité",
+      "description": "Lisez nos conditions et la politique de données."
+    },
+    "channelReports": {
+      "title": "Rapports de chaîne",
+      "description": "Gérer et consulter les rapports."
+    },
+    "appInfo": {
+      "title": "Infos sur l'app",
+      "description": "Version, aspects légaux et détails techniques."
+    }
   }
 }

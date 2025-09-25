@@ -20,5 +20,24 @@
       "invalid": "Bitte eine gültige E-Mail-Adresse eingeben.",
       "maxlength": "Die E-Mail ist zu lang (maximal 254 Zeichen)."
     }
+  },
+  "helpPage": {
+    "title": "Hilfe",
+    "helpCenter": {
+      "title": "Hilfezentrum",
+      "description": "Hilfe, FAQs und Kontaktmöglichkeiten."
+    },
+    "terms": {
+      "title": "Nutzungsbedingungen & Datenschutz",
+      "description": "Lesen Sie unsere Bedingungen und Datenschutzrichtlinie."
+    },
+    "channelReports": {
+      "title": "Kanalberichte",
+      "description": "Berichte verwalten und anzeigen."
+    },
+    "appInfo": {
+      "title": "App-Informationen",
+      "description": "Version, rechtliche und technische Details."
+    }
   }
 }

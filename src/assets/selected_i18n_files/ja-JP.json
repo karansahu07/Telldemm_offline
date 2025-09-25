@@ -20,5 +20,24 @@
       "invalid": "有効なメールアドレスを入力してください。",
       "maxlength": "メールが長すぎます（最大254文字）。"
     }
+  },
+  "helpPage": {
+    "title": "ヘルプ",
+    "helpCenter": {
+      "title": "ヘルプセンター",
+      "description": "ヘルプ、よくある質問、お問い合わせ先。"
+    },
+    "terms": {
+      "title": "利用規約とプライバシーポリシー",
+      "description": "利用規約とデータポリシーをご確認ください。"
+    },
+    "channelReports": {
+      "title": "チャンネルレポート",
+      "description": "レポートの管理と表示。"
+    },
+    "appInfo": {
+      "title": "アプリ情報",
+      "description": "バージョン、法的および技術的な詳細。"
+    }
   }
 }

@@ -20,5 +20,23 @@
       "invalid": "Please enter a valid email address.",
       "maxlength": "Email is too long (maximum 254 characters)."
     }
+  },"helpPage": {
+    "title": "Help",
+    "helpCenter": {
+      "title": "Help Centre",
+      "description": "Get help, FAQs, and contact options."
+    },
+    "terms": {
+      "title": "Terms & Privacy Policy",
+      "description": "Read our terms and data policy."
+    },
+    "channelReports": {
+      "title": "Channel Reports",
+      "description": "Manage and view reports."
+    },
+    "appInfo": {
+      "title": "App Info",
+      "description": "Version, legal and technical details."
+    }
   }
 }

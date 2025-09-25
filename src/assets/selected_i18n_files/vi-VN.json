@@ -20,5 +20,24 @@
       "invalid": "Vui lòng nhập một địa chỉ email hợp lệ.",
       "maxlength": "Email quá dài (tối đa 254 ký tự)."
     }
+  },
+  "helpPage": {
+    "title": "Trợ giúp",
+    "helpCenter": {
+      "title": "Trung tâm Trợ giúp",
+      "description": "Nhận trợ giúp, Câu hỏi thường gặp và các tùy chọn liên hệ."
+    },
+    "terms": {
+      "title": "Điều khoản & Chính sách bảo mật",
+      "description": "Đọc các điều khoản và chính sách dữ liệu của chúng tôi."
+    },
+    "channelReports": {
+      "title": "Báo cáo kênh",
+      "description": "Quản lý và xem báo cáo."
+    },
+    "appInfo": {
+      "title": "Thông tin ứng dụng",
+      "description": "Phiên bản, thông tin pháp lý và kỹ thuật."
+    }
   }
 }

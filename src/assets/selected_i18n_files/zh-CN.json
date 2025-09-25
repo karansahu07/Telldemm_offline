@@ -20,5 +20,24 @@
       "invalid": "请输入有效的邮箱地址。",
       "maxlength": "邮箱过长（最多 254 个字符）。"
     }
+  },
+  "helpPage": {
+    "title": "帮助",
+    "helpCenter": {
+      "title": "帮助中心",
+      "description": "获取帮助、常见问题解答和联系方式。"
+    },
+    "terms": {
+      "title": "条款与隐私政策",
+      "description": "阅读我们的条款和数据政策。"
+    },
+    "channelReports": {
+      "title": "频道报告",
+      "description": "管理并查看报告。"
+    },
+    "appInfo": {
+      "title": "应用信息",
+      "description": "版本、法律和技术细节。"
+    }
   }
 }

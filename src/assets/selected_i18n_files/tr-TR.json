@@ -20,5 +20,24 @@
       "invalid": "Lütfen geçerli bir e-posta adresi girin.",
       "maxlength": "E-posta çok uzun (en fazla 254 karakter)."
     }
+  },
+  "helpPage": {
+    "title": "Yardım",
+    "helpCenter": {
+      "title": "Yardım Merkezi",
+      "description": "Yardım, SSS ve iletişim seçenekleri alın."
+    },
+    "terms": {
+      "title": "Şartlar ve Gizlilik Politikası",
+      "description": "Şartlarımızı ve veri politikamızı okuyun."
+    },
+    "channelReports": {
+      "title": "Kanal Raporları",
+      "description": "Raporları yönetin ve görüntüleyin."
+    },
+    "appInfo": {
+      "title": "Uygulama Bilgileri",
+      "description": "Sürüm, yasal ve teknik bilgiler."
+    }
   }
 }
