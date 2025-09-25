@@ -146,17 +146,30 @@ export class CommunityDetailPage implements OnInit {
   async openGroupPreview(group: any) {
     if (!group) return;
 
+    // const modal = await this.modalCtrl.create({
+    //   component: GroupPreviewModalComponent,
+    //   componentProps: {
+    //     group,
+    //     communityName: this.community?.name || '',
+    //     currentUserId: this.currentUserId,
+    //     currentUserName: this.currentUserName,
+    //     currentUserPhone: this.currentUserPhone
+    //   },
+    //   cssClass: 'group-preview-modal'
+    // });
+
     const modal = await this.modalCtrl.create({
-      component: GroupPreviewModalComponent,
-      componentProps: {
-        group,
-        communityName: this.community?.name || '',
-        currentUserId: this.currentUserId,
-        currentUserName: this.currentUserName,
-        currentUserPhone: this.currentUserPhone
-      },
-      cssClass: 'group-preview-modal'
-    });
+  component: GroupPreviewModalComponent,
+  componentProps: {
+    group,
+    communityName: this.community?.name || '',
+    // communityCreatedByName: this.community?.createdByName,
+    currentUserId: this.currentUserId,
+    currentUserName: this.currentUserName,
+    currentUserPhone: this.currentUserPhone
+  },
+  cssClass: 'group-preview-modal'
+});
 
     await modal.present();
     const { data } = await modal.onDidDismiss();

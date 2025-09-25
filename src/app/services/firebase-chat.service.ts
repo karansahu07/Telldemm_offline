@@ -738,6 +738,7 @@ async createCommunity(communityId: string, name: string, description: string, cr
       type: 'announcement',
       communityId: communityId,
       createdBy,
+      createdByName : creatorProfile.name,
       createdAt: now,
       admins: { [createdBy]: true },
       members: {
@@ -752,6 +753,7 @@ async createCommunity(communityId: string, name: string, description: string, cr
       type: 'general',
       communityId: communityId,
       createdBy,
+      createdByName : creatorProfile.name,
       createdAt: now,
       admins: { [createdBy]: true },
       members: {

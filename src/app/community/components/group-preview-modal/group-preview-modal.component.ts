@@ -44,7 +44,8 @@ export class GroupPreviewModalComponent {
   }
 
   get createdByText(): string {
-    const cb = (this.group?.createdByName || this.group?.created_by) ?? '';       
+    console.log("createdBy",this.group.createdBy, this.group.createdByName);
+    const cb = (this.group?.createdBy || this.group?.created_by) ?? '';
     return cb ? `Created by ${cb}` : '';
   }
 
