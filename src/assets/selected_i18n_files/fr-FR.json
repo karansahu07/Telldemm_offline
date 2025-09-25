@@ -1,0 +1,24 @@
+{
+  "meta": {
+    "generatedAt": "2025-09-25T06:49:05.846991Z",
+    "note": "Translations for email-edit page.",
+    "translated": true,
+    "locale": "fr-FR"
+  },
+  "emailEdit": {
+    "title": "Adresse e-mail",
+    "description": "L’e-mail vous aide à accéder à votre compte. Il n’est pas visible par les autres.",
+    "label": "E-mail",
+    "verified": "Vérifié",
+    "placeholder": "you@example.com",
+    "edit": "Modifier",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "savedSuccess": "L’e-mail a été enregistré avec succès.",
+    "validation": {
+      "required": "L’e-mail est requis.",
+      "invalid": "Veuillez saisir une adresse e-mail valide.",
+      "maxlength": "L’e-mail est trop long (254 caractères maximum)."
+    }
+  }
+}

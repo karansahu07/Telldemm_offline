@@ -299,6 +299,7 @@ import { filter } from 'rxjs/operators';
 
 import { PresenceService } from './services/presence.service'; // <-- added
 import { Subscription } from 'rxjs';
+import { Language } from './services/language';
 
 register();
 
@@ -332,9 +333,13 @@ export class AppComponent implements OnInit {
     private popoverCtrl: PopoverController,
     private actionSheetCtrl: ActionSheetController,
     private alertCtrl: AlertController,
-    private presence: PresenceService // <-- injected
+    private presence: PresenceService, // <-- injected
+    private langSvc: Language // <-- injected
   ) {
     this.initializeApp();
+    this.platform.ready().then(() => {
+      this.langSvc.init();
+    });
   }
 
   async ngOnInit() {

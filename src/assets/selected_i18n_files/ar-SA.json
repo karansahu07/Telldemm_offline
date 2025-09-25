@@ -1,0 +1,24 @@
+{
+  "meta": {
+    "generatedAt": "2025-09-25T06:49:05.846991Z",
+    "note": "Translations for email-edit page.",
+    "translated": true,
+    "locale": "ar-SA"
+  },
+  "emailEdit": {
+    "title": "عنوان البريد الإلكتروني",
+    "description": "يساعدك البريد الإلكتروني في الوصول إلى حسابك. لن يظهر للآخرين.",
+    "label": "البريد الإلكتروني",
+    "verified": "تم التحقق",
+    "placeholder": "you@example.com",
+    "edit": "تعديل",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "savedSuccess": "تم حفظ البريد الإلكتروني بنجاح.",
+    "validation": {
+      "required": "البريد الإلكتروني مطلوب.",
+      "invalid": "يرجى إدخال بريد إلكتروني صحيح.",
+      "maxlength": "البريد الإلكتروني طويل جدًا (الحد الأقصى 254 حرفًا)."
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "meta": {
+    "generatedAt": "2025-09-25T06:49:05.846991Z",
+    "note": "Translations for email-edit page.",
+    "translated": true,
+    "locale": "ta-IN"
+  },
+  "emailEdit": {
+    "title": "மின்னஞ்சல் முகவரி",
+    "description": "மின்னஞ்சல் உங்கள் கணக்கை அணுக உதவுகிறது. இது பிறருக்கு தெரியாது.",
+    "label": "மின்னஞ்சல்",
+    "verified": "சரிபார்க்கப்பட்டது",
+    "placeholder": "you@example.com",
+    "edit": "திருத்து",
+    "cancel": "ரத்து செய்",
+    "save": "சேமிக்க",
+    "savedSuccess": "மின்னஞ்சல் வெற்றிகரமாக சேமிக்கப்பட்டது.",
+    "validation": {
+      "required": "மின்னஞ்சல் தேவை.",
+      "invalid": "சரியான மின்னஞ்சல் முகவரியை உள்ளிடவும்.",
+      "maxlength": "மின்னஞ்சல் மிகவும் நீளமாக உள்ளது (அதிகபட்சம் 254 எழுத்துகள்)."
+    }
+  }
+}

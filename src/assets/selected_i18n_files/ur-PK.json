@@ -1,0 +1,24 @@
+{
+  "meta": {
+    "generatedAt": "2025-09-25T06:49:05.846991Z",
+    "note": "Translations for email-edit page.",
+    "translated": true,
+    "locale": "ur-PK"
+  },
+  "emailEdit": {
+    "title": "ای میل پتہ",
+    "description": "ای میل آپ کو اپنے اکاؤنٹ تک رسائی میں مدد دیتی ہے۔ یہ دوسروں کو نظر نہیں آئے گی۔",
+    "label": "ای میل",
+    "verified": "تصدیق شدہ",
+    "placeholder": "you@example.com",
+    "edit": "ترمیم کریں",
+    "cancel": "منسوخ کریں",
+    "save": "محفوظ کریں",
+    "savedSuccess": "ای میل کامیابی کے ساتھ محفوظ ہو گئی ہے۔",
+    "validation": {
+      "required": "ای میل درکار ہے۔",
+      "invalid": "براہ کرم ایک درست ای میل پتہ درج کریں۔",
+      "maxlength": "ای میل بہت لمبی ہے (زیادہ سے زیادہ 254 حروف)۔"
+    }
+  }
+}

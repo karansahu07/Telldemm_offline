@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { from, Observable } from 'rxjs';
-import { environment } from 'src/environments/environment';
+// import { environment } from 'src/environments/environment';
 import { GetSocialMediaResponse } from 'src/types';
+import { environment } from 'src/environments/environment.prod';
 
 
 

@@ -1,0 +1,24 @@
+{
+  "meta": {
+    "generatedAt": "2025-09-25T06:49:05.846991Z",
+    "note": "Translations for email-edit page.",
+    "translated": true,
+    "locale": "fa-IR"
+  },
+  "emailEdit": {
+    "title": "آدرس ایمیل",
+    "description": "ایمیل به شما کمک می‌کند به حساب کاربری خود دسترسی داشته باشید. این برای دیگران قابل مشاهده نیست.",
+    "label": "ایمیل",
+    "verified": "تأیید شده",
+    "placeholder": "you@example.com",
+    "edit": "ویرایش",
+    "cancel": "انصراف",
+    "save": "ذخیره",
+    "savedSuccess": "ایمیل با موفقیت ذخیره شد.",
+    "validation": {
+      "required": "ایمیل الزامی است.",
+      "invalid": "لطفاً یک آدرس ایمیل معتبر وارد کنید.",
+      "maxlength": "ایمیل خیلی طولانی است (حداکثر ۲۵۴ کاراکتر)."
+    }
+  }
+}

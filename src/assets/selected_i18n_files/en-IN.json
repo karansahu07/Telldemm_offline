@@ -1,0 +1,24 @@
+{
+  "meta": {
+    "generatedAt": "2025-09-25T06:49:05.846991Z",
+    "note": "Translations for email-edit page in Indian English.",
+    "translated": true,
+    "locale": "en-IN"
+  },
+  "emailEdit": {
+    "title": "Email address",
+    "description": "Email helps you to access your account. It is not visible to others.",
+    "label": "Email",
+    "verified": "Verified",
+    "placeholder": "you@example.com",
+    "edit": "Edit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "savedSuccess": "Email has been saved successfully.",
+    "validation": {
+      "required": "Email is required.",
+      "invalid": "Please enter a valid email address.",
+      "maxlength": "Email is too long (maximum 254 characters)."
+    }
+  }
+}

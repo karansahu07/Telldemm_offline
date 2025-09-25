@@ -1,0 +1,24 @@
+{
+  "meta": {
+    "generatedAt": "2025-09-25T06:49:05.846991Z",
+    "note": "Translations for email-edit page.",
+    "translated": true,
+    "locale": "ja-JP"
+  },
+  "emailEdit": {
+    "title": "メールアドレス",
+    "description": "メールはアカウントへのアクセスに役立ちます。他のユーザーには表示されません。",
+    "label": "メール",
+    "verified": "確認済み",
+    "placeholder": "you@example.com",
+    "edit": "編集",
+    "cancel": "キャンセル",
+    "save": "保存",
+    "savedSuccess": "メールが正常に保存されました。",
+    "validation": {
+      "required": "メールは必須です。",
+      "invalid": "有効なメールアドレスを入力してください。",
+      "maxlength": "メールが長すぎます（最大254文字）。"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "meta": {
+    "generatedAt": "2025-09-25T06:49:05.846991Z",
+    "note": "Translations for email-edit page in British English.",
+    "translated": true,
+    "locale": "en-GB"
+  },
+  "emailEdit": {
+    "title": "Email address",
+    "description": "Email helps you access your account. It isn’t visible to others.",
+    "label": "Email",
+    "verified": "Verified",
+    "placeholder": "you@example.com",
+    "edit": "Edit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "savedSuccess": "Email saved successfully.",
+    "validation": {
+      "required": "Email is required.",
+      "invalid": "Please enter a valid email address.",
+      "maxlength": "Email is too long (maximum 254 characters)."
+    }
+  }
+}

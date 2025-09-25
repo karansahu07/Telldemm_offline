@@ -1,0 +1,24 @@
+{
+  "meta": {
+    "generatedAt": "2025-09-25T06:49:05.846991Z",
+    "note": "Translations for email-edit page.",
+    "translated": true,
+    "locale": "te-IN"
+  },
+  "emailEdit": {
+    "title": "ఈమెయిల్ చిరునామా",
+    "description": "ఈమెయిల్ మీ ఖాతాకు ప్రాప్యత పొందడానికి సహాయపడుతుంది. ఇది ఇతరులకు కనిపించదు.",
+    "label": "ఈమెయిల్",
+    "verified": "ధృవీకరించబడింది",
+    "placeholder": "you@example.com",
+    "edit": "మార్చు",
+    "cancel": "రద్దు చేయి",
+    "save": "సేవ్ చేయి",
+    "savedSuccess": "ఈమెయిల్ విజయవంతంగా సేవ్ చేయబడింది.",
+    "validation": {
+      "required": "ఈమెయిల్ అవసరం.",
+      "invalid": "దయచేసి సరైన ఈమెయిల్ చిరునామాను నమోదు చేయండి.",
+      "maxlength": "ఈమెయిల్ చాలా పొడవుగా ఉంది (గరిష్టంగా 254 అక్షరాలు)."
+    }
+  }
+}

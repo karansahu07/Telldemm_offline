@@ -1,0 +1,24 @@
+{
+  "meta": {
+    "generatedAt": "2025-09-25T06:49:05.846991Z",
+    "note": "Translations for email-edit page.",
+    "translated": true,
+    "locale": "hi-IN"
+  },
+  "emailEdit": {
+    "title": "ईमेल पता",
+    "description": "ईमेल आपको अपने खाते तक पहुँचने में मदद करता है। यह दूसरों को दिखाई नहीं देता।",
+    "label": "ईमेल",
+    "verified": "सत्यापित",
+    "placeholder": "you@example.com",
+    "edit": "संपादित करें",
+    "cancel": "रद्द करें",
+    "save": "सहेजें",
+    "savedSuccess": "ईमेल सफलतापूर्वक सहेजा गया।",
+    "validation": {
+      "required": "ईमेल आवश्यक है।",
+      "invalid": "कृपया एक मान्य ईमेल पता दर्ज करें।",
+      "maxlength": "ईमेल बहुत लंबा है (अधिकतम 254 अक्षर)।"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "meta": {
+    "generatedAt": "2025-09-25T06:49:05.846991Z",
+    "note": "Translations for email-edit page.",
+    "translated": true,
+    "locale": "gu-IN"
+  },
+  "emailEdit": {
+    "title": "ઇમેલ સરનામું",
+    "description": "ઇમેલ તમને તમારા એકાઉન્ટ સુધી પહોંચવામાં મદદ કરે છે. તે અન્ય લોકોને દેખાતું નથી.",
+    "label": "ઇમેલ",
+    "verified": "ચકાસાયેલ",
+    "placeholder": "you@example.com",
+    "edit": "ફેરફાર કરો",
+    "cancel": "રદ કરો",
+    "save": "સાચવો",
+    "savedSuccess": "ઇમેલ સફળતાપૂર્વક સાચવાયો છે.",
+    "validation": {
+      "required": "ઇમેલ જરૂરી છે.",
+      "invalid": "કૃપા કરીને માન્ય ઇમેલ સરનામું દાખલ કરો.",
+      "maxlength": "ઇમેલ ખૂબ લાંબો છે (મહત્તમ 254 અક્ષરો)."
+    }
+  }
+}

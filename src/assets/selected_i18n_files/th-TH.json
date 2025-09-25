@@ -1,0 +1,24 @@
+{
+  "meta": {
+    "generatedAt": "2025-09-25T06:49:05.846991Z",
+    "note": "Translations for email-edit page.",
+    "translated": true,
+    "locale": "th-TH"
+  },
+  "emailEdit": {
+    "title": "ที่อยู่อีเมล",
+    "description": "อีเมลช่วยให้คุณเข้าถึงบัญชีของคุณได้ ข้อมูลนี้จะไม่แสดงต่อผู้อื่น",
+    "label": "อีเมล",
+    "verified": "ยืนยันแล้ว",
+    "placeholder": "you@example.com",
+    "edit": "แก้ไข",
+    "cancel": "ยกเลิก",
+    "save": "บันทึก",
+    "savedSuccess": "บันทึกอีเมลเรียบร้อยแล้ว",
+    "validation": {
+      "required": "จำเป็นต้องใช้อีเมล",
+      "invalid": "กรุณากรอกที่อยู่อีเมลที่ถูกต้อง",
+      "maxlength": "อีเมลยาวเกินไป (สูงสุด 254 ตัวอักษร)"
+    }
+  }
+}

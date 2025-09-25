@@ -1,0 +1,24 @@
+{
+  "meta": {
+    "generatedAt": "2025-09-25T06:49:05.846991Z",
+    "note": "Translations for email-edit page.",
+    "translated": true,
+    "locale": "tr-TR"
+  },
+  "emailEdit": {
+    "title": "E-posta adresi",
+    "description": "E-posta, hesabınıza erişmenize yardımcı olur. Başkaları tarafından görülemez.",
+    "label": "E-posta",
+    "verified": "Doğrulandı",
+    "placeholder": "you@example.com",
+    "edit": "Düzenle",
+    "cancel": "İptal",
+    "save": "Kaydet",
+    "savedSuccess": "E-posta başarıyla kaydedildi.",
+    "validation": {
+      "required": "E-posta gereklidir.",
+      "invalid": "Lütfen geçerli bir e-posta adresi girin.",
+      "maxlength": "E-posta çok uzun (en fazla 254 karakter)."
+    }
+  }
+}

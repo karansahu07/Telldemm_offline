@@ -4,16 +4,17 @@ import { IonicModule, ToastController } from '@ionic/angular';
 import { FormBuilder, FormGroup, Validators, FormControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ApiService } from 'src/app/services/api/api.service';
-// import { UserService } from '../services/user.service';  // ✅ import service
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { AuthService } from 'src/app/auth/auth.service';
 
-const USER_ID = 52; // ⚡ replace with logged-in user ID from auth/session
+// const USER_ID = 52; // replace with logged-in user ID from auth/session
 
 @Component({
   selector: 'app-email-edit',
   templateUrl: './email-edit.page.html',
   styleUrls: ['./email-edit.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule, TranslateModule],
 })
 export class EmailEditPage implements OnInit {
   emailForm: FormGroup;
@@ -24,7 +25,9 @@ export class EmailEditPage implements OnInit {
     private fb: FormBuilder,
     private toastCtrl: ToastController,
     private router: Router,
-    private userService: ApiService   // ✅ inject service
+    private userService: ApiService, // your ApiService
+    private translate: TranslateService,
+    private authService:AuthService
   ) {
     this.emailForm = this.fb.group({
       email: ['', [Validators.required, Validators.email, Validators.maxLength(254)]],
@@ -39,20 +42,33 @@ export class EmailEditPage implements OnInit {
     return this.emailForm.get('email') as FormControl;
   }
 
-  /** ✅ Load email from service */
+
+
+  /** Load email from service */
   loadEmail() {
-    this.userService.getUserEmail(USER_ID).subscribe({
+      const uidStr = this.authService.authData?.userId;
+
+    const uid = Number(uidStr);
+    this.userService.getUserEmail(uid).subscribe({
       next: (res) => {
-        this.originalEmail = res.email;
-        this.emailForm.patchValue({ email: res.email });
+        // {"user_id":"86","email":null}
+         const email = res.email ? res.email : 'you@example.com';
+         this.originalEmail = email;
+         this.emailForm.patchValue({ email });
+        // this.originalEmail = res.email;
+        // this.emailForm.patchValue({ email: res.email });
       },
       error: async () => {
-        const toast = await this.toastCtrl.create({
-          message: 'Failed to load email',
-          color: 'danger',
-          duration: 2000,
+        // localized toast for load failure
+        this.translate.get('emailEdit.toast.loadFailed').subscribe(async (msg: string) => {
+          const toast = await this.toastCtrl.create({
+            message: msg,
+            color: 'danger',
+            duration: 2000,
+            position: 'bottom'
+          });
+          toast.present();
         });
-        toast.present();
       },
     });
   }
@@ -60,24 +76,33 @@ export class EmailEditPage implements OnInit {
   /** Switch to edit mode */
   editEmail() {
     this.isEditing = true;
+    // reset touched/pristine so validation messages don't show immediately
+    this.emailControl.markAsPristine();
+    this.emailControl.markAsUntouched();
   }
 
-  /** ✅ Save email via service */
+  /** Save email via service */
   saveEmail() {
     if (this.emailForm.invalid) return;
     const newEmail = this.emailForm.value.email;
+   const uidStr = this.authService.authData?.userId;
 
-    this.userService.updateUserEmail(USER_ID, newEmail).subscribe({
+    const uid = Number(uidStr);
+    this.userService.updateUserEmail(uid, newEmail).subscribe({
       next: async (res) => {
         this.originalEmail = res.email;
         this.isEditing = false;
 
-        const toast = await this.toastCtrl.create({
-          message: 'Email updated successfully',
-          color: 'success',
-          duration: 2000,
+        // localized success toast (uses savedSuccess which may accept interpolation)
+        this.translate.get('emailEdit.savedSuccess', { email: res.email }).subscribe(async (msg: string) => {
+          const toast = await this.toastCtrl.create({
+            message: msg,
+            color: 'success',
+            duration: 2000,
+            position: 'bottom'
+          });
+          toast.present();
         });
-        toast.present();
       },
       error: async (err) => {
         let msg = 'Failed to update email';

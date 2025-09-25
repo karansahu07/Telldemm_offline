@@ -1,0 +1,24 @@
+{
+  "meta": {
+    "generatedAt": "2025-09-25T06:49:05.846991Z",
+    "note": "Translations for email-edit page.",
+    "translated": true,
+    "locale": "zh-TW"
+  },
+  "emailEdit": {
+    "title": "電子郵件地址",
+    "description": "電子郵件可幫助您存取帳戶。它不會顯示給其他人。",
+    "label": "電子郵件",
+    "verified": "已驗證",
+    "placeholder": "you@example.com",
+    "edit": "編輯",
+    "cancel": "取消",
+    "save": "儲存",
+    "savedSuccess": "電子郵件已成功儲存。",
+    "validation": {
+      "required": "電子郵件為必填項。",
+      "invalid": "請輸入有效的電子郵件地址。",
+      "maxlength": "電子郵件過長（最多 254 個字元）。"
+    }
+  }
+}

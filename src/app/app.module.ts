@@ -3,12 +3,12 @@ import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
 
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS, HttpClient } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 
-import { environment } from '../environments/environment';
+// import { environment } from '../environments/environment';
 
 // ✅ Modular Firebase imports
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
@@ -18,6 +18,9 @@ import { IonicStorageModule } from '@ionic/storage-angular';
 // ✅ Custom imports
 import { ServerErrorInterceptor } from './interceptors/http-error.interceptor';
 import { AuthService } from './auth/auth.service';
+import { environment } from 'src/environments/environment.prod';
+import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { HttpLoaderFactory } from './translate-loader';
 
 // ✅ APP_INITIALIZER to hydrate auth state before app starts
 export function initAuth(authService: AuthService) {
@@ -32,7 +35,16 @@ export function initAuth(authService: AuthService) {
     IonicModule.forRoot(),
     AppRoutingModule,
     HttpClientModule,
+    TranslateModule.forRoot({
+      defaultLanguage: 'en-US',
+      loader: {
+        provide: TranslateLoader,
+        useFactory: HttpLoaderFactory,
+        deps: [HttpClient]
+      }
+    }),
     IonicStorageModule.forRoot(),
+    
 
     // ✅ Modular Firebase setup
     provideFirebaseApp(() => initializeApp(environment.firebase)),

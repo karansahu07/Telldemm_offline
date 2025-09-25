@@ -1,0 +1,24 @@
+{
+  "meta": {
+    "generatedAt": "2025-09-25T06:49:05.846991Z",
+    "note": "Translations for email-edit page.",
+    "translated": true,
+    "locale": "pa-IN"
+  },
+  "emailEdit": {
+    "title": "ਈਮੇਲ ਪਤਾ",
+    "description": "ਈਮੇਲ ਤੁਹਾਨੂੰ ਆਪਣੇ ਖਾਤੇ ਤੱਕ ਪਹੁੰਚ ਕਰਨ ਵਿੱਚ ਮਦਦ ਕਰਦਾ ਹੈ। ਇਹ ਹੋਰਨਾਂ ਨੂੰ ਦਿਖਾਈ ਨਹੀਂ ਦਿੰਦਾ।",
+    "label": "ਈਮੇਲ",
+    "verified": "ਪ੍ਰਮਾਣਿਤ",
+    "placeholder": "you@example.com",
+    "edit": "ਸੋਧੋ",
+    "cancel": "ਰੱਦ ਕਰੋ",
+    "save": "ਸੰਭਾਲੋ",
+    "savedSuccess": "ਈਮੇਲ ਸਫਲਤਾਪੂਰਵਕ ਸੰਭਾਲਿਆ ਗਿਆ ਹੈ।",
+    "validation": {
+      "required": "ਈਮੇਲ ਲਾਜ਼ਮੀ ਹੈ।",
+      "invalid": "ਕਿਰਪਾ ਕਰਕੇ ਇੱਕ ਵੈਧ ਈਮੇਲ ਪਤਾ ਦਰਜ ਕਰੋ।",
+      "maxlength": "ਈਮੇਲ ਬਹੁਤ ਲੰਬਾ ਹੈ (ਵੱਧ ਤੋਂ ਵੱਧ 254 ਅੱਖਰ)।"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "meta": {
+    "generatedAt": "2025-09-25T06:49:05.846991Z",
+    "note": "Translations for email-edit page.",
+    "translated": true,
+    "locale": "zh-CN"
+  },
+  "emailEdit": {
+    "title": "邮箱地址",
+    "description": "邮箱可帮助您访问账户。它对其他人不可见。",
+    "label": "邮箱",
+    "verified": "已验证",
+    "placeholder": "you@example.com",
+    "edit": "编辑",
+    "cancel": "取消",
+    "save": "保存",
+    "savedSuccess": "邮箱已成功保存。",
+    "validation": {
+      "required": "邮箱是必填项。",
+      "invalid": "请输入有效的邮箱地址。",
+      "maxlength": "邮箱过长（最多 254 个字符）。"
+    }
+  }
+}
