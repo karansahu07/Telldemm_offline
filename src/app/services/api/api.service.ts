@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { from, Observable } from 'rxjs';
 // import { environment } from 'src/environments/environment';
-import { GetSocialMediaResponse } from 'src/types';
+import { CreateCommunityPayload, CreateCommunityResponse, GetSocialMediaResponse } from 'src/types';
 import { environment } from 'src/environments/environment.prod';
 
 
@@ -65,7 +65,7 @@ getUserStatus(user_id: number): Observable<{ status: boolean; data: { is_online:
  * Update user's timezone on backend
  */
 setUserTimezone(user_id: number, timezone: string): Observable<any> {
-  return this.post('/api/users/users/status_timezone', { user_id, timezone });
+  return this.post('/api/users/status_timezone', { user_id, timezone });
 }
 
 /** Get user email by ID */
@@ -319,6 +319,13 @@ getGroupDp(firebase_group_id: string): Observable<{ status: boolean; group_dp: s
  */
 updateUserStatus(user_id: number, status: string): Observable<any> {
   return this.post('/api/users/update-status', { user_id, status });
+}
+
+/**
+ * Create a new community
+ */
+createCommunity(payload: CreateCommunityPayload): Observable<CreateCommunityResponse> {
+  return this.post<CreateCommunityResponse>('/api/communities/create', payload);
 }
 
 }

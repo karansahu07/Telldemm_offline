@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ApiService } from './api/api.service';
-import { of, timer } from 'rxjs';
+import { Observable, of, timer } from 'rxjs';
 import { catchError, retry } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
@@ -44,13 +44,44 @@ export class PresenceService {
   /**
    * Get status for a user id
    */
-  getStatus(userId: number) {
-    return this.api.getUserStatus(userId).pipe(
+  // getStatus(userId: number) {
+  //   return this.api.getUserStatus(userId).pipe(
+  //     catchError(err => {
+  //       console.warn('getUserStatus failed', err);
+  //       // align with expected return shape
+  //       return of({ status: false, data: { is_online: 0, last_seen: null } });
+  //     })
+  //   );
+  // }
+   getStatus(userId: number): Observable<{ status: boolean; data: { is_online: number; last_seen: string | null } }> {
+    if (!userId) {
+      return of({ status: false, data: { is_online: 0, last_seen: null } });
+    }
+
+    const timezone = this.getDeviceTimezone();
+
+    return this.api.setUserTimezone(userId, timezone).pipe(
       catchError(err => {
-        console.warn('getUserStatus failed', err);
-        // align with expected return shape
+        console.warn('PresenceService.getStatus failed', err);
+        // keep return shape consistent with previous usage
         return of({ status: false, data: { is_online: 0, last_seen: null } });
       })
     );
+  }
+
+  /**
+   * Best-effort device timezone detection.
+   * Falls back to 'UTC' if timezone cannot be determined.
+   */
+  private getDeviceTimezone(): string {
+    try {
+      if (typeof Intl !== 'undefined' && (Intl as any).DateTimeFormat) {
+        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        if (tz && typeof tz === 'string' && tz.length > 0) return tz;
+      }
+    } catch (e) {
+      console.warn('Intl timezone detection failed', e);
+    }
+    return 'UTC';
   }
 }

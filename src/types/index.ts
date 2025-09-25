@@ -147,3 +147,22 @@ description?: string;
 createdBy: string;
 groups?: Record<string, boolean> | {};
 }
+
+export interface CreateCommunityPayload {
+  community_name: string;
+  description?: string;
+  community_dp?: string;
+  is_public?: boolean;
+  max_members?: number;
+  can_edit_dp?: boolean;
+  can_add_members?: boolean;
+  can_add_groups?: boolean;
+  creatorId: number;
+  firebase_community_id?: string;
+}
+
+export interface CreateCommunityResponse {
+  status: boolean;
+  message?: string;
+  data?: any;
+}

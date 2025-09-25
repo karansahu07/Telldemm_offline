@@ -61,6 +61,9 @@ import { Subject, Subscription as RxSub } from 'rxjs';
 import { throttleTime } from 'rxjs/operators';
 import { PresenceService } from 'src/app/services/presence.service';
 import { switchMap } from 'rxjs/operators';
+import { resolve } from 'path';
+
+
 
 @Component({
   selector: 'app-chatting-screen',
@@ -864,7 +867,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-
+//this is important
 // async deleteSelectedMessages() {
 //   if (!this.selectedMessages || this.selectedMessages.length === 0) {
 //     return;
@@ -873,7 +876,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
 //   const currentUserId = this.senderId;
 //   const count = this.selectedMessages.length;
 
-//   // Determine whether all selected messages were sent by current user (so "delete for everyone" is allowed)
+//   // Determine whether all selected messages were sent by current user
 //   const canDeleteForEveryone = this.selectedMessages.every(m => String(m.sender_id) === String(currentUserId));
 
 //   // Build preview text
@@ -896,25 +899,19 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
 
 //   const alert = await this.alertCtrl.create({
 //     header: 'Delete messages?',
-//     // message: `<div style="text-align:left;">${preview}</div>`,
 //     cssClass: 'delete-confirm-alert',
 //     inputs,
 //     buttons: [
-//       {
-//         text: 'Cancel',
-//         role: 'cancel'
-//       },
+//       { text: 'Cancel', role: 'cancel' },
 //       {
 //         text: 'OK',
 //         handler: async (selectedValue: any) => {
-//           // For radio, Ionic often returns the value directly (string). Normalize anyway.
 //           let choice: string = '';
 //           if (typeof selectedValue === 'string') {
 //             choice = selectedValue;
 //           } else if (Array.isArray(selectedValue) && selectedValue.length > 0) {
 //             choice = selectedValue[0];
 //           } else if (selectedValue && typeof selectedValue === 'object') {
-//             // older ionic versions may return object of truthy keys
 //             const keys = Object.keys(selectedValue).filter(k => selectedValue[k]);
 //             choice = keys[0] || '';
 //           }
@@ -922,7 +919,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
 //           const doForMe = choice === 'forMe';
 //           const doForEveryone = choice === 'forEveryone';
 
-//           if (!doForMe && !doForEveryone) return; // nothing chosen
+//           if (!doForMe && !doForEveryone) return;
 
 //           try {
 //             const db = getDatabase();
@@ -931,7 +928,21 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
 //               const key = msg.key;
 //               if (!key) continue;
 
-//               // DELETE FOR ME: set /chats/<roomId>/<key>/deletedFor/<currentUserId> = true
+//                     this.selectedMessages.forEach(msg => msg.fadeOut = true);
+
+//             // Wait for fade-out CSS transition (300ms) then update message arrays
+//             alert.dismiss({confirm : true})
+//              await new Promise((resolve)=>{
+//               setTimeout(async () => {
+//               this.allMessages = this.allMessages.filter(m => !m.fadeOut);
+//               this.displayedMessages = this.displayedMessages.filter(m => !m.fadeOut);
+//               this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
+//               this.saveToLocalStorage();
+//               resolve(null);
+//             }, 2100);
+//              })
+
+//               // DELETE FOR ME
 //               if (doForMe) {
 //                 try {
 //                   if (this.chatService.deleteMessageForMe) {
@@ -946,11 +957,10 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
 //                 }
 //               }
 
-//               // DELETE FOR EVERYONE: only if current user is the sender for that message
+//               // DELETE FOR EVERYONE
 //               if (doForEveryone && String(msg.sender_id) === String(currentUserId)) {
 //                 try {
 //                   if (this.chatService.deleteMessageForEveryone) {
-//                     // Best: chatService will set flags in db and optionally wipe text/attachment
 //                     await this.chatService.deleteMessageForEveryone(
 //                       this.roomId,
 //                       key,
@@ -958,33 +968,20 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
 //                       this.chatType === 'group' ? this.groupMembers.map(g => String(g.user_id)) : [this.receiverId, this.senderId]
 //                     );
 //                   } else {
-//                     // fallback: set convenience flags (deletedForEveryone + deletedBy + deletedAt)
 //                     const updates: any = {};
 //                     updates[`/chats/${this.roomId}/${key}/deletedForEveryone`] = true;
 //                     updates[`/chats/${this.roomId}/${key}/deletedBy`] = currentUserId;
 //                     updates[`/chats/${this.roomId}/${key}/deletedAt`] = Date.now();
-//                     // Optional: replace content with placeholder or clear content fields
-//                     // updates[`/chats/${this.roomId}/${key}/text`] = '';
-//                     // updates[`/chats/${this.roomId}/${key}/attachment`] = null;
 //                     await update(ref(db), updates);
 //                   }
 //                 } catch (err) {
 //                   console.warn('deleteForEveryone failed for key', key, err);
 //                 }
 //               }
-//             }
-
-//             // Update UI: remove locally-hidden messages
-//             if (doForMe || doForEveryone) {
-//               // Filter displayed/all messages according to the new deletion flags
-//               this.allMessages = this.allMessages.filter(m => !this.applyDeletionFilters(m));
-//               this.displayedMessages = this.displayedMessages.filter(m => !this.applyDeletionFilters(m));
-//               this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
-//               this.saveToLocalStorage();
-//             }
+//             }         
 
 //             const toast = await this.toastCtrl.create({
-//               message: (doForEveryone ? 'Deleted for everyone' : 'Deleted for you'),
+//               message: doForEveryone ? 'Deleted for everyone' : 'Deleted for you',
 //               duration: 1600,
 //               color: 'medium'
 //             });
@@ -992,6 +989,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
 
 //             this.selectedMessages = [];
 //             this.lastPressedMessage = null;
+
 //           } catch (e) {
 //             console.error('deleteSelectedMessages handler err', e);
 //             const t = await this.toastCtrl.create({ message: 'Failed to delete messages', duration: 2000, color: 'danger' });
@@ -1005,8 +1003,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
 //   await alert.present();
 // }
 
-// Replace your existing deleteSelectedMessages() with this:
-
 async deleteSelectedMessages() {
   if (!this.selectedMessages || this.selectedMessages.length === 0) {
     return;
@@ -1015,8 +1011,7 @@ async deleteSelectedMessages() {
   const currentUserId = this.senderId;
   const count = this.selectedMessages.length;
 
-  // NOTE: We intentionally do NOT restrict "Delete for everyone" to messages
-  // sent by the current user. The server may still reject such attempts.
+  // Build preview text
   let preview = '';
   if (count === 1) {
     const m = this.selectedMessages[0];
@@ -1026,7 +1021,7 @@ async deleteSelectedMessages() {
     preview = `${count} messages`;
   }
 
-  // Always show both delete choices (Delete for me, Delete for everyone)
+  // Always offer both options. Default to 'Delete for me'
   const inputs: any[] = [
     { name: 'choice', type: 'radio', label: 'Delete for me', value: 'forMe', checked: true },
     { name: 'choice', type: 'radio', label: 'Delete for everyone', value: 'forEveryone', checked: false }
@@ -1042,35 +1037,54 @@ async deleteSelectedMessages() {
         text: 'OK',
         handler: async (selectedValue: any) => {
           let choice: string = '';
-          if (typeof selectedValue === 'string') choice = selectedValue;
-          else if (Array.isArray(selectedValue) && selectedValue.length > 0) choice = selectedValue[0];
-          else if (selectedValue && typeof selectedValue === 'object') {
+          if (typeof selectedValue === 'string') {
+            choice = selectedValue;
+          } else if (Array.isArray(selectedValue) && selectedValue.length > 0) {
+            choice = selectedValue[0];
+          } else if (selectedValue && typeof selectedValue === 'object') {
             const keys = Object.keys(selectedValue).filter(k => selectedValue[k]);
             choice = keys[0] || '';
           }
 
           const doForMe = choice === 'forMe';
           const doForEveryone = choice === 'forEveryone';
+
           if (!doForMe && !doForEveryone) return;
 
-          // clone and clear selection for immediate UI feedback
-          const messagesToDelete = [...this.selectedMessages];
-          this.selectedMessages = [];
-          this.lastPressedMessage = null;
-
           try {
-            // 1. start animations with stagger and wait for all to finish
-            const playPromises = messagesToDelete.map((m, idx) => this.playDeleteAnimationForMessage(m, idx));
-            await Promise.all(playPromises);
-
-            // 2. perform DB updates after animation completes
             const db = getDatabase();
 
-            for (const msg of messagesToDelete) {
+            // trigger fade-out on UI messages
+            this.selectedMessages.forEach(msg => msg.fadeOut = true);
+
+            // dismiss the alert first, then wait for fade-out duration before removing from arrays
+            try {
+              await alert.dismiss();
+            } catch (e) {
+              // ignore
+            }
+
+            await new Promise<void>((resolve) => {
+              setTimeout(async () => {
+                try {
+                  this.allMessages = this.allMessages.filter(m => !m.fadeOut);
+                  this.displayedMessages = this.displayedMessages.filter(m => !m.fadeOut);
+                  this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
+                  this.saveToLocalStorage();
+                } catch (e) {
+                  console.error('fade-out removal failed', e);
+                } finally {
+                  resolve();
+                }
+              }, 2100); // match CSS transition duration
+            });
+
+            // Now apply deletions to server/db for each selected message
+            for (const msg of [...this.selectedMessages]) {
               const key = msg.key;
               if (!key) continue;
 
-              // DELETE FOR ME: set /chats/<roomId>/<key>/deletedFor/<currentUserId> = true
+              // DELETE FOR ME: mark deleted for this user
               if (doForMe) {
                 try {
                   if (this.chatService.deleteMessageForMe) {
@@ -1085,12 +1099,11 @@ async deleteSelectedMessages() {
                 }
               }
 
-              // DELETE FOR EVERYONE: try for all messages (no sender-only check)
+              // DELETE FOR EVERYONE: attempt for all messages (not restricted to sender)
               if (doForEveryone) {
                 try {
                   if (this.chatService.deleteMessageForEveryone) {
-                    // It's up to your chatService/backend to permit or reject this;
-                    // we still attempt for all messages and handle failure gracefully.
+                    // try service method (best)
                     await this.chatService.deleteMessageForEveryone(
                       this.roomId,
                       key,
@@ -1098,41 +1111,31 @@ async deleteSelectedMessages() {
                       this.chatType === 'group' ? this.groupMembers.map(g => String(g.user_id)) : [this.receiverId, this.senderId]
                     );
                   } else {
-                    // Fallback: set flags in Firebase. Backend rules may still prevent this.
+                    // fallback: set convenience flags in DB so clients hide the message
                     const updates: any = {};
                     updates[`/chats/${this.roomId}/${key}/deletedForEveryone`] = true;
                     updates[`/chats/${this.roomId}/${key}/deletedBy`] = currentUserId;
                     updates[`/chats/${this.roomId}/${key}/deletedAt`] = Date.now();
+                    // optionally clear content:
+                    // updates[`/chats/${this.roomId}/${key}/text`] = '';
+                    // updates[`/chats/${this.roomId}/${key}/attachment`] = null;
                     await update(ref(db), updates);
                   }
                 } catch (err) {
-                  console.warn('deleteForEveryone attempt failed for key', key, err);
-                  // Inform user that server rejected deleting this message for everyone
-                  const toast = await this.toastCtrl.create({
-                    message: 'Could not delete some messages for everyone (permission denied)',
-                    duration: 2400,
-                    color: 'warning'
-                  });
-                  await toast.present();
+                  console.warn('deleteForEveryone failed for key', key, err);
                 }
               }
             }
 
-            // 3. update local UI arrays (remove deleted messages for this client)
-            // Note: if server rejected delete-for-everyone for some messages, we already animated them away.
-            // We will still remove them from local arrays so UI is consistent; server state might differ.
-            this.allMessages = this.allMessages.filter(m => !messagesToDelete.some(dm => dm.key === m.key));
-            this.displayedMessages = this.displayedMessages.filter(m => !messagesToDelete.some(dm => dm.key === m.key));
-            this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
-            this.saveToLocalStorage();
-
             const toast = await this.toastCtrl.create({
-              message: (doForEveryone ? 'Delete attempted for everyone' : 'Deleted for you'),
+              message: doForEveryone ? 'Deleted for everyone' : 'Deleted for you',
               duration: 1600,
               color: 'medium'
             });
             await toast.present();
 
+            this.selectedMessages = [];
+            this.lastPressedMessage = null;
           } catch (e) {
             console.error('deleteSelectedMessages handler err', e);
             const t = await this.toastCtrl.create({ message: 'Failed to delete messages', duration: 2000, color: 'danger' });
@@ -1145,198 +1148,6 @@ async deleteSelectedMessages() {
 
   await alert.present();
 }
-
-
-// async deleteSelectedMessages() {
-//   if (!this.selectedMessages || this.selectedMessages.length === 0) {
-//     return;
-//   }
-
-//   const currentUserId = this.senderId;
-//   const count = this.selectedMessages.length;
-
-//   const canDeleteForEveryone = this.selectedMessages.every(m => String(m.sender_id) === String(currentUserId));
-
-//   let preview = '';
-//   if (count === 1) {
-//     const m = this.selectedMessages[0];
-//     if (m.text && m.text.trim()) preview = m.text.length > 120 ? m.text.substring(0, 120) + '...' : m.text;
-//     else preview = this.getAttachmentPreview(m.attachment || {});
-//   } else {
-//     preview = `${count} messages`;
-//   }
-
-//   const inputs: any[] = [
-//     { name: 'choice', type: 'radio', label: 'Delete for me', value: 'forMe', checked: true }
-//   ];
-//   if (canDeleteForEveryone) {
-//     inputs.push({ name: 'choice', type: 'radio', label: 'Delete for everyone', value: 'forEveryone', checked: false });
-//   }
-
-//   const alert = await this.alertCtrl.create({
-//     header: 'Delete messages?',
-//     cssClass: 'delete-confirm-alert',
-//     inputs,
-//     buttons: [
-//       { text: 'Cancel', role: 'cancel' },
-//       {
-//         text: 'OK',
-//         handler: async (selectedValue: any) => {
-//           let choice: string = '';
-//           if (typeof selectedValue === 'string') choice = selectedValue;
-//           else if (Array.isArray(selectedValue) && selectedValue.length > 0) choice = selectedValue[0];
-//           else if (selectedValue && typeof selectedValue === 'object') {
-//             const keys = Object.keys(selectedValue).filter(k => selectedValue[k]);
-//             choice = keys[0] || '';
-//           }
-
-//           const doForMe = choice === 'forMe';
-//           const doForEveryone = choice === 'forEveryone';
-//           if (!doForMe && !doForEveryone) return;
-
-//           // clone and clear selection for immediate UI feedback
-//           const messagesToDelete = [...this.selectedMessages];
-//           this.selectedMessages = [];
-//           this.lastPressedMessage = null;
-
-//           try {
-//             // 1. start animations with stagger and wait for all to finish
-//             // we use index to set --del-delay for each element
-//             const playPromises = messagesToDelete.map((m, idx) => this.playDeleteAnimationForMessage(m, idx));
-//             await Promise.all(playPromises);
-
-//             // 2. perform DB updates after animation completes
-//             const db = getDatabase();
-//             for (const msg of messagesToDelete) {
-//               const key = msg.key;
-//               if (!key) continue;
-
-//               if (doForMe) {
-//                 try {
-//                   if (this.chatService.deleteMessageForMe) {
-//                     await this.chatService.deleteMessageForMe(this.roomId, key, currentUserId);
-//                   } else {
-//                     const updates: any = {};
-//                     updates[`/chats/${this.roomId}/${key}/deletedFor/${currentUserId}`] = true;
-//                     await update(ref(db), updates);
-//                   }
-//                 } catch (err) {
-//                   console.warn('deleteForMe failed for key', key, err);
-//                 }
-//               }
-
-//               if (doForEveryone && String(msg.sender_id) === String(currentUserId)) {
-//                 try {
-//                   if (this.chatService.deleteMessageForEveryone) {
-//                     await this.chatService.deleteMessageForEveryone(
-//                       this.roomId,
-//                       key,
-//                       currentUserId,
-//                       this.chatType === 'group' ? this.groupMembers.map(g => String(g.user_id)) : [this.receiverId, this.senderId]
-//                     );
-//                   } else {
-//                     const updates: any = {};
-//                     updates[`/chats/${this.roomId}/${key}/deletedForEveryone`] = true;
-//                     updates[`/chats/${this.roomId}/${key}/deletedBy`] = currentUserId;
-//                     updates[`/chats/${this.roomId}/${key}/deletedAt`] = Date.now();
-//                     await update(ref(db), updates);
-//                   }
-//                 } catch (err) {
-//                   console.warn('deleteForEveryone failed for key', key, err);
-//                 }
-//               }
-//             }
-
-//             // 3. update local UI arrays (remove deleted messages)
-//             this.allMessages = this.allMessages.filter(m => !messagesToDelete.some(dm => dm.key === m.key));
-//             this.displayedMessages = this.displayedMessages.filter(m => !messagesToDelete.some(dm => dm.key === m.key));
-//             this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
-//             this.saveToLocalStorage();
-
-//             const toast = await this.toastCtrl.create({
-//               message: (doForEveryone ? 'Deleted for everyone' : 'Deleted for you'),
-//               duration: 1600,
-//               color: 'medium'
-//             });
-//             await toast.present();
-
-//           } catch (e) {
-//             console.error('deleteSelectedMessages handler err', e);
-//             const t = await this.toastCtrl.create({ message: 'Failed to delete messages', duration: 2000, color: 'danger' });
-//             t.present();
-//           }
-//         }
-//       }
-//     ]
-//   });
-
-//   await alert.present();
-// }
-
-
-/**
- * Play delete/disintegrate animation on message element.
- * idx -> used to set stagger delay via CSS variable --del-delay (in seconds)
- */
-private playDeleteAnimationForMessage(msg: any, idx: number = 0): Promise<void> {
-  return new Promise<void>((resolve) => {
-    try {
-      const selector = `[data-msg-key="${msg.key}"]`;
-      const el = document.querySelector(selector) as HTMLElement | null;
-
-      if (!el) {
-        resolve(); // not in DOM (paged out), proceed
-        return;
-      }
-
-      // Ensure sender/receiver classes exist on element (your template already has them)
-      // Set stagger delay css var
-      const perItemDelay = 0.06; // 60ms per message; tweak if you want faster/slower
-      el.style.setProperty('--del-delay', `${idx * perItemDelay}s`);
-
-      // Force reflow to ensure CSS var applied before adding class
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      el.offsetWidth;
-
-      // Add class to trigger animation
-      el.classList.add('fade-out');
-
-      // Because animations could be on pseudo-elements, listen both animationend and transitionend safely
-      const onAnimEnd = (ev?: AnimationEvent | Event) => {
-        try {
-          el.removeEventListener('animationend', onAnimEnd as any);
-          el.removeEventListener('transitionend', onAnimEnd as any);
-        } catch (e) { /* ignore */ }
-        resolve();
-      };
-
-      el.addEventListener('animationend', onAnimEnd as any, { once: true });
-      el.addEventListener('transitionend', onAnimEnd as any, { once: true });
-
-      // fallback
-      const fallbackMs = 2400 + (idx * perItemDelay * 1000); // slightly larger than animation durations
-      const fallback = window.setTimeout(() => {
-        try {
-          el.removeEventListener('animationend', onAnimEnd as any);
-          el.removeEventListener('transitionend', onAnimEnd as any);
-        } catch (e) { }
-        resolve();
-      }, fallbackMs);
-
-      // When resolved we should clear fallback
-      const originalResolve = resolve;
-      resolve = (() => {
-        clearTimeout(fallback);
-        originalResolve();
-      }) as any;
-
-    } catch (err) {
-      console.warn('playDeleteAnimationForMessage error', err);
-      resolve();
-    }
-  });
-}
-
 
 
 
