@@ -1,67 +1,209 @@
-.big-avatar {
+// .big-avatar {
+//   width: 72px;
+//   height: 72px;
+//   margin: 0 auto;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   --background: transparent;
+//   ion-icon {
+//     font-size: 36px;
+//     padding-top: 12px;
+//     color: var(--ion-color-primary);
+//   }
+// }
+
+// .small-avatar {
+//   width: 40px;
+//   height: 40px;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   --background: transparent;
+// }
+
+// .members-list {
+//   display: flex;
+//   gap: 8px;
+//   align-items: center;
+//   flex-wrap: wrap;
+//   margin-top: 8px;
+// }
+
+// .member-avatar-wrap {
+//   display: flex;
+//   align-items: center;
+//   gap: 8px;
+// }
+
+// .avatar-initials {
+//   width: 100%;
+//   height: 100%;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   font-weight: 700;
+//   font-size: 14px;
+//   color: white;
+//   background: #b7e4c7;
+//   border-radius: 50%;
+// }
+
+// .more-badge {
+//   margin-left: 6px;
+//   color: var(--ion-color-medium);
+//   font-size: 14px;
+// }
+
+// .join-wrap {
+//   margin-top: 28px;
+//   display: flex;
+//   justify-content: center;
+//   padding: 0 16px;
+// }
+
+// .muted {
+//   color: var(--ion-color-medium);
+// }
+
+
+:host {
+  --ion-background-color: transparent;
+}
+
+.modal-header {
+  --background: transparent;
+  height: 36px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  padding-top: 6px;
+}
+.drag-handle {
+  width: 44px;
+  height: 6px;
+  background: rgba(0,0,0,0.12);
+  border-radius: 4px;
+  margin: 0 auto;
+}
+
+.modal-content {
+  --background: #ffffff;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 -6px 24px rgba(0,0,0,0.08);
+}
+
+.top-block {
+  text-align: center;
+  padding-top: 8px;
+}
+
+.group-avatar {
   width: 72px;
   height: 72px;
-  margin: 0 auto;
+  margin: 6px auto;
+  background: #f1f3f4;
   display: flex;
   align-items: center;
   justify-content: center;
-  --background: transparent;
+  border-radius: 50%;
   ion-icon {
-    font-size: 36px;
-    padding-top: 12px;
-    color: var(--ion-color-primary);
+    font-size: 34px;
+    color: rgba(0,0,0,0.25);
   }
 }
 
-.small-avatar {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  --background: transparent;
-}
-
-.members-list {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  flex-wrap: wrap;
+.group-title {
   margin-top: 8px;
-}
-
-.member-avatar-wrap {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.avatar-initials {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  font-size: 22px;
   font-weight: 700;
+}
+
+.created-by {
+  margin-top: 6px;
+  color: var(--ion-color-medium);
   font-size: 14px;
+}
+
+.members-row {
+  margin-top: 12px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.avatars {
+  display:flex;
+  gap: 8px;
+  align-items:center;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+
+.member-avatar {
+  width:44px;
+  height:44px;
+  border-radius: 50%;
+  overflow: hidden;
+  img {
+    width:100%;
+    height:100%;
+    object-fit:cover;
+  }
+}
+.avatar-initials {
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:700;
+  font-size:14px;
   color: white;
-  background: #b7e4c7;
+  background: linear-gradient(135deg,#ffd1dc,#ffc7e3);
   border-radius: 50%;
 }
 
-.more-badge {
-  margin-left: 6px;
+.more-count {
   color: var(--ion-color-medium);
-  font-size: 14px;
+  font-size: 13px;
+  padding-left: 6px;
 }
 
-.join-wrap {
-  margin-top: 28px;
-  display: flex;
-  justify-content: center;
-  padding: 0 16px;
+.description {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 16px;
+  color: rgba(0,0,0,0.85);
 }
 
-.muted {
+.info-note {
+  margin-top: 16px;
+  text-align:center;
   color: var(--ion-color-medium);
+  .small-note {
+    margin-top:10px;
+    font-size: 13px;
+  }
 }
+
+.join-row {
+  margin-top: 22px;
+  display:flex;
+  justify-content:center;
+}
+.join-btn {
+  --background: #1db954; /* green */
+  --border-radius: 28px;
+  --box-shadow: none;
+  width: 84%;
+  font-weight: 700;
+  height: 48px;
+  --padding-start: 20px;
+  --padding-end: 20px;
+  color: #fff;
+}
+
