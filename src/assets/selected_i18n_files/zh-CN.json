@@ -68,6 +68,30 @@
       "successMessage": "你已成功退出登录。"
     },
     "defaultStatus": "在线"
+  },
+  "appUpdates": {
+    "title": "应用更新",
+    "version": "版本",
+    "latestAvailable": "最新可用版本",
+    "status": "状态",
+    "statusMessages": {
+      "updateAvailable": "有可用更新。",
+      "upToDate": "您已使用最新版本。"
+    },
+    "badge": {
+      "updateAvailable": "有更新",
+      "upToDate": "最新"
+    },
+    "checkForUpdates": {
+      "title": "检查更新",
+      "description": "手动检查是否有新版本"
+    },
+    "checking": "正在检查…",
+    "toast": {
+      "latest": "您正在使用最新版本。",
+      "updateAvailable": "有更新可用: {{version}}",
+      "error": "无法检查更新，请稍后再试。"
+    }
   }
 
 }

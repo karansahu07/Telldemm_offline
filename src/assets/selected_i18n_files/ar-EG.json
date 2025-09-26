@@ -69,6 +69,30 @@
       "successMessage": "تم تسجيل الخروج بنجاح."
     },
     "defaultStatus": "متاح"
+  },
+  "appUpdates": {
+    "title": "تحديثات التطبيق",
+    "version": "الإصدار",
+    "latestAvailable": "أحدث إصدار متاح",
+    "status": "الحالة",
+    "statusMessages": {
+      "updateAvailable": "يوجد تحديث متاح.",
+      "upToDate": "أنت على أحدث إصدار."
+    },
+    "badge": {
+      "updateAvailable": "تحديث متاح",
+      "upToDate": "محدث"
+    },
+    "checkForUpdates": {
+      "title": "التحقق من التحديثات",
+      "description": "تحقق يدويًا مما إذا كان هناك إصدار جديد متاح"
+    },
+    "checking": "جارٍ التحقق…",
+    "toast": {
+      "latest": "أنت تستخدم أحدث إصدار.",
+      "updateAvailable": "تحديث متاح: {{version}}",
+      "error": "تعذر التحقق من التحديثات. حاول مرة أخرى لاحقًا."
+    }
   }
 
 }

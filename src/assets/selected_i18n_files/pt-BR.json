@@ -68,5 +68,29 @@
       "successMessage": "Você saiu com sucesso."
     },
     "defaultStatus": "Disponível"
+  },
+  "appUpdates": {
+    "title": "Atualizações do app",
+    "version": "Versão",
+    "latestAvailable": "Última disponível",
+    "status": "Status",
+    "statusMessages": {
+      "updateAvailable": "Uma atualização está disponível.",
+      "upToDate": "Você está na versão mais recente."
+    },
+    "badge": {
+      "updateAvailable": "Atualização disponível",
+      "upToDate": "Atualizado"
+    },
+    "checkForUpdates": {
+      "title": "Verificar atualizações",
+      "description": "Verifique manualmente se há uma nova versão disponível"
+    },
+    "checking": "Verificando…",
+    "toast": {
+      "latest": "Você está usando a versão mais recente.",
+      "updateAvailable": "Atualização disponível: {{version}}",
+      "error": "Não foi possível verificar atualizações. Tente novamente mais tarde."
+    }
   }
 }

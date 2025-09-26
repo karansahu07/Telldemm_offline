@@ -1,9 +1,9 @@
 <ion-header>
   <ion-toolbar style="--background: #f0f0f0; --color: #000000;">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/settings"></ion-back-button>
+      <ion-back-button defaultHref="/settings" [attr.aria-label]="'common.back' | translate"></ion-back-button>
     </ion-buttons>
-    <ion-title>App Updates</ion-title>
+    <ion-title>{{ 'appUpdates.title' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -11,35 +11,39 @@
   <ion-list lines="inset">
     <!-- Installed -->
     <ion-item>
-      <ion-icon slot="start" name="information-circle-outline"></ion-icon>
-      <ion-label><h2>Version</h2></ion-label>
+      <ion-icon slot="start" name="information-circle-outline" aria-hidden="true"></ion-icon>
+      <ion-label><h2>{{ 'appUpdates.version' | translate }}</h2></ion-label>
       <ion-note slot="end" class="version">{{ version }}</ion-note>
     </ion-item>
 
     <!-- Latest (only if known) -->
     <ion-item *ngIf="latestVersion">
-      <ion-icon slot="start" name="sparkles-outline"></ion-icon>
-      <ion-label><h2>Latest Available</h2></ion-label>
+      <ion-icon slot="start" name="sparkles-outline" aria-hidden="true"></ion-icon>
+      <ion-label><h2>{{ 'appUpdates.latestAvailable' | translate }}</h2></ion-label>
       <ion-note slot="end">{{ latestVersion }}</ion-note>
     </ion-item>
 
     <!-- Status chip -->
     <ion-item>
       <ion-label>
-        <h2>Status</h2>
-        <p *ngIf="updateAvailable">An update is available.</p>
-        <p *ngIf="!updateAvailable">You are on the latest version.</p>
+        <h2>{{ 'appUpdates.status' | translate }}</h2>
+        <p *ngIf="updateAvailable">{{ 'appUpdates.statusMessages.updateAvailable' | translate }}</p>
+        <p *ngIf="!updateAvailable">{{ 'appUpdates.statusMessages.upToDate' | translate }}</p>
       </ion-label>
-      <ion-chip slot="end" *ngIf="updateAvailable" color="warning">Update available</ion-chip>
-      <ion-chip slot="end" *ngIf="!updateAvailable" color="success">Up to date</ion-chip>
+      <ion-chip slot="end" *ngIf="updateAvailable" color="warning">
+        {{ 'appUpdates.badge.updateAvailable' | translate }}
+      </ion-chip>
+      <ion-chip slot="end" *ngIf="!updateAvailable" color="success">
+        {{ 'appUpdates.badge.upToDate' | translate }}
+      </ion-chip>
     </ion-item>
 
     <!-- Manual check -->
-    <ion-item button detail (click)="checkForUpdates()">
-      <ion-icon slot="start" name="download-outline"></ion-icon>
+    <ion-item button detail (click)="checkForUpdates()" [attr.aria-label]="'appUpdates.checkForUpdates.title' | translate">
+      <ion-icon slot="start" name="download-outline" aria-hidden="true"></ion-icon>
       <ion-label>
-        <h2>Check for Updates</h2>
-        <p>Manually check if a new version is available</p>
+        <h2>{{ 'appUpdates.checkForUpdates.title' | translate }}</h2>
+        <p>{{ 'appUpdates.checkForUpdates.description' | translate }}</p>
       </ion-label>
     </ion-item>
   </ion-list>

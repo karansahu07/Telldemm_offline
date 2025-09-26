@@ -68,5 +68,29 @@
       "successMessage": "તમે સફળતાપૂર્વક લોગ આઉટ થયા છો."
     },
     "defaultStatus": "ઉપલબ્ધ"
+  },
+  "appUpdates": {
+    "title": "એપ અપડેટ્સ",
+    "version": "વર્ઝન",
+    "latestAvailable": "નવીનતમ ઉપલબ્ધ",
+    "status": "સ્થિતિ",
+    "statusMessages": {
+      "updateAvailable": "અપડેટ ઉપલબ્ધ છે.",
+      "upToDate": "તમે નવીનતમ વર્ઝન પર છો."
+    },
+    "badge": {
+      "updateAvailable": "અપડેટ ઉપલબ્ધ",
+      "upToDate": "અપ ટુ ડેટ"
+    },
+    "checkForUpdates": {
+      "title": "અપડેટ્સ તપાસો",
+      "description": "હસ્તકૌશલ્યથી તપાસો કે નવું વર્ઝન ઉપલબ્ધ છે કે નહીં"
+    },
+    "checking": "તપાસી રહ્યું છે…",
+    "toast": {
+      "latest": "તમે નવીનતમ વર્ઝન વાપરી રહ્યા છો.",
+      "updateAvailable": "અપડેટ ઉપલબ્ધ: {{version}}",
+      "error": "અપડેટ્સ તપાસી શક્યા નથી. કૃપા કરીને પછી ફરી પ્રયાસ કરો."
+    }
   }
 }

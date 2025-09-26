@@ -68,5 +68,29 @@
       "successMessage": "คุณออกจากระบบเรียบร้อยแล้ว"
     },
     "defaultStatus": "พร้อมใช้งาน"
+  },
+  "appUpdates": {
+    "title": "อัปเดตแอป",
+    "version": "เวอร์ชัน",
+    "latestAvailable": "ล่าสุดที่มีให้",
+    "status": "สถานะ",
+    "statusMessages": {
+      "updateAvailable": "มีการอัปเดตใหม่",
+      "upToDate": "คุณกำลังใช้เวอร์ชันล่าสุด"
+    },
+    "badge": {
+      "updateAvailable": "มีอัปเดต",
+      "upToDate": "ล่าสุด"
+    },
+    "checkForUpdates": {
+      "title": "ตรวจสอบการอัปเดต",
+      "description": "ตรวจสอบด้วยตนเองว่ามีเวอร์ชันใหม่หรือไม่"
+    },
+    "checking": "กำลังตรวจสอบ…",
+    "toast": {
+      "latest": "คุณกำลังใช้เวอร์ชันล่าสุด",
+      "updateAvailable": "มีอัปเดต: {{version}}",
+      "error": "ไม่สามารถตรวจสอบการอัปเดตได้ โปรดลองอีกครั้งภายหลัง"
+    }
   }
 }

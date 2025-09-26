@@ -68,5 +68,29 @@
       "successMessage": "Disconnessione avvenuta con successo."
     },
     "defaultStatus": "Disponibile"
+  },
+  "appUpdates": {
+    "title": "Aggiornamenti app",
+    "version": "Versione",
+    "latestAvailable": "Ultima disponibile",
+    "status": "Stato",
+    "statusMessages": {
+      "updateAvailable": "È disponibile un aggiornamento.",
+      "upToDate": "Stai usando l’ultima versione."
+    },
+    "badge": {
+      "updateAvailable": "Aggiornamento disponibile",
+      "upToDate": "Aggiornato"
+    },
+    "checkForUpdates": {
+      "title": "Controlla aggiornamenti",
+      "description": "Controlla manualmente se è disponibile una nuova versione"
+    },
+    "checking": "Verifica…",
+    "toast": {
+      "latest": "Stai usando l’ultima versione.",
+      "updateAvailable": "Aggiornamento disponibile: {{version}}",
+      "error": "Impossibile verificare gli aggiornamenti. Riprova più tardi."
+    }
   }
 }

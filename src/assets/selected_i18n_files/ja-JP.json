@@ -68,5 +68,29 @@
       "successMessage": "正常にログアウトしました。"
     },
     "defaultStatus": "オンライン"
+  },
+  "appUpdates": {
+    "title": "アプリの更新",
+    "version": "バージョン",
+    "latestAvailable": "最新の利用可能バージョン",
+    "status": "ステータス",
+    "statusMessages": {
+      "updateAvailable": "アップデートがあります。",
+      "upToDate": "最新バージョンを利用中です。"
+    },
+    "badge": {
+      "updateAvailable": "アップデートあり",
+      "upToDate": "最新"
+    },
+    "checkForUpdates": {
+      "title": "更新を確認",
+      "description": "新しいバージョンがあるか手動で確認します"
+    },
+    "checking": "確認中…",
+    "toast": {
+      "latest": "最新バージョンを利用しています。",
+      "updateAvailable": "アップデートあり: {{version}}",
+      "error": "更新を確認できませんでした。後でもう一度お試しください。"
+    }
   }
 }

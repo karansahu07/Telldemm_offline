@@ -69,6 +69,30 @@
       "successMessage": "আপনি সফলভাবে লগ আউট করেছেন।"
     },
     "defaultStatus": "উপলব্ধ"
+  },
+  "appUpdates": {
+    "title": "অ্যাপ আপডেট",
+    "version": "ভার্সন",
+    "latestAvailable": "সর্বশেষ উপলব্ধ",
+    "status": "অবস্থা",
+    "statusMessages": {
+      "updateAvailable": "একটি আপডেট উপলব্ধ।",
+      "upToDate": "আপনি সর্বশেষ সংস্করণ ব্যবহার করছেন।"
+    },
+    "badge": {
+      "updateAvailable": "আপডেট উপলব্ধ",
+      "upToDate": "সর্বশেষ"
+    },
+    "checkForUpdates": {
+      "title": "আপডেট পরীক্ষা করুন",
+      "description": "ম্যানুয়ালি দেখুন নতুন সংস্করণ উপলব্ধ কিনা"
+    },
+    "checking": "পরীক্ষা হচ্ছে…",
+    "toast": {
+      "latest": "আপনি সর্বশেষ সংস্করণ ব্যবহার করছেন।",
+      "updateAvailable": "আপডেট উপলব্ধ: {{version}}",
+      "error": "আপডেট পরীক্ষা করা যায়নি। অনুগ্রহ করে পরে আবার চেষ্টা করুন।"
+    }
   }
 
 

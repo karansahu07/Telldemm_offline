@@ -68,5 +68,29 @@
       "successMessage": "You have successfully logged out."
     },
     "defaultStatus": "Available"
+  },
+  "appUpdates": {
+    "title": "App Updates",
+    "version": "Version",
+    "latestAvailable": "Latest Available",
+    "status": "Status",
+    "statusMessages": {
+      "updateAvailable": "An update is available.",
+      "upToDate": "You are on the latest version."
+    },
+    "badge": {
+      "updateAvailable": "Update available",
+      "upToDate": "Up to date"
+    },
+    "checkForUpdates": {
+      "title": "Check for Updates",
+      "description": "Manually check if a new version is available"
+    },
+    "checking": "Checking…",
+    "toast": {
+      "latest": "You are using the latest version.",
+      "updateAvailable": "Update available: {{version}}",
+      "error": "Could not check updates. Please try again later."
+    }
   }
 }

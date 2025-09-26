@@ -68,5 +68,29 @@
       "successMessage": "성공적으로 로그아웃되었습니다."
     },
     "defaultStatus": "사용 가능"
+  },
+  "appUpdates": {
+    "title": "앱 업데이트",
+    "version": "버전",
+    "latestAvailable": "최신 사용 가능",
+    "status": "상태",
+    "statusMessages": {
+      "updateAvailable": "업데이트가 있습니다.",
+      "upToDate": "최신 버전을 사용 중입니다."
+    },
+    "badge": {
+      "updateAvailable": "업데이트 가능",
+      "upToDate": "최신"
+    },
+    "checkForUpdates": {
+      "title": "업데이트 확인",
+      "description": "새 버전이 있는지 수동으로 확인하세요"
+    },
+    "checking": "확인 중…",
+    "toast": {
+      "latest": "최신 버전을 사용 중입니다.",
+      "updateAvailable": "업데이트 가능: {{version}}",
+      "error": "업데이트를 확인할 수 없습니다. 나중에 다시 시도하세요."
+    }
   }
 }

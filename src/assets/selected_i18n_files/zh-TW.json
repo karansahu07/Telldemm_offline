@@ -69,6 +69,30 @@
       "successMessage": "你已成功登出。"
     },
     "defaultStatus": "線上"
+  },
+  "appUpdates": {
+    "title": "應用更新",
+    "version": "版本",
+    "latestAvailable": "最新可用版本",
+    "status": "狀態",
+    "statusMessages": {
+      "updateAvailable": "有可用更新。",
+      "upToDate": "您已使用最新版本。"
+    },
+    "badge": {
+      "updateAvailable": "有更新",
+      "upToDate": "最新"
+    },
+    "checkForUpdates": {
+      "title": "檢查更新",
+      "description": "手動檢查是否有新版本"
+    },
+    "checking": "正在檢查…",
+    "toast": {
+      "latest": "您正在使用最新版本。",
+      "updateAvailable": "有可用更新: {{version}}",
+      "error": "無法檢查更新，請稍後再試。"
+    }
   }
 
 }

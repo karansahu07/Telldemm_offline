@@ -69,5 +69,29 @@
       "successMessage": "Sie wurden erfolgreich abgemeldet."
     },
     "defaultStatus": "Verfügbar"
+  },
+  "appUpdates": {
+    "title": "App-Updates",
+    "version": "Version",
+    "latestAvailable": "Neueste verfügbar",
+    "status": "Status",
+    "statusMessages": {
+      "updateAvailable": "Ein Update ist verfügbar.",
+      "upToDate": "Sie verwenden die neueste Version."
+    },
+    "badge": {
+      "updateAvailable": "Update verfügbar",
+      "upToDate": "Aktuell"
+    },
+    "checkForUpdates": {
+      "title": "Nach Updates suchen",
+      "description": "Manuell prüfen, ob eine neue Version verfügbar ist"
+    },
+    "checking": "Überprüfung…",
+    "toast": {
+      "latest": "Sie verwenden die neueste Version.",
+      "updateAvailable": "Update verfügbar: {{version}}",
+      "error": "Updates konnten nicht überprüft werden. Bitte versuchen Sie es später erneut."
+    }
   }
 }

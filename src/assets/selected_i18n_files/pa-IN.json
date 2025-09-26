@@ -68,5 +68,29 @@
       "successMessage": "ਤੁਸੀਂ ਸਫਲਤਾਪੂਰਵਕ ਲਾੱਗ ਆਉਟ ਕਰ ਦਿੱਤਾ ਹੈ।"
     },
     "defaultStatus": "ਉਪਲਬਧ"
+  },
+  "appUpdates": {
+    "title": "ਐਪ ਅੱਪਡੇਟਸ",
+    "version": "ਵਰਜਨ",
+    "latestAvailable": "ਤਾਜ਼ਾ ਉਪਲਬਧ",
+    "status": "ਸਥਿਤੀ",
+    "statusMessages": {
+      "updateAvailable": "ਇੱਕ ਅੱਪਡੇਟ ਉਪਲਬਧ ਹੈ।",
+      "upToDate": "ਤੁਸੀਂ ਤਾਜ਼ਾ ਵਰਜਨ ਵਰਤ ਰਹੇ ਹੋ।"
+    },
+    "badge": {
+      "updateAvailable": "ਅੱਪਡੇਟ ਉਪਲਬਧ",
+      "upToDate": "ਅਪ-ਟੂ-ਡੇਟ"
+    },
+    "checkForUpdates": {
+      "title": "ਅੱਪਡੇਟਸ ਦੀ ਜਾਂਚ ਕਰੋ",
+      "description": "ਮੈਨੁਅਲ ਤੌਰ 'ਤੇ ਚੈਕ ਕਰੋ ਕਿ ਨਵਾਂ ਵਰਜਨ ਉਪਲਬਧ ਹੈ ਜਾਂ ਨਹੀਂ"
+    },
+    "checking": "ਜਾਂਚ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ…",
+    "toast": {
+      "latest": "ਤੁਸੀਂ ਤਾਜ਼ਾ ਵਰਜਨ ਵਰਤ ਰਹੇ ਹੋ।",
+      "updateAvailable": "ਅੱਪਡੇਟ ਉਪਲਬਧ: {{version}}",
+      "error": "ਅੱਪਡੇਟਸ ਦੀ ਜਾਂਚ ਨਹੀਂ ਹੋ ਸਕੀ। ਬਾਅਦ ਵਿੱਚ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।"
+    }
   }
 }

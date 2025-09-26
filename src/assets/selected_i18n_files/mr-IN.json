@@ -68,5 +68,29 @@
       "successMessage": "तुम्ही यशस्वीरित्या लॉग आऊट केले आहे."
     },
     "defaultStatus": "उपलब्ध"
+  },
+  "appUpdates": {
+    "title": "ॲप अपडेट्स",
+    "version": "आवृत्ती",
+    "latestAvailable": "नवीनतम उपलब्ध",
+    "status": "स्थिती",
+    "statusMessages": {
+      "updateAvailable": "अपडेट उपलब्ध आहे.",
+      "upToDate": "आपण नवीनतम आवृत्ती वापरत आहात."
+    },
+    "badge": {
+      "updateAvailable": "अपडेट उपलब्ध",
+      "upToDate": "अप-टू-डेट"
+    },
+    "checkForUpdates": {
+      "title": "अपडेट्स तपासा",
+      "description": "नवीन आवृत्ती उपलब्ध आहे का ते मॅन्युअली तपासा"
+    },
+    "checking": "तपासत आहे…",
+    "toast": {
+      "latest": "आपण नवीनतम आवृत्ती वापरत आहात.",
+      "updateAvailable": "अपडेट उपलब्ध: {{version}}",
+      "error": "अपडेट तपासता आले नाही. कृपया नंतर पुन्हा प्रयत्न करा."
+    }
   }
 }

@@ -68,5 +68,29 @@
       "successMessage": "Вы успешно вышли из системы."
     },
     "defaultStatus": "Доступен"
+  },
+  "appUpdates": {
+    "title": "Обновления приложения",
+    "version": "Версия",
+    "latestAvailable": "Последняя доступная",
+    "status": "Статус",
+    "statusMessages": {
+      "updateAvailable": "Доступно обновление.",
+      "upToDate": "У вас установлена последняя версия."
+    },
+    "badge": {
+      "updateAvailable": "Доступно обновление",
+      "upToDate": "Актуально"
+    },
+    "checkForUpdates": {
+      "title": "Проверить обновления",
+      "description": "Проверьте вручную, доступна ли новая версия"
+    },
+    "checking": "Проверка…",
+    "toast": {
+      "latest": "Вы используете последнюю версию.",
+      "updateAvailable": "Доступно обновление: {{version}}",
+      "error": "Не удалось проверить обновления. Попробуйте позже."
+    }
   }
 }
