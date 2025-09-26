@@ -1,15 +1,22 @@
-// import { Injectable } from '@angular/core';
-
-// @Injectable({
-//   providedIn: 'root'
-// })
-// export class VersionCheck {
-  
-// }
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { App } from '@capacitor/app';
 import { AlertController, Platform } from '@ionic/angular';
+
+type VersionCheckResult = {
+  currentVersion: string;
+  latestVersion: string | null;
+  packageName: string;
+  updateAvailable: boolean;
+};
+
+const LS_KEYS = {
+  current: 'app_current_version',
+  latest: 'app_latest_version',
+  pkg: 'app_package_name',
+  checkedAt: 'app_version_checked_at',
+  updateAvailable: 'app_update_available',
+};
 
 @Injectable({ providedIn: 'root' })
 export class VersionCheck {
@@ -19,35 +26,48 @@ export class VersionCheck {
     private platform: Platform
   ) {}
 
-  package_name:string="";
+  package_name = '';
 
-  async checkVersion() {
+  async checkVersion(): Promise<VersionCheckResult> {
     const appInfo = await App.getInfo();
     const currentVersion = appInfo.version;
     const packageName = appInfo.id;
 
-    console.log('📱 Installed Version:', currentVersion);
-//  debug   📱 Installed Version: 6.0
-
-    console.log('📦 Package Name:', packageName);
+    // persist current + package
+    localStorage.setItem(LS_KEYS.current, currentVersion);
+    localStorage.setItem(LS_KEYS.pkg, packageName);
     this.package_name = packageName;
-
-    
 
     let latestVersion: string | null = null;
 
     if (this.platform.is('android')) {
-      // ⚠️ Needs backend proxy or API scraper because Play Store has no free JSON API
       latestVersion = await this.getLatestFromPlayStore(packageName);
-      console.log("latestVersion",latestVersion);
-      //Debug latestVersion 8 (8.0)
     } else if (this.platform.is('ios')) {
       latestVersion = await this.getLatestFromAppStore(packageName);
     }
 
-    if (latestVersion && this.isUpdateAvailable(currentVersion, latestVersion)) {
-      this.showUpdateAlert();
+    // normalize + persist latest if any
+    if (latestVersion) {
+      const cleaned = this.cleanVersion(latestVersion);
+      latestVersion = cleaned;
+      localStorage.setItem(LS_KEYS.latest, cleaned);
     }
+
+    const updateAvailable =
+      !!latestVersion && this.isUpdateAvailable(currentVersion, latestVersion);
+
+    localStorage.setItem(LS_KEYS.updateAvailable, String(updateAvailable));
+    localStorage.setItem(LS_KEYS.checkedAt, new Date().toISOString());
+
+    return { currentVersion, latestVersion, packageName, updateAvailable };
+  }
+
+  async checkAndNotify(): Promise<VersionCheckResult> {
+    const result = await this.checkVersion();
+    if (result.updateAvailable) {
+      await this.showUpdateAlert();
+    }
+    return result;
   }
 
   private async getLatestFromAppStore(bundleId: string): Promise<string | null> {
@@ -55,10 +75,8 @@ export class VersionCheck {
       const url = `https://itunes.apple.com/lookup?bundleId=${bundleId}`;
       const data: any = await this.http.get(url).toPromise();
       if (data?.resultCount > 0) {
-        return data.results[0].version;
+        return data.results[0].version as string;
       }
-
-      
       return null;
     } catch (err) {
       console.error('App Store fetch failed:', err);
@@ -68,59 +86,60 @@ export class VersionCheck {
 
   private async getLatestFromPlayStore(packageName: string): Promise<string | null> {
     try {
-      // ✅ You should call your own backend API that uses google-play-scraper
-      // Example: GET https://your-api.com/check-version?package=com.your.app
+      // Your backend should return something like { latestVersion: "8 (8.0)" } or "8.0"
       const url = `https://apps.ekarigar.com/backend/check-version?package=${packageName}`;
       const data: any = await this.http.get(url).toPromise();
-
-          // 🧹 Clean up version string (e.g. "8 (8.0)" → "8.0")
-    const match = data.latestVersion.match(/\d+(\.\d+)*/);
-    return match ? match[0] : data.latestVersion;
-      // return data.latestVersion;
+      // accept either raw string or { latestVersion: string }
+      const raw = typeof data === 'string' ? data : data?.latestVersion;
+      return raw ?? null;
     } catch (err) {
       console.error('Play Store fetch failed:', err);
       return null;
     }
   }
 
+  private cleanVersion(v: string): string {
+    // e.g. "8 (8.0)" -> "8.0"
+    const match = v.match(/\d+(\.\d+)*/);
+    return match ? match[0] : v;
+    }
+
   private isUpdateAvailable(current: string, latest: string): boolean {
     const currParts = current.split('.').map(Number);
     const latestParts = latest.split('.').map(Number);
 
-    for (let i = 0; i < latestParts.length; i++) {
-      if ((currParts[i] || 0) < latestParts[i]) {
-        return true;
-      } else if ((currParts[i] || 0) > latestParts[i]) {
-        return false;
-      }
+    const maxLen = Math.max(currParts.length, latestParts.length);
+    for (let i = 0; i < maxLen; i++) {
+      const c = currParts[i] ?? 0;
+      const l = latestParts[i] ?? 0;
+      if (c < l) return true;
+      if (c > l) return false;
     }
     return false;
   }
 
   private async showUpdateAlert() {
-  const packageName = this.package_name;
-  const alert = await this.alertCtrl.create({
-    header: 'Update Available',
-    message: 'A new version of the app is available. Please update.',
-    buttons: [
-      {
-        text: 'Update',
-        handler: () => {
-          if (this.platform.is('android')) {
-            window.open(`https://play.google.com/store/apps/details?id=${packageName}`, '_system');
-          } else if (this.platform.is('ios')) {
-            window.open(`itms-apps://itunes.apple.com/app/id=${packageName}`, '_system');
-          }
+    const packageName = this.package_name;
+    const alert = await this.alertCtrl.create({
+      header: 'Update Available',
+      message: 'A new version of the app is available. Please update.',
+      buttons: [
+        {
+          text: 'Update',
+          handler: () => {
+            if (this.platform.is('android')) {
+              window.open(`https://play.google.com/store/apps/details?id=${packageName}`, '_system');
+            } else if (this.platform.is('ios')) {
+              // NOTE: For iOS you typically need the numeric App Store ID; if you only have bundleId,
+              // consider saving the appId in config and using it here.
+              window.open(`itms-apps://itunes.apple.com/app/id=${packageName}`, '_system');
+            }
+          },
         },
-      },
-      {
-        text: 'Later',
-        role: 'cancel'
-      }
-    ],
-    backdropDismiss: false,
-  });
-  await alert.present();
-}
-
+        { text: 'Later', role: 'cancel' }
+      ],
+      backdropDismiss: false,
+    });
+    await alert.present();
+  }
 }

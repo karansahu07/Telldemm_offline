@@ -9,13 +9,29 @@
 
 <ion-content class="ion-padding" style="--background: #ffffff;">
   <ion-list lines="inset">
-    <!-- Current version -->
+    <!-- Installed -->
     <ion-item>
       <ion-icon slot="start" name="information-circle-outline"></ion-icon>
+      <ion-label><h2>Version</h2></ion-label>
+      <ion-note slot="end" class="version">{{ version }}</ion-note>
+    </ion-item>
+
+    <!-- Latest (only if known) -->
+    <ion-item *ngIf="latestVersion">
+      <ion-icon slot="start" name="sparkles-outline"></ion-icon>
+      <ion-label><h2>Latest Available</h2></ion-label>
+      <ion-note slot="end">{{ latestVersion }}</ion-note>
+    </ion-item>
+
+    <!-- Status chip -->
+    <ion-item>
       <ion-label>
-        <h2>Version</h2>
+        <h2>Status</h2>
+        <p *ngIf="updateAvailable">An update is available.</p>
+        <p *ngIf="!updateAvailable">You are on the latest version.</p>
       </ion-label>
-      <ion-note slot="end" class="version">2.24.17.76</ion-note>
+      <ion-chip slot="end" *ngIf="updateAvailable" color="warning">Update available</ion-chip>
+      <ion-chip slot="end" *ngIf="!updateAvailable" color="success">Up to date</ion-chip>
     </ion-item>
 
     <!-- Manual check -->
@@ -25,16 +41,6 @@
         <h2>Check for Updates</h2>
         <p>Manually check if a new version is available</p>
       </ion-label>
-    </ion-item>
-
-    <!-- Auto-update toggle -->
-    <ion-item>
-      <ion-icon slot="start" name="sync-outline"></ion-icon>
-      <ion-label>
-        <h2>Auto Update</h2>
-        <p>Install updates automatically</p>
-      </ion-label>
-      <ion-toggle slot="end" [(ngModel)]="autoUpdate"></ion-toggle>
     </ion-item>
   </ion-list>
 </ion-content>

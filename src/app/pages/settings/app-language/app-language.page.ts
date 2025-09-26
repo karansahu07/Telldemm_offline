@@ -1,7 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, ToastController } from '@ionic/angular';
+import { Subscription } from 'rxjs';
+import { Language } from 'src/app/services/language';
+
+// ⬇️ import your Language service (path may differ in your project)
+// import { Language } from '../../services/language'; // adjust relative path if needed
 
 const LANG_STORAGE_KEY = 'app_language';
 
@@ -10,12 +15,12 @@ const LANG_STORAGE_KEY = 'app_language';
   templateUrl: './app-language.page.html',
   styleUrls: ['./app-language.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule,FormsModule],
+  imports: [IonicModule, CommonModule, FormsModule],
 })
-export class AppLanguagePage implements OnInit {
-
- selectedLanguage = 'en-US';
+export class AppLanguagePage implements OnInit, OnDestroy {
+  selectedLanguage = 'en-US';
   searchTerm = '';
+  private langSub?: Subscription;
 
   // Alphabetically sorted list of languages (label ascending)
   languages = [
@@ -50,37 +55,54 @@ export class AppLanguagePage implements OnInit {
     { code: 'zh-TW', label: 'Chinese (Traditional)' },
   ];
 
-  // filteredLanguages is shown in the radio list; initially same as languages
   filteredLanguages = [...this.languages];
 
-  constructor(private toastCtrl: ToastController) {}
+  constructor(
+    private toastCtrl: ToastController,
+    private langSvc: Language
+  ) {}
 
   ngOnInit() {
-    const saved = localStorage.getItem(LANG_STORAGE_KEY);
-    if (saved) {
-      this.selectedLanguage = saved;
-    }
-    // ensure languages array is sorted (defensive)
+    // sort defensively
     this.languages.sort((a, b) => a.label.localeCompare(b.label));
     this.filteredLanguages = [...this.languages];
+
+    // read current language from service (it reads saved value or default)
+    this.selectedLanguage = this.langSvc.getCurrentLanguage() || this.selectedLanguage;
+
+    // OPTIONAL: keep radio selection in sync if language changes elsewhere
+    // (only if you added currentLang$ in the service)
+    // this.langSub = this.langSvc.currentLang$.subscribe(code => {
+    //   this.selectedLanguage = code;
+    // });
   }
 
-  // Called when user picks language using search-filtered radio list
+  ngOnDestroy() {
+    this.langSub?.unsubscribe();
+  }
+
+  // Radio list changed
   async changeLanguage(event: any) {
-    const lang = event?.detail?.value ?? this.selectedLanguage;
-    this.setLanguage(lang);
+    const code = event?.detail?.value ?? this.selectedLanguage;
+    await this.setLanguage(code);
   }
 
-  // Called when user picks language from select dropdown
+  // If you also have a dropdown
   onSelectChange(event: any) {
-    const lang = event?.detail?.value ?? this.selectedLanguage;
-    this.setLanguage(lang);
+    const code = event?.detail?.value ?? this.selectedLanguage;
+    this.setLanguage(code);
   }
 
-  // central setter
-  async setLanguage(langCode: string) {
-    if (!langCode) { return; }
+  // Central setter
+  private async setLanguage(langCode: string) {
+    if (!langCode) return;
+
+    // ⬇️ THIS is the important part: switch translations right now
+    await this.langSvc.useLanguage(langCode);
+
+    // (The service already persists to localStorage; keeping this is harmless but redundant)
     localStorage.setItem(LANG_STORAGE_KEY, langCode);
+
     this.selectedLanguage = langCode;
 
     const t = await this.toastCtrl.create({
@@ -89,31 +111,18 @@ export class AppLanguagePage implements OnInit {
       position: 'bottom'
     });
     await t.present();
-
-    this.applyRtlIfNeeded(langCode);
   }
 
   getLabel(code: string) {
     return this.languages.find(l => l.code === code)?.label || code;
   }
 
-  applyRtlIfNeeded(code: string) {
-    const rtlLangs = ['ar', 'ur', 'fa', 'he'];
-    if (rtlLangs.some(rtl => code.startsWith(rtl))) {
-      document.documentElement.setAttribute('dir', 'rtl');
-    } else {
-      document.documentElement.setAttribute('dir', 'ltr');
-    }
-  }
-
-  // filter function called on ionInput of searchbar
   filterLanguages() {
     const q = (this.searchTerm || '').trim().toLowerCase();
     if (!q) {
       this.filteredLanguages = [...this.languages];
       return;
     }
-
     this.filteredLanguages = this.languages.filter(l => {
       const label = l.label.toLowerCase();
       const code = l.code.toLowerCase();
