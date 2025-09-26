@@ -68,5 +68,22 @@
       "successMessage": "Bạn đã đăng xuất thành công."
     },
     "defaultStatus": "Trực tuyến"
+  },"accountPage": {
+    "title": "Tài khoản",
+    "securityNotifications": "Thông báo bảo mật",
+    "passkeys": "Khóa truy cập",
+    "emailAddress": "Địa chỉ email",
+    "twoStep": "Xác minh hai bước",
+    "changeNumber": "Đổi số",
+    "requestInfo": "Yêu cầu thông tin tài khoản",
+    "addAccount": "Thêm tài khoản",
+    "deleteAccount": "Xóa tài khoản",
+    "confirmDelete": {
+      "title": "Xóa tài khoản?",
+      "message": "Hành động này sẽ xóa vĩnh viễn tài khoản và dữ liệu của bạn.",
+      "confirm": "Xóa",
+      "cancel": "Hủy",
+      "log": "Đã mở hộp thoại xóa tài khoản"
+    }
   }
 }

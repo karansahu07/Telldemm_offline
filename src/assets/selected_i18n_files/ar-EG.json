@@ -93,6 +93,23 @@
       "updateAvailable": "تحديث متاح: {{version}}",
       "error": "تعذر التحقق من التحديثات. حاول مرة أخرى لاحقًا."
     }
+  },
+  "accountPage": {
+    "title": "الحساب",
+    "securityNotifications": "إشعارات الأمان",
+    "passkeys": "مفاتيح المرور",
+    "emailAddress": "عنوان البريد الإلكتروني",
+    "twoStep": "التحقق بخطوتين",
+    "changeNumber": "تغيير الرقم",
+    "requestInfo": "طلب معلومات الحساب",
+    "addAccount": "إضافة حساب",
+    "deleteAccount": "حذف الحساب",
+    "confirmDelete": {
+      "title": "حذف الحساب؟",
+      "message": "سيؤدي هذا الإجراء إلى حذف حسابك وبياناتك نهائيًا.",
+      "confirm": "حذف",
+      "cancel": "إلغاء",
+      "log": "تم فتح نافذة حذف الحساب"
+    }
   }
-
 }

@@ -92,5 +92,22 @@
       "updateAvailable": "มีอัปเดต: {{version}}",
       "error": "ไม่สามารถตรวจสอบการอัปเดตได้ โปรดลองอีกครั้งภายหลัง"
     }
+  },"accountPage": {
+    "title": "บัญชี",
+    "securityNotifications": "การแจ้งเตือนด้านความปลอดภัย",
+    "passkeys": "รหัสผ่านกุญแจ",
+    "emailAddress": "ที่อยู่อีเมล",
+    "twoStep": "การยืนยันตัวตนสองขั้นตอน",
+    "changeNumber": "เปลี่ยนหมายเลข",
+    "requestInfo": "ขอข้อมูลบัญชี",
+    "addAccount": "เพิ่มบัญชี",
+    "deleteAccount": "ลบบัญชี",
+    "confirmDelete": {
+      "title": "ลบบัญชี?",
+      "message": "การดำเนินการนี้จะลบบัญชีและข้อมูลของคุณอย่างถาวร",
+      "confirm": "ลบ",
+      "cancel": "ยกเลิก",
+      "log": "เปิดหน้าต่างลบบัญชี"
+    }
   }
 }

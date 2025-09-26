@@ -39,5 +39,22 @@
       "title": "اطلاعات برنامه",
       "description": "نسخه، جزئیات قانونی و فنی."
     }
+  },"accountPage": {
+    "title": "حساب کاربری",
+    "securityNotifications": "اعلان‌های امنیتی",
+    "passkeys": "کلیدهای عبور",
+    "emailAddress": "آدرس ایمیل",
+    "twoStep": "تأیید دو مرحله‌ای",
+    "changeNumber": "تغییر شماره",
+    "requestInfo": "درخواست اطلاعات حساب",
+    "addAccount": "افزودن حساب",
+    "deleteAccount": "حذف حساب",
+    "confirmDelete": {
+      "title": "حذف حساب؟",
+      "message": "این اقدام حساب و داده‌های شما را برای همیشه حذف خواهد کرد.",
+      "confirm": "حذف",
+      "cancel": "لغو",
+      "log": "پنجره حذف حساب باز شد"
+    }
   }
 }

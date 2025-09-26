@@ -92,5 +92,22 @@
       "updateAvailable": "업데이트 가능: {{version}}",
       "error": "업데이트를 확인할 수 없습니다. 나중에 다시 시도하세요."
     }
+  }, "accountPage": {
+    "title": "계정",
+    "securityNotifications": "보안 알림",
+    "passkeys": "패스키",
+    "emailAddress": "이메일 주소",
+    "twoStep": "2단계 인증",
+    "changeNumber": "번호 변경",
+    "requestInfo": "계정 정보 요청",
+    "addAccount": "계정 추가",
+    "deleteAccount": "계정 삭제",
+    "confirmDelete": {
+      "title": "계정을 삭제하시겠습니까?",
+      "message": "이 작업은 계정과 데이터를 영구적으로 삭제합니다.",
+      "confirm": "삭제",
+      "cancel": "취소",
+      "log": "계정 삭제 모달 열림"
+    }
   }
 }

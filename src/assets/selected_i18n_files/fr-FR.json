@@ -93,5 +93,22 @@
       "updateAvailable": "Mise à jour disponible : {{version}}",
       "error": "Impossible de vérifier les mises à jour. Veuillez réessayer plus tard."
     }
+  },"accountPage": {
+    "title": "Compte",
+    "securityNotifications": "Notifications de sécurité",
+    "passkeys": "Clés d’accès",
+    "emailAddress": "Adresse e-mail",
+    "twoStep": "Vérification en deux étapes",
+    "changeNumber": "Changer de numéro",
+    "requestInfo": "Demander les informations du compte",
+    "addAccount": "Ajouter un compte",
+    "deleteAccount": "Supprimer le compte",
+    "confirmDelete": {
+      "title": "Supprimer le compte ?",
+      "message": "Cette action supprimera définitivement votre compte et vos données.",
+      "confirm": "Supprimer",
+      "cancel": "Annuler",
+      "log": "Fenêtre de suppression du compte ouverte"
+    }
   }
 }

@@ -92,5 +92,22 @@
       "updateAvailable": "Actualización disponible: {{version}}",
       "error": "No se pudo comprobar si hay actualizaciones. Inténtalo de nuevo más tarde."
     }
+  },"accountPage": {
+    "title": "Cuenta",
+    "securityNotifications": "Notificaciones de seguridad",
+    "passkeys": "Llaves de acceso",
+    "emailAddress": "Dirección de correo electrónico",
+    "twoStep": "Verificación en dos pasos",
+    "changeNumber": "Cambiar número",
+    "requestInfo": "Solicitar información de la cuenta",
+    "addAccount": "Añadir cuenta",
+    "deleteAccount": "Eliminar cuenta",
+    "confirmDelete": {
+      "title": "¿Eliminar cuenta?",
+      "message": "Esta acción eliminará permanentemente tu cuenta y datos.",
+      "confirm": "Eliminar",
+      "cancel": "Cancelar",
+      "log": "Se abrió la ventana de eliminación de cuenta"
+    }
   }
 }

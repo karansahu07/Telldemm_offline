@@ -92,5 +92,22 @@
       "updateAvailable": "ਅੱਪਡੇਟ ਉਪਲਬਧ: {{version}}",
       "error": "ਅੱਪਡੇਟਸ ਦੀ ਜਾਂਚ ਨਹੀਂ ਹੋ ਸਕੀ। ਬਾਅਦ ਵਿੱਚ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।"
     }
+  }, "accountPage": {
+    "title": "ਖਾਤਾ",
+    "securityNotifications": "ਸੁਰੱਖਿਆ ਸੂਚਨਾਵਾਂ",
+    "passkeys": "ਪਾਸਕੀ",
+    "emailAddress": "ਈਮੇਲ ਪਤਾ",
+    "twoStep": "ਦੋ-ਕਦਮ ਪ੍ਰਮਾਣਿਕਤਾ",
+    "changeNumber": "ਨੰਬਰ ਬਦਲੋ",
+    "requestInfo": "ਖਾਤੇ ਦੀ ਜਾਣਕਾਰੀ ਦੀ ਬੇਨਤੀ ਕਰੋ",
+    "addAccount": "ਖਾਤਾ ਜੋੜੋ",
+    "deleteAccount": "ਖਾਤਾ ਮਿਟਾਓ",
+    "confirmDelete": {
+      "title": "ਖਾਤਾ ਮਿਟਾਉਣਾ ਹੈ?",
+      "message": "ਇਹ ਕਾਰਵਾਈ ਤੁਹਾਡਾ ਖਾਤਾ ਅਤੇ ਡਾਟਾ ਸਥਾਈ ਤੌਰ 'ਤੇ ਮਿਟਾ ਦੇਵੇਗੀ।",
+      "confirm": "ਮਿਟਾਓ",
+      "cancel": "ਰੱਦ ਕਰੋ",
+      "log": "ਖਾਤਾ ਮਿਟਾਉਣ ਵਾਲਾ ਮੋਡਲ ਖੋਲ੍ਹਿਆ ਗਿਆ"
+    }
   }
 }

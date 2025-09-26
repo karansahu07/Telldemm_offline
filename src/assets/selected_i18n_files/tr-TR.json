@@ -68,5 +68,22 @@
       "successMessage": "Başarıyla çıkış yaptınız."
     },
     "defaultStatus": "Mevcut"
+  },"accountPage": {
+    "title": "Hesap",
+    "securityNotifications": "Güvenlik bildirimleri",
+    "passkeys": "Geçiş anahtarları",
+    "emailAddress": "E-posta adresi",
+    "twoStep": "İki adımlı doğrulama",
+    "changeNumber": "Numarayı değiştir",
+    "requestInfo": "Hesap bilgisi iste",
+    "addAccount": "Hesap ekle",
+    "deleteAccount": "Hesabı sil",
+    "confirmDelete": {
+      "title": "Hesap silinsin mi?",
+      "message": "Bu işlem hesabınızı ve verilerinizi kalıcı olarak silecektir.",
+      "confirm": "Sil",
+      "cancel": "İptal",
+      "log": "Hesap silme penceresi açıldı"
+    }
   }
 }

@@ -92,5 +92,22 @@
       "updateAvailable": "アップデートあり: {{version}}",
       "error": "更新を確認できませんでした。後でもう一度お試しください。"
     }
+  },"accountPage": {
+    "title": "アカウント",
+    "securityNotifications": "セキュリティ通知",
+    "passkeys": "パスキー",
+    "emailAddress": "メールアドレス",
+    "twoStep": "2段階認証",
+    "changeNumber": "番号を変更",
+    "requestInfo": "アカウント情報をリクエスト",
+    "addAccount": "アカウントを追加",
+    "deleteAccount": "アカウントを削除",
+    "confirmDelete": {
+      "title": "アカウントを削除しますか？",
+      "message": "この操作により、アカウントとデータは完全に削除されます。",
+      "confirm": "削除",
+      "cancel": "キャンセル",
+      "log": "アカウント削除モーダルが開きました"
+    }
   }
 }

@@ -92,5 +92,22 @@
       "updateAvailable": "अपडेट उपलब्ध: {{version}}",
       "error": "अपडेट तपासता आले नाही. कृपया नंतर पुन्हा प्रयत्न करा."
     }
+  },"accountPage": {
+    "title": "खाते",
+    "securityNotifications": "सुरक्षा सूचना",
+    "passkeys": "पासकी",
+    "emailAddress": "ईमेल पत्ता",
+    "twoStep": "दोन-स्तरीय पडताळणी",
+    "changeNumber": "क्रमांक बदला",
+    "requestInfo": "खात्याची माहिती मागवा",
+    "addAccount": "खाते जोडा",
+    "deleteAccount": "खाते हटवा",
+    "confirmDelete": {
+      "title": "खाते हटवायचे?",
+      "message": "ही क्रिया तुमचे खाते आणि डेटा कायमचे हटवेल.",
+      "confirm": "हटवा",
+      "cancel": "रद्द करा",
+      "log": "खाते हटवण्याचे मोडल उघडले"
+    }
   }
 }

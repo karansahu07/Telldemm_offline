@@ -92,5 +92,22 @@
       "updateAvailable": "અપડેટ ઉપલબ્ધ: {{version}}",
       "error": "અપડેટ્સ તપાસી શક્યા નથી. કૃપા કરીને પછી ફરી પ્રયાસ કરો."
     }
+  },"accountPage": {
+    "title": "એકાઉન્ટ",
+    "securityNotifications": "સુરક્ષા સૂચનાઓ",
+    "passkeys": "પાસકી",
+    "emailAddress": "ઇમેલ સરનામું",
+    "twoStep": "ટૂ-સ્ટેપ ચકાસણી",
+    "changeNumber": "નંબર બદલો",
+    "requestInfo": "એકાઉન્ટ માહિતી માંગો",
+    "addAccount": "એકાઉન્ટ ઉમેરો",
+    "deleteAccount": "એકાઉન્ટ કાઢી નાખો",
+    "confirmDelete": {
+      "title": "એકાઉન્ટ કાઢી નાખવું છે?",
+      "message": "આ ક્રિયા તમારું એકાઉન્ટ અને ડેટા કાયમી રીતે કાઢી નાખશે.",
+      "confirm": "કાઢી નાખો",
+      "cancel": "રદ કરો",
+      "log": "એકાઉન્ટ કાઢી નાખવાનું મોડલ ખોલાયું"
+    }
   }
 }

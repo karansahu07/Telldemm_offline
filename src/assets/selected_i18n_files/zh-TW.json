@@ -93,6 +93,24 @@
       "updateAvailable": "有可用更新: {{version}}",
       "error": "無法檢查更新，請稍後再試。"
     }
+  },
+  "accountPage": {
+    "title": "帳號",
+    "securityNotifications": "安全通知",
+    "passkeys": "通行密鑰",
+    "emailAddress": "電子郵件地址",
+    "twoStep": "兩步驟驗證",
+    "changeNumber": "更改號碼",
+    "requestInfo": "請求帳號資訊",
+    "addAccount": "新增帳號",
+    "deleteAccount": "刪除帳號",
+    "confirmDelete": {
+      "title": "刪除帳號？",
+      "message": "此操作將永久刪除您的帳號和資料。",
+      "confirm": "刪除",
+      "cancel": "取消",
+      "log": "刪除帳號視窗已開啟"
+    }
   }
 
 }

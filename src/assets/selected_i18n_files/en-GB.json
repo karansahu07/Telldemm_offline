@@ -92,5 +92,23 @@
       "updateAvailable": "Update available: {{version}}",
       "error": "Could not check updates. Please try again later."
     }
+  },
+  "accountPage": {
+    "title": "Account",
+    "securityNotifications": "Security notifications",
+    "passkeys": "Passkeys",
+    "emailAddress": "Email address",
+    "twoStep": "Two-step verification",
+    "changeNumber": "Change number",
+    "requestInfo": "Request account information",
+    "addAccount": "Add account",
+    "deleteAccount": "Delete account",
+    "confirmDelete": {
+      "title": "Delete account?",
+      "message": "This action will permanently delete your account and data.",
+      "confirm": "Delete",
+      "cancel": "Cancel",
+      "log": "Delete account modal opened"
+    }
   }
 }

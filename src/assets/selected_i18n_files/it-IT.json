@@ -92,5 +92,22 @@
       "updateAvailable": "Aggiornamento disponibile: {{version}}",
       "error": "Impossibile verificare gli aggiornamenti. Riprova più tardi."
     }
+  },"accountPage": {
+    "title": "Account",
+    "securityNotifications": "Notifiche di sicurezza",
+    "passkeys": "Passkey",
+    "emailAddress": "Indirizzo email",
+    "twoStep": "Verifica in due passaggi",
+    "changeNumber": "Cambia numero",
+    "requestInfo": "Richiedi informazioni account",
+    "addAccount": "Aggiungi account",
+    "deleteAccount": "Elimina account",
+    "confirmDelete": {
+      "title": "Eliminare l’account?",
+      "message": "Questa azione eliminerà definitivamente il tuo account e i tuoi dati.",
+      "confirm": "Elimina",
+      "cancel": "Annulla",
+      "log": "Finestra di eliminazione account aperta"
+    }
   }
 }

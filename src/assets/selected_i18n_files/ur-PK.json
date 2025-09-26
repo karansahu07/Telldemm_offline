@@ -68,5 +68,22 @@
       "successMessage": "آپ کامیابی کے ساتھ لاگ آؤٹ ہوگئے ہیں۔"
     },
     "defaultStatus": "دستیاب"
+  },"accountPage": {
+    "title": "اکاؤنٹ",
+    "securityNotifications": "سیکیورٹی اطلاعات",
+    "passkeys": "پاس کیز",
+    "emailAddress": "ای میل ایڈریس",
+    "twoStep": "دو مرحلہ تصدیق",
+    "changeNumber": "نمبر تبدیل کریں",
+    "requestInfo": "اکاؤنٹ کی معلومات کی درخواست",
+    "addAccount": "اکاؤنٹ شامل کریں",
+    "deleteAccount": "اکاؤنٹ حذف کریں",
+    "confirmDelete": {
+      "title": "اکاؤنٹ حذف کریں؟",
+      "message": "یہ عمل آپ کا اکاؤنٹ اور ڈیٹا مستقل طور پر حذف کر دے گا۔",
+      "confirm": "حذف کریں",
+      "cancel": "منسوخ کریں",
+      "log": "اکاؤنٹ حذف کرنے کی ونڈو کھولی گئی"
+    }
   }
 }

@@ -92,6 +92,24 @@
       "updateAvailable": "有更新可用: {{version}}",
       "error": "无法检查更新，请稍后再试。"
     }
+  },
+  "accountPage": {
+    "title": "账户",
+    "securityNotifications": "安全通知",
+    "passkeys": "通行密钥",
+    "emailAddress": "电子邮件地址",
+    "twoStep": "两步验证",
+    "changeNumber": "更改号码",
+    "requestInfo": "请求账户信息",
+    "addAccount": "添加账户",
+    "deleteAccount": "删除账户",
+    "confirmDelete": {
+      "title": "删除账户？",
+      "message": "此操作将永久删除您的账户和数据。",
+      "confirm": "删除",
+      "cancel": "取消",
+      "log": "删除账户弹窗已打开"
+    }
   }
 
 }
