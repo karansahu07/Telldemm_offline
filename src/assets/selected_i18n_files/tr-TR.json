@@ -85,5 +85,27 @@
       "cancel": "İptal",
       "log": "Hesap silme penceresi açıldı"
     }
+  },"accessibility": {
+    "title": "Erişilebilirlik",
+    "groups": {
+      "displayMotion": "Görüntü ve hareket",
+      "interaction": "Etkileşim"
+    },
+    "increaseContrast": {
+      "title": "Kontrastı artır",
+      "desc": "Açık modda okunabilirliği artırmak için ana renkleri koyulaştırın."
+    },
+    "reduceMotion": {
+      "title": "Hareketi azalt",
+      "desc": "Animasyonlu çıkartmaları, GIF’leri ve geçişleri en aza indirin."
+    },
+    "largeText": {
+      "title": "Büyük metin",
+      "desc": "Okumayı kolaylaştırmak için sistem yazı tipi boyutunu artırın."
+    },
+    "simpleAnimations": {
+      "title": "Basitleştirilmiş animasyonlar",
+      "desc": "Etkileşimi kolaylaştırmak için karmaşık animasyonları azaltın."
+    }
   }
 }

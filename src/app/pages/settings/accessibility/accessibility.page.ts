@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 const STORAGE_KEY = 'settings.accessibility';
 
@@ -10,25 +11,22 @@ const STORAGE_KEY = 'settings.accessibility';
   templateUrl: './accessibility.page.html',
   styleUrls: ['./accessibility.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule,FormsModule],
+  imports: [IonicModule, CommonModule, FormsModule, TranslateModule],
 })
 export class AccessibilityPage implements OnInit {
-
-    increaseContrast = false;
+  increaseContrast = false;
   reduceMotion = true;
   largeText = false;
   simpleAnimations = true;
 
-  constructor() {}
+  constructor(private translate: TranslateService) {}
 
   ngOnInit(): void {
     this.loadSettings();
-    // Optionally apply settings immediately (e.g., toggle CSS classes)
     this.applyVisualSettings();
   }
 
-  onToggle(key: keyof AccessibilityPage, ev: any) {
-    // value already bound via ngModel; persist and apply side-effects
+  onToggle(_key: keyof AccessibilityPage, _ev: any) {
     this.saveSettings();
     this.applyVisualSettings();
   }
@@ -62,15 +60,10 @@ export class AccessibilityPage implements OnInit {
   }
 
   private applyVisualSettings() {
-    // Example side-effects: toggle CSS classes on body to reflect choices
     const body = document.body;
     body.classList.toggle('accessibility-high-contrast', this.increaseContrast);
     body.classList.toggle('accessibility-reduced-motion', this.reduceMotion);
     body.classList.toggle('accessibility-large-text', this.largeText);
     body.classList.toggle('accessibility-simple-animations', this.simpleAnimations);
   }
-
-
-
-
 }

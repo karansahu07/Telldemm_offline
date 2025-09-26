@@ -109,5 +109,27 @@
       "cancel": "Cancelar",
       "log": "Se abrió el modal de eliminación de cuenta"
     }
+  }, "accessibility": {
+    "title": "Accesibilidad",
+    "groups": {
+      "displayMotion": "Pantalla y movimiento",
+      "interaction": "Interacción"
+    },
+    "increaseContrast": {
+      "title": "Aumentar contraste",
+      "desc": "Oscurecer los colores principales para mejorar la legibilidad en modo claro."
+    },
+    "reduceMotion": {
+      "title": "Reducir movimiento",
+      "desc": "Minimizar stickers animados, GIFs y transiciones."
+    },
+    "largeText": {
+      "title": "Texto grande",
+      "desc": "Aumentar el tamaño de fuente del sistema para facilitar la lectura."
+    },
+    "simpleAnimations": {
+      "title": "Animaciones simplificadas",
+      "desc": "Reducir animaciones complejas para facilitar la interacción."
+    }
   }
 }

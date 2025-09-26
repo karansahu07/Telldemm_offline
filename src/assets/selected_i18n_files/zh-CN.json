@@ -110,6 +110,28 @@
       "cancel": "取消",
       "log": "删除账户弹窗已打开"
     }
+  },"accessibility": {
+    "title": "辅助功能",
+    "groups": {
+      "displayMotion": "显示与动画",
+      "interaction": "交互"
+    },
+    "increaseContrast": {
+      "title": "增加对比度",
+      "desc": "加深关键颜色以提高在浅色模式下的可读性。"
+    },
+    "reduceMotion": {
+      "title": "减少动画",
+      "desc": "减少动态贴纸、GIF 和过渡效果。"
+    },
+    "largeText": {
+      "title": "大号文字",
+      "desc": "增加系统字体大小以便于阅读。"
+    },
+    "simpleAnimations": {
+      "title": "简化动画",
+      "desc": "减少复杂动画以便更容易交互。"
+    }
   }
 
 }

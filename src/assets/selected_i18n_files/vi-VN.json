@@ -85,5 +85,27 @@
       "cancel": "Hủy",
       "log": "Đã mở hộp thoại xóa tài khoản"
     }
+  },"accessibility": {
+    "title": "Trợ năng",
+    "groups": {
+      "displayMotion": "Hiển thị & chuyển động",
+      "interaction": "Tương tác"
+    },
+    "increaseContrast": {
+      "title": "Tăng độ tương phản",
+      "desc": "Làm tối các màu chính để cải thiện khả năng đọc ở chế độ sáng."
+    },
+    "reduceMotion": {
+      "title": "Giảm chuyển động",
+      "desc": "Giảm thiểu nhãn dán động, GIF và hiệu ứng chuyển cảnh."
+    },
+    "largeText": {
+      "title": "Chữ lớn",
+      "desc": "Tăng kích thước phông chữ hệ thống để dễ đọc hơn."
+    },
+    "simpleAnimations": {
+      "title": "Hoạt ảnh đơn giản",
+      "desc": "Giảm hoạt ảnh phức tạp để tương tác dễ dàng hơn."
+    }
   }
 }

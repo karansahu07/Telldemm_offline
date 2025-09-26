@@ -1,59 +1,81 @@
 <ion-header>
- 
-   <ion-toolbar style="--background: #ffffff; --color: #000000;">
+  <ion-toolbar style="--background: #ffffff; --color: #000000;">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/settings"></ion-back-button>
+      <ion-back-button
+        defaultHref="/settings"
+        [attr.aria-label]="'common.back' | translate">
+      </ion-back-button>
     </ion-buttons>
-    <ion-title>Accessibility</ion-title>
+    <ion-title>{{ 'accessibility.title' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding" style="--background: #ffffff;">
   <ion-list lines="inset">
     <ion-list-header>
-      <ion-label>Display & motion</ion-label>
+      <ion-label>{{ 'accessibility.groups.displayMotion' | translate }}</ion-label>
     </ion-list-header>
 
     <ion-item>
-      <ion-icon slot="start" name="contrast-outline"></ion-icon>
+      <ion-icon slot="start" name="contrast-outline" aria-hidden="true"></ion-icon>
       <ion-label>
-        <h2>Increase contrast</h2>
-        <p>Darken key colors to improve readability in light mode.</p>
+        <h2>{{ 'accessibility.increaseContrast.title' | translate }}</h2>
+        <p>{{ 'accessibility.increaseContrast.desc' | translate }}</p>
       </ion-label>
-      <ion-toggle slot="end" [(ngModel)]="increaseContrast" (ionChange)="onToggle('increaseContrast', $event)"></ion-toggle>
+      <ion-toggle
+        slot="end"
+        [(ngModel)]="increaseContrast"
+        (ionChange)="onToggle('increaseContrast', $event)"
+        [attr.aria-label]="'accessibility.increaseContrast.title' | translate">
+      </ion-toggle>
     </ion-item>
 
     <ion-item>
-      <ion-icon slot="start" name="play-back-outline"></ion-icon>
+      <ion-icon slot="start" name="play-back-outline" aria-hidden="true"></ion-icon>
       <ion-label>
-        <h2>Reduce motion</h2>
-        <p>Minimize animated stickers, GIFs and transitions.</p>
+        <h2>{{ 'accessibility.reduceMotion.title' | translate }}</h2>
+        <p>{{ 'accessibility.reduceMotion.desc' | translate }}</p>
       </ion-label>
-      <ion-toggle slot="end" [(ngModel)]="reduceMotion" (ionChange)="onToggle('reduceMotion', $event)"></ion-toggle>
+      <ion-toggle
+        slot="end"
+        [(ngModel)]="reduceMotion"
+        (ionChange)="onToggle('reduceMotion', $event)"
+        [attr.aria-label]="'accessibility.reduceMotion.title' | translate">
+      </ion-toggle>
     </ion-item>
 
     <ion-item>
-      <ion-icon slot="start" name="text-outline"></ion-icon>
+      <ion-icon slot="start" name="text-outline" aria-hidden="true"></ion-icon>
       <ion-label>
-        <h2>Large text</h2>
-        <p>Increase system font scale for easier reading.</p>
+        <h2>{{ 'accessibility.largeText.title' | translate }}</h2>
+        <p>{{ 'accessibility.largeText.desc' | translate }}</p>
       </ion-label>
-      <ion-toggle slot="end" [(ngModel)]="largeText" (ionChange)="onToggle('largeText', $event)"></ion-toggle>
+      <ion-toggle
+        slot="end"
+        [(ngModel)]="largeText"
+        (ionChange)="onToggle('largeText', $event)"
+        [attr.aria-label]="'accessibility.largeText.title' | translate">
+      </ion-toggle>
     </ion-item>
   </ion-list>
 
   <ion-list lines="inset">
     <ion-list-header>
-      <ion-label>Interaction</ion-label>
+      <ion-label>{{ 'accessibility.groups.interaction' | translate }}</ion-label>
     </ion-list-header>
 
     <ion-item>
-      <ion-icon slot="start" name="hand-left-outline"></ion-icon>
+      <ion-icon slot="start" name="hand-left-outline" aria-hidden="true"></ion-icon>
       <ion-label>
-        <h2>Simplified animations</h2>
-        <p>Reduce complex animations for easier interaction.</p>
+        <h2>{{ 'accessibility.simpleAnimations.title' | translate }}</h2>
+        <p>{{ 'accessibility.simpleAnimations.desc' | translate }}</p>
       </ion-label>
-      <ion-toggle slot="end" [(ngModel)]="simpleAnimations" (ionChange)="onToggle('simpleAnimations', $event)"></ion-toggle>
+      <ion-toggle
+        slot="end"
+        [(ngModel)]="simpleAnimations"
+        (ionChange)="onToggle('simpleAnimations', $event)"
+        [attr.aria-label]="'accessibility.simpleAnimations.title' | translate">
+      </ion-toggle>
     </ion-item>
   </ion-list>
 </ion-content>

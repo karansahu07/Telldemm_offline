@@ -110,5 +110,27 @@
       "cancel": "Abbrechen",
       "log": "Konto-Löschungsfenster geöffnet"
     }
+  },"accessibility": {
+    "title": "Barrierefreiheit",
+    "groups": {
+      "displayMotion": "Anzeige & Bewegung",
+      "interaction": "Interaktion"
+    },
+    "increaseContrast": {
+      "title": "Kontrast erhöhen",
+      "desc": "Wichtige Farben abdunkeln, um die Lesbarkeit im hellen Modus zu verbessern."
+    },
+    "reduceMotion": {
+      "title": "Bewegung reduzieren",
+      "desc": "Animierte Sticker, GIFs und Übergänge minimieren."
+    },
+    "largeText": {
+      "title": "Großer Text",
+      "desc": "Systemschriftgröße erhöhen, um das Lesen zu erleichtern."
+    },
+    "simpleAnimations": {
+      "title": "Vereinfachte Animationen",
+      "desc": "Komplexe Animationen reduzieren, um die Interaktion zu erleichtern."
+    }
   }
 }

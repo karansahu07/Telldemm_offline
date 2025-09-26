@@ -109,5 +109,27 @@
       "cancel": "Cancelar",
       "log": "Modal de exclusão de conta aberto"
     }
+  },"accessibility": {
+    "title": "Acessibilidade",
+    "groups": {
+      "displayMotion": "Exibição e movimento",
+      "interaction": "Interação"
+    },
+    "increaseContrast": {
+      "title": "Aumentar contraste",
+      "desc": "Escureça as cores principais para melhorar a leitura no modo claro."
+    },
+    "reduceMotion": {
+      "title": "Reduzir movimento",
+      "desc": "Minimize figurinhas animadas, GIFs e transições."
+    },
+    "largeText": {
+      "title": "Texto grande",
+      "desc": "Aumente a escala da fonte do sistema para facilitar a leitura."
+    },
+    "simpleAnimations": {
+      "title": "Animações simplificadas",
+      "desc": "Reduza animações complexas para facilitar a interação."
+    }
   }
 }

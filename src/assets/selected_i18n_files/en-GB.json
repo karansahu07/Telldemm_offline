@@ -110,5 +110,27 @@
       "cancel": "Cancel",
       "log": "Delete account modal opened"
     }
+  },"accessibility": {
+    "title": "Accessibility",
+    "groups": {
+      "displayMotion": "Display & motion",
+      "interaction": "Interaction"
+    },
+    "increaseContrast": {
+      "title": "Increase contrast",
+      "desc": "Darken key colours to improve readability in light mode."
+    },
+    "reduceMotion": {
+      "title": "Reduce motion",
+      "desc": "Minimise animated stickers, GIFs and transitions."
+    },
+    "largeText": {
+      "title": "Large text",
+      "desc": "Increase system font scale for easier reading."
+    },
+    "simpleAnimations": {
+      "title": "Simplified animations",
+      "desc": "Reduce complex animations for easier interaction."
+    }
   }
 }
