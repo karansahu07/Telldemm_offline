@@ -281,7 +281,7 @@
 
 
 
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
 import { ToastController, Platform, ModalController, PopoverController, ActionSheetController, AlertController } from '@ionic/angular';
 import { NetworkService } from './services/network-connection/network.service';
 import { FirebasePushService } from './services/push_notification/firebase-push.service';
@@ -300,6 +300,7 @@ import { filter } from 'rxjs/operators';
 import { PresenceService } from './services/presence.service'; // <-- added
 import { Subscription } from 'rxjs';
 import { Language } from './services/language';
+import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
 
 register();
 
@@ -317,6 +318,8 @@ export class AppComponent implements OnInit {
   private appStateListener: any = null;
   private beforeUnloadHandler: any = null;
   private presenceSub?: Subscription;
+  private langSub?: Subscription;
+  private langSvcSub?: Subscription;
 
   constructor(
     private networkService: NetworkService,
@@ -334,13 +337,60 @@ export class AppComponent implements OnInit {
     private actionSheetCtrl: ActionSheetController,
     private alertCtrl: AlertController,
     private presence: PresenceService, // <-- injected
-    private langSvc: Language // <-- injected
-  ) {
+    private langSvc: Language,
+    private translate: TranslateService,  
+     private zone: NgZone,
+       private cd: ChangeDetectorRef,   //// <-- injected
+  ) 
+  // {
+  //   this.initializeApp();
+  //   this.platform.ready().then(() => {
+  //     this.langSvc.init();
+  //   });
+
+  // }
+  {
     this.initializeApp();
     this.platform.ready().then(() => {
       this.langSvc.init();
+
+      // 1) subscribe to ngx-translate onLangChange
+      this.langSub = this.translate.onLangChange.subscribe((evt: LangChangeEvent) => {
+        this.zone.run(() => {
+          console.log('[AppComponent] translate.onLangChange ->', evt.lang);
+          this.applyLanguageChange(evt.lang);
+        });
+      });
+
+      // 2) (optional) if your Language service exposes an observable, subscribe to it too
+      // Replace `langChanged$` with the actual observable name if different.
+      if ((this.langSvc as any).langChanged$) {
+        this.langSvcSub = (this.langSvc as any).langChanged$.subscribe((newLang: string) => {
+          this.zone.run(() => {
+            console.log('[AppComponent] langSvc.langChanged$ ->', newLang);
+            this.applyLanguageChange(newLang);
+          });
+        });
+      }
     });
   }
+
+private applyLanguageChange(newLang: string) {
+  // Call your Language service to set the language
+  if (typeof this.langSvc.useLanguage === 'function') {
+    this.langSvc.useLanguage(newLang);
+  }
+
+  // Set document direction (RTL/LTR)
+  const isRtl = /^(ar|he|fa|ur)/.test(newLang); // add more RTL langs if needed
+  document.documentElement.dir = isRtl ? 'rtl' : 'ltr';
+  document.documentElement.classList.toggle('rtl', isRtl);
+
+  // Force UI refresh
+  try { this.cd.detectChanges(); } catch (e) { console.warn('CD detect failed', e); }
+}
+
+
 
   async ngOnInit() {
     await this.fcmService.initializePushNotifications();
