@@ -39,5 +39,34 @@
       "title": "अॅप माहिती",
       "description": "आवृत्ती, कायदेशीर व तांत्रिक तपशील."
     }
+  },"common": {
+    "ok": "ठीक आहे",
+    "cancel": "रद्द करा",
+    "logout": "लॉग आऊट"
+  },
+  "settingsPage": {
+    "title": "सेटिंग्ज",
+    "account": { "title": "खाते", "description": "गोपनीयता, सुरक्षा, क्रमांक बदला" },
+    "privacy": { "title": "गोपनीयता", "description": "आपली गोपनीयता सेटिंग्ज नियंत्रित करा" },
+    "avatar": { "title": "अवतार", "description": "प्रोफाइल फोटो बदला" },
+    "chats": { "title": "चॅट्स", "description": "थीम, वॉलपेपर, बॅकअप" },
+    "accessibility": { "title": "सुलभता", "description": "मजकूराचा आकार आणि प्रदर्शन पर्याय" },
+    "notifications": { "title": "सूचना", "description": "संदेश, गट आणि कॉल सूचना" },
+    "storage": { "title": "स्टोरेज आणि डेटा", "description": "स्टोरेज आणि नेटवर्क वापर व्यवस्थापित करा" },
+    "appLanguage": { "title": "अॅप भाषा", "description": "अॅपची भाषा निवडा" },
+    "help": { "title": "मदत आणि अभिप्राय", "description": "मदत केंद्र, आमच्याशी संपर्क साधा, अॅप माहिती" },
+    "updates": { "title": "अॅप अपडेट्स", "description": "अपडेट तपासा, स्वयंचलित अपडेट" },
+    "invite": { "title": "मित्राला आमंत्रित करा", "description": "अॅप संपर्कांसोबत शेअर करा" },
+    "logout": {
+      "title": "लॉग आऊट",
+      "description": "अॅप डेटा साफ करा आणि साइन आउट करा",
+      "confirmHeader": "लॉग आऊटची पुष्टी करा",
+      "confirmMessage": "तुम्हाला खात्री आहे की तुम्ही लॉग आऊट करून अॅप डेटा साफ करू इच्छिता?",
+      "loadingHeader": "लॉग आऊट होत आहे",
+      "loadingMessage": "कृपया थांबा...",
+      "successHeader": "लॉग आऊट झाले",
+      "successMessage": "तुम्ही यशस्वीरित्या लॉग आऊट केले आहे."
+    },
+    "defaultStatus": "उपलब्ध"
   }
 }

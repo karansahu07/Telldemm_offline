@@ -39,5 +39,34 @@
       "title": "Info app",
       "description": "Versione, dettagli legali e tecnici."
     }
+  },"common": {
+    "ok": "OK",
+    "cancel": "Annulla",
+    "logout": "Disconnetti"
+  },
+  "settingsPage": {
+    "title": "Impostazioni",
+    "account": { "title": "Account", "description": "Privacy, sicurezza, cambia numero" },
+    "privacy": { "title": "Privacy", "description": "Controlla le tue impostazioni sulla privacy" },
+    "avatar": { "title": "Avatar", "description": "Cambia foto profilo" },
+    "chats": { "title": "Chat", "description": "Tema, sfondo, backup" },
+    "accessibility": { "title": "Accessibilità", "description": "Dimensione del testo e opzioni di visualizzazione" },
+    "notifications": { "title": "Notifiche", "description": "Avvisi di messaggi, gruppi e chiamate" },
+    "storage": { "title": "Archiviazione e dati", "description": "Gestisci archiviazione e utilizzo della rete" },
+    "appLanguage": { "title": "Lingua dell'app", "description": "Scegli la lingua dell'app" },
+    "help": { "title": "Aiuto e feedback", "description": "Centro assistenza, contattaci, info sull'app" },
+    "updates": { "title": "Aggiornamenti app", "description": "Controlla aggiornamenti, aggiornamento automatico" },
+    "invite": { "title": "Invita un amico", "description": "Condividi l'app con i contatti" },
+    "logout": {
+      "title": "Disconnetti",
+      "description": "Cancella i dati dell'app ed esci",
+      "confirmHeader": "Conferma disconnessione",
+      "confirmMessage": "Sei sicuro di voler uscire e cancellare i dati dell'app?",
+      "loadingHeader": "Disconnessione in corso",
+      "loadingMessage": "Attendere prego...",
+      "successHeader": "Disconnesso",
+      "successMessage": "Disconnessione avvenuta con successo."
+    },
+    "defaultStatus": "Disponibile"
   }
 }

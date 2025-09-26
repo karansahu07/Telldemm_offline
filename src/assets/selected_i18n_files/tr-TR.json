@@ -39,5 +39,34 @@
       "title": "Uygulama Bilgileri",
       "description": "Sürüm, yasal ve teknik bilgiler."
     }
+  },"common": {
+    "ok": "Tamam",
+    "cancel": "İptal",
+    "logout": "Çıkış yap"
+  },
+  "settingsPage": {
+    "title": "Ayarlar",
+    "account": { "title": "Hesap", "description": "Gizlilik, güvenlik, numara değiştir" },
+    "privacy": { "title": "Gizlilik", "description": "Gizlilik ayarlarını kontrol et" },
+    "avatar": { "title": "Avatar", "description": "Profil resmini değiştir" },
+    "chats": { "title": "Sohbetler", "description": "Tema, duvar kağıdı, yedekleme" },
+    "accessibility": { "title": "Erişilebilirlik", "description": "Yazı boyutu ve görüntüleme seçenekleri" },
+    "notifications": { "title": "Bildirimler", "description": "Mesaj, grup ve arama uyarıları" },
+    "storage": { "title": "Depolama ve Veri", "description": "Depolamayı ve ağ kullanımını yönet" },
+    "appLanguage": { "title": "Uygulama Dili", "description": "Uygulama dilini seç" },
+    "help": { "title": "Yardım ve Geri Bildirim", "description": "Yardım merkezi, bizimle iletişime geç, uygulama bilgisi" },
+    "updates": { "title": "Uygulama Güncellemeleri", "description": "Güncellemeleri kontrol et, otomatik güncelleme" },
+    "invite": { "title": "Bir Arkadaş Davet Et", "description": "Uygulamayı kişilerle paylaş" },
+    "logout": {
+      "title": "Çıkış yap",
+      "description": "Uygulama verilerini temizle ve çıkış yap",
+      "confirmHeader": "Çıkışı Onayla",
+      "confirmMessage": "Çıkış yapmak ve uygulama verilerini temizlemek istediğinizden emin misiniz?",
+      "loadingHeader": "Çıkış yapılıyor",
+      "loadingMessage": "Lütfen bekleyin...",
+      "successHeader": "Çıkış yapıldı",
+      "successMessage": "Başarıyla çıkış yaptınız."
+    },
+    "defaultStatus": "Mevcut"
   }
 }

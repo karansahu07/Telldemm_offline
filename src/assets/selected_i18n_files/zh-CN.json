@@ -39,5 +39,35 @@
       "title": "应用信息",
       "description": "版本、法律和技术细节。"
     }
+  },"common": {
+    "ok": "确定",
+    "cancel": "取消",
+    "logout": "退出登录"
+  },
+  "settingsPage": {
+    "title": "设置",
+    "account": { "title": "账户", "description": "隐私、安全、更改号码" },
+    "privacy": { "title": "隐私", "description": "管理你的隐私设置" },
+    "avatar": { "title": "头像", "description": "更改个人资料照片" },
+    "chats": { "title": "聊天", "description": "主题、壁纸、备份" },
+    "accessibility": { "title": "辅助功能", "description": "文字大小与显示选项" },
+    "notifications": { "title": "通知", "description": "消息、群组与通话提醒" },
+    "storage": { "title": "存储与数据", "description": "管理存储和网络使用" },
+    "appLanguage": { "title": "应用语言", "description": "选择应用语言" },
+    "help": { "title": "帮助与反馈", "description": "帮助中心、联系我们、应用信息" },
+    "updates": { "title": "应用更新", "description": "检查更新与自动更新" },
+    "invite": { "title": "邀请好友", "description": "与联系人分享应用" },
+    "logout": {
+      "title": "退出登录",
+      "description": "清除应用数据并退出",
+      "confirmHeader": "确认退出登录",
+      "confirmMessage": "确定要退出并清除应用数据吗？",
+      "loadingHeader": "正在退出",
+      "loadingMessage": "请稍候…",
+      "successHeader": "已退出登录",
+      "successMessage": "你已成功退出登录。"
+    },
+    "defaultStatus": "在线"
   }
+
 }

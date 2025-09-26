@@ -39,5 +39,35 @@
       "title": "Infos sur l'app",
       "description": "Version, aspects légaux et détails techniques."
     }
+  },
+  "common": {
+    "ok": "OK",
+    "cancel": "Annuler",
+    "logout": "Se déconnecter"
+  },
+  "settingsPage": {
+    "title": "Paramètres",
+    "account": { "title": "Compte", "description": "Confidentialité, sécurité, changer de numéro" },
+    "privacy": { "title": "Confidentialité", "description": "Contrôlez vos paramètres de confidentialité" },
+    "avatar": { "title": "Avatar", "description": "Changer la photo de profil" },
+    "chats": { "title": "Discussions", "description": "Thème, fond d’écran, sauvegarde" },
+    "accessibility": { "title": "Accessibilité", "description": "Taille du texte et options d’affichage" },
+    "notifications": { "title": "Notifications", "description": "Alertes de messages, groupes et appels" },
+    "storage": { "title": "Stockage et données", "description": "Gérer le stockage et l’utilisation du réseau" },
+    "appLanguage": { "title": "Langue de l’application", "description": "Choisir la langue de l’application" },
+    "help": { "title": "Aide et commentaires", "description": "Centre d’aide, contactez-nous, infos sur l’application" },
+    "updates": { "title": "Mises à jour", "description": "Vérifier les mises à jour, mise à jour automatique" },
+    "invite": { "title": "Inviter un ami", "description": "Partager l’application avec vos contacts" },
+    "logout": {
+      "title": "Se déconnecter",
+      "description": "Effacer les données de l’application et se déconnecter",
+      "confirmHeader": "Confirmer la déconnexion",
+      "confirmMessage": "Voulez-vous vraiment vous déconnecter et effacer les données de l’application ?",
+      "loadingHeader": "Déconnexion en cours",
+      "loadingMessage": "Veuillez patienter...",
+      "successHeader": "Déconnecté",
+      "successMessage": "Vous vous êtes déconnecté avec succès."
+    },
+    "defaultStatus": "Disponible"
   }
 }

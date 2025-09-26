@@ -38,5 +38,35 @@
       "title": "Información de la app",
       "description": "Versión, detalles legales y técnicos."
     }
+  },
+  "common": {
+    "ok": "OK",
+    "cancel": "Cancelar",
+    "logout": "Cerrar sesión"
+  },
+  "settingsPage": {
+    "title": "Ajustes",
+    "account": { "title": "Cuenta", "description": "Privacidad, seguridad, cambiar número" },
+    "privacy": { "title": "Privacidad", "description": "Controla tu configuración de privacidad" },
+    "avatar": { "title": "Avatar", "description": "Cambiar foto de perfil" },
+    "chats": { "title": "Chats", "description": "Tema, fondo de pantalla, copia de seguridad" },
+    "accessibility": { "title": "Accesibilidad", "description": "Tamaño de texto y opciones de visualización" },
+    "notifications": { "title": "Notificaciones", "description": "Alertas de mensajes, grupos y llamadas" },
+    "storage": { "title": "Almacenamiento y datos", "description": "Administrar almacenamiento y uso de red" },
+    "appLanguage": { "title": "Idioma de la app", "description": "Elige el idioma de la aplicación" },
+    "help": { "title": "Ayuda y comentarios", "description": "Centro de ayuda, contáctanos, información de la app" },
+    "updates": { "title": "Actualizaciones de la app", "description": "Buscar actualizaciones, actualización automática" },
+    "invite": { "title": "Invitar a un amigo", "description": "Comparte la app con tus contactos" },
+    "logout": {
+      "title": "Cerrar sesión",
+      "description": "Borrar datos de la app y cerrar sesión",
+      "confirmHeader": "Confirmar cierre de sesión",
+      "confirmMessage": "¿Estás seguro de que quieres cerrar sesión y borrar los datos de la app?",
+      "loadingHeader": "Cerrando sesión",
+      "loadingMessage": "Por favor espera...",
+      "successHeader": "Sesión cerrada",
+      "successMessage": "Has cerrado sesión correctamente."
+    },
+    "defaultStatus": "Disponible"
   }
 }

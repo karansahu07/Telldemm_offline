@@ -39,5 +39,36 @@
       "title": "معلومات التطبيق",
       "description": "الإصدار، المعلومات القانونية والتفاصيل التقنية."
     }
+  },
+  "common": {
+    "ok": "حسنًا",
+    "cancel": "إلغاء",
+    "logout": "تسجيل الخروج"
+  },
+  "settingsPage": {
+    "title": "الإعدادات",
+    "account": { "title": "الحساب", "description": "الخصوصية، الأمان، تغيير الرقم" },
+    "privacy": { "title": "الخصوصية", "description": "تحكم في إعدادات الخصوصية" },
+    "avatar": { "title": "الصورة الرمزية", "description": "تغيير صورة الملف الشخصي" },
+    "chats": { "title": "الدردشات", "description": "الثيم، الخلفية، النسخ الاحتياطي" },
+    "accessibility": { "title": "إمكانية الوصول", "description": "حجم النص وخيارات العرض" },
+    "notifications": { "title": "الإشعارات", "description": "تنبيهات الرسائل والمجموعات والمكالمات" },
+    "storage": { "title": "التخزين والبيانات", "description": "إدارة التخزين واستخدام الشبكة" },
+    "appLanguage": { "title": "لغة التطبيق", "description": "اختر لغة التطبيق" },
+    "help": { "title": "المساعدة والتعليقات", "description": "مركز المساعدة، تواصل معنا، معلومات التطبيق" },
+    "updates": { "title": "تحديثات التطبيق", "description": "تحقق من وجود تحديثات وتحديث تلقائي" },
+    "invite": { "title": "دعوة صديق", "description": "شارك التطبيق مع جهات الاتصال" },
+    "logout": {
+      "title": "تسجيل الخروج",
+      "description": "مسح بيانات التطبيق وتسجيل الخروج",
+      "confirmHeader": "تأكيد تسجيل الخروج",
+      "confirmMessage": "هل تريد بالتأكيد تسجيل الخروج ومسح بيانات التطبيق؟",
+      "loadingHeader": "جاري تسجيل الخروج",
+      "loadingMessage": "يرجى الانتظار...",
+      "successHeader": "تم تسجيل الخروج",
+      "successMessage": "تم تسجيل الخروج بنجاح."
+    },
+    "defaultStatus": "متاح"
   }
+
 }

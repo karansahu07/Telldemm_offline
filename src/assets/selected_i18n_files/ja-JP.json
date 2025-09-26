@@ -39,5 +39,34 @@
       "title": "アプリ情報",
       "description": "バージョン、法的および技術的な詳細。"
     }
+  },"common": {
+    "ok": "OK",
+    "cancel": "キャンセル",
+    "logout": "ログアウト"
+  },
+  "settingsPage": {
+    "title": "設定",
+    "account": { "title": "アカウント", "description": "プライバシー、セキュリティ、番号変更" },
+    "privacy": { "title": "プライバシー", "description": "プライバシー設定を管理する" },
+    "avatar": { "title": "アバター", "description": "プロフィール写真を変更する" },
+    "chats": { "title": "チャット", "description": "テーマ、壁紙、バックアップ" },
+    "accessibility": { "title": "アクセシビリティ", "description": "文字サイズと表示オプション" },
+    "notifications": { "title": "通知", "description": "メッセージ、グループ、通話の通知" },
+    "storage": { "title": "ストレージとデータ", "description": "ストレージとネットワーク使用を管理" },
+    "appLanguage": { "title": "アプリの言語", "description": "アプリの言語を選択" },
+    "help": { "title": "ヘルプとフィードバック", "description": "ヘルプセンター、お問い合わせ、アプリ情報" },
+    "updates": { "title": "アプリの更新", "description": "更新を確認、自動更新" },
+    "invite": { "title": "友達を招待", "description": "アプリを連絡先と共有" },
+    "logout": {
+      "title": "ログアウト",
+      "description": "アプリデータを消去してサインアウト",
+      "confirmHeader": "ログアウトを確認",
+      "confirmMessage": "本当にログアウトしてアプリデータを消去しますか？",
+      "loadingHeader": "ログアウト中",
+      "loadingMessage": "しばらくお待ちください…",
+      "successHeader": "ログアウト完了",
+      "successMessage": "正常にログアウトしました。"
+    },
+    "defaultStatus": "オンライン"
   }
 }

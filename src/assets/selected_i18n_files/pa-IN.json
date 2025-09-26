@@ -39,5 +39,34 @@
       "title": "ਐਪ ਜਾਣਕਾਰੀ",
       "description": "ਵਰਜ਼ਨ, ਕਾਨੂੰਨੀ ਅਤੇ ਤਕਨੀਕੀ ਵੇਰਵੇ।"
     }
+  },"common": {
+    "ok": "ਠੀਕ ਹੈ",
+    "cancel": "ਰੱਦ ਕਰੋ",
+    "logout": "ਲਾੱਗ ਆਉਟ"
+  },
+  "settingsPage": {
+    "title": "ਸੈਟਿੰਗਜ਼",
+    "account": { "title": "ਖਾਤਾ", "description": "ਪ੍ਰਾਈਵੇਸੀ, ਸੁਰੱਖਿਆ, ਨੰਬਰ ਬਦਲੋ" },
+    "privacy": { "title": "ਪ੍ਰਾਈਵੇਸੀ", "description": "ਆਪਣੀਆਂ ਪ੍ਰਾਈਵੇਸੀ ਸੈਟਿੰਗਜ਼ ਕੰਟਰੋਲ ਕਰੋ" },
+    "avatar": { "title": "ਅਵਤਾਰ", "description": "ਪ੍ਰੋਫਾਈਲ ਤਸਵੀਰ ਬਦਲੋ" },
+    "chats": { "title": "ਚੈਟਾਂ", "description": "ਥੀਮ, ਵਾਲਪੇਪਰ, ਬੈਕਅੱਪ" },
+    "accessibility": { "title": "ਪਹੁੰਚਯੋਗਤਾ", "description": "ਲਿਖਤ ਦਾ ਆਕਾਰ ਅਤੇ ਪ੍ਰਦਰਸ਼ਨ ਵਿਕਲਪ" },
+    "notifications": { "title": "ਨੋਟੀਫਿਕੇਸ਼ਨ", "description": "ਸੁਨੇਹੇ, ਸਮੂਹ ਅਤੇ ਕਾਲ ਅਲਰਟ" },
+    "storage": { "title": "ਸਟੋਰੇਜ ਅਤੇ ਡਾਟਾ", "description": "ਸਟੋਰੇਜ ਅਤੇ ਨੈੱਟਵਰਕ ਵਰਤੋਂ ਪ੍ਰਬੰਧਿਤ ਕਰੋ" },
+    "appLanguage": { "title": "ਐਪ ਭਾਸ਼ਾ", "description": "ਐਪ ਭਾਸ਼ਾ ਚੁਣੋ" },
+    "help": { "title": "ਮਦਦ ਅਤੇ ਫੀਡਬੈਕ", "description": "ਮਦਦ ਕੇਂਦਰ, ਸਾਡੇ ਨਾਲ ਸੰਪਰਕ ਕਰੋ, ਐਪ ਜਾਣਕਾਰੀ" },
+    "updates": { "title": "ਐਪ ਅੱਪਡੇਟ", "description": "ਅੱਪਡੇਟ ਚੈੱਕ ਕਰੋ, ਆਟੋਮੈਟਿਕ ਅੱਪਡੇਟ" },
+    "invite": { "title": "ਦੋਸਤ ਨੂੰ ਸੱਦਾ ਦਿਓ", "description": "ਐਪ ਸੰਪਰਕਾਂ ਨਾਲ ਸਾਂਝੀ ਕਰੋ" },
+    "logout": {
+      "title": "ਲਾੱਗ ਆਉਟ",
+      "description": "ਐਪ ਡਾਟਾ ਸਾਫ ਕਰੋ ਅਤੇ ਸਾਈਨ ਆਉਟ ਕਰੋ",
+      "confirmHeader": "ਲਾੱਗ ਆਉਟ ਦੀ ਪੁਸ਼ਟੀ ਕਰੋ",
+      "confirmMessage": "ਕੀ ਤੁਸੀਂ ਯਕੀਨੀ ਤੌਰ 'ਤੇ ਲਾੱਗ ਆਉਟ ਕਰਨਾ ਅਤੇ ਐਪ ਡਾਟਾ ਸਾਫ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?",
+      "loadingHeader": "ਲਾੱਗ ਆਉਟ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ",
+      "loadingMessage": "ਕਿਰਪਾ ਕਰਕੇ ਉਡੀਕ ਕਰੋ...",
+      "successHeader": "ਲਾੱਗ ਆਉਟ ਹੋ ਗਿਆ",
+      "successMessage": "ਤੁਸੀਂ ਸਫਲਤਾਪੂਰਵਕ ਲਾੱਗ ਆਉਟ ਕਰ ਦਿੱਤਾ ਹੈ।"
+    },
+    "defaultStatus": "ਉਪਲਬਧ"
   }
 }

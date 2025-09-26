@@ -25,8 +25,12 @@ const config: CapacitorConfig = {
     Keyboard: {
       resize: KeyboardResize.Ionic,          // Correct use of enum
       style: KeyboardStyle.Light,             // Also using enum
-      resizeOnFullScreen: true,               // Optional Android workaround
+      resizeOnFullScreen: true,  
+                // Optional Android workaround
     },
+    EdgeToEdge: {
+      backgroundColor: "#ffffff",  // color for status + navigation bar
+    },   
   },
 };
  

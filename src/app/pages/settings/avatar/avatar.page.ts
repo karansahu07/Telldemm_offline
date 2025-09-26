@@ -4,12 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { ActionSheetController, IonicModule, ModalController } from '@ionic/angular';
 import { Avatar } from 'src/app/services/avatar';
 
-// interface User {
-//   id: string;
-//   name: string;
-//   lastMessage?: string;
-//   avatarUrl?: string;
-// }
 
 @Component({
   selector: 'app-avatar',
@@ -55,57 +49,7 @@ options: any = {};
     this.avatarUrl = this.avatarService.generateAvatarUrl(this.options, { size: 250 } as any);
   }
 
-  /**
-   * Download avatar as PNG. Steps:
-   *  - fetch SVG text
-   *  - convert to PNG blob at desired size
-   *  - trigger download
-   */
-  // async downloadPng() {
-  //   this.isDownloading = true;
-  //   try {
-  //     // Create the avataaars URL requesting SVG at a larger size so details are preserved.
-  //     const size = 512; // PNG size in px
-  //     // Ensure the URL doesn't force raster server-side; we want raw SVG text.
-  //     // The service generateUrl adds width/height; it's okay because avataaars returns svg text.
-  //     const url = this.avatarService.generateUrl(this.options, size);
 
-  //     // Fetch SVG text
-  //     const svgText = await this.avatarService.fetchAvatarSvg(url);
-
-  //     // Convert SVG string to PNG blob
-  //     const pngBlob = await this.avatarService.svgStringToPngBlob(svgText, size);
-
-  //     // Download blob as file
-  //     this.avatarService.downloadBlob(pngBlob, `${this.userId || 'avatar'}.png`);
-  //   } catch (err: any) {
-  //     console.error('Download failed:', err);
-  //     // Fallback: open avatar URL in new tab so user can manually save
-  //     const fallbackUrl = this.avatarService.generateAvatarUrl(this.options, { size: 1024 } as any);
-  //     window.open(fallbackUrl, '_blank');
-  //     alert('Automatic conversion failed (CORS or browser restriction). Avatar opened in new tab — right-click and Save Image.');
-  //   } finally {
-  //     this.isDownloading = false;
-  //   }
-  // }
-
-//   async downloadPng() {
-//   try {
-//     const url = this.avatarService.generateUrl(this.options, 512);
-
-//     // Fetch SVG as text
-//     const svgText = await this.avatarService.fetchAvatarSvg(url);
-
-//     // Convert to PNG Blob
-//     const pngBlob = await this.avatarService.svgStringToPngBlob(svgText, 512);
-
-//     // Trigger download
-//     this.avatarService.downloadBlob(pngBlob, 'avatar.png');
-//   } catch (err) {
-//     console.error('Download failed', err);
-//     alert('Download failed. Please try again.');
-//   }
-// }
 
 async downloadPng() {
   const url = this.avatarService.generateUrl(this.options, 512) + '&format=png';
@@ -166,7 +110,29 @@ async downloadFromServerless() {
 }
 
 
+// async downloadAvatar() {
+//   const params = new URLSearchParams({
+//     avatarStyle: 'Circle',
+//     topType: this.options.topType || 'ShortHairShortFlat',
+//     accessoriesType: this.options.accessoriesType || 'Blank',
+//     hairColor: this.options.hairColor || 'BrownDark',
+//     eyeType: this.options.eyeType || 'Default',
+//     mouthType: this.options.mouthType || 'Smile',
+//     clotheType: this.options.clotheType || 'ShirtCrewNeck',
+//     skinColor: this.options.skinColor || 'Light',
+//     width: '1024',
+//     height: '1024'
+//   });
+
+//   const url = `https://avatarserverlesstwo.vercel.app/api/avatar?${params.toString()}`;
+
+//   // ✅ Open the URL in a new browser tab/window → should trigger download
+//   window.open(url, '_blank');
+// }
+
 async downloadAvatar() {
+  this.isDownloading = true;
+
   const params = new URLSearchParams({
     avatarStyle: 'Circle',
     topType: this.options.topType || 'ShortHairShortFlat',
@@ -182,11 +148,14 @@ async downloadAvatar() {
 
   const url = `https://avatarserverlesstwo.vercel.app/api/avatar?${params.toString()}`;
 
-  // ✅ Open the URL in a new browser tab/window → should trigger download
+  // open in new tab
   window.open(url, '_blank');
+
+  // reset loading state after 3s (enough time to start download)
+  setTimeout(() => {
+    this.isDownloading = false;
+  }, 3000);
 }
-
-
  
   saveOptions() {
     localStorage.setItem(`avatar_opts:${this.userId}`, JSON.stringify(this.options));

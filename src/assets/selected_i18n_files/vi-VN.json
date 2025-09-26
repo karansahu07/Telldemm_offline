@@ -39,5 +39,34 @@
       "title": "Thông tin ứng dụng",
       "description": "Phiên bản, thông tin pháp lý và kỹ thuật."
     }
+  },"common": {
+    "ok": "OK",
+    "cancel": "Hủy",
+    "logout": "Đăng xuất"
+  },
+  "settingsPage": {
+    "title": "Cài đặt",
+    "account": { "title": "Tài khoản", "description": "Quyền riêng tư, bảo mật, đổi số" },
+    "privacy": { "title": "Quyền riêng tư", "description": "Kiểm soát cài đặt quyền riêng tư của bạn" },
+    "avatar": { "title": "Ảnh đại diện", "description": "Đổi ảnh hồ sơ" },
+    "chats": { "title": "Trò chuyện", "description": "Chủ đề, hình nền, sao lưu" },
+    "accessibility": { "title": "Trợ năng", "description": "Kích thước văn bản và tùy chọn hiển thị" },
+    "notifications": { "title": "Thông báo", "description": "Cảnh báo tin nhắn, nhóm và cuộc gọi" },
+    "storage": { "title": "Dung lượng & Dữ liệu", "description": "Quản lý dung lượng và sử dụng mạng" },
+    "appLanguage": { "title": "Ngôn ngữ ứng dụng", "description": "Chọn ngôn ngữ ứng dụng" },
+    "help": { "title": "Trợ giúp & Phản hồi", "description": "Trung tâm trợ giúp, liên hệ chúng tôi, thông tin ứng dụng" },
+    "updates": { "title": "Cập nhật ứng dụng", "description": "Kiểm tra cập nhật, tự động cập nhật" },
+    "invite": { "title": "Mời bạn bè", "description": "Chia sẻ ứng dụng với danh bạ" },
+    "logout": {
+      "title": "Đăng xuất",
+      "description": "Xóa dữ liệu ứng dụng và đăng xuất",
+      "confirmHeader": "Xác nhận đăng xuất",
+      "confirmMessage": "Bạn có chắc muốn đăng xuất và xóa dữ liệu ứng dụng không?",
+      "loadingHeader": "Đang đăng xuất",
+      "loadingMessage": "Vui lòng chờ...",
+      "successHeader": "Đã đăng xuất",
+      "successMessage": "Bạn đã đăng xuất thành công."
+    },
+    "defaultStatus": "Trực tuyến"
   }
 }

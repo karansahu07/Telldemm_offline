@@ -301,6 +301,10 @@ import { PresenceService } from './services/presence.service'; // <-- added
 import { Subscription } from 'rxjs';
 import { Language } from './services/language';
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
+<<<<<<< HEAD
+=======
+import { EdgeToEdge } from '@capawesome/capacitor-android-edge-to-edge-support';
+>>>>>>> b3c238e (use edge to edge plugin and done with settings page translation mapping)
 
 register();
 
@@ -351,6 +355,7 @@ export class AppComponent implements OnInit {
   // }
   {
     this.initializeApp();
+    this.NavBar_initialize();
     this.platform.ready().then(() => {
       this.langSvc.init();
 
@@ -392,6 +397,16 @@ private applyLanguageChange(newLang: string) {
 
 
 
+<<<<<<< HEAD
+=======
+
+async NavBar_initialize() {
+  await EdgeToEdge.enable();  // enable edge-to-edge mode
+  await EdgeToEdge.setBackgroundColor({ color: "#ffffff" });
+  await StatusBar.setStyle({ style: Style.Light });  // choose text/icon style
+}
+
+>>>>>>> b3c238e (use edge to edge plugin and done with settings page translation mapping)
   async ngOnInit() {
     await this.fcmService.initializePushNotifications();
     // await this.FirebasePushService.initPush();

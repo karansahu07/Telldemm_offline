@@ -38,5 +38,35 @@
       "title": "App Info",
       "description": "Version, legal and technical details."
     }
+  },
+  "common": {
+    "ok": "OK",
+    "cancel": "Cancel",
+    "logout": "Log Out"
+  },
+  "settingsPage": {
+    "title": "Settings",
+    "account": { "title": "Account", "description": "Privacy, security, change number" },
+    "privacy": { "title": "Privacy", "description": "Control your privacy settings" },
+    "avatar": { "title": "Avatar", "description": "Change profile picture" },
+    "chats": { "title": "Chats", "description": "Theme, wallpaper, backup" },
+    "accessibility": { "title": "Accessibility", "description": "Text size and display options" },
+    "notifications": { "title": "Notifications", "description": "Message, group, and call alerts" },
+    "storage": { "title": "Storage & Data", "description": "Manage storage and network usage" },
+    "appLanguage": { "title": "App Language", "description": "Choose app language" },
+    "help": { "title": "Help & Feedback", "description": "Help centre, contact us, app info" },
+    "updates": { "title": "App Updates", "description": "Check for updates, auto-update" },
+    "invite": { "title": "Invite a Friend", "description": "Share the app with contacts" },
+    "logout": {
+      "title": "Log Out",
+      "description": "Clear app data and sign out",
+      "confirmHeader": "Confirm Log Out",
+      "confirmMessage": "Are you sure you want to log out and clear app data?",
+      "loadingHeader": "Logging Out",
+      "loadingMessage": "Please wait...",
+      "successHeader": "Logged Out",
+      "successMessage": "You have successfully logged out."
+    },
+    "defaultStatus": "Available"
   }
 }

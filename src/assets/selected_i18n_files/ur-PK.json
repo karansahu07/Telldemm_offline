@@ -39,5 +39,34 @@
       "title": "ایپ معلومات",
       "description": "ورژن، قانونی اور تکنیکی تفصیلات۔"
     }
+  },"common": {
+    "ok": "ٹھیک ہے",
+    "cancel": "منسوخ کریں",
+    "logout": "لاگ آؤٹ"
+  },
+  "settingsPage": {
+    "title": "ترتیبات",
+    "account": { "title": "اکاؤنٹ", "description": "رازداری، سیکیورٹی، نمبر تبدیل کریں" },
+    "privacy": { "title": "رازداری", "description": "اپنی رازداری کی ترتیبات کنٹرول کریں" },
+    "avatar": { "title": "اوتار", "description": "پروفائل تصویر تبدیل کریں" },
+    "chats": { "title": "چیٹس", "description": "تھیم، وال پیپر، بیک اپ" },
+    "accessibility": { "title": "قابل رسائی", "description": "متن کا سائز اور ڈسپلے کے اختیارات" },
+    "notifications": { "title": "اطلاعات", "description": "پیغامات، گروپس اور کال الرٹس" },
+    "storage": { "title": "اسٹوریج اور ڈیٹا", "description": "اسٹوریج اور نیٹ ورک کا استعمال منظم کریں" },
+    "appLanguage": { "title": "ایپ کی زبان", "description": "ایپ کی زبان منتخب کریں" },
+    "help": { "title": "مدد اور رائے", "description": "مدد مرکز، ہم سے رابطہ کریں، ایپ کی معلومات" },
+    "updates": { "title": "ایپ اپ ڈیٹس", "description": "اپ ڈیٹس چیک کریں، خودکار اپ ڈیٹ" },
+    "invite": { "title": "دوست کو مدعو کریں", "description": "ایپ کو روابط کے ساتھ شیئر کریں" },
+    "logout": {
+      "title": "لاگ آؤٹ",
+      "description": "ایپ کا ڈیٹا صاف کریں اور سائن آؤٹ کریں",
+      "confirmHeader": "لاگ آؤٹ کی تصدیق کریں",
+      "confirmMessage": "کیا آپ واقعی لاگ آؤٹ کرکے ایپ کا ڈیٹا صاف کرنا چاہتے ہیں؟",
+      "loadingHeader": "لاگ آؤٹ ہو رہا ہے",
+      "loadingMessage": "براہ کرم انتظار کریں...",
+      "successHeader": "لاگ آؤٹ ہوگیا",
+      "successMessage": "آپ کامیابی کے ساتھ لاگ آؤٹ ہوگئے ہیں۔"
+    },
+    "defaultStatus": "دستیاب"
   }
 }

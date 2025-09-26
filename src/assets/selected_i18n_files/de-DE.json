@@ -39,5 +39,35 @@
       "title": "App-Informationen",
       "description": "Version, rechtliche und technische Details."
     }
+  },
+  "common": {
+    "ok": "OK",
+    "cancel": "Abbrechen",
+    "logout": "Abmelden"
+  },
+  "settingsPage": {
+    "title": "Einstellungen",
+    "account": { "title": "Konto", "description": "Datenschutz, Sicherheit, Nummer ändern" },
+    "privacy": { "title": "Datenschutz", "description": "Verwalten Sie Ihre Datenschutzeinstellungen" },
+    "avatar": { "title": "Avatar", "description": "Profilbild ändern" },
+    "chats": { "title": "Chats", "description": "Thema, Hintergrund, Sicherung" },
+    "accessibility": { "title": "Barrierefreiheit", "description": "Textgröße und Anzeigeoptionen" },
+    "notifications": { "title": "Benachrichtigungen", "description": "Nachrichten-, Gruppen- und Anrufbenachrichtigungen" },
+    "storage": { "title": "Speicher & Daten", "description": "Speicher und Datennutzung verwalten" },
+    "appLanguage": { "title": "App-Sprache", "description": "App-Sprache auswählen" },
+    "help": { "title": "Hilfe & Feedback", "description": "Hilfe-Center, Kontakt, App-Infos" },
+    "updates": { "title": "App-Updates", "description": "Nach Updates suchen, Auto-Update" },
+    "invite": { "title": "Freund einladen", "description": "App mit Kontakten teilen" },
+    "logout": {
+      "title": "Abmelden",
+      "description": "App-Daten löschen und abmelden",
+      "confirmHeader": "Abmeldung bestätigen",
+      "confirmMessage": "Möchten Sie sich wirklich abmelden und die App-Daten löschen?",
+      "loadingHeader": "Abmeldung läuft",
+      "loadingMessage": "Bitte warten...",
+      "successHeader": "Abgemeldet",
+      "successMessage": "Sie wurden erfolgreich abgemeldet."
+    },
+    "defaultStatus": "Verfügbar"
   }
 }

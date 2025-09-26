@@ -39,5 +39,34 @@
       "title": "એપ માહિતી",
       "description": "વરનીશન, કાનૂની અને ટેકનિકલ વિગતો."
     }
+  },"common": {
+    "ok": "બરાબર",
+    "cancel": "રદ કરો",
+    "logout": "લોગ આઉટ"
+  },
+  "settingsPage": {
+    "title": "સેટિંગ્સ",
+    "account": { "title": "એકાઉન્ટ", "description": "ગોપનીયતા, સુરક્ષા, નંબર બદલો" },
+    "privacy": { "title": "ગોપનીયતા", "description": "તમારી ગોપનીયતા સેટિંગ્સ નિયંત્રિત કરો" },
+    "avatar": { "title": "અવતાર", "description": "પ્રોફાઇલ તસવીર બદલો" },
+    "chats": { "title": "ચેટ્સ", "description": "થીમ, વોલપેપર, બેકઅપ" },
+    "accessibility": { "title": "સુગમતા", "description": "લખાણનું કદ અને પ્રદર્શન વિકલ્પો" },
+    "notifications": { "title": "સૂચનાઓ", "description": "સંદેશા, જૂથ અને કૉલ એલર્ટ્સ" },
+    "storage": { "title": "સ્ટોરેજ અને ડેટા", "description": "સ્ટોરેજ અને નેટવર્ક ઉપયોગ મેનેજ કરો" },
+    "appLanguage": { "title": "એપ્લિકેશન ભાષા", "description": "એપ્લિકેશન ભાષા પસંદ કરો" },
+    "help": { "title": "મદદ અને પ્રતિસાદ", "description": "મદદ કેન્દ્ર, અમારો સંપર્ક કરો, એપ્લિકેશન માહિતી" },
+    "updates": { "title": "એપ્લિકેશન અપડેટ્સ", "description": "અપડેટ્સ તપાસો, આપોઆપ અપડેટ" },
+    "invite": { "title": "મિત્રને આમંત્રણ આપો", "description": "એપ્લિકેશનને સંપર્કો સાથે શેર કરો" },
+    "logout": {
+      "title": "લોગ આઉટ",
+      "description": "એપ્લિકેશન ડેટા સાફ કરો અને સાઇન આઉટ કરો",
+      "confirmHeader": "લોગ આઉટની પુષ્ટિ કરો",
+      "confirmMessage": "શું તમે ખરેખર લોગ આઉટ કરીને એપ્લિકેશન ડેટા સાફ કરવા માંગો છો?",
+      "loadingHeader": "લોગ આઉટ થઈ રહ્યું છે",
+      "loadingMessage": "કૃપા કરીને રાહ જુઓ...",
+      "successHeader": "લોગ આઉટ થયું",
+      "successMessage": "તમે સફળતાપૂર્વક લોગ આઉટ થયા છો."
+    },
+    "defaultStatus": "ઉપલબ્ધ"
   }
 }
