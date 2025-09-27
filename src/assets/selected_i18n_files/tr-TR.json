@@ -138,5 +138,38 @@
       "contacts": "Kişilerim",
       "nobody": "Hiç kimse"
     }
+  },"avatarPage": {
+    "title": "Avatarını Oluştur",
+    "previewAlt": "Avatar önizlemesi",
+    "sections": {
+      "customization": "Kişiselleştirme Seçenekleri"
+    },
+    "fields": {
+      "hair": "Saç",
+      "accessories": "Aksesuarlar",
+      "hairColor": "Saç rengi",
+      "eyes": "Gözler",
+      "mouth": "Ağız",
+      "clothes": "Kıyafetler",
+      "skin": "Ten"
+    },
+    "placeholders": {
+      "hair": "Saç stilini seç",
+      "accessories": "Aksesuarları seç",
+      "hairColor": "Saç rengini seç",
+      "eyes": "Göz stilini seç",
+      "mouth": "Ağız stilini seç",
+      "clothes": "Kıyafet seç",
+      "skin": "Ten rengini seç"
+    },
+    "buttons": {
+      "download": "İndir",
+      "downloading": "İndiriliyor…",
+      "save": "Kaydet"
+    },
+    "toast": {
+      "saved": "Avatar seçenekleri yerel olarak kaydedildi.",
+      "downloadError": "İndirme başarısız. Lütfen tekrar deneyin."
+    }
   }
 }

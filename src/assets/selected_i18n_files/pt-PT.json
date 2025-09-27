@@ -162,5 +162,38 @@
       "contacts": "Os meus contactos",
       "nobody": "Ninguém"
     }
+  },"avatarPage": {
+    "title": "Cria o teu Avatar",
+    "previewAlt": "Pré-visualização do avatar",
+    "sections": {
+      "customization": "Opções de personalização"
+    },
+    "fields": {
+      "hair": "Cabelo",
+      "accessories": "Acessórios",
+      "hairColor": "Cor do cabelo",
+      "eyes": "Olhos",
+      "mouth": "Boca",
+      "clothes": "Roupas",
+      "skin": "Pele"
+    },
+    "placeholders": {
+      "hair": "Seleciona o penteado",
+      "accessories": "Seleciona acessórios",
+      "hairColor": "Seleciona a cor do cabelo",
+      "eyes": "Seleciona o estilo dos olhos",
+      "mouth": "Seleciona o estilo da boca",
+      "clothes": "Seleciona roupas",
+      "skin": "Seleciona o tom de pele"
+    },
+    "buttons": {
+      "download": "Transferir",
+      "downloading": "A transferir…",
+      "save": "Guardar"
+    },
+    "toast": {
+      "saved": "As escolhas do avatar foram guardadas localmente.",
+      "downloadError": "Falha na transferência. Por favor, tenta novamente."
+    }
   }
 }

@@ -164,5 +164,38 @@
       "contacts": "جهات الاتصال",
       "nobody": "لا أحد"
     }
+  },"avatarPage": {
+    "title": "أنشئ صورتك الرمزية",
+    "previewAlt": "معاينة الصورة الرمزية",
+    "sections": {
+      "customization": "خيارات التخصيص"
+    },
+    "fields": {
+      "hair": "الشعر",
+      "accessories": "الإكسسوارات",
+      "hairColor": "لون الشعر",
+      "eyes": "العيون",
+      "mouth": "الفم",
+      "clothes": "الملابس",
+      "skin": "البشرة"
+    },
+    "placeholders": {
+      "hair": "اختر تسريحة الشعر",
+      "accessories": "اختر الإكسسوارات",
+      "hairColor": "اختر لون الشعر",
+      "eyes": "اختر شكل العيون",
+      "mouth": "اختر شكل الفم",
+      "clothes": "اختر الملابس",
+      "skin": "اختر لون البشرة"
+    },
+    "buttons": {
+      "download": "تحميل",
+      "downloading": "جارٍ التحميل…",
+      "save": "حفظ"
+    },
+    "toast": {
+      "saved": "تم حفظ خيارات الصورة الرمزية محليًا.",
+      "downloadError": "فشل التحميل. يرجى المحاولة مرة أخرى."
+    }
   }
 }

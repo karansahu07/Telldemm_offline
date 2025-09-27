@@ -162,5 +162,38 @@
       "contacts": "自分の連絡先",
       "nobody": "誰も"
     }
+  },"avatarPage": {
+    "title": "アバターを作成",
+    "previewAlt": "アバターのプレビュー",
+    "sections": {
+      "customization": "カスタマイズオプション"
+    },
+    "fields": {
+      "hair": "髪",
+      "accessories": "アクセサリー",
+      "hairColor": "髪の色",
+      "eyes": "目",
+      "mouth": "口",
+      "clothes": "服",
+      "skin": "肌"
+    },
+    "placeholders": {
+      "hair": "髪型を選択",
+      "accessories": "アクセサリーを選択",
+      "hairColor": "髪の色を選択",
+      "eyes": "目のスタイルを選択",
+      "mouth": "口のスタイルを選択",
+      "clothes": "服を選択",
+      "skin": "肌の色を選択"
+    },
+    "buttons": {
+      "download": "ダウンロード",
+      "downloading": "ダウンロード中…",
+      "save": "保存"
+    },
+    "toast": {
+      "saved": "アバターの選択がローカルに保存されました。",
+      "downloadError": "ダウンロードに失敗しました。もう一度お試しください。"
+    }
   }
 }

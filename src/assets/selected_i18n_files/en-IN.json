@@ -164,5 +164,38 @@
       "contacts": "My Contacts",
       "nobody": "Nobody"
     }
+  },"avatarPage": {
+    "title": "Create your Avatar",
+    "previewAlt": "Avatar preview",
+    "sections": {
+      "customization": "Customization Options"
+    },
+    "fields": {
+      "hair": "Hair",
+      "accessories": "Accessories",
+      "hairColor": "Hair color",
+      "eyes": "Eyes",
+      "mouth": "Mouth",
+      "clothes": "Clothes",
+      "skin": "Skin"
+    },
+    "placeholders": {
+      "hair": "Select hair style",
+      "accessories": "Select accessories",
+      "hairColor": "Select hair color",
+      "eyes": "Select eye style",
+      "mouth": "Select mouth style",
+      "clothes": "Select clothing",
+      "skin": "Select skin tone"
+    },
+    "buttons": {
+      "download": "Download",
+      "downloading": "Downloading…",
+      "save": "Save"
+    },
+    "toast": {
+      "saved": "Avatar choices saved locally.",
+      "downloadError": "Download failed. Please try again."
+    }
   }
 }

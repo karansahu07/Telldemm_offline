@@ -164,6 +164,39 @@
       "contacts": "我的聯絡人",
       "nobody": "無人"
     }
+  },"avatarPage": {
+    "title": "建立你的頭像",
+    "previewAlt": "頭像預覽",
+    "sections": {
+      "customization": "自訂選項"
+    },
+    "fields": {
+      "hair": "頭髮",
+      "accessories": "配件",
+      "hairColor": "頭髮顏色",
+      "eyes": "眼睛",
+      "mouth": "嘴巴",
+      "clothes": "衣服",
+      "skin": "膚色"
+    },
+    "placeholders": {
+      "hair": "選擇髮型",
+      "accessories": "選擇配件",
+      "hairColor": "選擇頭髮顏色",
+      "eyes": "選擇眼睛樣式",
+      "mouth": "選擇嘴型",
+      "clothes": "選擇服裝",
+      "skin": "選擇膚色"
+    },
+    "buttons": {
+      "download": "下載",
+      "downloading": "正在下載…",
+      "save": "儲存"
+    },
+    "toast": {
+      "saved": "頭像選項已儲存在本機。",
+      "downloadError": "下載失敗。請再試一次。"
+    }
   }
 
 }

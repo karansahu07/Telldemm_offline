@@ -163,6 +163,39 @@
       "contacts": "我的联系人",
       "nobody": "无人"
     }
+  },"avatarPage": {
+    "title": "创建你的头像",
+    "previewAlt": "头像预览",
+    "sections": {
+      "customization": "自定义选项"
+    },
+    "fields": {
+      "hair": "头发",
+      "accessories": "配饰",
+      "hairColor": "头发颜色",
+      "eyes": "眼睛",
+      "mouth": "嘴巴",
+      "clothes": "衣服",
+      "skin": "肤色"
+    },
+    "placeholders": {
+      "hair": "选择发型",
+      "accessories": "选择配饰",
+      "hairColor": "选择头发颜色",
+      "eyes": "选择眼睛样式",
+      "mouth": "选择嘴型",
+      "clothes": "选择服装",
+      "skin": "选择肤色"
+    },
+    "buttons": {
+      "download": "下载",
+      "downloading": "正在下载…",
+      "save": "保存"
+    },
+    "toast": {
+      "saved": "头像选项已本地保存。",
+      "downloadError": "下载失败，请重试。"
+    }
   }
 
 }

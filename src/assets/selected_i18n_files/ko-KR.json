@@ -162,5 +162,38 @@
       "contacts": "내 연락처",
       "nobody": "없음"
     }
+  },"avatarPage": {
+    "title": "아바타 만들기",
+    "previewAlt": "아바타 미리보기",
+    "sections": {
+      "customization": "맞춤 옵션"
+    },
+    "fields": {
+      "hair": "머리카락",
+      "accessories": "액세서리",
+      "hairColor": "머리 색상",
+      "eyes": "눈",
+      "mouth": "입",
+      "clothes": "옷",
+      "skin": "피부"
+    },
+    "placeholders": {
+      "hair": "헤어스타일 선택",
+      "accessories": "액세서리 선택",
+      "hairColor": "머리 색상 선택",
+      "eyes": "눈 모양 선택",
+      "mouth": "입 모양 선택",
+      "clothes": "옷 선택",
+      "skin": "피부 톤 선택"
+    },
+    "buttons": {
+      "download": "다운로드",
+      "downloading": "다운로드 중…",
+      "save": "저장"
+    },
+    "toast": {
+      "saved": "아바타 선택 항목이 로컬에 저장되었습니다.",
+      "downloadError": "다운로드 실패. 다시 시도하세요."
+    }
   }
 }

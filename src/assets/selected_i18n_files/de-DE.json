@@ -163,5 +163,38 @@
       "contacts": "Meine Kontakte",
       "nobody": "Niemand"
     }
+  },"avatarPage": {
+    "title": "Erstelle dein Avatar",
+    "previewAlt": "Avatar-Vorschau",
+    "sections": {
+      "customization": "Anpassungsoptionen"
+    },
+    "fields": {
+      "hair": "Haare",
+      "accessories": "Zubehör",
+      "hairColor": "Haarfarbe",
+      "eyes": "Augen",
+      "mouth": "Mund",
+      "clothes": "Kleidung",
+      "skin": "Haut"
+    },
+    "placeholders": {
+      "hair": "Frisur auswählen",
+      "accessories": "Zubehör auswählen",
+      "hairColor": "Haarfarbe auswählen",
+      "eyes": "Augenstil auswählen",
+      "mouth": "Mundform auswählen",
+      "clothes": "Kleidung auswählen",
+      "skin": "Hautton auswählen"
+    },
+    "buttons": {
+      "download": "Herunterladen",
+      "downloading": "Wird heruntergeladen…",
+      "save": "Speichern"
+    },
+    "toast": {
+      "saved": "Avatar-Auswahl wurde lokal gespeichert.",
+      "downloadError": "Download fehlgeschlagen. Bitte erneut versuchen."
+    }
   }
 }

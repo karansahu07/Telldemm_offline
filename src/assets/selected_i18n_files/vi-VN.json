@@ -138,5 +138,38 @@
       "contacts": "Danh bạ của tôi",
       "nobody": "Không ai"
     }
+  },"avatarPage": {
+    "title": "Tạo Avatar của bạn",
+    "previewAlt": "Xem trước Avatar",
+    "sections": {
+      "customization": "Tùy chọn tùy chỉnh"
+    },
+    "fields": {
+      "hair": "Tóc",
+      "accessories": "Phụ kiện",
+      "hairColor": "Màu tóc",
+      "eyes": "Mắt",
+      "mouth": "Miệng",
+      "clothes": "Quần áo",
+      "skin": "Da"
+    },
+    "placeholders": {
+      "hair": "Chọn kiểu tóc",
+      "accessories": "Chọn phụ kiện",
+      "hairColor": "Chọn màu tóc",
+      "eyes": "Chọn kiểu mắt",
+      "mouth": "Chọn kiểu miệng",
+      "clothes": "Chọn trang phục",
+      "skin": "Chọn màu da"
+    },
+    "buttons": {
+      "download": "Tải xuống",
+      "downloading": "Đang tải xuống…",
+      "save": "Lưu"
+    },
+    "toast": {
+      "saved": "Các lựa chọn Avatar đã được lưu cục bộ.",
+      "downloadError": "Tải xuống thất bại. Vui lòng thử lại."
+    }
   }
 }

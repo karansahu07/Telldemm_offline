@@ -164,5 +164,38 @@
       "contacts": "جهات الاتصال الخاصة بي",
       "nobody": "لا أحد"
     }
+  },"avatarPage": {
+    "title": "إنشاء الأفاتار الخاص بك",
+    "previewAlt": "معاينة الأفاتار",
+    "sections": {
+      "customization": "خيارات التخصيص"
+    },
+    "fields": {
+      "hair": "الشعر",
+      "accessories": "الإكسسوارات",
+      "hairColor": "لون الشعر",
+      "eyes": "العينان",
+      "mouth": "الفم",
+      "clothes": "الملابس",
+      "skin": "البشرة"
+    },
+    "placeholders": {
+      "hair": "اختر تسريحة الشعر",
+      "accessories": "اختر الإكسسوارات",
+      "hairColor": "اختر لون الشعر",
+      "eyes": "اختر شكل العين",
+      "mouth": "اختر شكل الفم",
+      "clothes": "اختر الملابس",
+      "skin": "اختر لون البشرة"
+    },
+    "buttons": {
+      "download": "تنزيل",
+      "downloading": "جارٍ التنزيل…",
+      "save": "حفظ"
+    },
+    "toast": {
+      "saved": "تم حفظ خيارات الأفاتار محليًا.",
+      "downloadError": "فشل التنزيل. حاول مرة أخرى."
+    }
   }
 }
