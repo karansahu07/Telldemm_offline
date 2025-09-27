@@ -256,6 +256,77 @@
       "cleared": "已清除 {{mb}} MB 快取",
       "statsReset": "網路統計已重設"
     }
+  },"chats": {
+    "title": "聊天",
+    "sections": {
+      "appearance": "外觀",
+      "behavior": "訊息行為",
+      "management": "聊天管理"
+    },
+    "items": {
+      "theme": {
+        "title": "主題",
+        "sub": "系統預設"
+      },
+      "chatTheme": {
+        "title": "預設聊天主題",
+        "sub": "選擇桌布或主題"
+      },
+      "fontSize": {
+        "title": "字體大小",
+        "sub": "中等"
+      },
+      "enterToSend": {
+        "title": "Enter 送出",
+        "sub": "按 Enter 鍵傳送訊息"
+      },
+      "mediaVisibility": {
+        "title": "媒體可見性",
+        "sub": "在相簿中顯示新下載的媒體"
+      },
+      "keepArchived": {
+        "title": "保持聊天封存",
+        "sub": "新訊息到來時，已封存的聊天保持封存"
+      },
+      "transcripts": {
+        "title": "語音訊息轉錄",
+        "sub": "自動轉錄新的語音訊息"
+      },
+      "backup": {
+        "title": "聊天備份",
+        "sub": "將訊息備份到雲端儲存"
+      },
+      "transfer": {
+        "title": "傳輸聊天",
+        "sub": "在裝置間移動聊天"
+      },
+      "history": {
+        "title": "聊天記錄",
+        "sub": "匯出、封存、清除或刪除所有聊天"
+      }
+    },
+    "toasts": {
+      "enter": {
+        "enabled": "Enter-送出 已啟用",
+        "disabled": "Enter-送出 已停用"
+      },
+      "media": {
+        "on": "媒體可見性已開啟",
+        "off": "媒體可見性已關閉"
+      },
+      "archived": {
+        "enabled": "保持封存 已啟用",
+        "disabled": "保持封存 已停用"
+      },
+      "transcripts": {
+        "enabled": "語音訊息轉錄已啟用",
+        "disabled": "語音訊息轉錄已停用"
+      },
+      "backup": {
+        "starting": "正在開始備份…",
+        "done": "備份完成"
+      }
+    }
   }
 
 }

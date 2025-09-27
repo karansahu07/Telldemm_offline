@@ -254,5 +254,76 @@
       "cleared": "Cleared {{mb}} MB cache",
       "statsReset": "Network statistics reset"
     }
+  },"chats": {
+    "title": "Chats",
+    "sections": {
+      "appearance": "Appearance",
+      "behavior": "Message behavior",
+      "management": "Chat management"
+    },
+    "items": {
+      "theme": {
+        "title": "Theme",
+        "sub": "System default"
+      },
+      "chatTheme": {
+        "title": "Default chat theme",
+        "sub": "Choose wallpaper or theme"
+      },
+      "fontSize": {
+        "title": "Font size",
+        "sub": "Medium"
+      },
+      "enterToSend": {
+        "title": "Enter is send",
+        "sub": "Press Enter to send messages"
+      },
+      "mediaVisibility": {
+        "title": "Media visibility",
+        "sub": "Show newly downloaded media in your gallery"
+      },
+      "keepArchived": {
+        "title": "Keep chats archived",
+        "sub": "Archived chats stay archived when new messages arrive"
+      },
+      "transcripts": {
+        "title": "Voice message transcripts",
+        "sub": "Automatically transcribe new voice messages"
+      },
+      "backup": {
+        "title": "Chat backup",
+        "sub": "Back up messages to cloud storage"
+      },
+      "transfer": {
+        "title": "Transfer chats",
+        "sub": "Move chats between devices"
+      },
+      "history": {
+        "title": "Chat history",
+        "sub": "Export, archive, clear or delete all chats"
+      }
+    },
+    "toasts": {
+      "enter": {
+        "enabled": "Enter-to-send enabled",
+        "disabled": "Enter-to-send disabled"
+      },
+      "media": {
+        "on": "Media visibility on",
+        "off": "Media visibility off"
+      },
+      "archived": {
+        "enabled": "Keep archived enabled",
+        "disabled": "Keep archived disabled"
+      },
+      "transcripts": {
+        "enabled": "Voice message transcripts enabled",
+        "disabled": "Voice message transcripts disabled"
+      },
+      "backup": {
+        "starting": "Starting backup…",
+        "done": "Backup completed"
+      }
+    }
   }
 }

@@ -230,5 +230,76 @@
       "cleared": "Đã xóa {{mb}} MB bộ nhớ đệm",
       "statsReset": "Đã đặt lại thống kê mạng"
     }
+  },"chats": {
+    "title": "Trò chuyện",
+    "sections": {
+      "appearance": "Giao diện",
+      "behavior": "Hành vi tin nhắn",
+      "management": "Quản lý trò chuyện"
+    },
+    "items": {
+      "theme": {
+        "title": "Chủ đề",
+        "sub": "Mặc định hệ thống"
+      },
+      "chatTheme": {
+        "title": "Chủ đề trò chuyện mặc định",
+        "sub": "Chọn hình nền hoặc chủ đề"
+      },
+      "fontSize": {
+        "title": "Cỡ chữ",
+        "sub": "Trung bình"
+      },
+      "enterToSend": {
+        "title": "Nhấn Enter để gửi",
+        "sub": "Nhấn Enter để gửi tin nhắn"
+      },
+      "mediaVisibility": {
+        "title": "Hiển thị phương tiện",
+        "sub": "Hiển thị phương tiện mới tải trong thư viện"
+      },
+      "keepArchived": {
+        "title": "Giữ trò chuyện đã lưu trữ",
+        "sub": "Trò chuyện đã lưu trữ sẽ vẫn được lưu trữ khi có tin nhắn mới"
+      },
+      "transcripts": {
+        "title": "Bản chép lời tin nhắn thoại",
+        "sub": "Tự động chép lời tin nhắn thoại mới"
+      },
+      "backup": {
+        "title": "Sao lưu trò chuyện",
+        "sub": "Sao lưu tin nhắn lên đám mây"
+      },
+      "transfer": {
+        "title": "Chuyển trò chuyện",
+        "sub": "Di chuyển trò chuyện giữa các thiết bị"
+      },
+      "history": {
+        "title": "Lịch sử trò chuyện",
+        "sub": "Xuất, lưu trữ, dọn dẹp hoặc xóa tất cả trò chuyện"
+      }
+    },
+    "toasts": {
+      "enter": {
+        "enabled": "Đã bật Enter-để-gửi",
+        "disabled": "Đã tắt Enter-để-gửi"
+      },
+      "media": {
+        "on": "Đã bật hiển thị phương tiện",
+        "off": "Đã tắt hiển thị phương tiện"
+      },
+      "archived": {
+        "enabled": "Đã bật giữ lưu trữ",
+        "disabled": "Đã tắt giữ lưu trữ"
+      },
+      "transcripts": {
+        "enabled": "Đã bật chép lời tin nhắn thoại",
+        "disabled": "Đã tắt chép lời tin nhắn thoại"
+      },
+      "backup": {
+        "starting": "Đang bắt đầu sao lưu…",
+        "done": "Sao lưu hoàn tất"
+      }
+    }
   }
 }

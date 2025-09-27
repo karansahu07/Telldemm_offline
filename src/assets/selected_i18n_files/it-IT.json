@@ -254,5 +254,76 @@
       "cleared": "Cancellati {{mb}} MB di cache",
       "statsReset": "Statistiche di rete reimpostate"
     }
+  },"chats": {
+    "title": "Chat",
+    "sections": {
+      "appearance": "Aspetto",
+      "behavior": "Comportamento messaggi",
+      "management": "Gestione chat"
+    },
+    "items": {
+      "theme": {
+        "title": "Tema",
+        "sub": "Predefinito di sistema"
+      },
+      "chatTheme": {
+        "title": "Tema chat predefinito",
+        "sub": "Scegli sfondo o tema"
+      },
+      "fontSize": {
+        "title": "Dimensione del carattere",
+        "sub": "Media"
+      },
+      "enterToSend": {
+        "title": "Invio con Invio",
+        "sub": "Premi Invio per inviare i messaggi"
+      },
+      "mediaVisibility": {
+        "title": "Visibilità dei media",
+        "sub": "Mostra i nuovi media scaricati nella tua galleria"
+      },
+      "keepArchived": {
+        "title": "Mantieni chat archiviate",
+        "sub": "Le chat archiviate restano tali quando arrivano nuovi messaggi"
+      },
+      "transcripts": {
+        "title": "Trascrizioni messaggi vocali",
+        "sub": "Trascrivi automaticamente i nuovi messaggi vocali"
+      },
+      "backup": {
+        "title": "Backup chat",
+        "sub": "Esegui il backup dei messaggi sul cloud"
+      },
+      "transfer": {
+        "title": "Trasferisci chat",
+        "sub": "Sposta le chat tra dispositivi"
+      },
+      "history": {
+        "title": "Cronologia chat",
+        "sub": "Esporta, archivia, cancella o elimina tutte le chat"
+      }
+    },
+    "toasts": {
+      "enter": {
+        "enabled": "Invio-per-inviare attivato",
+        "disabled": "Invio-per-inviare disattivato"
+      },
+      "media": {
+        "on": "Visibilità dei media attivata",
+        "off": "Visibilità dei media disattivata"
+      },
+      "archived": {
+        "enabled": "Mantieni archiviate attivato",
+        "disabled": "Mantieni archiviate disattivato"
+      },
+      "transcripts": {
+        "enabled": "Trascrizioni messaggi vocali attivate",
+        "disabled": "Trascrizioni messaggi vocali disattivate"
+      },
+      "backup": {
+        "starting": "Avvio backup…",
+        "done": "Backup completato"
+      }
+    }
   }
 }

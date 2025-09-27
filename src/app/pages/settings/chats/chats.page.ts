@@ -3,14 +3,17 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonicModule, ToastController } from '@ionic/angular';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 const STORAGE_KEY = 'settings.chats';
+
+type FontSize = 'small' | 'medium' | 'large';
 
 interface ChatsSettings {
   enterToSend: boolean;
   mediaVisibility: boolean;
   keepArchived: boolean;
-  fontSize: 'small' | 'medium' | 'large';
+  fontSize: FontSize;
   voiceTranscriptsEnabled: boolean;
 }
 
@@ -19,28 +22,22 @@ interface ChatsSettings {
   templateUrl: './chats.page.html',
   styleUrls: ['./chats.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule,FormsModule],
+  imports: [IonicModule, CommonModule, FormsModule, TranslateModule],
 })
 export class ChatsPage implements OnInit {
-
-
-
-
- 
-  // UI-bound properties
   enterToSend = false;
   mediaVisibility = true;
   keepArchived = true;
-  fontSize: 'small' | 'medium' | 'large' = 'medium';
+  fontSize: FontSize = 'medium';
   voiceTranscriptsEnabled = false;
 
-  // small preview for wallpaper or font-size preview
   preview = 'assets/wallpaper-preview.jpg';
   lastBackup: string | null = null;
 
   constructor(
     private router: Router,
-    private toastCtrl: ToastController
+    private toastCtrl: ToastController,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -48,56 +45,65 @@ export class ChatsPage implements OnInit {
     this.loadLastBackup();
   }
 
-  /* ---------- Navigation / Open pages ---------- */
+  /* ---------- Navigation ---------- */
   openTheme() {
-    // navigate to theme page (adjust route if different)
     this.router.navigate(['settings', 'chats', 'theme']);
   }
-
   openChatTheme() {
     this.router.navigate(['settings', 'chats', 'wallpaper']);
   }
-
   openFontSize() {
     this.router.navigate(['settings', 'chats', 'font-size']);
   }
-
   openChatBackup() {
     this.router.navigate(['settings', 'chats', 'backup']);
   }
-
   openTransferChats() {
     this.router.navigate(['settings', 'chats', 'transfer']);
   }
-
   openChatHistory() {
     this.router.navigate(['settings', 'chats', 'history']);
   }
 
-  /* ---------- Toggle & action handlers ---------- */
+  /* ---------- Toggle handlers (with i18n toasts) ---------- */
   async toggleEnterToSend() {
     this.enterToSend = !this.enterToSend;
     this.saveSettings();
-    await this.showToast(`Enter-to-send ${this.enterToSend ? 'enabled' : 'disabled'}`);
+    await this.showToast(
+      this.translate.instant(
+        this.enterToSend ? 'chats.toasts.enter.enabled' : 'chats.toasts.enter.disabled'
+      )
+    );
   }
 
   async toggleMediaVisibility() {
     this.mediaVisibility = !this.mediaVisibility;
     this.saveSettings();
-    await this.showToast(`Media visibility ${this.mediaVisibility ? 'on' : 'off'}`);
+    await this.showToast(
+      this.translate.instant(
+        this.mediaVisibility ? 'chats.toasts.media.on' : 'chats.toasts.media.off'
+      )
+    );
   }
 
   async toggleKeepArchived() {
     this.keepArchived = !this.keepArchived;
     this.saveSettings();
-    await this.showToast(`Keep archived ${this.keepArchived ? 'enabled' : 'disabled'}`);
+    await this.showToast(
+      this.translate.instant(
+        this.keepArchived ? 'chats.toasts.archived.enabled' : 'chats.toasts.archived.disabled'
+      )
+    );
   }
 
   async toggleVoiceMessageTranscripts() {
-    // for a page-like control we open the page; if you want a toggle, flip boolean instead
     this.voiceTranscriptsEnabled = !this.voiceTranscriptsEnabled;
     this.saveSettings();
-    await this.showToast(`Voice message transcripts ${this.voiceTranscriptsEnabled ? 'enabled' : 'disabled'}`);
+    await this.showToast(
+      this.translate.instant(
+        this.voiceTranscriptsEnabled ? 'chats.toasts.transcripts.enabled' : 'chats.toasts.transcripts.disabled'
+      )
+    );
   }
 
   /* ---------- Persistence ---------- */
@@ -133,27 +139,19 @@ export class ChatsPage implements OnInit {
 
   /* ---------- Helpers ---------- */
   async showToast(message: string, duration = 1400) {
-    const t = await this.toastCtrl.create({
-      message,
-      duration,
-      position: 'bottom'
-    });
+    const t = await this.toastCtrl.create({ message, duration, position: 'bottom' });
     await t.present();
   }
 
   loadLastBackup() {
-    // placeholder — replace with real backup metadata retrieval
     this.lastBackup = localStorage.getItem('chats.lastBackup') || null;
   }
 
-  // Example method that simulates making a backup
   async startBackup() {
-    // show a quick toast then set lastBackup
-    await this.showToast('Starting backup…', 800);
+    await this.showToast(this.translate.instant('chats.toasts.backup.starting'), 800);
     const now = new Date().toISOString();
     localStorage.setItem('chats.lastBackup', now);
     this.lastBackup = now;
-    await this.showToast('Backup completed');
+    await this.showToast(this.translate.instant('chats.toasts.backup.done'));
   }
-
 }

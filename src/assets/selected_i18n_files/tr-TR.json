@@ -231,5 +231,76 @@
       "cleared": "{{mb}} MB önbellek temizlendi",
       "statsReset": "Ağ istatistikleri sıfırlandı"
     }
+  },"chats": {
+    "title": "Sohbetler",
+    "sections": {
+      "appearance": "Görünüm",
+      "behavior": "Mesaj davranışı",
+      "management": "Sohbet yönetimi"
+    },
+    "items": {
+      "theme": {
+        "title": "Tema",
+        "sub": "Sistem varsayılanı"
+      },
+      "chatTheme": {
+        "title": "Varsayılan sohbet teması",
+        "sub": "Duvar kağıdı veya tema seçin"
+      },
+      "fontSize": {
+        "title": "Yazı tipi boyutu",
+        "sub": "Orta"
+      },
+      "enterToSend": {
+        "title": "Enter ile gönder",
+        "sub": "Mesaj göndermek için Enter’a basın"
+      },
+      "mediaVisibility": {
+        "title": "Medya görünürlüğü",
+        "sub": "Yeni indirilen medyayı galerinizde gösterin"
+      },
+      "keepArchived": {
+        "title": "Sohbetleri arşivde tut",
+        "sub": "Yeni mesajlar geldiğinde arşivlenmiş sohbetler arşivde kalır"
+      },
+      "transcripts": {
+        "title": "Sesli mesaj transkriptleri",
+        "sub": "Yeni sesli mesajları otomatik olarak yazıya dökün"
+      },
+      "backup": {
+        "title": "Sohbet yedeği",
+        "sub": "Mesajları buluta yedekleyin"
+      },
+      "transfer": {
+        "title": "Sohbetleri aktar",
+        "sub": "Sohbetleri cihazlar arasında taşıyın"
+      },
+      "history": {
+        "title": "Sohbet geçmişi",
+        "sub": "Tüm sohbetleri dışa aktarın, arşivleyin, temizleyin veya silin"
+      }
+    },
+    "toasts": {
+      "enter": {
+        "enabled": "Enter-ile-gönder etkin",
+        "disabled": "Enter-ile-gönder devre dışı"
+      },
+      "media": {
+        "on": "Medya görünürlüğü açık",
+        "off": "Medya görünürlüğü kapalı"
+      },
+      "archived": {
+        "enabled": "Arşivde tutma etkin",
+        "disabled": "Arşivde tutma devre dışı"
+      },
+      "transcripts": {
+        "enabled": "Sesli mesaj transkriptleri etkin",
+        "disabled": "Sesli mesaj transkriptleri devre dışı"
+      },
+      "backup": {
+        "starting": "Yedekleme başlatılıyor…",
+        "done": "Yedekleme tamamlandı"
+      }
+    }
   }
 }

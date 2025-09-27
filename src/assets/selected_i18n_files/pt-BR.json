@@ -254,5 +254,76 @@
       "cleared": "Cache de {{mb}} MB limpo",
       "statsReset": "Estatísticas de rede redefinidas"
     }
+  }, "chats": {
+    "title": "Conversas",
+    "sections": {
+      "appearance": "Aparência",
+      "behavior": "Comportamento da mensagem",
+      "management": "Gerenciamento de conversas"
+    },
+    "items": {
+      "theme": {
+        "title": "Tema",
+        "sub": "Padrão do sistema"
+      },
+      "chatTheme": {
+        "title": "Tema padrão da conversa",
+        "sub": "Escolha papel de parede ou tema"
+      },
+      "fontSize": {
+        "title": "Tamanho da fonte",
+        "sub": "Médio"
+      },
+      "enterToSend": {
+        "title": "Enter para enviar",
+        "sub": "Pressione Enter para enviar mensagens"
+      },
+      "mediaVisibility": {
+        "title": "Visibilidade da mídia",
+        "sub": "Mostrar mídias recém-baixadas na sua galeria"
+      },
+      "keepArchived": {
+        "title": "Manter conversas arquivadas",
+        "sub": "Conversas arquivadas permanecem arquivadas quando novas mensagens chegam"
+      },
+      "transcripts": {
+        "title": "Transcrições de mensagens de voz",
+        "sub": "Transcreva automaticamente novas mensagens de voz"
+      },
+      "backup": {
+        "title": "Backup de conversas",
+        "sub": "Fazer backup das mensagens na nuvem"
+      },
+      "transfer": {
+        "title": "Transferir conversas",
+        "sub": "Mover conversas entre dispositivos"
+      },
+      "history": {
+        "title": "Histórico de conversas",
+        "sub": "Exportar, arquivar, limpar ou excluir todas as conversas"
+      }
+    },
+    "toasts": {
+      "enter": {
+        "enabled": "Enter-para-enviar ativado",
+        "disabled": "Enter-para-enviar desativado"
+      },
+      "media": {
+        "on": "Visibilidade da mídia ativada",
+        "off": "Visibilidade da mídia desativada"
+      },
+      "archived": {
+        "enabled": "Manter arquivadas ativado",
+        "disabled": "Manter arquivadas desativado"
+      },
+      "transcripts": {
+        "enabled": "Transcrições de mensagens de voz ativadas",
+        "disabled": "Transcrições de mensagens de voz desativadas"
+      },
+      "backup": {
+        "starting": "Iniciando backup…",
+        "done": "Backup concluído"
+      }
+    }
   }
 }

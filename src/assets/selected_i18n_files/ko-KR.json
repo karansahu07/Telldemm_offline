@@ -254,5 +254,76 @@
       "cleared": "{{mb}} MB 캐시 삭제됨",
       "statsReset": "네트워크 통계가 초기화됨"
     }
+  }, "chats": {
+    "title": "채팅",
+    "sections": {
+      "appearance": "모양",
+      "behavior": "메시지 동작",
+      "management": "채팅 관리"
+    },
+    "items": {
+      "theme": {
+        "title": "테마",
+        "sub": "시스템 기본값"
+      },
+      "chatTheme": {
+        "title": "기본 채팅 테마",
+        "sub": "배경화면 또는 테마 선택"
+      },
+      "fontSize": {
+        "title": "글꼴 크기",
+        "sub": "보통"
+      },
+      "enterToSend": {
+        "title": "Enter로 보내기",
+        "sub": "Enter 키를 눌러 메시지 전송"
+      },
+      "mediaVisibility": {
+        "title": "미디어 표시",
+        "sub": "새로 다운로드한 미디어를 갤러리에 표시"
+      },
+      "keepArchived": {
+        "title": "채팅 보관 유지",
+        "sub": "새 메시지가 와도 보관된 채팅은 그대로 유지됩니다"
+      },
+      "transcripts": {
+        "title": "음성 메시지 전사",
+        "sub": "새 음성 메시지를 자동으로 전사"
+      },
+      "backup": {
+        "title": "채팅 백업",
+        "sub": "메시지를 클라우드에 백업"
+      },
+      "transfer": {
+        "title": "채팅 전송",
+        "sub": "기기 간에 채팅 이동"
+      },
+      "history": {
+        "title": "채팅 기록",
+        "sub": "모든 채팅 내보내기, 보관, 지우기 또는 삭제"
+      }
+    },
+    "toasts": {
+      "enter": {
+        "enabled": "Enter로 보내기 활성화됨",
+        "disabled": "Enter로 보내기 비활성화됨"
+      },
+      "media": {
+        "on": "미디어 표시 켜짐",
+        "off": "미디어 표시 꺼짐"
+      },
+      "archived": {
+        "enabled": "보관 유지 활성화됨",
+        "disabled": "보관 유지 비활성화됨"
+      },
+      "transcripts": {
+        "enabled": "음성 메시지 전사 활성화됨",
+        "disabled": "음성 메시지 전사 비활성화됨"
+      },
+      "backup": {
+        "starting": "백업 시작 중…",
+        "done": "백업 완료"
+      }
+    }
   }
 }

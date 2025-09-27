@@ -255,5 +255,76 @@
       "cleared": "{{mb}} MB Cache geleert",
       "statsReset": "Netzwerkstatistiken zurückgesetzt"
     }
+  },"chats": {
+    "title": "Chats",
+    "sections": {
+      "appearance": "Darstellung",
+      "behavior": "Nachrichtenverhalten",
+      "management": "Chatverwaltung"
+    },
+    "items": {
+      "theme": {
+        "title": "Design",
+        "sub": "Systemstandard"
+      },
+      "chatTheme": {
+        "title": "Standard-Chat-Design",
+        "sub": "Hintergrund oder Design auswählen"
+      },
+      "fontSize": {
+        "title": "Schriftgröße",
+        "sub": "Mittel"
+      },
+      "enterToSend": {
+        "title": "Enter zum Senden",
+        "sub": "Drücken Sie Enter, um Nachrichten zu senden"
+      },
+      "mediaVisibility": {
+        "title": "Mediensichtbarkeit",
+        "sub": "Neu heruntergeladene Medien in Ihrer Galerie anzeigen"
+      },
+      "keepArchived": {
+        "title": "Chats archiviert lassen",
+        "sub": "Archivierte Chats bleiben archiviert, wenn neue Nachrichten eingehen"
+      },
+      "transcripts": {
+        "title": "Sprachnachrichten-Transkripte",
+        "sub": "Neue Sprachnachrichten automatisch transkribieren"
+      },
+      "backup": {
+        "title": "Chat-Backup",
+        "sub": "Nachrichten in der Cloud sichern"
+      },
+      "transfer": {
+        "title": "Chats übertragen",
+        "sub": "Chats zwischen Geräten verschieben"
+      },
+      "history": {
+        "title": "Chatverlauf",
+        "sub": "Alle Chats exportieren, archivieren, löschen oder leeren"
+      }
+    },
+    "toasts": {
+      "enter": {
+        "enabled": "Enter-zum-Senden aktiviert",
+        "disabled": "Enter-zum-Senden deaktiviert"
+      },
+      "media": {
+        "on": "Mediensichtbarkeit ein",
+        "off": "Mediensichtbarkeit aus"
+      },
+      "archived": {
+        "enabled": "Archivierung aktiviert",
+        "disabled": "Archivierung deaktiviert"
+      },
+      "transcripts": {
+        "enabled": "Sprachnachrichten-Transkripte aktiviert",
+        "disabled": "Sprachnachrichten-Transkripte deaktiviert"
+      },
+      "backup": {
+        "starting": "Backup wird gestartet…",
+        "done": "Backup abgeschlossen"
+      }
+    }
   }
 }

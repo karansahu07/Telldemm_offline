@@ -255,5 +255,76 @@
       "cleared": "{{mb}} Mo de cache vidé",
       "statsReset": "Statistiques réseau réinitialisées"
     }
+  },"chats": {
+    "title": "Discussions",
+    "sections": {
+      "appearance": "Apparence",
+      "behavior": "Comportement des messages",
+      "management": "Gestion des discussions"
+    },
+    "items": {
+      "theme": {
+        "title": "Thème",
+        "sub": "Par défaut du système"
+      },
+      "chatTheme": {
+        "title": "Thème de discussion par défaut",
+        "sub": "Choisissez un fond d’écran ou un thème"
+      },
+      "fontSize": {
+        "title": "Taille de police",
+        "sub": "Moyenne"
+      },
+      "enterToSend": {
+        "title": "Entrée pour envoyer",
+        "sub": "Appuyez sur Entrée pour envoyer des messages"
+      },
+      "mediaVisibility": {
+        "title": "Visibilité des médias",
+        "sub": "Afficher les médias nouvellement téléchargés dans votre galerie"
+      },
+      "keepArchived": {
+        "title": "Garder les discussions archivées",
+        "sub": "Les discussions archivées restent archivées quand de nouveaux messages arrivent"
+      },
+      "transcripts": {
+        "title": "Transcription des messages vocaux",
+        "sub": "Transcrire automatiquement les nouveaux messages vocaux"
+      },
+      "backup": {
+        "title": "Sauvegarde des discussions",
+        "sub": "Sauvegardez les messages sur le cloud"
+      },
+      "transfer": {
+        "title": "Transférer les discussions",
+        "sub": "Déplacez les discussions entre appareils"
+      },
+      "history": {
+        "title": "Historique des discussions",
+        "sub": "Exporter, archiver, effacer ou supprimer toutes les discussions"
+      }
+    },
+    "toasts": {
+      "enter": {
+        "enabled": "Entrée pour envoyer activé",
+        "disabled": "Entrée pour envoyer désactivé"
+      },
+      "media": {
+        "on": "Visibilité des médias activée",
+        "off": "Visibilité des médias désactivée"
+      },
+      "archived": {
+        "enabled": "Archivage activé",
+        "disabled": "Archivage désactivé"
+      },
+      "transcripts": {
+        "enabled": "Transcription des messages vocaux activée",
+        "disabled": "Transcription des messages vocaux désactivée"
+      },
+      "backup": {
+        "starting": "Démarrage de la sauvegarde…",
+        "done": "Sauvegarde terminée"
+      }
+    }
   }
 }

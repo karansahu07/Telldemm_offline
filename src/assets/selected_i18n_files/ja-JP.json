@@ -254,5 +254,76 @@
       "cleared": "{{mb}} MB のキャッシュをクリアしました",
       "statsReset": "ネットワーク統計がリセットされました"
     }
+  },"chats": {
+    "title": "チャット",
+    "sections": {
+      "appearance": "外観",
+      "behavior": "メッセージの動作",
+      "management": "チャット管理"
+    },
+    "items": {
+      "theme": {
+        "title": "テーマ",
+        "sub": "システムデフォルト"
+      },
+      "chatTheme": {
+        "title": "デフォルトチャットテーマ",
+        "sub": "壁紙またはテーマを選択"
+      },
+      "fontSize": {
+        "title": "文字サイズ",
+        "sub": "中"
+      },
+      "enterToSend": {
+        "title": "Enterで送信",
+        "sub": "Enterキーでメッセージを送信"
+      },
+      "mediaVisibility": {
+        "title": "メディアの表示",
+        "sub": "新しくダウンロードしたメディアをギャラリーに表示"
+      },
+      "keepArchived": {
+        "title": "チャットをアーカイブしたままにする",
+        "sub": "新しいメッセージが届いてもアーカイブされたチャットはそのまま残ります"
+      },
+      "transcripts": {
+        "title": "音声メッセージ文字起こし",
+        "sub": "新しい音声メッセージを自動で文字起こし"
+      },
+      "backup": {
+        "title": "チャットのバックアップ",
+        "sub": "メッセージをクラウドにバックアップ"
+      },
+      "transfer": {
+        "title": "チャットを転送",
+        "sub": "デバイス間でチャットを移動"
+      },
+      "history": {
+        "title": "チャット履歴",
+        "sub": "すべてのチャットをエクスポート、アーカイブ、消去または削除"
+      }
+    },
+    "toasts": {
+      "enter": {
+        "enabled": "Enterで送信 有効",
+        "disabled": "Enterで送信 無効"
+      },
+      "media": {
+        "on": "メディア表示 オン",
+        "off": "メディア表示 オフ"
+      },
+      "archived": {
+        "enabled": "アーカイブ保持 有効",
+        "disabled": "アーカイブ保持 無効"
+      },
+      "transcripts": {
+        "enabled": "音声メッセージ文字起こし 有効",
+        "disabled": "音声メッセージ文字起こし 無効"
+      },
+      "backup": {
+        "starting": "バックアップを開始しています…",
+        "done": "バックアップ完了"
+      }
+    }
   }
 }

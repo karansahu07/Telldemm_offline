@@ -254,5 +254,77 @@
       "cleared": "Se borraron {{mb}} MB de caché",
       "statsReset": "Estadísticas de red restablecidas"
     }
+  },
+  "chats": {
+    "title": "Chats",
+    "sections": {
+      "appearance": "Apariencia",
+      "behavior": "Comportamiento de los mensajes",
+      "management": "Gestión de chats"
+    },
+    "items": {
+      "theme": {
+        "title": "Tema",
+        "sub": "Predeterminado del sistema"
+      },
+      "chatTheme": {
+        "title": "Tema predeterminado del chat",
+        "sub": "Elige fondo de pantalla o tema"
+      },
+      "fontSize": {
+        "title": "Tamaño de fuente",
+        "sub": "Mediano"
+      },
+      "enterToSend": {
+        "title": "Enter para enviar",
+        "sub": "Pulsa Enter para enviar mensajes"
+      },
+      "mediaVisibility": {
+        "title": "Visibilidad de medios",
+        "sub": "Mostrar medios recién descargados en tu galería"
+      },
+      "keepArchived": {
+        "title": "Mantener chats archivados",
+        "sub": "Los chats archivados permanecen archivados cuando llegan mensajes nuevos"
+      },
+      "transcripts": {
+        "title": "Transcripciones de mensajes de voz",
+        "sub": "Transcribir automáticamente nuevos mensajes de voz"
+      },
+      "backup": {
+        "title": "Copia de seguridad de chats",
+        "sub": "Respaldar mensajes en la nube"
+      },
+      "transfer": {
+        "title": "Transferir chats",
+        "sub": "Mover chats entre dispositivos"
+      },
+      "history": {
+        "title": "Historial de chats",
+        "sub": "Exportar, archivar, borrar o eliminar todos los chats"
+      }
+    },
+    "toasts": {
+      "enter": {
+        "enabled": "Enter-para-enviar activado",
+        "disabled": "Enter-para-enviar desactivado"
+      },
+      "media": {
+        "on": "Visibilidad de medios activada",
+        "off": "Visibilidad de medios desactivada"
+      },
+      "archived": {
+        "enabled": "Mantener archivados activado",
+        "disabled": "Mantener archivados desactivado"
+      },
+      "transcripts": {
+        "enabled": "Transcripciones activadas",
+        "disabled": "Transcripciones desactivadas"
+      },
+      "backup": {
+        "starting": "Iniciando copia de seguridad…",
+        "done": "Copia de seguridad completada"
+      }
+    }
   }
 }

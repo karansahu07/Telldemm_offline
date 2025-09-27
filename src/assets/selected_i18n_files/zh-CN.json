@@ -255,6 +255,77 @@
       "cleared": "已清除 {{mb}} MB 缓存",
       "statsReset": "网络统计已重置"
     }
+  },"chats": {
+    "title": "聊天",
+    "sections": {
+      "appearance": "外观",
+      "behavior": "消息行为",
+      "management": "聊天管理"
+    },
+    "items": {
+      "theme": {
+        "title": "主题",
+        "sub": "系统默认"
+      },
+      "chatTheme": {
+        "title": "默认聊天主题",
+        "sub": "选择壁纸或主题"
+      },
+      "fontSize": {
+        "title": "字体大小",
+        "sub": "中等"
+      },
+      "enterToSend": {
+        "title": "Enter 发送",
+        "sub": "按 Enter 键发送消息"
+      },
+      "mediaVisibility": {
+        "title": "媒体可见性",
+        "sub": "在图库中显示新下载的媒体"
+      },
+      "keepArchived": {
+        "title": "保持聊天归档",
+        "sub": "新消息到来时，已归档的聊天保持归档"
+      },
+      "transcripts": {
+        "title": "语音消息转录",
+        "sub": "自动转录新语音消息"
+      },
+      "backup": {
+        "title": "聊天备份",
+        "sub": "将消息备份到云存储"
+      },
+      "transfer": {
+        "title": "传输聊天",
+        "sub": "在设备间移动聊天"
+      },
+      "history": {
+        "title": "聊天记录",
+        "sub": "导出、归档、清除或删除所有聊天"
+      }
+    },
+    "toasts": {
+      "enter": {
+        "enabled": "Enter-发送 已启用",
+        "disabled": "Enter-发送 已禁用"
+      },
+      "media": {
+        "on": "媒体可见性已开启",
+        "off": "媒体可见性已关闭"
+      },
+      "archived": {
+        "enabled": "保持归档 已启用",
+        "disabled": "保持归档 已禁用"
+      },
+      "transcripts": {
+        "enabled": "语音消息转录已启用",
+        "disabled": "语音消息转录已禁用"
+      },
+      "backup": {
+        "starting": "正在开始备份…",
+        "done": "备份完成"
+      }
+    }
   }
 
 }
