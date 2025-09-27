@@ -107,5 +107,36 @@
       "title": "Basitleştirilmiş animasyonlar",
       "desc": "Etkileşimi kolaylaştırmak için karmaşık animasyonları azaltın."
     }
+  },"privacyPage": {
+    "title": "Gizlilik",
+    "groups": {
+      "whoCanSee": "Bilgilerimi kim görebilir",
+      "other": "Diğer"
+    },
+    "lastSeen": {
+      "title": "Son Görülme ve Çevrimiçi",
+      "desc": "Son görülme ve çevrimiçi durumunuzu kimin görebileceğini kontrol edin"
+    },
+    "profilePhoto": {
+      "title": "Profil Fotoğrafı",
+      "desc": "Fotoğrafınızı kimin görebileceğini seçin"
+    },
+    "about": {
+      "title": "Hakkında",
+      "desc": "Hakkında bilgilerinizi kimin görebileceğini kontrol edin"
+    },
+    "status": {
+      "title": "Durum",
+      "desc": "Durum güncellemelerinizi kimin görebileceğini yönetin"
+    },
+    "blocked": {
+      "title": "Engellenen Kişiler",
+      "desc": "Engellenen kullanıcıları görüntüleyin ve yönetin"
+    },
+    "options": {
+      "everyone": "Herkes",
+      "contacts": "Kişilerim",
+      "nobody": "Hiç kimse"
+    }
   }
 }

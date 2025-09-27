@@ -132,5 +132,36 @@
       "title": "Vereinfachte Animationen",
       "desc": "Komplexe Animationen reduzieren, um die Interaktion zu erleichtern."
     }
+  },"privacyPage": {
+    "title": "Datenschutz",
+    "groups": {
+      "whoCanSee": "Wer kann meine Infos sehen",
+      "other": "Andere"
+    },
+    "lastSeen": {
+      "title": "Zuletzt online & Online-Status",
+      "desc": "Steuern Sie, wer Ihren zuletzt gesehen- und Online-Status sehen kann"
+    },
+    "profilePhoto": {
+      "title": "Profilfoto",
+      "desc": "Wählen Sie, wer Ihr Foto sehen darf"
+    },
+    "about": {
+      "title": "Info",
+      "desc": "Steuern Sie, wer Ihre Info sehen darf"
+    },
+    "status": {
+      "title": "Status",
+      "desc": "Verwalten Sie, wer Ihre Status-Updates sehen kann"
+    },
+    "blocked": {
+      "title": "Blockierte Kontakte",
+      "desc": "Blockierte Benutzer anzeigen und verwalten"
+    },
+    "options": {
+      "everyone": "Jeder",
+      "contacts": "Meine Kontakte",
+      "nobody": "Niemand"
+    }
   }
 }

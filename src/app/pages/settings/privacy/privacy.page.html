@@ -1,82 +1,99 @@
 <ion-header>
-  
-   <ion-toolbar style="--background: #ffffff; --color: #000000;">
+  <ion-toolbar style="--background: #ffffff; --color: #000000;">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/settings"></ion-back-button>
+      <ion-back-button
+        defaultHref="/settings"
+        [attr.aria-label]="'common.back' | translate">
+      </ion-back-button>
     </ion-buttons>
-    <ion-title>Privacy</ion-title>
+    <ion-title>{{ 'privacyPage.title' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding" style="--background: #f8f8f8;">
+
   <ion-list lines="full">
     <ion-list-header>
-      <ion-label>Who can see my info</ion-label>
+      <ion-label>{{ 'privacyPage.groups.whoCanSee' | translate }}</ion-label>
     </ion-list-header>
 
     <!-- Last Seen -->
     <ion-item>
-      <ion-icon slot="start" name="time-outline"></ion-icon>
+      <ion-icon slot="start" name="time-outline" aria-hidden="true"></ion-icon>
       <ion-label>
-        <h2>Last Seen & Online</h2>
-        <p>Control who can see your last seen and online status</p>
+        <h2>{{ 'privacyPage.lastSeen.title' | translate }}</h2>
+        <p>{{ 'privacyPage.lastSeen.desc' | translate }}</p>
       </ion-label>
-      <ion-select slot="end" [(ngModel)]="lastSeen" interface="action-sheet">
-        <ion-select-option value="everyone">Everyone</ion-select-option>
-        <ion-select-option value="contacts">My Contacts</ion-select-option>
-        <ion-select-option value="nobody">Nobody</ion-select-option>
+      <ion-select
+        slot="end"
+        [(ngModel)]="lastSeen"
+        interface="action-sheet"
+        [attr.aria-label]="'privacyPage.lastSeen.title' | translate">
+        <ion-select-option value="everyone">{{ 'privacyPage.options.everyone' | translate }}</ion-select-option>
+        <ion-select-option value="contacts">{{ 'privacyPage.options.contacts' | translate }}</ion-select-option>
+        <ion-select-option value="nobody">{{ 'privacyPage.options.nobody' | translate }}</ion-select-option>
       </ion-select>
     </ion-item>
 
     <!-- Profile Photo -->
     <ion-item>
-      <ion-icon slot="start" name="person-circle-outline"></ion-icon>
+      <ion-icon slot="start" name="person-circle-outline" aria-hidden="true"></ion-icon>
       <ion-label>
-        <h2>Profile Photo</h2>
-        <p>Choose who can view your photo</p>
+        <h2>{{ 'privacyPage.profilePhoto.title' | translate }}</h2>
+        <p>{{ 'privacyPage.profilePhoto.desc' | translate }}</p>
       </ion-label>
-      <ion-select slot="end" [(ngModel)]="profilePhoto" interface="action-sheet">
-        <ion-select-option value="everyone">Everyone</ion-select-option>
-        <ion-select-option value="contacts">My Contacts</ion-select-option>
-        <ion-select-option value="nobody">Nobody</ion-select-option>
+      <ion-select
+        slot="end"
+        [(ngModel)]="profilePhoto"
+        interface="action-sheet"
+        [attr.aria-label]="'privacyPage.profilePhoto.title' | translate">
+        <ion-select-option value="everyone">{{ 'privacyPage.options.everyone' | translate }}</ion-select-option>
+        <ion-select-option value="contacts">{{ 'privacyPage.options.contacts' | translate }}</ion-select-option>
+        <ion-select-option value="nobody">{{ 'privacyPage.options.nobody' | translate }}</ion-select-option>
       </ion-select>
     </ion-item>
 
     <!-- About -->
     <ion-item>
-      <ion-icon slot="start" name="information-circle-outline"></ion-icon>
+      <ion-icon slot="start" name="information-circle-outline" aria-hidden="true"></ion-icon>
       <ion-label>
-        <h2>About</h2>
-        <p>Control who can see your about info</p>
+        <h2>{{ 'privacyPage.about.title' | translate }}</h2>
+        <p>{{ 'privacyPage.about.desc' | translate }}</p>
       </ion-label>
-      <ion-select slot="end" [(ngModel)]="about" interface="action-sheet">
-        <ion-select-option value="everyone">Everyone</ion-select-option>
-        <ion-select-option value="contacts">My Contacts</ion-select-option>
-        <ion-select-option value="nobody">Nobody</ion-select-option>
+      <ion-select
+        slot="end"
+        [(ngModel)]="about"
+        interface="action-sheet"
+        [attr.aria-label]="'privacyPage.about.title' | translate">
+        <ion-select-option value="everyone">{{ 'privacyPage.options.everyone' | translate }}</ion-select-option>
+        <ion-select-option value="contacts">{{ 'privacyPage.options.contacts' | translate }}</ion-select-option>
+        <ion-select-option value="nobody">{{ 'privacyPage.options.nobody' | translate }}</ion-select-option>
       </ion-select>
     </ion-item>
   </ion-list>
 
   <ion-list lines="full">
     <ion-list-header>
-      <ion-label>Other</ion-label>
+      <ion-label>{{ 'privacyPage.groups.other' | translate }}</ion-label>
     </ion-list-header>
 
     <!-- Status -->
-    <ion-item button detail (click)="goToStatusPrivacy()">
-      <ion-icon slot="start" name="ellipse-outline"></ion-icon>
+    <ion-item button detail (click)="goToStatusPrivacy()"
+              [attr.aria-label]="'privacyPage.status.title' | translate">
+      <ion-icon slot="start" name="ellipse-outline" aria-hidden="true"></ion-icon>
       <ion-label>
-        <h2>Status</h2>
-        <p>Manage who can see your status updates</p>
+        <h2>{{ 'privacyPage.status.title' | translate }}</h2>
+        <p>{{ 'privacyPage.status.desc' | translate }}</p>
       </ion-label>
     </ion-item>
 
     <!-- Blocked Contacts -->
-    <ion-item button detail (click)="goToBlockedContacts()">
-      <ion-icon slot="start" name="ban-outline"></ion-icon>
+    <ion-item button detail (click)="goToBlockedContacts()"
+              [attr.aria-label]="'privacyPage.blocked.title' | translate">
+      <ion-icon slot="start" name="ban-outline" aria-hidden="true"></ion-icon>
       <ion-label>
-        <h2>Blocked Contacts</h2>
-        <p>View and manage blocked users</p>
+        <h2>{{ 'privacyPage.blocked.title' | translate }}</h2>
+        <p>{{ 'privacyPage.blocked.desc' | translate }}</p>
       </ion-label>
     </ion-item>
   </ion-list>

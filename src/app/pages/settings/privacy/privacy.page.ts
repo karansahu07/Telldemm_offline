@@ -3,25 +3,24 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-privacy',
   templateUrl: './privacy.page.html',
   styleUrls: ['./privacy.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule,FormsModule],
+  imports: [IonicModule, CommonModule, FormsModule, TranslateModule],
 })
 export class PrivacyPage implements OnInit {
+  // values are internal codes; labels come from i18n
+  lastSeen: 'everyone' | 'contacts' | 'nobody' = 'contacts';
+  profilePhoto: 'everyone' | 'contacts' | 'nobody' = 'everyone';
+  about: 'everyone' | 'contacts' | 'nobody' = 'contacts';
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private translate: TranslateService) {}
 
-  ngOnInit() {
-  }
-lastSeen: string = 'contacts';
-  profilePhoto: string = 'everyone';
-  about: string = 'contacts';
-
- 
+  ngOnInit() {}
 
   goToStatusPrivacy() {
     this.router.navigateByUrl('privacy/status');

@@ -107,5 +107,36 @@
       "title": "Hoạt ảnh đơn giản",
       "desc": "Giảm hoạt ảnh phức tạp để tương tác dễ dàng hơn."
     }
+  },"privacyPage": {
+    "title": "Quyền riêng tư",
+    "groups": {
+      "whoCanSee": "Ai có thể xem thông tin của tôi",
+      "other": "Khác"
+    },
+    "lastSeen": {
+      "title": "Lần cuối & Trực tuyến",
+      "desc": "Kiểm soát ai có thể xem lần cuối bạn trực tuyến và trạng thái trực tuyến"
+    },
+    "profilePhoto": {
+      "title": "Ảnh hồ sơ",
+      "desc": "Chọn ai có thể xem ảnh của bạn"
+    },
+    "about": {
+      "title": "Giới thiệu",
+      "desc": "Kiểm soát ai có thể xem thông tin giới thiệu của bạn"
+    },
+    "status": {
+      "title": "Trạng thái",
+      "desc": "Quản lý ai có thể xem cập nhật trạng thái của bạn"
+    },
+    "blocked": {
+      "title": "Danh bạ đã chặn",
+      "desc": "Xem và quản lý người dùng đã chặn"
+    },
+    "options": {
+      "everyone": "Mọi người",
+      "contacts": "Danh bạ của tôi",
+      "nobody": "Không ai"
+    }
   }
 }

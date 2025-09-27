@@ -132,6 +132,37 @@
       "title": "简化动画",
       "desc": "减少复杂动画以便更容易交互。"
     }
+  },"privacyPage": {
+    "title": "隐私",
+    "groups": {
+      "whoCanSee": "谁可以查看我的信息",
+      "other": "其他"
+    },
+    "lastSeen": {
+      "title": "最近上线和在线状态",
+      "desc": "控制谁可以查看你的最近上线和在线状态"
+    },
+    "profilePhoto": {
+      "title": "头像",
+      "desc": "选择谁可以查看你的头像"
+    },
+    "about": {
+      "title": "关于",
+      "desc": "控制谁可以查看你的简介信息"
+    },
+    "status": {
+      "title": "状态",
+      "desc": "管理谁可以查看你的状态更新"
+    },
+    "blocked": {
+      "title": "已屏蔽的联系人",
+      "desc": "查看和管理已屏蔽的用户"
+    },
+    "options": {
+      "everyone": "所有人",
+      "contacts": "我的联系人",
+      "nobody": "无人"
+    }
   }
 
 }

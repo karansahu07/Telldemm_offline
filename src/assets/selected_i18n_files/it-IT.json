@@ -131,5 +131,36 @@
       "title": "Animazioni semplificate",
       "desc": "Riduci le animazioni complesse per interazioni più facili."
     }
+  },"privacyPage": {
+    "title": "Privacy",
+    "groups": {
+      "whoCanSee": "Chi può vedere le mie info",
+      "other": "Altro"
+    },
+    "lastSeen": {
+      "title": "Ultimo accesso e online",
+      "desc": "Controlla chi può vedere il tuo ultimo accesso e lo stato online"
+    },
+    "profilePhoto": {
+      "title": "Foto profilo",
+      "desc": "Scegli chi può vedere la tua foto"
+    },
+    "about": {
+      "title": "Info",
+      "desc": "Controlla chi può vedere le tue informazioni"
+    },
+    "status": {
+      "title": "Stato",
+      "desc": "Gestisci chi può vedere i tuoi aggiornamenti di stato"
+    },
+    "blocked": {
+      "title": "Contatti bloccati",
+      "desc": "Visualizza e gestisci gli utenti bloccati"
+    },
+    "options": {
+      "everyone": "Tutti",
+      "contacts": "I miei contatti",
+      "nobody": "Nessuno"
+    }
   }
 }

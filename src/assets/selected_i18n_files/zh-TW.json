@@ -133,6 +133,37 @@
       "title": "簡化動畫",
       "desc": "減少複雜動畫以便更容易操作。"
     }
+  },"privacyPage": {
+    "title": "隱私",
+    "groups": {
+      "whoCanSee": "誰可以查看我的資訊",
+      "other": "其他"
+    },
+    "lastSeen": {
+      "title": "上次上線與在線狀態",
+      "desc": "控制誰可以查看你的上次上線和在線狀態"
+    },
+    "profilePhoto": {
+      "title": "個人頭像",
+      "desc": "選擇誰可以查看你的照片"
+    },
+    "about": {
+      "title": "關於",
+      "desc": "控制誰可以查看你的個人資訊"
+    },
+    "status": {
+      "title": "狀態",
+      "desc": "管理誰可以查看你的狀態更新"
+    },
+    "blocked": {
+      "title": "已封鎖的聯絡人",
+      "desc": "檢視和管理已封鎖的使用者"
+    },
+    "options": {
+      "everyone": "所有人",
+      "contacts": "我的聯絡人",
+      "nobody": "無人"
+    }
   }
 
 }
