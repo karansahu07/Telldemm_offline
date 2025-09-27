@@ -341,5 +341,14 @@
       "updated": "Profil resmi başarıyla güncellendi!",
       "updateFailed": "Profil resmi güncellenemedi"
     }
+  },"footerTabs": {
+    "chat": "Sohbet",
+    "updates": "Güncellemeler",
+    "communities": "Topluluklar",
+    "calls": "Aramalar",
+    "badges": {
+      "unreadChats": "{{count}} okunmamış sohbet",
+      "unreadUpdates": "{{count}} güncelleme"
+    }
   }
 }

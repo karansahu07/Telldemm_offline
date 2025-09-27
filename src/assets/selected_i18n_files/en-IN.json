@@ -366,5 +366,14 @@
       "updated": "Profile picture updated successfully!",
       "updateFailed": "Failed to update profile picture"
     }
+  }, "footerTabs": {
+    "chat": "Chat",
+    "updates": "Updates",
+    "communities": "Communities",
+    "calls": "Calls",
+    "badges": {
+      "unreadChats": "{{count}} unread chats",
+      "unreadUpdates": "{{count}} updates"
+    }
   }
 }

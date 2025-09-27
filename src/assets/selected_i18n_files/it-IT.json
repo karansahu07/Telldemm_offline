@@ -364,5 +364,14 @@
       "updated": "Immagine profilo aggiornata con successo!",
       "updateFailed": "Impossibile aggiornare l’immagine del profilo"
     }
+  },"footerTabs": {
+    "chat": "Chat",
+    "updates": "Aggiornamenti",
+    "communities": "Comunità",
+    "calls": "Chiamate",
+    "badges": {
+      "unreadChats": "{{count}} chat non lette",
+      "unreadUpdates": "{{count}} aggiornamenti"
+    }
   }
 }

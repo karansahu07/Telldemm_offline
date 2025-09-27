@@ -365,6 +365,15 @@
       "updated": "头像更新成功！",
       "updateFailed": "更新头像失败"
     }
+  },"footerTabs": {
+    "chat": "聊天",
+    "updates": "更新",
+    "communities": "社区",
+    "calls": "通话",
+    "badges": {
+      "unreadChats": "{{count}} 个未读聊天",
+      "unreadUpdates": "{{count}} 个更新"
+    }
   }
 
 }

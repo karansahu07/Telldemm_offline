@@ -364,5 +364,14 @@
       "updated": "프로필 이미지가 성공적으로 업데이트되었습니다!",
       "updateFailed": "프로필 이미지 업데이트 실패"
     }
+  },"footerTabs": {
+    "chat": "채팅",
+    "updates": "업데이트",
+    "communities": "커뮤니티",
+    "calls": "통화",
+    "badges": {
+      "unreadChats": "{{count}}개의 안 읽은 채팅",
+      "unreadUpdates": "{{count}}개의 업데이트"
+    }
   }
 }

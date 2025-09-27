@@ -365,5 +365,14 @@
       "updated": "Photo de profil mise à jour avec succès !",
       "updateFailed": "Échec de la mise à jour de la photo de profil"
     }
+  }, "footerTabs": {
+    "chat": "Discussions",
+    "updates": "Mises à jour",
+    "communities": "Communautés",
+    "calls": "Appels",
+    "badges": {
+      "unreadChats": "{{count}} discussions non lues",
+      "unreadUpdates": "{{count}} mises à jour"
+    }
   }
 }

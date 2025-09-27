@@ -364,5 +364,14 @@
       "updated": "プロフィール画像が正常に更新されました！",
       "updateFailed": "プロフィール画像の更新に失敗しました"
     }
+  },"footerTabs": {
+    "chat": "チャット",
+    "updates": "アップデート",
+    "communities": "コミュニティ",
+    "calls": "通話",
+    "badges": {
+      "unreadChats": "{{count}} 件の未読チャット",
+      "unreadUpdates": "{{count}} 件のアップデート"
+    }
   }
 }

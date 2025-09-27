@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { Router } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-social-media-links',
   standalone: true,
-  imports: [IonicModule, CommonModule],
+  imports: [IonicModule, CommonModule, TranslateModule],
   templateUrl: './social-media-links.page.html',
   styleUrls: ['./social-media-links.page.scss'],
 })
@@ -30,7 +31,6 @@ export class SocialMediaLinksPage implements OnInit {
   }
 
   openAddInstagram() {
-    // navigate to add-instagram page
     this.router.navigate(['/add-instagram']);
   }
 }

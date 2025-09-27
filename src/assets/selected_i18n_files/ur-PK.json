@@ -340,5 +340,14 @@
       "updated": "پروفائل تصویر کامیابی کے ساتھ اپ ڈیٹ ہوگئی!",
       "updateFailed": "پروفائل تصویر اپ ڈیٹ کرنے میں ناکام"
     }
+  },"footerTabs": {
+    "chat": "چیٹ",
+    "updates": "اپ ڈیٹس",
+    "communities": "کمیونٹیز",
+    "calls": "کالز",
+    "badges": {
+      "unreadChats": "{{count}} نہ پڑھی گئی چیٹس",
+      "unreadUpdates": "{{count}} اپ ڈیٹس"
+    }
   }
 }

@@ -54,131 +54,99 @@
 
 
 import {
-  Component,
-  Input,
-  Renderer2,
-  AfterViewInit,
-  OnChanges,
-  SimpleChanges,
-  AfterViewChecked,
-  ElementRef   // ✅ add
+  Component, Input, Renderer2, AfterViewInit, OnChanges, SimpleChanges, AfterViewChecked, ElementRef
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { IonTabBar, IonBadge, Platform } from '@ionic/angular/standalone';
- 
+import { TranslateModule } from '@ngx-translate/core';
+
 @Component({
   selector: 'app-footer-tabs',
   templateUrl: './footer-tabs.component.html',
   styleUrls: ['./footer-tabs.component.scss'],
-  imports: [IonTabBar, CommonModule, IonBadge],
+  imports: [IonTabBar, CommonModule, IonBadge, TranslateModule],
 })
 export class FooterTabsComponent implements AfterViewInit, OnChanges, AfterViewChecked {
   @Input() totalUnreadCount: number = 0;
   @Input() totalUnreadUpdates: number = 0;
- 
+
   activePath: string = '/home-screen';
- 
+
   constructor(
     private router: Router,
     private platform: Platform,
     private renderer: Renderer2,
-    private el: ElementRef   // ✅ add
+    private el: ElementRef
   ) {
-    // Router navigation par recalc
     this.router.events.subscribe(() => {
       this.activePath = this.router.url;
       this.setDynamicPadding();
     });
   }
- 
+
   ngAfterViewInit() {
     this.setDynamicPadding();
     window.addEventListener('resize', () => this.setDynamicPadding());
   }
- 
+
   ngAfterViewChecked() {
     this.setDynamicPadding();
   }
- 
+
   ngOnChanges(changes: SimpleChanges) {
     if (changes['totalUnreadCount'] || changes['totalUnreadUpdates']) {
       this.setDynamicPadding();
     }
   }
- 
+
   private isGestureNavigation(): boolean {
-    const screenHeight = window.screen.height;
-    const innerHeight = window.innerHeight;
-    const diff = screenHeight - innerHeight;
-    // console.log(`screenHeight: ${screenHeight}, innerHeight: ${innerHeight}, diff: ${diff}`);
+    const diff = window.screen.height - window.innerHeight;
     return diff < 40;
   }
   private isTransparentButtonNav(): boolean {
-  const screenHeight = window.screen.height;
-  const innerHeight = window.innerHeight;
-  const diff = screenHeight - innerHeight;
- 
-  // Transparent button nav usually => diff < 5
-  return diff < 5;
-}
- 
- 
+    const diff = window.screen.height - window.innerHeight;
+    return diff < 5;
+  }
+
   setDynamicPadding() {
-    // ✅ sirf iss component ka mineclass select kar
     const mineclassEl = this.el.nativeElement.querySelector('.mineclass') as HTMLElement;
     if (!mineclassEl) return;
- 
+
     if (this.platform.is('ios')) {
-      const safeAreaBottom = parseInt(
-        getComputedStyle(document.documentElement).getPropertyValue('--ion-safe-area-bottom')
-      ) || 0;
- 
-      if (safeAreaBottom > 0) {
-        this.renderer.setStyle(mineclassEl, 'padding-bottom', '16px');
-        // console.log('✅ Gesture Navigation detected (iOS)');
+      const safeAreaBottom =
+        parseInt(getComputedStyle(document.documentElement).getPropertyValue('--ion-safe-area-bottom')) || 0;
+      this.renderer.setStyle(mineclassEl, 'padding-bottom', safeAreaBottom > 0 ? '16px' : '6px');
+    } else {
+      if (this.isGestureNavigation() || this.isTransparentButtonNav()) {
+        this.renderer.setStyle(mineclassEl, 'padding-bottom', '35px');
       } else {
         this.renderer.setStyle(mineclassEl, 'padding-bottom', '6px');
-        // console.log('🔘 Buttons Navigation detected (iOS)');
-      }
-    } else {
-      if (this.isGestureNavigation()) {
-        this.renderer.setStyle(mineclassEl, 'padding-bottom', '35px');
-        // console.log('✅ Gesture Navigation detected (Android)');
-      }  else if (this.isTransparentButtonNav()) {
-    this.renderer.setStyle(mineclassEl, 'padding-bottom', '35px');
-    // console.log('✨ Transparent Button Navigation detected (Android)');
-  }
-      else {
-        this.renderer.setStyle(mineclassEl, 'padding-bottom', '6px');
-        // console.log('🔘 Buttons Navigation detected (Android)');
       }
     }
   }
- 
+
   navigateTohomescreen() {
     this.router.navigate(['/home-screen']);
     this.activePath = '/home-screen';
   }
- 
   navigateTocallingscreen() {
     this.router.navigate(['/status-screen']);
     this.activePath = '/status-screen';
   }
- 
   navigateTocommunityscreen() {
     this.router.navigate(['/community-screen']);
     this.activePath = '/community-screen';
   }
- 
   navigateTocallsscreen() {
     this.router.navigate(['/mine']);
     this.activePath = '/mine';
   }
- 
+
   isActive(paths: string[]): boolean {
     return paths.includes(this.router.url);
   }
 }
+
  
  

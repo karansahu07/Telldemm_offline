@@ -366,6 +366,15 @@
       "updated": "প্রোফাইল ছবি সফলভাবে আপডেট হয়েছে!",
       "updateFailed": "প্রোফাইল ছবি আপডেট ব্যর্থ হয়েছে"
     }
+  },"footerTabs": {
+    "chat": "চ্যাট",
+    "updates": "আপডেট",
+    "communities": "কমিউনিটি",
+    "calls": "কল",
+    "badges": {
+      "unreadChats": "{{count}}টি অপঠিত চ্যাট",
+      "unreadUpdates": "{{count}}টি আপডেট"
+    }
   }
 
 

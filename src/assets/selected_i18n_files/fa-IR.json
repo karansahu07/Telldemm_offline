@@ -311,5 +311,14 @@
       "updated": "تصویر پروفایل با موفقیت به‌روزرسانی شد!",
       "updateFailed": "به‌روزرسانی تصویر پروفایل ناموفق بود"
     }
+  },"footerTabs": {
+    "chat": "گفتگو",
+    "updates": "به‌روزرسانی‌ها",
+    "communities": "انجمن‌ها",
+    "calls": "تماس‌ها",
+    "badges": {
+      "unreadChats": "{{count}} گفتگوی خوانده‌نشده",
+      "unreadUpdates": "{{count}} به‌روزرسانی"
+    }
   }
 }

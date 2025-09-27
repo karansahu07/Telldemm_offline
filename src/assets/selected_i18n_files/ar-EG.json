@@ -366,5 +366,15 @@
       "updated": "تم تحديث صورة الملف الشخصي بنجاح!",
       "updateFailed": "فشل في تحديث صورة الملف الشخصي"
     }
+  },
+  "footerTabs": {
+    "chat": "الدردشة",
+    "updates": "التحديثات",
+    "communities": "المجتمعات",
+    "calls": "المكالمات",
+    "badges": {
+      "unreadChats": "{{count}} دردشة غير مقروءة",
+      "unreadUpdates": "{{count}} تحديث"
+    }
   }
 }

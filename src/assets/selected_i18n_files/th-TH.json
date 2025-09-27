@@ -364,5 +364,14 @@
       "updated": "อัปเดตรูปโปรไฟล์เรียบร้อยแล้ว!",
       "updateFailed": "ไม่สามารถอัปเดตรูปโปรไฟล์ได้"
     }
+  },"footerTabs": {
+    "chat": "แชท",
+    "updates": "อัปเดต",
+    "communities": "ชุมชน",
+    "calls": "การโทร",
+    "badges": {
+      "unreadChats": "{{count}} แชทยังไม่ได้อ่าน",
+      "unreadUpdates": "{{count}} การอัปเดต"
+    }
   }
 }

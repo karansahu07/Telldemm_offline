@@ -364,5 +364,14 @@
       "updated": "Foto de perfil atualizada com sucesso!",
       "updateFailed": "Falha ao atualizar a foto de perfil"
     }
+  },"footerTabs": {
+    "chat": "Conversas",
+    "updates": "Atualizações",
+    "communities": "Comunidades",
+    "calls": "Chamadas",
+    "badges": {
+      "unreadChats": "{{count}} conversas não lidas",
+      "unreadUpdates": "{{count}} atualizações"
+    }
   }
 }

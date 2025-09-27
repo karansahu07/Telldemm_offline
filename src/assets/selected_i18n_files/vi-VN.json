@@ -340,5 +340,14 @@
       "updated": "Ảnh hồ sơ đã được cập nhật thành công!",
       "updateFailed": "Không thể cập nhật ảnh hồ sơ"
     }
+  },"footerTabs": {
+    "chat": "Trò chuyện",
+    "updates": "Cập nhật",
+    "communities": "Cộng đồng",
+    "calls": "Cuộc gọi",
+    "badges": {
+      "unreadChats": "{{count}} cuộc trò chuyện chưa đọc",
+      "unreadUpdates": "{{count}} bản cập nhật"
+    }
   }
 }

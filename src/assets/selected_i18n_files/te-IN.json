@@ -364,5 +364,14 @@
       "updated": "ప్రొఫైల్ చిత్రం విజయవంతంగా అప్‌డేట్ అయింది!",
       "updateFailed": "ప్రొఫైల్ చిత్రం అప్‌డేట్ విఫలమైంది"
     }
+  },"footerTabs": {
+    "chat": "చాట్",
+    "updates": "నవీకరణలు",
+    "communities": "కమ్యూనిటీలు",
+    "calls": "కాల్‌లు",
+    "badges": {
+      "unreadChats": "{{count}} చదవని చాట్లు",
+      "unreadUpdates": "{{count}} నవీకరణలు"
+    }
   }
 }

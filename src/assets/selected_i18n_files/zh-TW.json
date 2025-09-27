@@ -366,6 +366,15 @@
       "updated": "個人頭像更新成功！",
       "updateFailed": "更新個人頭像失敗"
     }
+  },"footerTabs": {
+    "chat": "聊天",
+    "updates": "更新",
+    "communities": "社群",
+    "calls": "通話",
+    "badges": {
+      "unreadChats": "{{count}} 個未讀聊天",
+      "unreadUpdates": "{{count}} 個更新"
+    }
   }
 
 }

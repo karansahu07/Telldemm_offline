@@ -364,5 +364,14 @@
       "updated": "प्रोफ़ाइल चित्र सफलतापूर्वक अपडेट हुआ!",
       "updateFailed": "प्रोफ़ाइल चित्र अपडेट करने में विफल"
     }
+  },"footerTabs": {
+    "chat": "चैट",
+    "updates": "अपडेट्स",
+    "communities": "समुदाय",
+    "calls": "कॉल्स",
+    "badges": {
+      "unreadChats": "{{count}} अपठित चैट्स",
+      "unreadUpdates": "{{count}} अपडेट्स"
+    }
   }
 }

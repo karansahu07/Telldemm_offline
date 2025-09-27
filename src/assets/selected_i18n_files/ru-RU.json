@@ -364,5 +364,14 @@
       "updated": "Фото профиля успешно обновлено!",
       "updateFailed": "Не удалось обновить фото профиля"
     }
+  },"footerTabs": {
+    "chat": "Чаты",
+    "updates": "Обновления",
+    "communities": "Сообщества",
+    "calls": "Звонки",
+    "badges": {
+      "unreadChats": "{{count}} непрочитанных чатов",
+      "unreadUpdates": "{{count}} обновлений"
+    }
   }
 }
