@@ -443,5 +443,15 @@
       "message": "सत्र का समय समाप्त/समाप्त हो गया।"
     },
     "alt": { "profile": "प्रोफ़ाइल" }
+  },"menu": {
+    "newGroup": "नया समूह",
+    "newCommunity": "नया समुदाय",
+    "newBroadcast": "नया प्रसारण (WIP)",
+    "starred": "सितारे वाले (WIP)",
+    "readAll": "सभी पढ़ें (WIP)",
+    "settings": "सेटिंग्स",
+    "createChannels": "चैनल बनाएं (WIP)",
+    "statusPrivacy": "स्टेटस गोपनीयता (WIP)",
+    "clearCallLogs": "कॉल लॉग्स साफ करें (WIP)"
   }
 }

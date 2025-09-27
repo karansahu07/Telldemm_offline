@@ -444,5 +444,15 @@
       "message": "ਸੈਸ਼ਨ ਸਮਾਪਤ/ਮਿਆਦ ਪੁੱਗ ਗਈ ਹੈ।"
     },
     "alt": { "profile": "ਪ੍ਰੋਫ਼ਾਈਲ" }
+  },"menu": {
+    "newGroup": "ਨਵਾਂ ਗਰੁੱਪ",
+    "newCommunity": "ਨਵੀਂ ਕਮਿਊਨਿਟੀ",
+    "newBroadcast": "ਨਵਾਂ ਪ੍ਰਸਾਰਣ (WIP)",
+    "starred": "ਸਟਾਰਡ (WIP)",
+    "readAll": "ਸਭ ਪੜ੍ਹੋ (WIP)",
+    "settings": "ਸੈਟਿੰਗਜ਼",
+    "createChannels": "ਚੈਨਲ ਬਣਾਓ (WIP)",
+    "statusPrivacy": "ਸਟੇਟਸ ਪਰਾਈਵੇਸੀ (WIP)",
+    "clearCallLogs": "ਕਾਲ ਲਾਗਸ ਸਾਫ ਕਰੋ (WIP)"
   }
 }

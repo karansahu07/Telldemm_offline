@@ -445,5 +445,15 @@
       "message": "انتهت الجلسة أو انتهت صلاحيتها."
     },
     "alt": { "profile": "الملف الشخصي" }
+  },"menu": {
+    "newGroup": "مجموعة جديدة",
+    "newCommunity": "مجتمع جديد",
+    "newBroadcast": "بث جديد (WIP)",
+    "starred": "مميز (WIP)",
+    "readAll": "قراءة الكل (WIP)",
+    "settings": "الإعدادات",
+    "createChannels": "إنشاء قنوات (WIP)",
+    "statusPrivacy": "خصوصية الحالة (WIP)",
+    "clearCallLogs": "مسح سجلات المكالمات (WIP)"
   }
 }

@@ -443,5 +443,15 @@
       "message": "அமர்வு காலாவதியானது."
     },
     "alt": { "profile": "சுயவிவரம்" }
+  },"menu": {
+    "newGroup": "புதிய குழு",
+    "newCommunity": "புதிய சமூகங்கள்",
+    "newBroadcast": "புதிய ஒளிபரப்பு (WIP)",
+    "starred": "நட்சத்திரம் (WIP)",
+    "readAll": "அனைத்தையும் படிக்கவும் (WIP)",
+    "settings": "அமைப்புகள்",
+    "createChannels": "சேனல்கள் உருவாக்கவும் (WIP)",
+    "statusPrivacy": "நிலையின் தனியுரிமை (WIP)",
+    "clearCallLogs": "அழைப்பு பதிவுகளை அழிக்கவும் (WIP)"
   }
 }

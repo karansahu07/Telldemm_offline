@@ -443,5 +443,15 @@
       "message": "セッションがタイムアウトまたは期限切れです。"
     },
     "alt": { "profile": "プロフィール" }
+  },"menu": {
+    "newGroup": "新しいグループ",
+    "newCommunity": "新しいコミュニティ",
+    "newBroadcast": "新しいブロードキャスト (WIP)",
+    "starred": "スター付き (WIP)",
+    "readAll": "すべて既読にする (WIP)",
+    "settings": "設定",
+    "createChannels": "チャンネルを作成 (WIP)",
+    "statusPrivacy": "ステータスのプライバシー (WIP)",
+    "clearCallLogs": "通話履歴を消去 (WIP)"
   }
 }

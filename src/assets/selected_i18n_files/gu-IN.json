@@ -443,5 +443,15 @@
       "message": "સત્ર સમય સમાપ્ત/સમાપ્ત થયું."
     },
     "alt": { "profile": "પ્રોફાઇલ" }
+  },"menu": {
+    "newGroup": "નવું જૂથ",
+    "newCommunity": "નવી કોમ્યુનિટી",
+    "newBroadcast": "નવો પ્રસારણ (WIP)",
+    "starred": "સ્ટાર્ડ (WIP)",
+    "readAll": "બધું વાંચો (WIP)",
+    "settings": "સેટિંગ્સ",
+    "createChannels": "ચેનલ્સ બનાવો (WIP)",
+    "statusPrivacy": "સ્ટેટસ પ્રાઈવસી (WIP)",
+    "clearCallLogs": "કૉલ લોગ્સ સાફ કરો (WIP)"
   }
 }

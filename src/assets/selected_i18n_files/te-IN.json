@@ -443,5 +443,15 @@
       "message": "సెషన్ కాలం ముగిసింది."
     },
     "alt": { "profile": "ప్రొఫైల్" }
+  },"menu": {
+    "newGroup": "క్రొత్త గ్రూప్",
+    "newCommunity": "క్రొత్త కమ్యూనిటీ",
+    "newBroadcast": "క్రొత్త ప్రసారం (WIP)",
+    "starred": "స్టార్డ్ (WIP)",
+    "readAll": "అన్నీ చదవండి (WIP)",
+    "settings": "సెట్టింగ్స్",
+    "createChannels": "ఛానెల్స్ సృష్టించండి (WIP)",
+    "statusPrivacy": "స్థితి గోప్యత (WIP)",
+    "clearCallLogs": "కాల్ లాగ్స్ క్లియర్ చేయండి (WIP)"
   }
 }

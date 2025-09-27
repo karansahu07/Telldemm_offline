@@ -443,5 +443,15 @@
       "message": "Сеанс завершён/истёк."
     },
     "alt": { "profile": "Профиль" }
+  },"menu": {
+    "newGroup": "Новая группа",
+    "newCommunity": "Новое сообщество",
+    "newBroadcast": "Новая рассылка (WIP)",
+    "starred": "Избранное (WIP)",
+    "readAll": "Отметить всё как прочитанное (WIP)",
+    "settings": "Настройки",
+    "createChannels": "Создать каналы (WIP)",
+    "statusPrivacy": "Приватность статуса (WIP)",
+    "clearCallLogs": "Очистить журнал звонков (WIP)"
   }
 }

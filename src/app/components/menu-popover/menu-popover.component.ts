@@ -1,19 +1,21 @@
 import { Component, OnInit } from '@angular/core';
-import { PopoverController } from '@ionic/angular';
-import { IonicModule } from '@ionic/angular';
+import { PopoverController, IonicModule } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
+
+type MenuOption = { labelKey: string; route?: string };
 
 @Component({
   selector: 'app-menu-popover',
   standalone: true,
   templateUrl: './menu-popover.component.html',
   styleUrls: ['./menu-popover.component.scss'],
-  imports: [IonicModule, CommonModule],
+  imports: [IonicModule, CommonModule, TranslateModule],
 })
 export class MenuPopoverComponent implements OnInit {
   currentUrl: string = '';
-  menuOptions: { label: string, route?: string }[] = [];
+  menuOptions: MenuOption[] = [];
 
   constructor(
     private popoverCtrl: PopoverController,
@@ -25,40 +27,38 @@ export class MenuPopoverComponent implements OnInit {
 
     if (this.currentUrl.includes('/home-screen')) {
       this.menuOptions = [
-        { label: 'New group',  route: '/contact-screen' },
-        { label: 'New Community',  route: '/community-screen' },
-        { label: 'New broadcast wip' },
-        // { label: 'Linked Devices wip' },
-        { label: 'Starred wip' },
-        { label: 'Read all wip' },
-        { label: 'Settings', route: '/setting-screen' }
+        { labelKey: 'menu.newGroup', route: '/contact-screen' },
+        { labelKey: 'menu.newCommunity', route: '/community-screen' },
+        { labelKey: 'menu.newBroadcast' },
+        { labelKey: 'menu.starred' },
+        { labelKey: 'menu.readAll' },
+        { labelKey: 'menu.settings', route: '/setting-screen' }
       ];
     } else if (this.currentUrl.includes('/status')) {
       this.menuOptions = [
-        { label: 'Create channels wip' },
-        { label: 'Status Privacy wip' },
-        { label: 'Starred wip' },
-        { label: 'Settings', route: '/setting-screen' }
+        { labelKey: 'menu.createChannels' },
+        { labelKey: 'menu.statusPrivacy' },
+        { labelKey: 'menu.starred' },
+        { labelKey: 'menu.settings', route: '/setting-screen' }
       ];
     } else if (this.currentUrl.includes('/community-screen')) {
       this.menuOptions = [
-        { label: 'Settings', route: '/setting-screen' }
+        { labelKey: 'menu.settings', route: '/setting-screen' }
       ];
     } else if (this.currentUrl.includes('/calls-screen')) {
       this.menuOptions = [
-        { label: 'Clear call logs wip' },
-        { label: 'Settings', route: '/setting-screen' }
+        { labelKey: 'menu.clearCallLogs' },
+        { labelKey: 'menu.settings', route: '/setting-screen' }
       ];
     }
   }
 
-  selectOption(option: any) {
+  selectOption(option: MenuOption) {
     this.popoverCtrl.dismiss();
 
     if (option.route) {
       this.router.navigate([option.route]);
     }
-
-    // You can add more actions here if needed
+    // For non-route items (like "starred", "readAll") → implement action later
   }
 }

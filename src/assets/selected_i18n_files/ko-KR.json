@@ -443,5 +443,15 @@
       "message": "세션이 만료되었습니다."
     },
     "alt": { "profile": "프로필" }
+  },"menu": {
+    "newGroup": "새 그룹",
+    "newCommunity": "새 커뮤니티",
+    "newBroadcast": "새 방송 (WIP)",
+    "starred": "별표 표시 (WIP)",
+    "readAll": "모두 읽음 (WIP)",
+    "settings": "설정",
+    "createChannels": "채널 만들기 (WIP)",
+    "statusPrivacy": "상태 공개 설정 (WIP)",
+    "clearCallLogs": "통화 기록 지우기 (WIP)"
   }
 }

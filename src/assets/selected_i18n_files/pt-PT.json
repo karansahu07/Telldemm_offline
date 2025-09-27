@@ -443,5 +443,15 @@
       "message": "Sessão expirada."
     },
     "alt": { "profile": "Perfil" }
+  },"menu": {
+    "newGroup": "Novo grupo",
+    "newCommunity": "Nova comunidade",
+    "newBroadcast": "Nova transmissão (WIP)",
+    "starred": "Marcados (WIP)",
+    "readAll": "Marcar tudo como lido (WIP)",
+    "settings": "Definições",
+    "createChannels": "Criar canais (WIP)",
+    "statusPrivacy": "Privacidade do estado (WIP)",
+    "clearCallLogs": "Limpar registos de chamadas (WIP)"
   }
 }

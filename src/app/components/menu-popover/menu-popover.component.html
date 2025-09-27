@@ -1,31 +1,9 @@
-<!-- <div style="background: white;">
-  <ul>
-    <li><button (click)="selectOption('Advertise')">Advertise</button></li>
-    <li><button (click)="selectOption('New group')">New group</button></li>
-    <li><button (click)="selectOption('New broadcast')">New broadcast</button></li>
-    <li><button (click)="selectOption('New broadcast')">Linked device</button></li>
-    <li><button (click)="selectOption('Labels')">Labels</button></li>
-    <li><button (click)="selectOption('Starred messages')">Starred messages</button></li>
-    <li><button (click)="selectOption('Setting')">Setting</button></li>
-  </ul>
-</div> -->
-
-<!-- <ion-list class="custom-list">
-  <ion-item button (click)="selectOption('Advertise')">Advertise</ion-item>
-  <ion-item button (click)="selectOption('New group')">New group</ion-item>
-  <ion-item button (click)="selectOption('New broadcast')">New broadcast</ion-item>
-  <ion-item button (click)="selectOption('Labels')">Labels</ion-item>
-  <ion-item button (click)="selectOption('Starred messages')">Starred messages</ion-item>
-  <ion-item button (click)="selectOption('Setting')">Setting</ion-item>
-  <ion-item button (click)="selectOption('Create channels')">Create channels</ion-item>
-  <ion-item button (click)="selectOption('Status Privacy')">Status Privacy</ion-item>
-  <ion-item button (click)="selectOption('Starred')">Starred</ion-item>
-  <ion-item button (click)="selectOption('Starred')">Clear call logs</ion-item>
-</ion-list> -->
-
-
 <ion-list class="custom-list">
-  <ion-item button *ngFor="let option of menuOptions" (click)="selectOption(option)">
-    {{ option.label }}
+  <ion-item
+    button
+    *ngFor="let option of menuOptions"
+    (click)="selectOption(option)"
+    [attr.aria-label]="option.labelKey | translate">
+    {{ option.labelKey | translate }}
   </ion-item>
 </ion-list>

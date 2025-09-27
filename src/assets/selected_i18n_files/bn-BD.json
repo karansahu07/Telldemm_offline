@@ -445,6 +445,16 @@
       "message": "সেশন শেষ হয়েছে/মেয়াদোত্তীর্ণ।"
     },
     "alt": { "profile": "প্রোফাইল" }
+  },"menu": {
+    "newGroup": "নতুন গ্রুপ",
+    "newCommunity": "নতুন কমিউনিটি",
+    "newBroadcast": "নতুন সম্প্রচার (WIP)",
+    "starred": "তারকাচিহ্নিত (WIP)",
+    "readAll": "সব পড়ুন (WIP)",
+    "settings": "সেটিংস",
+    "createChannels": "চ্যানেল তৈরি করুন (WIP)",
+    "statusPrivacy": "স্ট্যাটাস প্রাইভেসি (WIP)",
+    "clearCallLogs": "কল লগ মুছুন (WIP)"
   }
 
 

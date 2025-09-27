@@ -443,5 +443,15 @@
       "message": "Session timed out/expired."
     },
     "alt": { "profile": "Profile" }
+  },"menu": {
+    "newGroup": "New group",
+    "newCommunity": "New Community",
+    "newBroadcast": "New broadcast (WIP)",
+    "starred": "Starred (WIP)",
+    "readAll": "Read all (WIP)",
+    "settings": "Settings",
+    "createChannels": "Create channels (WIP)",
+    "statusPrivacy": "Status Privacy (WIP)",
+    "clearCallLogs": "Clear call logs (WIP)"
   }
 }

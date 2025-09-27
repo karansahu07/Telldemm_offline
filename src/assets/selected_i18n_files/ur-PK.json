@@ -419,5 +419,15 @@
       "message": "سیشن کا وقت ختم ہوگیا/میعاد ختم ہوگئی۔"
     },
     "alt": { "profile": "پروفائل" }
+  },"menu": {
+    "newGroup": "Yeni grup",
+    "newCommunity": "Yeni topluluk",
+    "newBroadcast": "Yeni yayın (WIP)",
+    "starred": "Yıldızlı (WIP)",
+    "readAll": "Tümünü oku (WIP)",
+    "settings": "Ayarlar",
+    "createChannels": "Kanal oluştur (WIP)",
+    "statusPrivacy": "Durum gizliliği (WIP)",
+    "clearCallLogs": "Çağrı kayıtlarını temizle (WIP)"
   }
 }

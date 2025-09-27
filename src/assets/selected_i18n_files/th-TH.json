@@ -443,5 +443,15 @@
       "message": "เซสชันหมดอายุแล้ว"
     },
     "alt": { "profile": "โปรไฟล์" }
+  },"menu": {
+    "newGroup": "สร้างกลุ่มใหม่",
+    "newCommunity": "สร้างชุมชนใหม่",
+    "newBroadcast": "ออกอากาศใหม่ (WIP)",
+    "starred": "ติดดาว (WIP)",
+    "readAll": "อ่านทั้งหมด (WIP)",
+    "settings": "การตั้งค่า",
+    "createChannels": "สร้างช่อง (WIP)",
+    "statusPrivacy": "ความเป็นส่วนตัวของสถานะ (WIP)",
+    "clearCallLogs": "ล้างประวัติการโทร (WIP)"
   }
 }

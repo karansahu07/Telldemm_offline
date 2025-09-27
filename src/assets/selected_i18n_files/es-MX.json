@@ -443,5 +443,15 @@
       "message": "La sesión ha caducado."
     },
     "alt": { "profile": "Perfil" }
+  },"menu": {
+    "newGroup": "Nuevo grupo",
+    "newCommunity": "Nueva comunidad",
+    "newBroadcast": "Nueva transmisión (WIP)",
+    "starred": "Destacados (WIP)",
+    "readAll": "Marcar todo como leído (WIP)",
+    "settings": "Configuraciones",
+    "createChannels": "Crear canales (WIP)",
+    "statusPrivacy": "Privacidad de estado (WIP)",
+    "clearCallLogs": "Borrar registros de llamadas (WIP)"
   }
 }

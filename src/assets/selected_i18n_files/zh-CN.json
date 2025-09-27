@@ -444,6 +444,16 @@
       "message": "会话超时/已过期。"
     },
     "alt": { "profile": "个人资料" }
+  },"menu": {
+    "newGroup": "新建群组",
+    "newCommunity": "新建社区",
+    "newBroadcast": "新建广播 (WIP)",
+    "starred": "已加星标 (WIP)",
+    "readAll": "全部已读 (WIP)",
+    "settings": "设置",
+    "createChannels": "创建频道 (WIP)",
+    "statusPrivacy": "状态隐私 (WIP)",
+    "clearCallLogs": "清除通话记录 (WIP)"
   }
 
 }

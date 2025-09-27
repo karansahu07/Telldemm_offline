@@ -419,5 +419,15 @@
       "message": "Phiên đã hết hạn."
     },
     "alt": { "profile": "Hồ sơ" }
+  }, "menu": {
+    "newGroup": "Nhóm mới",
+    "newCommunity": "Cộng đồng mới",
+    "newBroadcast": "Phát sóng mới (WIP)",
+    "starred": "Đã gắn sao (WIP)",
+    "readAll": "Đọc tất cả (WIP)",
+    "settings": "Cài đặt",
+    "createChannels": "Tạo kênh (WIP)",
+    "statusPrivacy": "Quyền riêng tư trạng thái (WIP)",
+    "clearCallLogs": "Xóa nhật ký cuộc gọi (WIP)"
   }
 }

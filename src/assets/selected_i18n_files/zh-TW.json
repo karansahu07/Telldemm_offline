@@ -445,6 +445,16 @@
       "message": "工作階段已超時/過期。"
     },
     "alt": { "profile": "個人資料" }
+  },"menu": {
+    "newGroup": "新增群組",
+    "newCommunity": "新增社群",
+    "newBroadcast": "新增廣播 (WIP)",
+    "starred": "已加星號 (WIP)",
+    "readAll": "全部標示為已讀 (WIP)",
+    "settings": "設定",
+    "createChannels": "建立頻道 (WIP)",
+    "statusPrivacy": "狀態隱私 (WIP)",
+    "clearCallLogs": "清除通話紀錄 (WIP)"
   }
 
 }

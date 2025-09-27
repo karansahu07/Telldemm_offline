@@ -443,5 +443,15 @@
       "message": "Sessione scaduta."
     },
     "alt": { "profile": "Profilo" }
+  },"menu": {
+    "newGroup": "Nuovo gruppo",
+    "newCommunity": "Nuova community",
+    "newBroadcast": "Nuova trasmissione (WIP)",
+    "starred": "Speciali (WIP)",
+    "readAll": "Segna tutto come letto (WIP)",
+    "settings": "Impostazioni",
+    "createChannels": "Crea canali (WIP)",
+    "statusPrivacy": "Privacy stato (WIP)",
+    "clearCallLogs": "Cancella registro chiamate (WIP)"
   }
 }

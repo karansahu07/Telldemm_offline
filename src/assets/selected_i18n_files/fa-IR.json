@@ -390,5 +390,15 @@
       "message": "نشست منقضی شده است."
     },
     "alt": { "profile": "پروفایل" }
+  }, "menu": {
+    "newGroup": "گروه جدید",
+    "newCommunity": "انجمن جدید",
+    "newBroadcast": "پخش جدید (WIP)",
+    "starred": "ستاره‌دار (WIP)",
+    "readAll": "خواندن همه (WIP)",
+    "settings": "تنظیمات",
+    "createChannels": "ایجاد کانال‌ها (WIP)",
+    "statusPrivacy": "حریم خصوصی وضعیت (WIP)",
+    "clearCallLogs": "پاک کردن تاریخچه تماس‌ها (WIP)"
   }
 }

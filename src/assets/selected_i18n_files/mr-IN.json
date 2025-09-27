@@ -443,5 +443,15 @@
       "message": "सत्राची वेळ संपली/कालबाह्य झाले."
     },
     "alt": { "profile": "प्रोफाइल" }
+  }, "menu": {
+    "newGroup": "नवीन गट",
+    "newCommunity": "नवीन कम्युनिटी",
+    "newBroadcast": "नवीन प्रसारण (WIP)",
+    "starred": "स्टार केलेले (WIP)",
+    "readAll": "सर्व वाचा (WIP)",
+    "settings": "सेटिंग्ज",
+    "createChannels": "चॅनेल तयार करा (WIP)",
+    "statusPrivacy": "स्टेटस प्रायव्हसी (WIP)",
+    "clearCallLogs": "कॉल लॉग्स साफ करा (WIP)"
   }
 }
