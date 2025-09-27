@@ -373,5 +373,41 @@
       "unreadChats": "{{count}}개의 안 읽은 채팅",
       "unreadUpdates": "{{count}}개의 업데이트"
     }
+  },"socialLinks": {
+    "title": "링크",
+    "intro": "프로필에 링크를 추가하면 연락처가 다른 프로필로 쉽게 이동할 수 있습니다.",
+    "instagram": {
+      "title": "인스타그램",
+      "add": "인스타그램 추가"
+    },
+    "actions": {
+      "add": "추가",
+      "edit": "편집"
+    },
+    "privacy": {
+      "note": "누가 내 링크를 볼 수 있는지 관리하려면",
+      "link": "개인정보 설정"
+    }
+  },
+  "addInstagram": {
+    "title": "인스타그램 추가",
+    "loading": "로드 중...",
+    "saving": "저장 중...",
+    "usernameLabel": "인스타그램 사용자 이름",
+    "usernamePlaceholder": "username",
+    "hint": {
+      "text": "인스타그램 사용자 이름을 추가하면 프로필에 표시됩니다.",
+      "learnMore": "자세히 알아보기"
+    },
+    "save": "저장",
+    "validation": {
+      "required": "인스타그램 사용자 이름을 입력해 주세요",
+      "invalid": "유효한 사용자 이름을 입력하세요 (공백 없음, 최대 30자)"
+    },
+    "toast": {
+      "fetchFailed": "인스타그램 링크를 가져오지 못했습니다",
+      "saved": "인스타그램이 성공적으로 저장되었습니다!",
+      "saveFailed": "인스타그램 링크를 업데이트하지 못했습니다. 다시 시도하세요."
+    }
   }
 }

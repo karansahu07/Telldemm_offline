@@ -373,5 +373,41 @@
       "unreadChats": "{{count}} chats no leídos",
       "unreadUpdates": "{{count}} actualizaciones"
     }
+  },"socialLinks": {
+    "title": "Enlaces",
+    "intro": "Agregar enlaces a tu perfil ayuda a tus contactos a visitar fácilmente tus otros perfiles.",
+    "instagram": {
+      "title": "Instagram",
+      "add": "Agrega tu Instagram"
+    },
+    "actions": {
+      "add": "Agregar",
+      "edit": "Editar"
+    },
+    "privacy": {
+      "note": "Para administrar quién puede ver tus enlaces, ve a",
+      "link": "configuración de privacidad"
+    }
+  },
+  "addInstagram": {
+    "title": "Agregar Instagram",
+    "loading": "Cargando...",
+    "saving": "Guardando...",
+    "usernameLabel": "Nombre de usuario de Instagram",
+    "usernamePlaceholder": "usuario",
+    "hint": {
+      "text": "Al agregar un nombre de usuario de Instagram se mostrará en tu perfil.",
+      "learnMore": "Más información"
+    },
+    "save": "Guardar",
+    "validation": {
+      "required": "Por favor ingresa tu nombre de usuario de Instagram",
+      "invalid": "Ingresa un nombre de usuario válido (sin espacios, máximo 30 caracteres)"
+    },
+    "toast": {
+      "fetchFailed": "Error al obtener el enlace de Instagram",
+      "saved": "¡Instagram guardado con éxito!",
+      "saveFailed": "Error al actualizar el enlace de Instagram. Inténtalo de nuevo."
+    }
   }
 }

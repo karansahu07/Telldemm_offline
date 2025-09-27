@@ -374,6 +374,42 @@
       "unreadChats": "{{count}} 个未读聊天",
       "unreadUpdates": "{{count}} 个更新"
     }
+  }, "socialLinks": {
+    "title": "链接",
+    "intro": "在个人资料中添加链接可帮助联系人轻松访问您的其他资料。",
+    "instagram": {
+      "title": "Instagram",
+      "add": "添加您的 Instagram"
+    },
+    "actions": {
+      "add": "添加",
+      "edit": "编辑"
+    },
+    "privacy": {
+      "note": "要管理谁可以查看您的链接，请前往",
+      "link": "隐私设置"
+    }
+  },
+  "addInstagram": {
+    "title": "添加 Instagram",
+    "loading": "正在加载...",
+    "saving": "正在保存...",
+    "usernameLabel": "Instagram 用户名",
+    "usernamePlaceholder": "用户名",
+    "hint": {
+      "text": "添加 Instagram 用户名后，它将显示在您的个人资料中。",
+      "learnMore": "了解更多"
+    },
+    "save": "保存",
+    "validation": {
+      "required": "请输入您的 Instagram 用户名",
+      "invalid": "请输入有效的用户名（无空格，最多 30 个字符）"
+    },
+    "toast": {
+      "fetchFailed": "获取 Instagram 链接失败",
+      "saved": "Instagram 保存成功！",
+      "saveFailed": "更新 Instagram 链接失败，请重试。"
+    }
   }
 
 }

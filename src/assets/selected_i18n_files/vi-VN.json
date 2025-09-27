@@ -349,5 +349,41 @@
       "unreadChats": "{{count}} cuộc trò chuyện chưa đọc",
       "unreadUpdates": "{{count}} bản cập nhật"
     }
+  },"socialLinks": {
+    "title": "Liên kết",
+    "intro": "Thêm liên kết vào hồ sơ của bạn giúp liên hệ dễ dàng truy cập các hồ sơ khác của bạn.",
+    "instagram": {
+      "title": "Instagram",
+      "add": "Thêm Instagram của bạn"
+    },
+    "actions": {
+      "add": "Thêm",
+      "edit": "Chỉnh sửa"
+    },
+    "privacy": {
+      "note": "Để quản lý ai có thể xem các liên kết của bạn, hãy vào",
+      "link": "cài đặt quyền riêng tư"
+    }
+  },
+  "addInstagram": {
+    "title": "Thêm Instagram",
+    "loading": "Đang tải...",
+    "saving": "Đang lưu...",
+    "usernameLabel": "Tên người dùng Instagram",
+    "usernamePlaceholder": "tên người dùng",
+    "hint": {
+      "text": "Thêm tên người dùng Instagram sẽ hiển thị trên hồ sơ của bạn.",
+      "learnMore": "Tìm hiểu thêm"
+    },
+    "save": "Lưu",
+    "validation": {
+      "required": "Vui lòng nhập tên người dùng Instagram của bạn",
+      "invalid": "Nhập tên người dùng hợp lệ (không có khoảng trắng, tối đa 30 ký tự)"
+    },
+    "toast": {
+      "fetchFailed": "Không thể lấy liên kết Instagram",
+      "saved": "Đã lưu Instagram thành công!",
+      "saveFailed": "Không thể cập nhật liên kết Instagram. Vui lòng thử lại."
+    }
   }
 }

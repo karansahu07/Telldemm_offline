@@ -373,5 +373,41 @@
       "unreadChats": "{{count}} unread chats",
       "unreadUpdates": "{{count}} updates"
     }
+  },"socialLinks": {
+    "title": "Links",
+    "intro": "Adding links to your profile helps your contacts easily visit your other profiles.",
+    "instagram": {
+      "title": "Instagram",
+      "add": "Add your Instagram"
+    },
+    "actions": {
+      "add": "Add",
+      "edit": "Edit"
+    },
+    "privacy": {
+      "note": "To manage who can see your links, go to",
+      "link": "privacy settings"
+    }
+  },
+  "addInstagram": {
+    "title": "Add Instagram",
+    "loading": "Loading...",
+    "saving": "Saving...",
+    "usernameLabel": "Instagram username",
+    "usernamePlaceholder": "username",
+    "hint": {
+      "text": "Adding an Instagram username will make it visible on your profile.",
+      "learnMore": "Learn more"
+    },
+    "save": "Save",
+    "validation": {
+      "required": "Please enter your Instagram username",
+      "invalid": "Enter a valid username (no spaces, max 30 chars)"
+    },
+    "toast": {
+      "fetchFailed": "Failed to fetch Instagram link",
+      "saved": "Instagram saved successfully!",
+      "saveFailed": "Failed to update Instagram link. Try again."
+    }
   }
 }

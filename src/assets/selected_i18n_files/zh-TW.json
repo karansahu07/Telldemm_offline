@@ -375,6 +375,42 @@
       "unreadChats": "{{count}} 個未讀聊天",
       "unreadUpdates": "{{count}} 個更新"
     }
+  },"socialLinks": {
+    "title": "連結",
+    "intro": "在個人資料中新增連結可讓聯絡人輕鬆造訪您的其他帳號。",
+    "instagram": {
+      "title": "Instagram",
+      "add": "新增您的 Instagram"
+    },
+    "actions": {
+      "add": "新增",
+      "edit": "編輯"
+    },
+    "privacy": {
+      "note": "若要管理誰可以看到您的連結，請前往",
+      "link": "隱私設定"
+    }
+  },
+  "addInstagram": {
+    "title": "新增 Instagram",
+    "loading": "正在載入...",
+    "saving": "正在儲存...",
+    "usernameLabel": "Instagram 使用者名稱",
+    "usernamePlaceholder": "使用者名稱",
+    "hint": {
+      "text": "新增 Instagram 使用者名稱後，將會顯示在您的個人資料中。",
+      "learnMore": "了解更多"
+    },
+    "save": "儲存",
+    "validation": {
+      "required": "請輸入您的 Instagram 使用者名稱",
+      "invalid": "請輸入有效的使用者名稱（不可有空格，最多 30 個字元）"
+    },
+    "toast": {
+      "fetchFailed": "無法取得 Instagram 連結",
+      "saved": "Instagram 已成功儲存！",
+      "saveFailed": "無法更新 Instagram 連結，請再試一次。"
+    }
   }
 
 }

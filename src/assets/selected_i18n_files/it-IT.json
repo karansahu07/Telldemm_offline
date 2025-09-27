@@ -373,5 +373,41 @@
       "unreadChats": "{{count}} chat non lette",
       "unreadUpdates": "{{count}} aggiornamenti"
     }
+  },"socialLinks": {
+    "title": "Link",
+    "intro": "Aggiungere link al tuo profilo aiuta i contatti a visitare facilmente gli altri tuoi profili.",
+    "instagram": {
+      "title": "Instagram",
+      "add": "Aggiungi il tuo Instagram"
+    },
+    "actions": {
+      "add": "Aggiungi",
+      "edit": "Modifica"
+    },
+    "privacy": {
+      "note": "Per gestire chi può vedere i tuoi link, vai a",
+      "link": "impostazioni sulla privacy"
+    }
+  },
+  "addInstagram": {
+    "title": "Aggiungi Instagram",
+    "loading": "Caricamento...",
+    "saving": "Salvataggio...",
+    "usernameLabel": "Nome utente Instagram",
+    "usernamePlaceholder": "username",
+    "hint": {
+      "text": "Aggiungendo un nome utente Instagram, questo sarà visibile nel profilo.",
+      "learnMore": "Scopri di più"
+    },
+    "save": "Salva",
+    "validation": {
+      "required": "Inserisci il tuo nome utente Instagram",
+      "invalid": "Inserisci un nome utente valido (niente spazi, max 30 caratteri)"
+    },
+    "toast": {
+      "fetchFailed": "Impossibile recuperare il link Instagram",
+      "saved": "Instagram salvato con successo!",
+      "saveFailed": "Impossibile aggiornare il link Instagram. Riprova."
+    }
   }
 }

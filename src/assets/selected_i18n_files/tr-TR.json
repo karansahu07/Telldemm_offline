@@ -350,5 +350,41 @@
       "unreadChats": "{{count}} okunmamış sohbet",
       "unreadUpdates": "{{count}} güncelleme"
     }
+  },"socialLinks": {
+    "title": "Bağlantılar",
+    "intro": "Profilinize bağlantılar eklemek, kişilerin diğer profillerinizi kolayca ziyaret etmesine yardımcı olur.",
+    "instagram": {
+      "title": "Instagram",
+      "add": "Instagram hesabınızı ekleyin"
+    },
+    "actions": {
+      "add": "Ekle",
+      "edit": "Düzenle"
+    },
+    "privacy": {
+      "note": "Bağlantılarınızı kimin görebileceğini yönetmek için gidin",
+      "link": "gizlilik ayarları"
+    }
+  },
+  "addInstagram": {
+    "title": "Instagram Ekle",
+    "loading": "Yükleniyor...",
+    "saving": "Kaydediliyor...",
+    "usernameLabel": "Instagram kullanıcı adı",
+    "usernamePlaceholder": "kullanıcı adı",
+    "hint": {
+      "text": "Instagram kullanıcı adı eklemek profilinizde görünür hale getirecektir.",
+      "learnMore": "Daha fazla bilgi"
+    },
+    "save": "Kaydet",
+    "validation": {
+      "required": "Lütfen Instagram kullanıcı adınızı girin",
+      "invalid": "Geçerli bir kullanıcı adı girin (boşluk yok, en fazla 30 karakter)"
+    },
+    "toast": {
+      "fetchFailed": "Instagram bağlantısı alınamadı",
+      "saved": "Instagram başarıyla kaydedildi!",
+      "saveFailed": "Instagram bağlantısı güncellenemedi. Tekrar deneyin."
+    }
   }
 }

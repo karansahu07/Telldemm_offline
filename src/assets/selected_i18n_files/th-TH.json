@@ -373,5 +373,41 @@
       "unreadChats": "{{count}} แชทยังไม่ได้อ่าน",
       "unreadUpdates": "{{count}} การอัปเดต"
     }
+  },"socialLinks": {
+    "title": "ลิงก์",
+    "intro": "การเพิ่มลิงก์ในโปรไฟล์ของคุณช่วยให้ผู้ติดต่อเข้าถึงโปรไฟล์อื่น ๆ ของคุณได้ง่ายขึ้น",
+    "instagram": {
+      "title": "Instagram",
+      "add": "เพิ่ม Instagram ของคุณ"
+    },
+    "actions": {
+      "add": "เพิ่ม",
+      "edit": "แก้ไข"
+    },
+    "privacy": {
+      "note": "หากต้องการจัดการว่าใครสามารถดูได้ ให้ไปที่",
+      "link": "การตั้งค่าความเป็นส่วนตัว"
+    }
+  },
+  "addInstagram": {
+    "title": "เพิ่ม Instagram",
+    "loading": "กำลังโหลด...",
+    "saving": "กำลังบันทึก...",
+    "usernameLabel": "ชื่อผู้ใช้ Instagram",
+    "usernamePlaceholder": "ชื่อผู้ใช้",
+    "hint": {
+      "text": "การเพิ่มชื่อผู้ใช้ Instagram จะทำให้มองเห็นได้ในโปรไฟล์ของคุณ",
+      "learnMore": "เรียนรู้เพิ่มเติม"
+    },
+    "save": "บันทึก",
+    "validation": {
+      "required": "กรุณากรอกชื่อผู้ใช้ Instagram ของคุณ",
+      "invalid": "กรุณากรอกชื่อผู้ใช้ที่ถูกต้อง (ไม่มีช่องว่าง สูงสุด 30 ตัวอักษร)"
+    },
+    "toast": {
+      "fetchFailed": "ไม่สามารถดึงลิงก์ Instagram ได้",
+      "saved": "บันทึก Instagram สำเร็จ!",
+      "saveFailed": "ไม่สามารถอัปเดตลิงก์ Instagram ได้ โปรดลองอีกครั้ง"
+    }
   }
 }

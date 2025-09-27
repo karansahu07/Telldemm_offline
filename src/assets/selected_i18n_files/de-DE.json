@@ -374,5 +374,41 @@
       "unreadChats": "{{count}} ungelesene Chats",
       "unreadUpdates": "{{count}} Updates"
     }
+  },"socialLinks": {
+    "title": "Links",
+    "intro": "Das Hinzufügen von Links zu Ihrem Profil hilft Ihren Kontakten, Ihre anderen Profile leicht zu besuchen.",
+    "instagram": {
+      "title": "Instagram",
+      "add": "Fügen Sie Ihr Instagram hinzu"
+    },
+    "actions": {
+      "add": "Hinzufügen",
+      "edit": "Bearbeiten"
+    },
+    "privacy": {
+      "note": "Um zu verwalten, wer Ihre Links sehen kann, gehen Sie zu",
+      "link": "Datenschutzeinstellungen"
+    }
+  },
+  "addInstagram": {
+    "title": "Instagram hinzufügen",
+    "loading": "Wird geladen...",
+    "saving": "Wird gespeichert...",
+    "usernameLabel": "Instagram-Benutzername",
+    "usernamePlaceholder": "Benutzername",
+    "hint": {
+      "text": "Das Hinzufügen eines Instagram-Benutzernamens macht ihn in Ihrem Profil sichtbar.",
+      "learnMore": "Mehr erfahren"
+    },
+    "save": "Speichern",
+    "validation": {
+      "required": "Bitte geben Sie Ihren Instagram-Benutzernamen ein",
+      "invalid": "Geben Sie einen gültigen Benutzernamen ein (keine Leerzeichen, max. 30 Zeichen)"
+    },
+    "toast": {
+      "fetchFailed": "Instagram-Link konnte nicht abgerufen werden",
+      "saved": "Instagram erfolgreich gespeichert!",
+      "saveFailed": "Instagram-Link konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut."
+    }
   }
 }

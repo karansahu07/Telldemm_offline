@@ -374,5 +374,41 @@
       "unreadChats": "{{count}} discussions non lues",
       "unreadUpdates": "{{count}} mises à jour"
     }
+  }, "socialLinks": {
+    "title": "Liens",
+    "intro": "Ajouter des liens à votre profil aide vos contacts à visiter facilement vos autres profils.",
+    "instagram": {
+      "title": "Instagram",
+      "add": "Ajoutez votre Instagram"
+    },
+    "actions": {
+      "add": "Ajouter",
+      "edit": "Modifier"
+    },
+    "privacy": {
+      "note": "Pour gérer qui peut voir vos liens, allez dans",
+      "link": "paramètres de confidentialité"
+    }
+  },
+  "addInstagram": {
+    "title": "Ajouter Instagram",
+    "loading": "Chargement...",
+    "saving": "Enregistrement...",
+    "usernameLabel": "Nom d’utilisateur Instagram",
+    "usernamePlaceholder": "nom d’utilisateur",
+    "hint": {
+      "text": "Ajouter un nom d’utilisateur Instagram le rendra visible sur votre profil.",
+      "learnMore": "En savoir plus"
+    },
+    "save": "Enregistrer",
+    "validation": {
+      "required": "Veuillez entrer votre nom d’utilisateur Instagram",
+      "invalid": "Entrez un nom d’utilisateur valide (pas d’espaces, max 30 caractères)"
+    },
+    "toast": {
+      "fetchFailed": "Échec de la récupération du lien Instagram",
+      "saved": "Instagram enregistré avec succès !",
+      "saveFailed": "Échec de la mise à jour du lien Instagram. Réessayez."
+    }
   }
 }
