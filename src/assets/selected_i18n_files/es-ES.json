@@ -410,5 +410,39 @@
       "saved": "¡Instagram guardado con éxito!",
       "saveFailed": "No se pudo actualizar el enlace de Instagram. Inténtalo de nuevo."
     }
+  },"home": {
+    "search": { "placeholder": "Pregunta a Meta AI o Busca" },
+    "filters": { "all": "TODOS", "read": "Leído", "unread": "No leído", "groups": "Grupos" },
+    "groupCreator": { "placeholder": "Introduce el nombre del grupo" },
+    "typing": "escribiendo...",
+    "time": { "yesterday": "Ayer" },
+    "preview": {
+      "deleted": "Este mensaje fue eliminado",
+      "encrypted": "[Cifrado]",
+      "media": {
+        "photo": "Foto",
+        "video": "Vídeo",
+        "audio": "Audio",
+        "file": "Archivo adjunto",
+        "generic": "[Medio]"
+      }
+    },
+    "actions": {
+      "scan": "Escanear QR",
+      "camera": "Abrir cámara",
+      "menu": "Abrir menú",
+      "contacts": "Contactos"
+    },
+    "scan": {
+      "onlyDevice": "El escaneo de códigos de barras solo funciona en un dispositivo real.",
+      "permission": "Se requiere permiso de la cámara para escanear códigos de barras.",
+      "notFound": "No se encontró ningún código de barras.",
+      "error": "Ocurrió un error durante el escaneo."
+    },
+    "logout": {
+      "header": "Cerrar sesión",
+      "message": "La sesión ha caducado."
+    },
+    "alt": { "profile": "Perfil" }
   }
 }

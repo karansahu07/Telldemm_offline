@@ -385,5 +385,39 @@
       "saved": "Đã lưu Instagram thành công!",
       "saveFailed": "Không thể cập nhật liên kết Instagram. Vui lòng thử lại."
     }
+  },"home": {
+    "search": { "placeholder": "Hỏi Meta AI hoặc Tìm kiếm" },
+    "filters": { "all": "TẤT CẢ", "read": "Đã đọc", "unread": "Chưa đọc", "groups": "Nhóm" },
+    "groupCreator": { "placeholder": "Nhập tên nhóm" },
+    "typing": "đang nhập...",
+    "time": { "yesterday": "Hôm qua" },
+    "preview": {
+      "deleted": "Tin nhắn này đã bị xóa",
+      "encrypted": "[Được mã hóa]",
+      "media": {
+        "photo": "Ảnh",
+        "video": "Video",
+        "audio": "Âm thanh",
+        "file": "Tệp đính kèm",
+        "generic": "[Phương tiện]"
+      }
+    },
+    "actions": {
+      "scan": "Quét QR",
+      "camera": "Mở máy ảnh",
+      "menu": "Mở menu",
+      "contacts": "Danh bạ"
+    },
+    "scan": {
+      "onlyDevice": "Quét mã vạch chỉ hoạt động trên thiết bị thật.",
+      "permission": "Cần quyền máy ảnh để quét mã vạch.",
+      "notFound": "Không tìm thấy mã vạch nào.",
+      "error": "Đã xảy ra lỗi trong quá trình quét."
+    },
+    "logout": {
+      "header": "Đăng xuất",
+      "message": "Phiên đã hết hạn."
+    },
+    "alt": { "profile": "Hồ sơ" }
   }
 }

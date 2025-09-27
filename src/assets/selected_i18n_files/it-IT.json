@@ -409,5 +409,39 @@
       "saved": "Instagram salvato con successo!",
       "saveFailed": "Impossibile aggiornare il link Instagram. Riprova."
     }
+  }, "home": {
+    "search": { "placeholder": "Chiedi a Meta AI o Cerca" },
+    "filters": { "all": "TUTTI", "read": "Letti", "unread": "Non letti", "groups": "Gruppi" },
+    "groupCreator": { "placeholder": "Inserisci il nome del gruppo" },
+    "typing": "sta scrivendo...",
+    "time": { "yesterday": "Ieri" },
+    "preview": {
+      "deleted": "Questo messaggio è stato eliminato",
+      "encrypted": "[Criptato]",
+      "media": {
+        "photo": "Foto",
+        "video": "Video",
+        "audio": "Audio",
+        "file": "Allegato",
+        "generic": "[Media]"
+      }
+    },
+    "actions": {
+      "scan": "Scansiona QR",
+      "camera": "Apri fotocamera",
+      "menu": "Apri menu",
+      "contacts": "Contatti"
+    },
+    "scan": {
+      "onlyDevice": "La scansione dei codici a barre funziona solo su un dispositivo reale.",
+      "permission": "È necessario il permesso della fotocamera per scansionare i codici a barre.",
+      "notFound": "Nessun codice a barre trovato.",
+      "error": "Si è verificato un errore durante la scansione."
+    },
+    "logout": {
+      "header": "Disconnetti",
+      "message": "Sessione scaduta."
+    },
+    "alt": { "profile": "Profilo" }
   }
 }

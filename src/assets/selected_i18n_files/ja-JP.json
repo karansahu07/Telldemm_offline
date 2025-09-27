@@ -409,5 +409,39 @@
       "saved": "Instagram を保存しました！",
       "saveFailed": "Instagram リンクの更新に失敗しました。もう一度お試しください。"
     }
+  }, "home": {
+    "search": { "placeholder": "Meta AIに質問または検索" },
+    "filters": { "all": "すべて", "read": "既読", "unread": "未読", "groups": "グループ" },
+    "groupCreator": { "placeholder": "グループ名を入力" },
+    "typing": "入力中...",
+    "time": { "yesterday": "昨日" },
+    "preview": {
+      "deleted": "このメッセージは削除されました",
+      "encrypted": "[暗号化済み]",
+      "media": {
+        "photo": "写真",
+        "video": "動画",
+        "audio": "音声",
+        "file": "添付ファイル",
+        "generic": "[メディア]"
+      }
+    },
+    "actions": {
+      "scan": "QRをスキャン",
+      "camera": "カメラを開く",
+      "menu": "メニューを開く",
+      "contacts": "連絡先"
+    },
+    "scan": {
+      "onlyDevice": "バーコードスキャンは実機でのみ動作します。",
+      "permission": "バーコードをスキャンするにはカメラの許可が必要です。",
+      "notFound": "バーコードが見つかりません。",
+      "error": "スキャン中に問題が発生しました。"
+    },
+    "logout": {
+      "header": "ログアウト",
+      "message": "セッションがタイムアウトまたは期限切れです。"
+    },
+    "alt": { "profile": "プロフィール" }
   }
 }

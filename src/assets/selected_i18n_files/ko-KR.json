@@ -409,5 +409,39 @@
       "saved": "인스타그램이 성공적으로 저장되었습니다!",
       "saveFailed": "인스타그램 링크를 업데이트하지 못했습니다. 다시 시도하세요."
     }
+  },"home": {
+    "search": { "placeholder": "Meta AI에게 물어보기 또는 검색" },
+    "filters": { "all": "전체", "read": "읽음", "unread": "읽지 않음", "groups": "그룹" },
+    "groupCreator": { "placeholder": "그룹 이름 입력" },
+    "typing": "입력 중...",
+    "time": { "yesterday": "어제" },
+    "preview": {
+      "deleted": "이 메시지는 삭제되었습니다",
+      "encrypted": "[암호화됨]",
+      "media": {
+        "photo": "사진",
+        "video": "동영상",
+        "audio": "오디오",
+        "file": "첨부 파일",
+        "generic": "[미디어]"
+      }
+    },
+    "actions": {
+      "scan": "QR 스캔",
+      "camera": "카메라 열기",
+      "menu": "메뉴 열기",
+      "contacts": "연락처"
+    },
+    "scan": {
+      "onlyDevice": "바코드 스캔은 실제 기기에서만 작동합니다.",
+      "permission": "바코드를 스캔하려면 카메라 권한이 필요합니다.",
+      "notFound": "바코드를 찾을 수 없습니다.",
+      "error": "스캔 중 오류가 발생했습니다."
+    },
+    "logout": {
+      "header": "로그아웃",
+      "message": "세션이 만료되었습니다."
+    },
+    "alt": { "profile": "프로필" }
   }
 }

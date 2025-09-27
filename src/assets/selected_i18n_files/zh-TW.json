@@ -411,6 +411,40 @@
       "saved": "Instagram 已成功儲存！",
       "saveFailed": "無法更新 Instagram 連結，請再試一次。"
     }
+  }, "home": {
+    "search": { "placeholder": "詢問 Meta AI 或搜尋" },
+    "filters": { "all": "全部", "read": "已讀", "unread": "未讀", "groups": "群組" },
+    "groupCreator": { "placeholder": "輸入群組名稱" },
+    "typing": "正在輸入...",
+    "time": { "yesterday": "昨天" },
+    "preview": {
+      "deleted": "此訊息已被刪除",
+      "encrypted": "[已加密]",
+      "media": {
+        "photo": "照片",
+        "video": "影片",
+        "audio": "音訊",
+        "file": "附件",
+        "generic": "[媒體]"
+      }
+    },
+    "actions": {
+      "scan": "掃描 QR",
+      "camera": "打開相機",
+      "menu": "打開選單",
+      "contacts": "聯絡人"
+    },
+    "scan": {
+      "onlyDevice": "條碼掃描僅能在實體裝置上使用。",
+      "permission": "需要相機權限才能掃描條碼。",
+      "notFound": "找不到條碼。",
+      "error": "掃描過程中發生錯誤。"
+    },
+    "logout": {
+      "header": "登出",
+      "message": "工作階段已超時/過期。"
+    },
+    "alt": { "profile": "個人資料" }
   }
 
 }

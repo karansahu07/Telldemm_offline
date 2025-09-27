@@ -410,5 +410,39 @@
       "saved": "Instagram enregistré avec succès !",
       "saveFailed": "Échec de la mise à jour du lien Instagram. Réessayez."
     }
+  }, "home": {
+    "search": { "placeholder": "Demandez à Meta AI ou Recherchez" },
+    "filters": { "all": "TOUT", "read": "Lu", "unread": "Non lu", "groups": "Groupes" },
+    "groupCreator": { "placeholder": "Entrez le nom du groupe" },
+    "typing": "en train d’écrire...",
+    "time": { "yesterday": "Hier" },
+    "preview": {
+      "deleted": "Ce message a été supprimé",
+      "encrypted": "[Chiffré]",
+      "media": {
+        "photo": "Photo",
+        "video": "Vidéo",
+        "audio": "Audio",
+        "file": "Pièce jointe",
+        "generic": "[Média]"
+      }
+    },
+    "actions": {
+      "scan": "Scanner le QR",
+      "camera": "Ouvrir la caméra",
+      "menu": "Ouvrir le menu",
+      "contacts": "Contacts"
+    },
+    "scan": {
+      "onlyDevice": "Le scan de code-barres fonctionne uniquement sur un appareil réel.",
+      "permission": "L’autorisation de la caméra est requise pour scanner les codes-barres.",
+      "notFound": "Aucun code-barres trouvé.",
+      "error": "Une erreur est survenue lors du scan."
+    },
+    "logout": {
+      "header": "Déconnexion",
+      "message": "Session expirée."
+    },
+    "alt": { "profile": "Profil" }
   }
 }

@@ -410,5 +410,39 @@
       "saved": "Instagram saved successfully!",
       "saveFailed": "Failed to update Instagram link. Try again."
     }
+  }, "home": {
+    "search": { "placeholder": "Ask Meta AI or Search" },
+    "filters": { "all": "ALL", "read": "Read", "unread": "Unread", "groups": "Groups" },
+    "groupCreator": { "placeholder": "Enter Group Name" },
+    "typing": "typing...",
+    "time": { "yesterday": "Yesterday" },
+    "preview": {
+      "deleted": "This message was deleted",
+      "encrypted": "[Encrypted]",
+      "media": {
+        "photo": "Photo",
+        "video": "Video",
+        "audio": "Audio",
+        "file": "Attachment",
+        "generic": "[Media]"
+      }
+    },
+    "actions": {
+      "scan": "Scan QR",
+      "camera": "Open camera",
+      "menu": "Open menu",
+      "contacts": "Contacts"
+    },
+    "scan": {
+      "onlyDevice": "Barcode scanning only works on a real device.",
+      "permission": "Camera permission is required to scan barcodes.",
+      "notFound": "No barcode found.",
+      "error": "Something went wrong during scanning."
+    },
+    "logout": {
+      "header": "Logout",
+      "message": "Session timed out/expired."
+    },
+    "alt": { "profile": "Profile" }
   }
 }

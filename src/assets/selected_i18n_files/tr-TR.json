@@ -386,5 +386,39 @@
       "saved": "Instagram başarıyla kaydedildi!",
       "saveFailed": "Instagram bağlantısı güncellenemedi. Tekrar deneyin."
     }
+  },"home": {
+    "search": { "placeholder": "Meta AI’ye Sor veya Ara" },
+    "filters": { "all": "TÜMÜ", "read": "Okundu", "unread": "Okunmadı", "groups": "Gruplar" },
+    "groupCreator": { "placeholder": "Grup Adını Girin" },
+    "typing": "yazıyor...",
+    "time": { "yesterday": "Dün" },
+    "preview": {
+      "deleted": "Bu mesaj silindi",
+      "encrypted": "[Şifreli]",
+      "media": {
+        "photo": "Fotoğraf",
+        "video": "Video",
+        "audio": "Ses",
+        "file": "Ek",
+        "generic": "[Medya]"
+      }
+    },
+    "actions": {
+      "scan": "QR Tara",
+      "camera": "Kamerayı aç",
+      "menu": "Menüyü aç",
+      "contacts": "Kişiler"
+    },
+    "scan": {
+      "onlyDevice": "Barkod tarama yalnızca gerçek bir cihazda çalışır.",
+      "permission": "Barkod taramak için kamera izni gereklidir.",
+      "notFound": "Barkod bulunamadı.",
+      "error": "Taramada bir sorun oluştu."
+    },
+    "logout": {
+      "header": "Çıkış",
+      "message": "Oturum zaman aşımına uğradı."
+    },
+    "alt": { "profile": "Profil" }
   }
 }

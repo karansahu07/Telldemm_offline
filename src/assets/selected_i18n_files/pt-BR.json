@@ -409,5 +409,39 @@
       "saved": "Instagram salvo com sucesso!",
       "saveFailed": "Falha ao atualizar link do Instagram. Tente novamente."
     }
+  }, "home": {
+    "search": { "placeholder": "Pergunte ao Meta AI ou Pesquise" },
+    "filters": { "all": "TODOS", "read": "Lidos", "unread": "Não lidos", "groups": "Grupos" },
+    "groupCreator": { "placeholder": "Digite o nome do grupo" },
+    "typing": "digitando...",
+    "time": { "yesterday": "Ontem" },
+    "preview": {
+      "deleted": "Esta mensagem foi apagada",
+      "encrypted": "[Criptografado]",
+      "media": {
+        "photo": "Foto",
+        "video": "Vídeo",
+        "audio": "Áudio",
+        "file": "Anexo",
+        "generic": "[Mídia]"
+      }
+    },
+    "actions": {
+      "scan": "Escanear QR",
+      "camera": "Abrir câmera",
+      "menu": "Abrir menu",
+      "contacts": "Contatos"
+    },
+    "scan": {
+      "onlyDevice": "A leitura de código de barras funciona apenas em um dispositivo real.",
+      "permission": "Permissão da câmera é necessária para escanear códigos de barras.",
+      "notFound": "Nenhum código de barras encontrado.",
+      "error": "Algo deu errado durante a leitura."
+    },
+    "logout": {
+      "header": "Sair",
+      "message": "Sessão expirada."
+    },
+    "alt": { "profile": "Perfil" }
   }
 }
