@@ -195,5 +195,23 @@
       "saved": "As escolhas do avatar foram salvas localmente.",
       "downloadError": "Falha no download. Tente novamente."
     }
+  },"notifications": {
+    "title": "Notificações",
+    "highPriority": {
+      "title": "Usar notificações de alta prioridade",
+      "desc": "Receba notificações com som e visualização mesmo quando o Não Perturbe estiver ativado"
+    },
+    "message": {
+      "title": "Notificações de mensagens",
+      "desc": "Personalize alertas para mensagens"
+    },
+    "group": {
+      "title": "Notificações de grupos",
+      "desc": "Gerencie notificações de conversas em grupo"
+    },
+    "call": {
+      "title": "Notificações de chamadas",
+      "desc": "Configurações de toques e vibração"
+    }
   }
 }

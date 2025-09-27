@@ -1,9 +1,12 @@
 <ion-header>
   <ion-toolbar style="--background: #f0f0f0; --color: #000000;">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/settings"></ion-back-button>
+      <ion-back-button
+        defaultHref="/settings"
+        [attr.aria-label]="'common.back' | translate">
+      </ion-back-button>
     </ion-buttons>
-    <ion-title>Notifications</ion-title>
+    <ion-title>{{ 'notifications.title' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -12,36 +15,43 @@
     <!-- High priority notifications -->
     <ion-item>
       <ion-label>
-        <h2>Use high priority notifications</h2>
-        <p>Get notifications with sound and preview even when Do Not Disturb is on</p>
+        <h2>{{ 'notifications.highPriority.title' | translate }}</h2>
+        <p>{{ 'notifications.highPriority.desc' | translate }}</p>
       </ion-label>
-      <ion-toggle slot="end" [(ngModel)]="highPriority"></ion-toggle>
+      <ion-toggle
+        slot="end"
+        [(ngModel)]="highPriority"
+        [attr.aria-label]="'notifications.highPriority.title' | translate">
+      </ion-toggle>
     </ion-item>
 
     <!-- Message notifications -->
-    <ion-item button detail (click)="openMessageNotifications()">
-      <ion-icon slot="start" name="chatbubble-ellipses-outline"></ion-icon>
+    <ion-item button detail (click)="openMessageNotifications()"
+              [attr.aria-label]="'notifications.message.title' | translate">
+      <ion-icon slot="start" name="chatbubble-ellipses-outline" aria-hidden="true"></ion-icon>
       <ion-label>
-        <h2>Message notifications</h2>
-        <p>Customize alerts for messages</p>
+        <h2>{{ 'notifications.message.title' | translate }}</h2>
+        <p>{{ 'notifications.message.desc' | translate }}</p>
       </ion-label>
     </ion-item>
 
     <!-- Group chat notifications -->
-    <ion-item button detail (click)="openGroupNotifications()">
-      <ion-icon slot="start" name="people-outline"></ion-icon>
+    <ion-item button detail (click)="openGroupNotifications()"
+              [attr.aria-label]="'notifications.group.title' | translate">
+      <ion-icon slot="start" name="people-outline" aria-hidden="true"></ion-icon>
       <ion-label>
-        <h2>Group chat notifications</h2>
-        <p>Manage notifications for group chats</p>
+        <h2>{{ 'notifications.group.title' | translate }}</h2>
+        <p>{{ 'notifications.group.desc' | translate }}</p>
       </ion-label>
     </ion-item>
 
     <!-- Call notifications -->
-    <ion-item button detail (click)="openCallNotifications()">
-      <ion-icon slot="start" name="call-outline"></ion-icon>
+    <ion-item button detail (click)="openCallNotifications()"
+              [attr.aria-label]="'notifications.call.title' | translate">
+      <ion-icon slot="start" name="call-outline" aria-hidden="true"></ion-icon>
       <ion-label>
-        <h2>Call notifications</h2>
-        <p>Ringtones and vibration settings</p>
+        <h2>{{ 'notifications.call.title' | translate }}</h2>
+        <p>{{ 'notifications.call.desc' | translate }}</p>
       </ion-label>
     </ion-item>
   </ion-list>

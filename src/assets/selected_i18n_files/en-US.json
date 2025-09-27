@@ -195,5 +195,23 @@
       "saved": "Avatar choices saved locally.",
       "downloadError": "Download failed. Please try again."
     }
+  },"notifications": {
+    "title": "Notifications",
+    "highPriority": {
+      "title": "Use high priority notifications",
+      "desc": "Get notifications with sound and preview even when Do Not Disturb is on"
+    },
+    "message": {
+      "title": "Message notifications",
+      "desc": "Customize alerts for messages"
+    },
+    "group": {
+      "title": "Group chat notifications",
+      "desc": "Manage notifications for group chats"
+    },
+    "call": {
+      "title": "Call notifications",
+      "desc": "Ringtones and vibration settings"
+    }
   }
 }

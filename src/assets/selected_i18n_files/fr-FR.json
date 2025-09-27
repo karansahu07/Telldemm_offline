@@ -196,5 +196,23 @@
       "saved": "Les choix de l'avatar ont été enregistrés localement.",
       "downloadError": "Échec du téléchargement. Veuillez réessayer."
     }
+  },"notifications": {
+    "title": "Notifications",
+    "highPriority": {
+      "title": "Utiliser les notifications prioritaires",
+      "desc": "Recevez des notifications avec son et aperçu même lorsque Ne pas déranger est activé"
+    },
+    "message": {
+      "title": "Notifications de messages",
+      "desc": "Personnalisez les alertes pour les messages"
+    },
+    "group": {
+      "title": "Notifications de groupe",
+      "desc": "Gérer les notifications des discussions de groupe"
+    },
+    "call": {
+      "title": "Notifications d'appel",
+      "desc": "Paramètres de sonneries et de vibrations"
+    }
   }
 }

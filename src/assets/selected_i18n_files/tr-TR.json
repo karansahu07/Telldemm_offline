@@ -171,5 +171,24 @@
       "saved": "Avatar seçenekleri yerel olarak kaydedildi.",
       "downloadError": "İndirme başarısız. Lütfen tekrar deneyin."
     }
+  },
+   "notifications": {
+    "title": "Bildirimler",
+    "highPriority": {
+      "title": "Yüksek öncelikli bildirimleri kullan",
+      "desc": "Rahatsız Etme açık olsa bile sesli ve önizlemeli bildirimler al"
+    },
+    "message": {
+      "title": "Mesaj bildirimleri",
+      "desc": "Mesajlar için uyarıları özelleştir"
+    },
+    "group": {
+      "title": "Grup sohbet bildirimleri",
+      "desc": "Grup sohbetleri için bildirimleri yönet"
+    },
+    "call": {
+      "title": "Arama bildirimleri",
+      "desc": "Zil sesleri ve titreşim ayarları"
+    }
   }
 }

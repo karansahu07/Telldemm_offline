@@ -195,5 +195,23 @@
       "saved": "Le scelte dell'avatar sono state salvate localmente.",
       "downloadError": "Download non riuscito. Riprova."
     }
+  },"notifications": {
+    "title": "Notifiche",
+    "highPriority": {
+      "title": "Usa notifiche ad alta priorità",
+      "desc": "Ricevi notifiche con suono e anteprima anche quando Non disturbare è attivo"
+    },
+    "message": {
+      "title": "Notifiche messaggi",
+      "desc": "Personalizza gli avvisi per i messaggi"
+    },
+    "group": {
+      "title": "Notifiche chat di gruppo",
+      "desc": "Gestisci le notifiche per le chat di gruppo"
+    },
+    "call": {
+      "title": "Notifiche chiamate",
+      "desc": "Impostazioni di suonerie e vibrazione"
+    }
   }
 }

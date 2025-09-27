@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 const STORAGE_KEY = 'settings.notifications';
 
@@ -11,20 +12,12 @@ const STORAGE_KEY = 'settings.notifications';
   templateUrl: './notification.page.html',
   styleUrls: ['./notification.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule,FormsModule],
+  imports: [IonicModule, CommonModule, FormsModule, TranslateModule],
 })
 export class NotificationPage implements OnInit {
+  highPriority = true;
 
-  // constructor() { }
-
-  // ngOnInit() {
-  // }
-
-  
-
-   highPriority = true;
-
-  constructor(private router: Router) {}
+  constructor(private router: Router, private translate: TranslateService) {}
 
   ngOnInit(): void {
     this.loadSettings();
@@ -69,6 +62,4 @@ export class NotificationPage implements OnInit {
       console.warn('Could not save notification settings', e);
     }
   }
-  
-
 }

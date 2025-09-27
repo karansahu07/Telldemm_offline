@@ -195,5 +195,23 @@
       "saved": "As escolhas do avatar foram guardadas localmente.",
       "downloadError": "Falha na transferência. Por favor, tenta novamente."
     }
+  },"notifications": {
+    "title": "Notificações",
+    "highPriority": {
+      "title": "Usar notificações de alta prioridade",
+      "desc": "Receba notificações com som e pré-visualização mesmo quando o Não Incomodar estiver ativo"
+    },
+    "message": {
+      "title": "Notificações de mensagens",
+      "desc": "Personalize os alertas para mensagens"
+    },
+    "group": {
+      "title": "Notificações de grupos",
+      "desc": "Gerir notificações de conversas em grupo"
+    },
+    "call": {
+      "title": "Notificações de chamadas",
+      "desc": "Definições de toques e vibração"
+    }
   }
 }

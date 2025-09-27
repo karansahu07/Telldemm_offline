@@ -196,5 +196,23 @@
       "saved": "Avatar-Auswahl wurde lokal gespeichert.",
       "downloadError": "Download fehlgeschlagen. Bitte erneut versuchen."
     }
+  },"notifications": {
+    "title": "Benachrichtigungen",
+    "highPriority": {
+      "title": "Benachrichtigungen mit hoher Priorität verwenden",
+      "desc": "Erhalten Sie Benachrichtigungen mit Ton und Vorschau, auch wenn „Nicht stören“ aktiviert ist"
+    },
+    "message": {
+      "title": "Nachrichten-Benachrichtigungen",
+      "desc": "Benachrichtigungen für Nachrichten anpassen"
+    },
+    "group": {
+      "title": "Gruppenchat-Benachrichtigungen",
+      "desc": "Benachrichtigungen für Gruppenchats verwalten"
+    },
+    "call": {
+      "title": "Anrufbenachrichtigungen",
+      "desc": "Einstellungen für Klingeltöne und Vibration"
+    }
   }
 }

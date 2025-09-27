@@ -196,6 +196,24 @@
       "saved": "头像选项已本地保存。",
       "downloadError": "下载失败，请重试。"
     }
+  },"notifications": {
+    "title": "通知",
+    "highPriority": {
+      "title": "使用高优先级通知",
+      "desc": "即使开启“请勿打扰”，也能收到带声音和预览的通知"
+    },
+    "message": {
+      "title": "消息通知",
+      "desc": "自定义消息提醒"
+    },
+    "group": {
+      "title": "群聊通知",
+      "desc": "管理群聊通知"
+    },
+    "call": {
+      "title": "通话通知",
+      "desc": "铃声和振动设置"
+    }
   }
 
 }

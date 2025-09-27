@@ -197,6 +197,24 @@
       "saved": "頭像選項已儲存在本機。",
       "downloadError": "下載失敗。請再試一次。"
     }
+  },"notifications": {
+    "title": "通知",
+    "highPriority": {
+      "title": "使用高優先順序通知",
+      "desc": "即使啟用「請勿打擾」，也能收到有聲音和預覽的通知"
+    },
+    "message": {
+      "title": "訊息通知",
+      "desc": "自訂訊息的提醒"
+    },
+    "group": {
+      "title": "群組聊天通知",
+      "desc": "管理群組聊天的通知"
+    },
+    "call": {
+      "title": "通話通知",
+      "desc": "鈴聲與震動設定"
+    }
   }
 
 }

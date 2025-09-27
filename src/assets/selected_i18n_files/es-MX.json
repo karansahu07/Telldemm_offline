@@ -195,5 +195,23 @@
       "saved": "Las opciones de avatar se guardaron localmente.",
       "downloadError": "La descarga falló. Intenta de nuevo."
     }
+  },"notifications": {
+    "title": "Notificaciones",
+    "highPriority": {
+      "title": "Usar notificaciones de alta prioridad",
+      "desc": "Recibe notificaciones con sonido y vista previa incluso cuando No molestar esté activado"
+    },
+    "message": {
+      "title": "Notificaciones de mensajes",
+      "desc": "Personaliza alertas para mensajes"
+    },
+    "group": {
+      "title": "Notificaciones de chats grupales",
+      "desc": "Administra notificaciones de chats grupales"
+    },
+    "call": {
+      "title": "Notificaciones de llamadas",
+      "desc": "Configuración de tonos y vibración"
+    }
   }
 }

@@ -171,5 +171,23 @@
       "saved": "Các lựa chọn Avatar đã được lưu cục bộ.",
       "downloadError": "Tải xuống thất bại. Vui lòng thử lại."
     }
+  },"notifications": {
+    "title": "Thông báo",
+    "highPriority": {
+      "title": "Sử dụng thông báo ưu tiên cao",
+      "desc": "Nhận thông báo có âm thanh và xem trước ngay cả khi chế độ Không làm phiền được bật"
+    },
+    "message": {
+      "title": "Thông báo tin nhắn",
+      "desc": "Tùy chỉnh cảnh báo cho tin nhắn"
+    },
+    "group": {
+      "title": "Thông báo nhóm chat",
+      "desc": "Quản lý thông báo cho các nhóm chat"
+    },
+    "call": {
+      "title": "Thông báo cuộc gọi",
+      "desc": "Cài đặt nhạc chuông và rung"
+    }
   }
 }
