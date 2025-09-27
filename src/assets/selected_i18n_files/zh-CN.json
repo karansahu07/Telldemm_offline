@@ -326,6 +326,45 @@
         "done": "备份完成"
       }
     }
+  }, "profilePage": {
+    "title": "个人资料",
+    "imageAlt": "头像",
+    "buttons": {
+      "edit": "编辑",
+      "addLinks": "添加链接",
+      "cancel": "取消"
+    },
+    "fields": {
+      "name": "姓名",
+      "about": "简介",
+      "phone": "电话",
+      "links": "链接"
+    },
+    "actions": {
+      "source": {
+        "header": "选择图片来源",
+        "camera": "相机",
+        "gallery": "图库"
+      }
+    },
+    "loading": {
+      "openingCamera": "正在打开相机...",
+      "processing": "正在处理图片...",
+      "updating": "正在更新头像..."
+    },
+    "validation": {
+      "size": "图片大小应小于 5MB",
+      "type": "请选择有效的图片文件 (JPEG, PNG, WebP)"
+    },
+    "toast": {
+      "loadFailed": "加载个人资料失败",
+      "imageLoadFailed": "加载头像失败",
+      "selectFailed": "选择图片失败，请重试。",
+      "processFailed": "处理图片出错，请重试。",
+      "noUser": "未找到用户 ID",
+      "updated": "头像更新成功！",
+      "updateFailed": "更新头像失败"
+    }
   }
 
 }

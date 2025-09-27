@@ -326,5 +326,44 @@
         "done": "Copia de seguridad completada"
       }
     }
+  },"profilePage": {
+    "title": "Perfil",
+    "imageAlt": "Imagen de perfil",
+    "buttons": {
+      "edit": "Editar",
+      "addLinks": "Añadir enlaces",
+      "cancel": "Cancelar"
+    },
+    "fields": {
+      "name": "Nombre",
+      "about": "Acerca de",
+      "phone": "Teléfono",
+      "links": "Enlaces"
+    },
+    "actions": {
+      "source": {
+        "header": "Seleccionar origen de la imagen",
+        "camera": "Cámara",
+        "gallery": "Galería"
+      }
+    },
+    "loading": {
+      "openingCamera": "Abriendo cámara...",
+      "processing": "Procesando imagen...",
+      "updating": "Actualizando foto de perfil..."
+    },
+    "validation": {
+      "size": "El tamaño de la imagen debe ser menor de 5 MB",
+      "type": "Seleccione un archivo de imagen válido (JPEG, PNG, WebP)"
+    },
+    "toast": {
+      "loadFailed": "No se pudieron cargar los datos del perfil",
+      "imageLoadFailed": "No se pudo cargar la imagen del perfil",
+      "selectFailed": "No se pudo seleccionar la imagen. Inténtelo de nuevo.",
+      "processFailed": "Error al procesar la imagen. Inténtelo de nuevo.",
+      "noUser": "ID de usuario no encontrado",
+      "updated": "¡Foto de perfil actualizada con éxito!",
+      "updateFailed": "No se pudo actualizar la foto de perfil"
+    }
   }
 }

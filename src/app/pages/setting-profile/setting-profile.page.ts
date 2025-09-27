@@ -8,32 +8,25 @@ import { ImageCropperModalComponent } from '../../components/image-cropper-modal
 import { Subject, takeUntil } from 'rxjs';
 import { Router } from '@angular/router';
 import { CropResult } from 'src/types';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-setting-profile',
   templateUrl: './setting-profile.page.html',
   styleUrls: ['./setting-profile.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule],
+  imports: [IonicModule, CommonModule, TranslateModule],
 })
 export class SettingProfilePage implements OnInit, OnDestroy {
   profileImageUrl = 'assets/images/user.jfif';
   isLoadingProfile = false;
   isUpdatingImage = false;
-  
-  user = {
-    name: '',
-    about: '',
-    phone: ''
-  };
-  
+
+  user = { name: '', about: '', phone: '' };
   currentUserId: number | null = null;
 
-  // Constants
   private readonly MAX_FILE_SIZE = 5 * 1024 * 1024;
   private readonly ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-  
-  // Cleanup
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -43,14 +36,15 @@ export class SettingProfilePage implements OnInit, OnDestroy {
     private loadingController: LoadingController,
     private toastController: ToastController,
     private actionSheetController: ActionSheetController,
-    private router: Router
+    private router: Router,
+    private translate: TranslateService
   ) {}
 
   async ngOnInit() {
     await this.initializeProfile();
   }
 
-  async ionViewWillEnter(){
+  async ionViewWillEnter() {
     await this.initializeProfile();
   }
 
@@ -59,21 +53,12 @@ export class SettingProfilePage implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  /**
-   * Initialize profile data
-   */
   private async initializeProfile() {
     try {
-      // Ensure auth is hydrated
       await this.authService.hydrateAuth();
-
-      // Get current user ID
       const id = this.authService.authData?.userId;
-      if (id) {
-        this.currentUserId = Number(id);
-      }
-      
-      // Set user data from auth
+      if (id) this.currentUserId = Number(id);
+
       if (this.authService.authData) {
         const auth = this.authService.authData;
         this.user = {
@@ -81,202 +66,142 @@ export class SettingProfilePage implements OnInit, OnDestroy {
           about: '.',
           phone: auth.phone_number || ''
         };
-        
-        // Load profile image
         await this.loadUserProfile();
       }
     } catch (error) {
       console.error('Error initializing profile:', error);
-      await this.showToast('Failed to load profile data', 'danger');
+      await this.showToast(this.translate.instant('profilePage.toast.loadFailed'), 'danger');
     }
   }
 
   goToUpdateName() {
-  this.router.navigate(['/update-username']);
-}
+    this.router.navigate(['/update-username']);
+  }
 
-goToUpdateStatus() {
-  this.router.navigate(['/update-status']);
-}
+  goToUpdateStatus() {
+    this.router.navigate(['/update-status']);
+  }
 
-  /**
-   * Load user profile from API
-   */
   async loadUserProfile() {
     const userId = this.authService.authData?.userId;
-    
-    if (!userId) {
-      console.warn('No user ID found');
-      return;
-    }
+    if (!userId) return;
 
     try {
       this.isLoadingProfile = true;
 
       this.service.getUserProfilebyId(userId)
-  .pipe(takeUntil(this.destroy$))
-  .subscribe({
-    next: (response: any) => {
-      console.log('Profile response:', response);
-
-      // Profile image (dp)
-      if (response?.profile || response?.image_url) {
-        this.profileImageUrl = response.profile || response.image_url;
-      }
-
-      // Name
-      if (response?.name) {
-        this.user.name = response.name;
-      }
-
-      // dp-status
-      if (response?.dp_status) {
-        this.user.about = response.dp_status;
-      }
-
-      this.isLoadingProfile = false;
-    },
-    error: (error: any) => {
-      console.error('Error loading profile:', error);
-      this.isLoadingProfile = false;
-      this.showToast('Failed to load profile image', 'danger');
-    }
-  });
-
-        
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (response: any) => {
+            if (response?.profile || response?.image_url) {
+              this.profileImageUrl = response.profile || response.image_url;
+            }
+            if (response?.name) this.user.name = response.name;
+            if (response?.dp_status) this.user.about = response.dp_status;
+            this.isLoadingProfile = false;
+          },
+          error: async () => {
+            this.isLoadingProfile = false;
+            await this.showToast(this.translate.instant('profilePage.toast.imageLoadFailed'), 'danger');
+          }
+        });
     } catch (error) {
       console.error('Error in loadUserProfile:', error);
       this.isLoadingProfile = false;
     }
   }
 
-  /**
-   * Handle image error - fallback to default
-   */
   onImageError() {
     this.profileImageUrl = 'assets/images/user.jfif';
   }
 
-  /**
-   * Show image source selection action sheet
-   */
   async editProfileImage() {
     const actionSheet = await this.actionSheetController.create({
-      header: 'Select Image Source',
+      header: this.translate.instant('profilePage.actions.source.header'),
       cssClass: 'custom-action-sheet',
       buttons: [
         {
-          text: 'Camera',
+          text: this.translate.instant('profilePage.actions.source.camera'),
           icon: 'camera',
-          handler: () => {
-            this.selectImageFromSource(CameraSource.Camera);
-          }
+          handler: () => this.selectImageFromSource(CameraSource.Camera)
         },
         {
-          text: 'Gallery',
+          text: this.translate.instant('profilePage.actions.source.gallery'),
           icon: 'images',
-          handler: () => {
-            this.selectImageFromSource(CameraSource.Photos);
-          }
+          handler: () => this.selectImageFromSource(CameraSource.Photos)
         },
         {
-          text: 'Cancel',
+          text: this.translate.instant('profilePage.actions.cancel'),
           icon: 'close',
           role: 'cancel'
         }
       ]
     });
-
     await actionSheet.present();
   }
 
-  /**
-   * Select image from camera or gallery
-   */
   private async selectImageFromSource(source: CameraSource) {
     try {
       const loading = await this.loadingController.create({
-        message: 'Opening camera...',
+        message: this.translate.instant('profilePage.loading.openingCamera'),
         duration: 5000
       });
       await loading.present();
 
       const image = await Camera.getPhoto({
         quality: 90,
-        allowEditing: false, // We'll handle cropping ourselves
+        allowEditing: false,
         resultType: CameraResultType.Uri,
-        source: source,
+        source,
         width: 1000,
         height: 1000
       });
 
       await loading.dismiss();
-
-      if (image?.webPath) {
-        await this.processSelectedImage(image.webPath);
-      }
-
+      if (image?.webPath) await this.processSelectedImage(image.webPath);
     } catch (error) {
       console.error('Error selecting image:', error);
-      await this.showToast('Failed to select image. Please try again.', 'danger');
+      await this.showToast(this.translate.instant('profilePage.toast.selectFailed'), 'danger');
     }
   }
 
-  /**
-   * Process selected image and open cropper
-   */
   private async processSelectedImage(imagePath: string) {
     try {
-      // Show processing message
       const loading = await this.loadingController.create({
-        message: 'Processing image...',
+        message: this.translate.instant('profilePage.loading.processing'),
         duration: 10000
       });
       await loading.present();
 
-      // Convert to blob first to validate
       const response = await fetch(imagePath);
       const blob = await response.blob();
-      
+
       await loading.dismiss();
 
-      // Validate file
       const validationError = this.validateImageBlob(blob);
       if (validationError) {
         await this.showToast(validationError, 'danger');
         return;
       }
 
-      // Convert to data URL for cropper
       const dataUrl = await this.blobToDataURL(blob);
-      
-      // Open cropper modal
       await this.openImageCropper(dataUrl, blob);
-
     } catch (error) {
       console.error('Error processing image:', error);
-      await this.showToast('Error processing image. Please try again.', 'danger');
+      await this.showToast(this.translate.instant('profilePage.toast.processFailed'), 'danger');
     }
   }
 
-  /**
-   * Validate image blob
-   */
   private validateImageBlob(blob: Blob): string | null {
     if (blob.size > this.MAX_FILE_SIZE) {
-      return 'Image size should be less than 5MB';
+      return this.translate.instant('profilePage.validation.size');
     }
-
     if (!this.ALLOWED_IMAGE_TYPES.includes(blob.type)) {
-      return 'Please select a valid image file (JPEG, PNG, WebP)';
+      return this.translate.instant('profilePage.validation.type');
     }
-
     return null;
   }
 
-  /**
-   * Convert blob to data URL
-   */
   private blobToDataURL(blob: Blob): Promise<string> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -286,15 +211,12 @@ goToUpdateStatus() {
     });
   }
 
-  /**
-   * Open image cropper modal
-   */
   private async openImageCropper(imageUrl: string, originalBlob: Blob) {
     const modal = await this.modalController.create({
       component: ImageCropperModalComponent,
       componentProps: {
-        imageUrl: imageUrl,
-        aspectRatio: 1, // Square crop for profile picture
+        imageUrl,
+        aspectRatio: 1,
         cropQuality: 0.9
       },
       cssClass: 'image-cropper-modal',
@@ -302,110 +224,73 @@ goToUpdateStatus() {
     });
 
     await modal.present();
-
     const { data } = await modal.onDidDismiss<CropResult>();
-    
+
     if (data?.success && data.croppedImage && data.originalBlob) {
-      // Update profile image with cropped version
       await this.updateProfileImage(data.originalBlob, data.croppedImage);
     } else if (data?.error) {
       await this.showToast(data.error, 'danger');
     }
-    // If cancelled, do nothing
   }
 
-  /**
-   * Update profile image on server
-   */
   private async updateProfileImage(croppedBlob: Blob, croppedImageUrl: string) {
     if (!this.currentUserId) {
-      await this.showToast('User ID not found', 'danger');
+      await this.showToast(this.translate.instant('profilePage.toast.noUser'), 'danger');
       return;
     }
 
     try {
       this.isUpdatingImage = true;
-
-      // Show loading
       const loading = await this.loadingController.create({
-        message: 'Updating profile picture...',
+        message: this.translate.instant('profilePage.loading.updating'),
         backdropDismiss: false
       });
       await loading.present();
 
-      // Create file from blob
-      const file = new File([croppedBlob], `profile_${Date.now()}.jpg`, { 
-        type: croppedBlob.type 
-      });
+      const file = new File([croppedBlob], `profile_${Date.now()}.jpg`, { type: croppedBlob.type });
 
-      // Update on server
       this.service.updateUserDp(this.currentUserId, file)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
-          next: async (response) => {
-            console.log('Profile updated successfully:', response);
-            
-            // Update local image immediately
+          next: async () => {
             this.profileImageUrl = croppedImageUrl;
-            
             await loading.dismiss();
-            await this.showToast('Profile picture updated successfully!', 'success');
+            await this.showToast(this.translate.instant('profilePage.toast.updated'), 'success');
             this.isUpdatingImage = false;
           },
-          error: async (error) => {
-            console.error('Error updating profile picture:', error);
+          error: async () => {
             await loading.dismiss();
-            await this.showToast('Failed to update profile picture', 'danger');
+            await this.showToast(this.translate.instant('profilePage.toast.updateFailed'), 'danger');
             this.isUpdatingImage = false;
           }
         });
-
     } catch (error) {
       console.error('Error in updateProfileImage:', error);
-      await this.showToast('Failed to update profile picture', 'danger');
+      await this.showToast(this.translate.instant('profilePage.toast.updateFailed'), 'danger');
       this.isUpdatingImage = false;
     }
   }
 
-  /**
-   * Show toast notification
-   */
   private async showToast(message: string, color: 'danger' | 'success' | 'dark' = 'dark') {
     const toast = await this.toastController.create({
       message,
       duration: 3000,
       color,
       position: 'bottom',
-      buttons: [
-        {
-          text: 'OK',
-          role: 'cancel'
-        }
-      ]
+      buttons: [{ text: this.translate.instant('common.ok'), role: 'cancel' }]
     });
     await toast.present();
   }
 
-  /**
-   * Add links functionality (placeholder)
-   */
- addLinks() {
-  this.router.navigate(['/social-media-links']);
-}
+  addLinks() {
+    this.router.navigate(['/social-media-links']);
+  }
 
-  /**
-   * Get display image URL with loading state
-   */
   get displayImageUrl(): string {
-    if (this.isLoadingProfile || this.isUpdatingImage) {
-      return 'assets/images/user.jfif'; // Show default while loading
-    }
+    if (this.isLoadingProfile || this.isUpdatingImage) return 'assets/images/user.jfif';
     return this.profileImageUrl;
   }
 
-  /**
-   * Check if image is loading
-   */
   get isImageLoading(): boolean {
     return this.isLoadingProfile || this.isUpdatingImage;
   }

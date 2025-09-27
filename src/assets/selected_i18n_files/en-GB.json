@@ -326,5 +326,44 @@
         "done": "Backup completed"
       }
     }
+  }, "profilePage": {
+    "title": "Profile",
+    "imageAlt": "Profile Image",
+    "buttons": {
+      "edit": "Edit",
+      "addLinks": "Add links",
+      "cancel": "Cancel"
+    },
+    "fields": {
+      "name": "Name",
+      "about": "About",
+      "phone": "Phone",
+      "links": "Links"
+    },
+    "actions": {
+      "source": {
+        "header": "Select Image Source",
+        "camera": "Camera",
+        "gallery": "Gallery"
+      }
+    },
+    "loading": {
+      "openingCamera": "Opening camera...",
+      "processing": "Processing image...",
+      "updating": "Updating profile picture..."
+    },
+    "validation": {
+      "size": "Image size should be less than 5MB",
+      "type": "Please select a valid image file (JPEG, PNG, WebP)"
+    },
+    "toast": {
+      "loadFailed": "Failed to load profile data",
+      "imageLoadFailed": "Failed to load profile image",
+      "selectFailed": "Failed to select image. Please try again.",
+      "processFailed": "Error processing image. Please try again.",
+      "noUser": "User ID not found",
+      "updated": "Profile picture updated successfully!",
+      "updateFailed": "Failed to update profile picture"
+    }
   }
 }

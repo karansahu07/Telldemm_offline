@@ -327,6 +327,45 @@
         "done": "備份完成"
       }
     }
+  },"profilePage": {
+    "title": "個人資料",
+    "imageAlt": "個人頭像",
+    "buttons": {
+      "edit": "編輯",
+      "addLinks": "新增連結",
+      "cancel": "取消"
+    },
+    "fields": {
+      "name": "姓名",
+      "about": "關於",
+      "phone": "電話",
+      "links": "連結"
+    },
+    "actions": {
+      "source": {
+        "header": "選擇圖片來源",
+        "camera": "相機",
+        "gallery": "相簿"
+      }
+    },
+    "loading": {
+      "openingCamera": "正在開啟相機...",
+      "processing": "正在處理圖片...",
+      "updating": "正在更新個人頭像..."
+    },
+    "validation": {
+      "size": "圖片大小必須小於 5MB",
+      "type": "請選擇有效的圖片檔案 (JPEG, PNG, WebP)"
+    },
+    "toast": {
+      "loadFailed": "載入個人資料失敗",
+      "imageLoadFailed": "載入個人頭像失敗",
+      "selectFailed": "選擇圖片失敗，請再試一次。",
+      "processFailed": "處理圖片時發生錯誤，請再試一次。",
+      "noUser": "找不到使用者 ID",
+      "updated": "個人頭像更新成功！",
+      "updateFailed": "更新個人頭像失敗"
+    }
   }
 
 }

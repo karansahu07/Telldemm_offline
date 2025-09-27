@@ -325,5 +325,44 @@
         "done": "バックアップ完了"
       }
     }
+  },"profilePage": {
+    "title": "プロフィール",
+    "imageAlt": "プロフィール画像",
+    "buttons": {
+      "edit": "編集",
+      "addLinks": "リンクを追加",
+      "cancel": "キャンセル"
+    },
+    "fields": {
+      "name": "名前",
+      "about": "自己紹介",
+      "phone": "電話番号",
+      "links": "リンク"
+    },
+    "actions": {
+      "source": {
+        "header": "画像ソースを選択",
+        "camera": "カメラ",
+        "gallery": "ギャラリー"
+      }
+    },
+    "loading": {
+      "openingCamera": "カメラを開いています...",
+      "processing": "画像を処理中...",
+      "updating": "プロフィール画像を更新しています..."
+    },
+    "validation": {
+      "size": "画像サイズは5MB未満である必要があります",
+      "type": "有効な画像ファイルを選択してください (JPEG, PNG, WebP)"
+    },
+    "toast": {
+      "loadFailed": "プロフィールデータの読み込みに失敗しました",
+      "imageLoadFailed": "プロフィール画像の読み込みに失敗しました",
+      "selectFailed": "画像の選択に失敗しました。再試行してください。",
+      "processFailed": "画像の処理中にエラーが発生しました。再試行してください。",
+      "noUser": "ユーザーIDが見つかりません",
+      "updated": "プロフィール画像が正常に更新されました！",
+      "updateFailed": "プロフィール画像の更新に失敗しました"
+    }
   }
 }

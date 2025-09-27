@@ -301,5 +301,44 @@
         "done": "Sao lưu hoàn tất"
       }
     }
+  }, "profilePage": {
+    "title": "Hồ sơ",
+    "imageAlt": "Ảnh hồ sơ",
+    "buttons": {
+      "edit": "Chỉnh sửa",
+      "addLinks": "Thêm liên kết",
+      "cancel": "Hủy"
+    },
+    "fields": {
+      "name": "Tên",
+      "about": "Giới thiệu",
+      "phone": "Điện thoại",
+      "links": "Liên kết"
+    },
+    "actions": {
+      "source": {
+        "header": "Chọn nguồn ảnh",
+        "camera": "Máy ảnh",
+        "gallery": "Thư viện"
+      }
+    },
+    "loading": {
+      "openingCamera": "Đang mở máy ảnh...",
+      "processing": "Đang xử lý ảnh...",
+      "updating": "Đang cập nhật ảnh hồ sơ..."
+    },
+    "validation": {
+      "size": "Kích thước ảnh phải nhỏ hơn 5MB",
+      "type": "Vui lòng chọn tệp ảnh hợp lệ (JPEG, PNG, WebP)"
+    },
+    "toast": {
+      "loadFailed": "Không thể tải dữ liệu hồ sơ",
+      "imageLoadFailed": "Không thể tải ảnh hồ sơ",
+      "selectFailed": "Không thể chọn ảnh. Vui lòng thử lại.",
+      "processFailed": "Lỗi xử lý ảnh. Vui lòng thử lại.",
+      "noUser": "Không tìm thấy ID người dùng",
+      "updated": "Ảnh hồ sơ đã được cập nhật thành công!",
+      "updateFailed": "Không thể cập nhật ảnh hồ sơ"
+    }
   }
 }

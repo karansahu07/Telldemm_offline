@@ -302,5 +302,44 @@
         "done": "Yedekleme tamamlandı"
       }
     }
+  },"profilePage": {
+    "title": "Profil",
+    "imageAlt": "Profil resmi",
+    "buttons": {
+      "edit": "Düzenle",
+      "addLinks": "Bağlantı ekle",
+      "cancel": "İptal"
+    },
+    "fields": {
+      "name": "Ad",
+      "about": "Hakkında",
+      "phone": "Telefon",
+      "links": "Bağlantılar"
+    },
+    "actions": {
+      "source": {
+        "header": "Resim kaynağını seç",
+        "camera": "Kamera",
+        "gallery": "Galeri"
+      }
+    },
+    "loading": {
+      "openingCamera": "Kamera açılıyor...",
+      "processing": "Resim işleniyor...",
+      "updating": "Profil resmi güncelleniyor..."
+    },
+    "validation": {
+      "size": "Resim boyutu 5MB’den küçük olmalıdır",
+      "type": "Lütfen geçerli bir resim dosyası seçin (JPEG, PNG, WebP)"
+    },
+    "toast": {
+      "loadFailed": "Profil verileri yüklenemedi",
+      "imageLoadFailed": "Profil resmi yüklenemedi",
+      "selectFailed": "Resim seçilemedi. Lütfen tekrar deneyin.",
+      "processFailed": "Resim işlenirken hata oluştu. Lütfen tekrar deneyin.",
+      "noUser": "Kullanıcı kimliği bulunamadı",
+      "updated": "Profil resmi başarıyla güncellendi!",
+      "updateFailed": "Profil resmi güncellenemedi"
+    }
   }
 }

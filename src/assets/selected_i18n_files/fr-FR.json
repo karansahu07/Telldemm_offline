@@ -326,5 +326,44 @@
         "done": "Sauvegarde terminée"
       }
     }
+  },"profilePage": {
+    "title": "Profil",
+    "imageAlt": "Image de profil",
+    "buttons": {
+      "edit": "Modifier",
+      "addLinks": "Ajouter des liens",
+      "cancel": "Annuler"
+    },
+    "fields": {
+      "name": "Nom",
+      "about": "À propos",
+      "phone": "Téléphone",
+      "links": "Liens"
+    },
+    "actions": {
+      "source": {
+        "header": "Sélectionner la source de l’image",
+        "camera": "Caméra",
+        "gallery": "Galerie"
+      }
+    },
+    "loading": {
+      "openingCamera": "Ouverture de la caméra...",
+      "processing": "Traitement de l’image...",
+      "updating": "Mise à jour de la photo de profil..."
+    },
+    "validation": {
+      "size": "La taille de l’image doit être inférieure à 5 Mo",
+      "type": "Veuillez sélectionner un fichier image valide (JPEG, PNG, WebP)"
+    },
+    "toast": {
+      "loadFailed": "Échec du chargement des données du profil",
+      "imageLoadFailed": "Échec du chargement de l’image de profil",
+      "selectFailed": "Échec de la sélection de l’image. Veuillez réessayer.",
+      "processFailed": "Erreur lors du traitement de l’image. Veuillez réessayer.",
+      "noUser": "ID utilisateur introuvable",
+      "updated": "Photo de profil mise à jour avec succès !",
+      "updateFailed": "Échec de la mise à jour de la photo de profil"
+    }
   }
 }
