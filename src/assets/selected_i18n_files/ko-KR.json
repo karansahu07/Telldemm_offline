@@ -213,5 +213,46 @@
       "title": "통화 알림",
       "desc": "벨소리 및 진동 설정"
     }
+  },"storage": {
+    "title": "스토리지 및 데이터",
+    "totalUsedHuman": "{{used}} MB / {{total}} MB",
+    "cards": {
+      "usage": {
+        "title": "스토리지 사용량",
+        "used": "{{mb}} MB 사용됨",
+        "total": "총 {{mb}} MB"
+      }
+    },
+    "sections": {
+      "network": "네트워크 사용량",
+      "manage": "관리"
+    },
+    "network": {
+      "sent": {
+        "title": "전송된 데이터",
+        "subtitle": "{{val}}"
+      },
+      "received": {
+        "title": "수신된 데이터",
+        "subtitle": "{{val}}"
+      }
+    },
+    "manage": {
+      "title": "스토리지 관리",
+      "desc": "큰 파일, 채팅 및 미디어 검토 및 삭제"
+    },
+    "autoDownload": {
+      "title": "미디어 자동 다운로드",
+      "desc": "모바일/Wi-Fi/로밍에서 다운로드할 항목 제어"
+    },
+    "actions": {
+      "analyze": "분석",
+      "clearCache": "캐시 지우기",
+      "resetStats": "통계 초기화"
+    },
+    "toast": {
+      "cleared": "{{mb}} MB 캐시 삭제됨",
+      "statsReset": "네트워크 통계가 초기화됨"
+    }
   }
 }

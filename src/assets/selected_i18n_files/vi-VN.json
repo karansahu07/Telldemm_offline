@@ -189,5 +189,46 @@
       "title": "Thông báo cuộc gọi",
       "desc": "Cài đặt nhạc chuông và rung"
     }
+  },"storage": {
+    "title": "Bộ nhớ & Dữ liệu",
+    "totalUsedHuman": "{{used}} MB / {{total}} MB",
+    "cards": {
+      "usage": {
+        "title": "Sử dụng bộ nhớ",
+        "used": "Đã dùng {{mb}} MB",
+        "total": "Tổng {{mb}} MB"
+      }
+    },
+    "sections": {
+      "network": "Sử dụng mạng",
+      "manage": "Quản lý"
+    },
+    "network": {
+      "sent": {
+        "title": "Dữ liệu đã gửi",
+        "subtitle": "{{val}}"
+      },
+      "received": {
+        "title": "Dữ liệu đã nhận",
+        "subtitle": "{{val}}"
+      }
+    },
+    "manage": {
+      "title": "Quản lý bộ nhớ",
+      "desc": "Xem lại và xóa tệp lớn, trò chuyện và phương tiện"
+    },
+    "autoDownload": {
+      "title": "Tự động tải phương tiện",
+      "desc": "Kiểm soát nội dung tải xuống trên di động/Wi-Fi/roaming"
+    },
+    "actions": {
+      "analyze": "Phân tích",
+      "clearCache": "Xóa bộ nhớ đệm",
+      "resetStats": "Đặt lại thống kê"
+    },
+    "toast": {
+      "cleared": "Đã xóa {{mb}} MB bộ nhớ đệm",
+      "statsReset": "Đã đặt lại thống kê mạng"
+    }
   }
 }

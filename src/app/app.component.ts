@@ -491,10 +491,10 @@ async NavBar_initialize() {
     //for status bar code
     await this.platform.ready();
 
-    if (this.platform.is('capacitor')) {
-      await StatusBar.setBackgroundColor({ color: '#ffffff' });
-      await StatusBar.setStyle({ style: Style.Light });
-    }
+    // if (this.platform.is('capacitor')) {
+    //   await StatusBar.setBackgroundColor({ color: '#ffffff' });
+    //   await StatusBar.setStyle({ style: Style.Light });
+    // }
 
     // Back button handling: single press on home route exits app (Android only)
     this.platform.backButton.subscribeWithPriority(10, async () => {

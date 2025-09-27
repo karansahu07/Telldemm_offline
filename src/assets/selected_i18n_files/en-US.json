@@ -213,5 +213,46 @@
       "title": "Call notifications",
       "desc": "Ringtones and vibration settings"
     }
+  },"storage": {
+    "title": "Storage & Data",
+    "totalUsedHuman": "{{used}} MB of {{total}} MB",
+    "cards": {
+      "usage": {
+        "title": "Storage Usage",
+        "used": "{{mb}} MB used",
+        "total": "{{mb}} MB total"
+      }
+    },
+    "sections": {
+      "network": "Network Usage",
+      "manage": "Manage"
+    },
+    "network": {
+      "sent": {
+        "title": "Data sent",
+        "subtitle": "{{val}}"
+      },
+      "received": {
+        "title": "Data received",
+        "subtitle": "{{val}}"
+      }
+    },
+    "manage": {
+      "title": "Manage Storage",
+      "desc": "Review and delete large files, chats and media"
+    },
+    "autoDownload": {
+      "title": "Media Auto-download",
+      "desc": "Control what downloads on mobile/Wi-Fi/roaming"
+    },
+    "actions": {
+      "analyze": "Analyze",
+      "clearCache": "Clear Cache",
+      "resetStats": "Reset statistics"
+    },
+    "toast": {
+      "cleared": "Cleared {{mb}} MB cache",
+      "statsReset": "Network statistics reset"
+    }
   }
 }

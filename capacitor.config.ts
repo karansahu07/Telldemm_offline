@@ -22,12 +22,12 @@ const config: CapacitorConfig = {
   cleartext: true
 },
    plugins: {
-    Keyboard: {
-      resize: KeyboardResize.Ionic,          // Correct use of enum
-      style: KeyboardStyle.Light,             // Also using enum
-      resizeOnFullScreen: true,  
-                // Optional Android workaround
-    },
+    // Keyboard: {
+    //   resize: KeyboardResize.Ionic,          // Correct use of enum
+    //   style: KeyboardStyle.Light,             // Also using enum
+    //   resizeOnFullScreen: true,  
+    //             // Optional Android workaround
+    // },
     EdgeToEdge: {
       backgroundColor: "#ffffff",  // color for status + navigation bar
     },   

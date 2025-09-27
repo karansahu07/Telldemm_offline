@@ -213,5 +213,46 @@
       "title": "通話通知",
       "desc": "着信音とバイブレーションの設定"
     }
+  },"storage": {
+    "title": "ストレージとデータ",
+    "totalUsedHuman": "{{used}} MB / {{total}} MB",
+    "cards": {
+      "usage": {
+        "title": "ストレージ使用状況",
+        "used": "{{mb}} MB 使用済み",
+        "total": "合計 {{mb}} MB"
+      }
+    },
+    "sections": {
+      "network": "ネットワーク使用状況",
+      "manage": "管理"
+    },
+    "network": {
+      "sent": {
+        "title": "送信データ",
+        "subtitle": "{{val}}"
+      },
+      "received": {
+        "title": "受信データ",
+        "subtitle": "{{val}}"
+      }
+    },
+    "manage": {
+      "title": "ストレージを管理",
+      "desc": "大きなファイル、チャット、メディアを確認して削除"
+    },
+    "autoDownload": {
+      "title": "メディア自動ダウンロード",
+      "desc": "モバイル/Wi-Fi/ローミングで何をダウンロードするかを制御"
+    },
+    "actions": {
+      "analyze": "分析",
+      "clearCache": "キャッシュをクリア",
+      "resetStats": "統計をリセット"
+    },
+    "toast": {
+      "cleared": "{{mb}} MB のキャッシュをクリアしました",
+      "statsReset": "ネットワーク統計がリセットされました"
+    }
   }
 }

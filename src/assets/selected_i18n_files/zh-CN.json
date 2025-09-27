@@ -214,6 +214,47 @@
       "title": "通话通知",
       "desc": "铃声和振动设置"
     }
+  },"storage": {
+    "title": "存储与数据",
+    "totalUsedHuman": "{{used}} MB / {{total}} MB",
+    "cards": {
+      "usage": {
+        "title": "存储使用情况",
+        "used": "已用 {{mb}} MB",
+        "total": "总共 {{mb}} MB"
+      }
+    },
+    "sections": {
+      "network": "网络使用",
+      "manage": "管理"
+    },
+    "network": {
+      "sent": {
+        "title": "已发送数据",
+        "subtitle": "{{val}}"
+      },
+      "received": {
+        "title": "已接收数据",
+        "subtitle": "{{val}}"
+      }
+    },
+    "manage": {
+      "title": "管理存储",
+      "desc": "查看并删除大文件、聊天和媒体"
+    },
+    "autoDownload": {
+      "title": "媒体自动下载",
+      "desc": "控制在移动/Wi-Fi/漫游时下载的内容"
+    },
+    "actions": {
+      "analyze": "分析",
+      "clearCache": "清除缓存",
+      "resetStats": "重置统计数据"
+    },
+    "toast": {
+      "cleared": "已清除 {{mb}} MB 缓存",
+      "statsReset": "网络统计已重置"
+    }
   }
 
 }

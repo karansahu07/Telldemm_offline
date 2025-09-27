@@ -214,5 +214,46 @@
       "title": "Notifications d'appel",
       "desc": "Paramètres de sonneries et de vibrations"
     }
+  },"storage": {
+    "title": "Stockage et données",
+    "totalUsedHuman": "{{used}} Mo sur {{total}} Mo",
+    "cards": {
+      "usage": {
+        "title": "Utilisation du stockage",
+        "used": "{{mb}} Mo utilisés",
+        "total": "{{mb}} Mo au total"
+      }
+    },
+    "sections": {
+      "network": "Utilisation du réseau",
+      "manage": "Gérer"
+    },
+    "network": {
+      "sent": {
+        "title": "Données envoyées",
+        "subtitle": "{{val}}"
+      },
+      "received": {
+        "title": "Données reçues",
+        "subtitle": "{{val}}"
+      }
+    },
+    "manage": {
+      "title": "Gérer le stockage",
+      "desc": "Vérifiez et supprimez les gros fichiers, discussions et médias"
+    },
+    "autoDownload": {
+      "title": "Téléchargement automatique des médias",
+      "desc": "Contrôlez ce qui se télécharge sur mobile/Wi-Fi/itinérance"
+    },
+    "actions": {
+      "analyze": "Analyser",
+      "clearCache": "Vider le cache",
+      "resetStats": "Réinitialiser les statistiques"
+    },
+    "toast": {
+      "cleared": "{{mb}} Mo de cache vidé",
+      "statsReset": "Statistiques réseau réinitialisées"
+    }
   }
 }

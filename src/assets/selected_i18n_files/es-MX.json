@@ -213,5 +213,46 @@
       "title": "Notificaciones de llamadas",
       "desc": "Configuración de tonos y vibración"
     }
+  },"storage": {
+    "title": "Almacenamiento y datos",
+    "totalUsedHuman": "{{used}} MB de {{total}} MB",
+    "cards": {
+      "usage": {
+        "title": "Uso de almacenamiento",
+        "used": "{{mb}} MB usados",
+        "total": "{{mb}} MB en total"
+      }
+    },
+    "sections": {
+      "network": "Uso de red",
+      "manage": "Administrar"
+    },
+    "network": {
+      "sent": {
+        "title": "Datos enviados",
+        "subtitle": "{{val}}"
+      },
+      "received": {
+        "title": "Datos recibidos",
+        "subtitle": "{{val}}"
+      }
+    },
+    "manage": {
+      "title": "Administrar almacenamiento",
+      "desc": "Revisa y elimina archivos grandes, chats y multimedia"
+    },
+    "autoDownload": {
+      "title": "Descarga automática de medios",
+      "desc": "Controla lo que se descarga en móvil/Wi-Fi/roaming"
+    },
+    "actions": {
+      "analyze": "Analizar",
+      "clearCache": "Borrar caché",
+      "resetStats": "Restablecer estadísticas"
+    },
+    "toast": {
+      "cleared": "Se borraron {{mb}} MB de caché",
+      "statsReset": "Estadísticas de red restablecidas"
+    }
   }
 }

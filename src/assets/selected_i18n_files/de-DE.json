@@ -214,5 +214,46 @@
       "title": "Anrufbenachrichtigungen",
       "desc": "Einstellungen für Klingeltöne und Vibration"
     }
+  },"storage": {
+    "title": "Speicher & Daten",
+    "totalUsedHuman": "{{used}} MB von {{total}} MB",
+    "cards": {
+      "usage": {
+        "title": "Speichernutzung",
+        "used": "{{mb}} MB verwendet",
+        "total": "{{mb}} MB insgesamt"
+      }
+    },
+    "sections": {
+      "network": "Netzwerknutzung",
+      "manage": "Verwalten"
+    },
+    "network": {
+      "sent": {
+        "title": "Gesendete Daten",
+        "subtitle": "{{val}}"
+      },
+      "received": {
+        "title": "Empfangene Daten",
+        "subtitle": "{{val}}"
+      }
+    },
+    "manage": {
+      "title": "Speicher verwalten",
+      "desc": "Überprüfen und löschen Sie große Dateien, Chats und Medien"
+    },
+    "autoDownload": {
+      "title": "Automatischer Medien-Download",
+      "desc": "Steuern Sie, was über Mobilfunk/WLAN/Roaming heruntergeladen wird"
+    },
+    "actions": {
+      "analyze": "Analysieren",
+      "clearCache": "Cache leeren",
+      "resetStats": "Statistiken zurücksetzen"
+    },
+    "toast": {
+      "cleared": "{{mb}} MB Cache geleert",
+      "statsReset": "Netzwerkstatistiken zurückgesetzt"
+    }
   }
 }

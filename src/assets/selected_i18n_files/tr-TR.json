@@ -190,5 +190,46 @@
       "title": "Arama bildirimleri",
       "desc": "Zil sesleri ve titreşim ayarları"
     }
+  },"storage": {
+    "title": "Depolama ve Veri",
+    "totalUsedHuman": "{{used}} MB / {{total}} MB",
+    "cards": {
+      "usage": {
+        "title": "Depolama kullanımı",
+        "used": "{{mb}} MB kullanıldı",
+        "total": "Toplam {{mb}} MB"
+      }
+    },
+    "sections": {
+      "network": "Ağ kullanımı",
+      "manage": "Yönet"
+    },
+    "network": {
+      "sent": {
+        "title": "Gönderilen veri",
+        "subtitle": "{{val}}"
+      },
+      "received": {
+        "title": "Alınan veri",
+        "subtitle": "{{val}}"
+      }
+    },
+    "manage": {
+      "title": "Depolamayı yönet",
+      "desc": "Büyük dosyaları, sohbetleri ve medyayı gözden geçir ve sil"
+    },
+    "autoDownload": {
+      "title": "Medya otomatik indirme",
+      "desc": "Mobil/Wi-Fi/dolaşımda nelerin indirileceğini kontrol et"
+    },
+    "actions": {
+      "analyze": "Analiz et",
+      "clearCache": "Önbelleği temizle",
+      "resetStats": "İstatistikleri sıfırla"
+    },
+    "toast": {
+      "cleared": "{{mb}} MB önbellek temizlendi",
+      "statsReset": "Ağ istatistikleri sıfırlandı"
+    }
   }
 }

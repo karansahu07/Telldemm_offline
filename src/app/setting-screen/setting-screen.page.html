@@ -1,4 +1,4 @@
-<ion-header [translucent]="true">
+<!-- <ion-header [translucent]="true">
   <ion-toolbar style="display: flex; flex-direction: column; align-items: stretch; --background: white;">
     <ion-buttons slot="start" style="color: black; width: 8%; margin-top: 15px;">
       <ion-back-button defaultHref="/home-screen"></ion-back-button>
@@ -12,6 +12,18 @@
       </ion-title>
     </div>
 
+  </ion-toolbar>
+</ion-header> -->
+
+<ion-header>
+  <ion-toolbar style="--background: #ffffff; --color: #000000;">
+    <ion-buttons slot="start">
+      <ion-back-button
+        defaultHref="/home-screen"
+        [attr.aria-label]="'common.back' | translate">
+      </ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ 'settingsPage.title' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 

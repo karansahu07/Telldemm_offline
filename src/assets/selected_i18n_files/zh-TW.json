@@ -215,6 +215,47 @@
       "title": "通話通知",
       "desc": "鈴聲與震動設定"
     }
+  },"storage": {
+    "title": "儲存空間與資料",
+    "totalUsedHuman": "{{used}} MB / {{total}} MB",
+    "cards": {
+      "usage": {
+        "title": "儲存空間使用情況",
+        "used": "已使用 {{mb}} MB",
+        "total": "總共 {{mb}} MB"
+      }
+    },
+    "sections": {
+      "network": "網路使用",
+      "manage": "管理"
+    },
+    "network": {
+      "sent": {
+        "title": "已傳送資料",
+        "subtitle": "{{val}}"
+      },
+      "received": {
+        "title": "已接收資料",
+        "subtitle": "{{val}}"
+      }
+    },
+    "manage": {
+      "title": "管理儲存空間",
+      "desc": "檢視並刪除大型檔案、聊天和媒體"
+    },
+    "autoDownload": {
+      "title": "媒體自動下載",
+      "desc": "控制在行動網路/ Wi-Fi/ 漫遊時的下載內容"
+    },
+    "actions": {
+      "analyze": "分析",
+      "clearCache": "清除快取",
+      "resetStats": "重設統計資料"
+    },
+    "toast": {
+      "cleared": "已清除 {{mb}} MB 快取",
+      "statsReset": "網路統計已重設"
+    }
   }
 
 }
