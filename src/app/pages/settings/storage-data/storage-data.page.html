@@ -1,9 +1,12 @@
 <ion-header>
   <ion-toolbar style="--background: #ffffff; --color: #000000;">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/settings"></ion-back-button>
+      <ion-back-button
+        defaultHref="/settings"
+        [attr.aria-label]="'common.back' | translate">
+      </ion-back-button>
     </ion-buttons>
-    <ion-title>Storage & Data</ion-title>
+    <ion-title>{{ 'storage.title' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -11,7 +14,7 @@
   <!-- Storage overview -->
   <ion-card>
     <ion-card-header>
-      <ion-card-title>Storage Usage</ion-card-title>
+      <ion-card-title>{{ 'storage.cards.usage.title' | translate }}</ion-card-title>
       <ion-card-subtitle>{{ totalUsedHuman }}</ion-card-subtitle>
     </ion-card-header>
 
@@ -19,19 +22,21 @@
       <div class="progress-row">
         <ion-progress-bar [value]="storageFraction"></ion-progress-bar>
         <div class="progress-meta">
-          <small>{{ usedMB }} MB used</small>
-          <small>{{ totalMB }} MB total</small>
+          <small>{{ 'storage.cards.usage.used' | translate:{ mb: usedMB } }}</small>
+          <small>{{ 'storage.cards.usage.total' | translate:{ mb: totalMB } }}</small>
         </div>
       </div>
 
       <div class="actions">
-        <ion-button fill="outline" (click)="analyzeStorage()">
+        <ion-button fill="outline" (click)="analyzeStorage()"
+                    [attr.aria-label]="'storage.actions.analyze' | translate">
           <ion-icon slot="start" name="search-outline"></ion-icon>
-          Analyze
+          {{ 'storage.actions.analyze' | translate }}
         </ion-button>
-        <ion-button color="danger" (click)="clearCache()">
+        <ion-button color="danger" (click)="clearCache()"
+                    [attr.aria-label]="'storage.actions.clearCache' | translate">
           <ion-icon slot="start" name="trash-outline"></ion-icon>
-          Clear Cache
+          {{ 'storage.actions.clearCache' | translate }}
         </ion-button>
       </div>
     </ion-card-content>
@@ -40,30 +45,31 @@
   <!-- Network usage -->
   <ion-list lines="inset">
     <ion-list-header>
-      <ion-label>Network Usage</ion-label>
+      <ion-label>{{ 'storage.sections.network' | translate }}</ion-label>
     </ion-list-header>
 
     <ion-item>
-      <ion-icon slot="start" name="cloud-upload-outline"></ion-icon>
+      <ion-icon slot="start" name="cloud-upload-outline" aria-hidden="true"></ion-icon>
       <ion-label>
-        <h2>Data sent</h2>
-        <p class="muted">{{ dataSentHuman }}</p>
+        <h2>{{ 'storage.network.sent.title' | translate }}</h2>
+        <p class="muted">{{ 'storage.network.sent.subtitle' | translate:{ val: dataSentHuman } }}</p>
       </ion-label>
       <ion-note slot="end">{{ dataSent }}</ion-note>
     </ion-item>
 
     <ion-item>
-      <ion-icon slot="start" name="cloud-download-outline"></ion-icon>
+      <ion-icon slot="start" name="cloud-download-outline" aria-hidden="true"></ion-icon>
       <ion-label>
-        <h2>Data received</h2>
-        <p class="muted">{{ dataReceivedHuman }}</p>
+        <h2>{{ 'storage.network.received.title' | translate }}</h2>
+        <p class="muted">{{ 'storage.network.received.subtitle' | translate:{ val: dataReceivedHuman } }}</p>
       </ion-label>
       <ion-note slot="end">{{ dataReceived }}</ion-note>
     </ion-item>
 
     <ion-item lines="none">
-      <ion-button fill="clear" (click)="resetNetworkStats()">
-        Reset statistics
+      <ion-button fill="clear" (click)="resetNetworkStats()"
+                  [attr.aria-label]="'storage.actions.resetStats' | translate">
+        {{ 'storage.actions.resetStats' | translate }}
       </ion-button>
     </ion-item>
   </ion-list>
@@ -71,22 +77,24 @@
   <!-- Manage storage -->
   <ion-list lines="inset">
     <ion-list-header>
-      <ion-label>Manage</ion-label>
+      <ion-label>{{ 'storage.sections.manage' | translate }}</ion-label>
     </ion-list-header>
 
-    <ion-item button detail (click)="openManageStorage()">
-      <ion-icon slot="start" name="folder-open-outline"></ion-icon>
+    <ion-item button detail (click)="openManageStorage()"
+              [attr.aria-label]="'storage.manage.title' | translate">
+      <ion-icon slot="start" name="folder-open-outline" aria-hidden="true"></ion-icon>
       <ion-label>
-        <h2>Manage Storage</h2>
-        <p>Review and delete large files, chats and media</p>
+        <h2>{{ 'storage.manage.title' | translate }}</h2>
+        <p>{{ 'storage.manage.desc' | translate }}</p>
       </ion-label>
     </ion-item>
 
-    <ion-item button detail (click)="openMediaAutoDownload()">
-      <ion-icon slot="start" name="download-outline"></ion-icon>
+    <ion-item button detail (click)="openMediaAutoDownload()"
+              [attr.aria-label]="'storage.autoDownload.title' | translate">
+      <ion-icon slot="start" name="download-outline" aria-hidden="true"></ion-icon>
       <ion-label>
-        <h2>Media Auto-download</h2>
-        <p>Control what downloads on mobile/Wi-Fi/roaming</p>
+        <h2>{{ 'storage.autoDownload.title' | translate }}</h2>
+        <p>{{ 'storage.autoDownload.desc' | translate }}</p>
       </ion-label>
     </ion-item>
   </ion-list>

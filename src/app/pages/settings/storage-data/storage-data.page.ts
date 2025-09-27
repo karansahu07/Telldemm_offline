@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonicModule, ToastController } from '@ionic/angular';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 const STORAGE_KEY = 'settings.storageData';
 
@@ -10,20 +11,18 @@ const STORAGE_KEY = 'settings.storageData';
   templateUrl: './storage-data.page.html',
   styleUrls: ['./storage-data.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule],
+  imports: [IonicModule, CommonModule, TranslateModule],
 })
 export class StorageDataPage implements OnInit {
-
-
-  // storage numbers (mocked as example). Replace with real values from native FS if available.
-  usedMB = 612;        // MB used by app data
-  totalMB = 1024;      // Total quota shown
+  usedMB = 612;
+  totalMB = 1024;
   dataSent = '1.2 GB';
   dataReceived = '3.4 GB';
 
   constructor(
     private toastCtrl: ToastController,
-    private router: Router
+    private router: Router,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -35,31 +34,35 @@ export class StorageDataPage implements OnInit {
   }
 
   get totalUsedHuman(): string {
-    return `${this.usedMB} MB of ${this.totalMB} MB`;
+    // "612 MB of 1024 MB"
+    return this.translate.instant('storage.totalUsedHuman', {
+      used: this.usedMB,
+      total: this.totalMB
+    });
   }
 
   get dataSentHuman(): string {
-    return this.dataSent;
+    return this.dataSent; // already formatted number; label is translated in template
   }
 
   get dataReceivedHuman(): string {
     return this.dataReceived;
   }
 
-  /* ---------- Actions ---------- */
   async clearCache() {
-    // Replace this stub with actual cache clearing (filesystem, caches, indexedDB, etc.)
-    // Here we simulate clearing 100 MB
     const freed = 100;
     this.usedMB = Math.max(0, this.usedMB - freed);
     this.saveStats();
 
-    const t = await this.toastCtrl.create({ message: `Cleared ${freed} MB cache`, duration: 1400, position: 'bottom' });
+    const t = await this.toastCtrl.create({
+      message: this.translate.instant('storage.toast.cleared', { mb: freed }),
+      duration: 1400,
+      position: 'bottom'
+    });
     await t.present();
   }
 
   analyzeStorage() {
-    // Navigate to a detailed manage-storage page (implement details there)
     this.router.navigateByUrl('storage-data/manage-storage');
   }
 
@@ -71,23 +74,24 @@ export class StorageDataPage implements OnInit {
     this.router.navigateByUrl('storage-data/media-auto-download');
   }
 
-  resetNetworkStats() {
-    // reset stats (demo)
+  async resetNetworkStats() {
     this.dataSent = '0 B';
     this.dataReceived = '0 B';
     this.saveStats();
-    this.toast('Network statistics reset');
+    await this.toast(this.translate.instant('storage.toast.statsReset'));
   }
 
-  /* ---------- Persistence ---------- */
   private saveStats() {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        usedMB: this.usedMB,
-        totalMB: this.totalMB,
-        dataSent: this.dataSent,
-        dataReceived: this.dataReceived
-      }));
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({
+          usedMB: this.usedMB,
+          totalMB: this.totalMB,
+          dataSent: this.dataSent,
+          dataReceived: this.dataReceived
+        })
+      );
     } catch (e) {
       console.warn('Could not save storage stats', e);
     }
@@ -111,5 +115,4 @@ export class StorageDataPage implements OnInit {
     const t = await this.toastCtrl.create({ message, duration: 1400, position: 'bottom' });
     await t.present();
   }
-
 }
