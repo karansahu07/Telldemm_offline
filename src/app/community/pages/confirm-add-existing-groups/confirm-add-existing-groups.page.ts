@@ -4,6 +4,8 @@ import { IonicModule, NavController, ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { FirebaseChatService } from 'src/app/services/firebase-chat.service';
 import { AuthService } from 'src/app/auth/auth.service';
+import { firstValueFrom } from 'rxjs';
+import { ApiService } from 'src/app/services/api/api.service';
 
 @Component({
   selector: 'app-confirm-add-existing-groups',
@@ -28,7 +30,8 @@ export class ConfirmAddExistingGroupsPage implements OnInit {
     private navCtrl: NavController,
     private toastCtrl: ToastController,
     private firebaseService: FirebaseChatService,
-    private authService: AuthService
+    private authService: AuthService,
+    private api : ApiService
   ) {}
 
   ngOnInit() {
@@ -50,108 +53,6 @@ export class ConfirmAddExistingGroupsPage implements OnInit {
     }
   }
 
-  // Final commit: link groups into the community
-   // without adding in announcement group add groups in community
-//   async addToCommunity() {
-//   if (!this.communityId) {
-//     const t = await this.toastCtrl.create({
-//       message: 'Community id missing',
-//       duration: 2000,
-//       color: 'danger'
-//     });
-//     await t.present();
-//     return;
-//   }
-
-//   const ids = this.groups.map(g => g.id).filter(Boolean);
-//   if (!ids.length) {
-//     const t = await this.toastCtrl.create({
-//       message: 'No groups to add',
-//       duration: 1500
-//     });
-//     await t.present();
-//     return;
-//   }
-
-//   this.adding = true;
-
-//   try {
-//     const updates: any = {};
-//     const newMemberIds = new Set<string>();
-
-//     // 1) Collect members from each selected group
-//     for (const gid of ids) {
-//       // link group under community and set group's communityId
-//       updates[`/communities/${this.communityId}/groups/${gid}`] = true;
-//       updates[`/groups/${gid}/communityId`] = this.communityId;
-
-//       try {
-//         const g = await this.firebaseService.getGroupInfo(gid);
-//         if (g && g.members) {
-//           const membersObj = g.members;
-//           Object.keys(membersObj).forEach((mid) => {
-//             if (mid) newMemberIds.add(mid);
-//           });
-//         }
-//       } catch (err) {
-//         console.warn('Failed to load group members for', gid, err);
-//       }
-//     }
-
-//     // 2) Also fetch existing community members (to compute final membersCount)
-//     let existingMembersObj: any = null;
-//     try {
-//       const comm = await this.firebaseService.getCommunityInfo(this.communityId);
-//       existingMembersObj = comm?.members || {};
-//       // add existing to set too so count is accurate
-//       Object.keys(existingMembersObj || {}).forEach(k => newMemberIds.add(k));
-//     } catch (err) {
-//       console.warn('Failed to load existing community members', err);
-//     }
-
-//     // 3) For each member ensure community membership references + usersInCommunity index
-//     newMemberIds.forEach((uid) => {
-//       updates[`/communities/${this.communityId}/members/${uid}`] = true;
-//       updates[`/usersInCommunity/${uid}/joinedCommunities/${this.communityId}`] = true;
-//     });
-
-//     // 4) Update membersCount to new size
-//     updates[`/communities/${this.communityId}/membersCount`] = newMemberIds.size;
-
-//     // 5) Commit via helper on firebaseService (bulkUpdate preferred)
-//     if (typeof (this.firebaseService as any).bulkUpdate === 'function') {
-//       await (this.firebaseService as any).bulkUpdate(updates);
-//     } else if (typeof (this.firebaseService as any).setPath === 'function') {
-//       // fallback: set each path separately (not fully atomic)
-//       const promises = Object.keys(updates).map(p =>
-//         (this.firebaseService as any).setPath(p, updates[p])
-//       );
-//       await Promise.all(promises);
-//     } else {
-//       throw new Error('bulkUpdate or setPath not found on FirebaseChatService. Add helper to perform atomic update.');
-//     }
-
-//     const toast = await this.toastCtrl.create({
-//       message: 'Groups and their members added to community',
-//       duration: 2000,
-//       color: 'success'
-//     });
-//     await toast.present();
-
-//     this.navCtrl.navigateBack('/community-detail');
-//   } catch (err: any) {
-//     console.error('addToCommunity failed', err);
-//     const msg = err && (err.message || err.code) ? (err.message || err.code) : String(err);
-//     const t = await this.toastCtrl.create({
-//       message: `Failed to add groups: ${msg}`,
-//       duration: 4000,
-//       color: 'danger'
-//     });
-//     await t.present();
-//   } finally {
-//     this.adding = false;
-//   }
-// }
 
 async addToCommunity() {
   if (!this.communityId) {
@@ -197,7 +98,43 @@ async addToCommunity() {
       }
     }
 
-    // 2) Fetch existing community members (so we don't remove them and compute accurate count)
+//     for (const gid of ids) {
+//   // Link in Firebase
+//   updates[`/communities/${this.communityId}/groups/${gid}`] = true;
+//   updates[`/groups/${gid}/communityId`] = this.communityId;
+
+//   try {
+//     // Load full group from Firebase to read backendGroupId + members
+//     const g: any = await this.firebaseService.getGroupInfo(gid);
+
+//     // ✅ pick backendGroupId for API
+//     const backendGroupId = g?.backendGroupId ?? g?.backend_group_id ?? null;
+//     if (backendGroupId == null) {
+//       console.warn(`No backendGroupId for group ${gid}; skipping backend add`);
+//     } else {
+//       // requester_id = current user
+//       const requesterIdNum = Number(this.userId);
+//       // communityId might be string; API accepts number|string
+//       await firstValueFrom(
+        
+//         this.api.addGroupToCommunity(this.communityId as string, String(backendGroupId), requesterIdNum)
+//       );
+//     }
+
+//     // collect members
+//     if (g && g.members) {
+//       Object.keys(g.members).forEach(mid => {
+//         if (mid) newMemberIds.add(mid);
+//       });
+//     }
+//   } catch (err) {
+//     console.warn('Failed while processing group', gid, err);
+//   }
+// }
+
+    
+
+// 2) Fetch existing community members (so we don't remove them and compute accurate count)
     let existingMembersObj: any = {};
     try {
       const comm = await this.firebaseService.getCommunityInfo(this.communityId);

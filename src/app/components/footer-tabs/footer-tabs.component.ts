@@ -139,8 +139,8 @@ export class FooterTabsComponent implements AfterViewInit, OnChanges, AfterViewC
     this.activePath = '/community-screen';
   }
   navigateTocallsscreen() {
-    this.router.navigate(['/mine']);
-    this.activePath = '/mine';
+    this.router.navigate(['/calls-screen']);
+    this.activePath = '/calls-screen';
   }
 
   isActive(paths: string[]): boolean {

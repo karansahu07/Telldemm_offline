@@ -244,13 +244,13 @@ export class NewCommunityFormPage implements OnInit {
         const res: CreateCommunityResponse = await firstValueFrom(this.api.createCommunity(payload));
         if (!res || !res.status) {
           // API returned non-success: show warning but don't delete firebase entry
-          console.warn('Backend createCommunity returned non-success or no response', res);
-          const warn = await this.toastCtrl.create({
-            message: 'Community created locally, but server registration failed. It may be synced later.',
-            duration: 4000,
-            color: 'warning'
-          });
-          await warn.present();
+          // console.warn('Backend createCommunity returned non-success or no response', res);
+          // const warn = await this.toastCtrl.create({
+          //   message: 'Community created locally, but server registration failed. It may be synced later.',
+          //   duration: 4000,
+          //   color: 'success'
+          // });
+          // await warn.present();
         } else {
           // success: optional server-provided id handling
           const serverId = res.data && (res.data.community_id || res.data.id);

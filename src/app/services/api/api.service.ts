@@ -328,4 +328,32 @@ createCommunity(payload: CreateCommunityPayload): Observable<CreateCommunityResp
   return this.post<CreateCommunityResponse>('/api/communities/create', payload);
 }
 
+/**
+ * ➕ Add an existing group to a community
+ *
+ * @param community_id number | string
+ * @param group_id number | string
+ * @param requester_id number
+ */
+addGroupToCommunity(
+  community_id: number | string,
+  group_id: number | string,
+  requester_id: number
+): Observable<any> {
+  const url = `/api/communities/${community_id}/groups`;
+  const payload = {
+    group_id: String(group_id),
+    requester_id
+  };
+
+  return this.post<any>(url, payload);
+}
+
+/**
+ * Get community details by community_id
+ */
+getCommunityById(community_id: string): Observable<any> {
+  return this.http.get<any>(`${this.baseUrl}/api/communities/community/${community_id}`);
+}
+
 }

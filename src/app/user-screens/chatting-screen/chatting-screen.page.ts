@@ -1076,7 +1076,7 @@ async deleteSelectedMessages() {
                 } finally {
                   resolve();
                 }
-              }, 2100); // match CSS transition duration
+              }, 1100); // match CSS transition duration
             });
 
             // Now apply deletions to server/db for each selected message

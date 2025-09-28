@@ -19,7 +19,7 @@ ion-header {
   .community-icon {
     width: 60px;
     height: 60px;
-    background: #f3d7ad;
+    // background: #f3d7ad;
     border-radius: 12px;
     display: flex;
     justify-content: center;
@@ -89,4 +89,25 @@ ion-header {
 ion-footer,
 ion-toolbar {
   box-shadow: none !important;
+}
+
+
+.community-icon {
+  width: 44px;   /* adjust as you like */
+  height: 44px;
+
+  svg { width: 100%; height: 100%; display: block; }
+
+  /* Colors */
+  --comm-bg: #ffffff;   /* WhatsApp-like green */
+  --comm-fg: gray;   /* icon (people) color */
+
+  .bg { fill: var(--comm-bg); }
+  .fg { fill: var(--comm-fg); }
+}
+
+/* Optional: adapt to dark/light theme */
+:root[mode=ios] .community-icon { --comm-bg: var(--ion-color-success, #25d366); }
+@media (prefers-color-scheme: dark) {
+  .community-icon { --comm-fg: #ffffff; }
 }
