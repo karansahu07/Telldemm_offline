@@ -547,3 +547,6 @@ ion-avatar img{
   font-style: italic;
   font-weight: 500;
 }
+
+ion-item.selected { --background: #e7bebe; }
+  .select-tick { width:24px; display:flex; align-items:center; justify-content:center; margin-right:4px; }

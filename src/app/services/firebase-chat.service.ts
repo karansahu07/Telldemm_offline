@@ -523,158 +523,6 @@ export class FirebaseChatService {
     return userGroups;
   }
 
-  
-  // ✅ Fixed createCommunity (no ancestor/descendant collision in updates)
-// async createCommunity(communityId: string, name: string, description: string, createdBy: string): Promise<void> {
-//   try {
-//     const rawDb = getDatabase();
-//     const now = Date.now();
-//     const annGroupId = `comm_group_${now}_ann`;
-//     const generalGroupId = `comm_group_${now}_gen`;
-
-//     // Build community object including child nodes (groups, members) so we only set /communities/<cid> once
-//     const communityObj: any = {
-//       id: communityId,
-//       name,
-//       description: description || '',
-//       icon: '',
-//       createdBy,
-//       createdAt: now,
-//       privacy: 'invite_only',
-//       settings: {
-//         whoCanCreateGroups: 'admins',
-//         announcementPosting: 'adminsOnly'
-//       },
-//       admins: { [createdBy]: true },
-//       membersCount: 1,
-//       // include child objects here instead of setting them as separate update keys
-//       groups: {
-//         [annGroupId]: true,
-//         [generalGroupId]: true
-//       },
-//       members: {
-//         [createdBy]: true
-//       }
-//     };
-
-//     // Prepare atomic updates. NOTE: do NOT include both '/communities/<cid>' and its subpaths.
-//     const updates: any = {};
-
-//     // 1) Set full community object at once (includes groups and members)
-//     updates[`/communities/${communityId}`] = communityObj;
-
-//     // 2) Create the two group nodes under /groups (these are separate top-level paths — OK)
-//     updates[`/groups/${annGroupId}`] = {
-//       id: annGroupId,
-//       name: 'Announcements',
-//       type: 'announcement',
-//       communityId: communityId,
-//       createdBy,
-//       createdAt: now,
-//       admins: { [createdBy]: true },
-//       members: { [createdBy]: true },
-//       membersCount: 1
-//     };
-
-//     updates[`/groups/${generalGroupId}`] = {
-//       id: generalGroupId,
-//       name: 'General',
-//       type: 'general',
-//       communityId: communityId,
-//       createdBy,
-//       createdAt: now,
-//       admins: { [createdBy]: true },
-//       members: { [createdBy]: true },
-//       membersCount: 1
-//     };
-
-//     // 3) Add user->community mapping and user->group indexes (safe separate paths)
-//     updates[`/usersInCommunity/${createdBy}/joinedCommunities/${communityId}`] = true;
-//     updates[`/users/${createdBy}/groups/${annGroupId}`] = true;
-//     updates[`/users/${createdBy}/groups/${generalGroupId}`] = true;
-
-//     // commit the multi-path update atomically
-//     await update(ref(rawDb), updates);
-//   } catch (err) {
-//     console.error('createCommunity error', err);
-//     throw err;
-//   }
-// }
-
-// async createCommunity(communityId: string, name: string, description: string, createdBy: string): Promise<void> {
-//   try {
-//     const rawDb = getDatabase();
-//     const now = Date.now();
-//     const annGroupId = `comm_group_${now}_ann`;
-//     const generalGroupId = `comm_group_${now}_gen`;
-
-//     // Build community object including child nodes (groups, members)
-//     const communityObj: any = {
-//       id: communityId,
-//       name,
-//       description: description || '',
-//       icon: '',
-//       createdBy,
-//       createdAt: now,
-//       privacy: 'invite_only',
-//       settings: {
-//         whoCanCreateGroups: 'admins',
-//         announcementPosting: 'adminsOnly'
-//       },
-//       admins: { [createdBy]: true },
-//       membersCount: 0,
-//       groups: {
-//         [annGroupId]: true,
-//         [generalGroupId]: true
-//       },
-//       members: {
-//         [createdBy]: true
-//       }
-//     };
-
-//     // Build group objects that ALREADY contain their members (so we don't add child paths separately)
-//     const annGroupObj = {
-//       id: annGroupId,
-//       name: 'Announcements',
-//       type: 'announcement',
-//       communityId: communityId,
-//       createdBy,
-//       createdAt: now,
-//       admins: { [createdBy]: true },
-//       members: { [createdBy]: true },   // include members here
-//       membersCount: 0
-//     };
-
-//     const genGroupObj = {
-//       id: generalGroupId,
-//       name: 'General',
-//       type: 'general',
-//       communityId: communityId,
-//       createdBy,
-//       createdAt: now,
-//       admins: { [createdBy]: true },
-//       members: { [createdBy]: true },
-//       membersCount: 0
-//     };
-
-//     // Prepare updates — NOTE: do NOT include both `/groups/<gid>` and `/groups/<gid>/members/<uid>`
-//     const updates: any = {};
-//     updates[`/communities/${communityId}`] = communityObj;
-//     updates[`/groups/${annGroupId}`] = annGroupObj;
-//     updates[`/groups/${generalGroupId}`] = genGroupObj;
-
-//     // separate index paths (these are different branches — OK)
-//     updates[`/usersInCommunity/${createdBy}/joinedCommunities/${communityId}`] = true;
-//     // updates[`/users/${createdBy}/groups/${annGroupId}`] = true;
-//     // updates[`/users/${createdBy}/groups/${generalGroupId}`] = true;
-
-//     await update(ref(rawDb), updates);
-//   } catch (err) {
-//     console.error('createCommunity error', err);
-//     throw err;
-//   }
-// }
-
 async createCommunity(communityId: string, name: string, description: string, createdBy: string): Promise<void> {
   try {
     const rawDb = getDatabase();
@@ -979,89 +827,6 @@ async setPath(path: string, value: any) {
     update(messageRef, { read: true, readAt : Date.now() });
   }
 
-  
-// async markDelivered(roomId: string, messageKey: string) {
-//   try {
-//     if (!roomId || !messageKey) return;
-//     const db = getDatabase();
-//     const msgRef = rtdbRef(db, `chats/${roomId}/${messageKey}`);
-//     await rtdbRunTransaction(msgRef, (current) => {
-//       if (current === null) return; // node removed / not exist => abort
-//       // set delivered true always, but set deliveredAt only if falsy
-//       return {
-//         ...current,
-//         delivered: true,
-//         deliveredAt: new Date().toISOString()
-//       };
-//     }, { applyLocally: false });
-//     console.log('markDelivered: transaction complete for', messageKey);
-//   } catch (err) {
-//     console.error('markDelivered transaction error', err);
-//   }
-// }
-
-// async markRead(roomId: string, messageKey: string) {
-//   try {
-//     if (!roomId || !messageKey) return;
-//     const db = getDatabase();
-//     const msgRef = rtdbRef(db, `chats/${roomId}/${messageKey}`);
-//     await rtdbRunTransaction(msgRef, (current) => {
-//       if (current === null) return;
-//       return {
-//         ...current,
-//         read: true,
-//         readAt: new Date().toISOString()
-//       };
-//     }, { applyLocally: false });
-//     console.log('markRead: transaction complete for', messageKey);
-//   } catch (err) {
-//     console.error('markRead transaction error', err);
-//   }
-// }
-
-
-
-// markDelivered(roomId: string, messageKey: string, forUserId?: string) {
-//   try {
-//     const now = Date.now();
-//     const db = getDatabase();
-
-//     if (forUserId) {
-//       // safe update to deliveredBy map
-//       const path = `chats/${roomId}/${messageKey}/deliveredBy/${forUserId}`;
-//       return rtdbUpdate(rtdbRef(db, path), now) // or set single path
-//         .catch(err => console.error('markDelivered(forUser) error', err));
-//     } else {
-//       // fallback: set top-level delivered flag + deliveredAt (for private chat usage)
-//       const messageRef = ref(this.db, `chats/${roomId}/${messageKey}`);
-//       return update(messageRef, { delivered: true, deliveredAt: now });
-//     }
-//   } catch (err) {
-//     console.error('markDelivered error', err);
-//   }
-// }
-
-// // markRead: record readBy/<userId> = timestamp
-// markRead(roomId: string, messageKey: string, forUserId?: string) {
-//   try {
-//     const now = Date.now();
-//     const db = getDatabase();
-
-//     if (forUserId) {
-//       // set readBy/userId timestamp
-//       const path = `chats/${roomId}/${messageKey}/readBy/${forUserId}`;
-//       return rtdbUpdate(rtdbRef(db, path), now)
-//         .catch(err => console.error('markRead(forUser) error', err));
-//     } else {
-//       // fallback: set top-level read flag + readAt
-//       const messageRef = ref(this.db, `chats/${roomId}/${messageKey}`);
-//       return update(messageRef, { read: true, readAt: now });
-//     }
-//   } catch (err) {
-//     console.error('markRead error', err);
-//   }
-// }
-
   //delete msg
   deleteMessage(roomId: string, messageKey: string) {
     const messageRef = ref(this.db, `chats/${roomId}/${messageKey}`);
@@ -1127,6 +892,114 @@ getSelectedMessageInfo(clearAfterRead = false): any {
   const m = this._selectedMessageInfo;
   if (clearAfterRead) this._selectedMessageInfo = null;
   return m;
+}
+
+//  async deleteChatForUser(
+//     userId: string,
+//     chat: { receiver_Id: string; group?: boolean; isCommunity?: boolean }
+//   ): Promise<void> {
+//     if (!userId || !chat?.receiver_Id) return;
+
+//     console.log("deleted selection");
+//     const db = getDatabase();
+//     const isGroup = !!chat.group;
+//     const roomId = isGroup
+//       ? chat.receiver_Id            // group roomId is same as groupId in your app
+//       : this.getRoomId(userId, chat.receiver_Id); // private chat roomId
+
+//     const payload = {
+//       roomId,
+//       type: isGroup ? 'group' : 'private',
+//       peerId: chat.receiver_Id,
+//       deletedAt: Date.now()
+//     };
+
+//     const updates: any = {};
+//     updates[`deleted/${userId}/${roomId}`] = payload;
+//     updates[`chats/${roomId}/deletedFor/${userId}`] = true;
+
+//     await update(rtdbRef(db), updates);
+//   }
+
+  // Delete chat for current user (soft delete - messages rahenge but UI se hide)
+async deleteChatForUser(roomId: string, userId: string): Promise<void> {
+  try {
+    const db = getDatabase();
+    
+    // Mark all messages as deleted for this user
+    const chatsRef = rtdbRef(db, `chats/${roomId}`);
+    const snapshot = await get(chatsRef);
+    
+    if (snapshot.exists()) {
+      const messages = snapshot.val();
+      const updates: any = {};
+      
+      Object.keys(messages).forEach(messageKey => {
+        updates[`chats/${roomId}/${messageKey}/deletedFor/${userId}`] = true;
+      });
+      
+      await update(rtdbRef(db), updates);
+    }
+    
+    // Clear unread count for this user
+    await update(rtdbRef(db), {
+      [`unreadCounts/${roomId}/${userId}`]: 0
+    });
+    
+    console.log(`✅ Chat ${roomId} deleted for user ${userId}`);
+  } catch (error) {
+    console.error('❌ Error deleting chat:', error);
+    throw error;
+  }
+}
+
+// Permanently delete entire chat room (both users ke liye)
+async deleteChatPermanently(roomId: string): Promise<void> {
+  try {
+    const db = getDatabase();
+    const updates: any = {};
+    
+    // Delete messages
+    updates[`chats/${roomId}`] = null;
+    
+    // Delete unread counts
+    updates[`unreadCounts/${roomId}`] = null;
+    
+    // Delete typing indicators
+    updates[`typing/${roomId}`] = null;
+    
+    await update(rtdbRef(db), updates);
+    console.log(`✅ Chat ${roomId} permanently deleted`);
+  } catch (error) {
+    console.error('❌ Error permanently deleting chat:', error);
+    throw error;
+  }
+}
+
+// Delete group and its messages
+async deleteGroup(groupId: string): Promise<void> {
+  try {
+    const db = getDatabase();
+    const updates: any = {};
+    
+    // Delete group info
+    updates[`groups/${groupId}`] = null;
+    
+    // Delete group messages
+    updates[`chats/${groupId}`] = null;
+    
+    // Delete unread counts
+    updates[`unreadCounts/${groupId}`] = null;
+    
+    // Delete typing indicators
+    updates[`typing/${groupId}`] = null;
+    
+    await update(rtdbRef(db), updates);
+    console.log(`✅ Group ${groupId} deleted`);
+  } catch (error) {
+    console.error('❌ Error deleting group:', error);
+    throw error;
+  }
 }
 
 }

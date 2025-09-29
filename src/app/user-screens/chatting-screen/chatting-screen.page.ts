@@ -422,96 +422,173 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  async handleOption(option: string) {
-    if (option === 'Search') {
-      this.showSearchBar = true;
-      setTimeout(() => {
-        const input = document.querySelector('ion-input');
-        (input as HTMLIonInputElement)?.setFocus();
-      }, 100);
+ async handleOption(option: string) {
+  if (option === 'Search') {
+    this.showSearchBar = true;
+    setTimeout(() => {
+      const input = document.querySelector('ion-input');
+      (input as HTMLIonInputElement)?.setFocus();
+    }, 100);
+    return;
+  }
+
+  if (option === 'View Contact') {
+    const queryParams: any = {
+      receiverId: this.receiverId,
+      receiver_phone: this.receiver_phone,
+      receiver_name: this.receiver_name,
+      isGroup: false
+    };
+    this.router.navigate(['/profile-screen'], { queryParams });
+    return;
+  }
+
+  // ✅ NEW: Clear Chat Option
+  if (option === 'clear chat') {
+    console.log("clear chat calls");
+    await this.handleClearChat();
+    return;
+  }
+
+  const groupId = this.receiverId;
+  const userId = await this.secureStorage.getItem('userId');
+
+  if (option === 'Group Info') {
+    const queryParams: any = {
+      receiverId: this.chatType === 'group' ? this.roomId : this.receiverId,
+      receiver_phone: this.receiver_phone,
+      receiver_name: this.receiver_name,
+      isGroup: this.chatType === 'group'
+    };
+    this.router.navigate(['/profile-screen'], { queryParams });
+
+  } else if (option === 'Add Members') {
+    const memberPhones = this.groupMembers.map(member => member.phone);
+    this.router.navigate(['/add-members'], {
+      queryParams: {
+        groupId: groupId,
+        members: JSON.stringify(memberPhones)
+      }
+    });
+
+  } else if (option === 'Exit Group') {
+    if (!groupId || !userId) {
+      console.error('Missing groupId or userId');
       return;
     }
 
-    if (option === 'View Contact') {
-      const queryParams: any = {
-        receiverId: this.receiverId,
-        receiver_phone: this.receiver_phone,
-        receiver_name: this.receiver_name,
-        isGroup: false
-      };
-      this.router.navigate(['/profile-screen'], { queryParams });
-      return;
-    }
+    const db = getDatabase();
+    const memberPath = `groups/${groupId}/members/${userId}`;
+    const pastMemberPath = `groups/${groupId}/pastmembers/${userId}`;
 
-    const groupId = this.receiverId;
-    const userId = await this.secureStorage.getItem('userId');
+    try {
+      const memberSnap = await get(ref(db, memberPath));
 
-    if (option === 'Group Info') {
-      const queryParams: any = {
-        receiverId: this.chatType === 'group' ? this.roomId : this.receiverId,
-        receiver_phone: this.receiver_phone,
-        receiver_name: this.receiver_name,
-        isGroup: this.chatType === 'group'
-      };
-      this.router.navigate(['/profile-screen'], { queryParams });
-
-    } else if (option === 'Add Members') {
-      const memberPhones = this.groupMembers.map(member => member.phone);
-      this.router.navigate(['/add-members'], {
-        queryParams: {
-          groupId: groupId,
-          members: JSON.stringify(memberPhones)
-        }
-      });
-
-    } else if (option === 'Exit Group') {
-      if (!groupId || !userId) {
-        console.error('Missing groupId or userId');
+      if (!memberSnap.exists()) {
+        console.error('Member data not found in Firebase');
         return;
       }
 
-      const db = getDatabase();
-      const memberPath = `groups/${groupId}/members/${userId}`;
-      const pastMemberPath = `groups/${groupId}/pastmembers/${userId}`;
+      const memberData = memberSnap.val();
+      const updatedMemberData = {
+        ...memberData,
+        status: 'inactive',
+        removedAt: new Date().toLocaleString()
+      };
 
-      try {
-        const memberSnap = await get(ref(db, memberPath));
+      await update(ref(db, memberPath), { status: 'inactive' });
+      await set(ref(db, pastMemberPath), updatedMemberData);
+      await remove(ref(db, memberPath));
 
-        if (!memberSnap.exists()) {
-          console.error('Member data not found in Firebase');
-          return;
-        }
+      const toast = await this.toastCtrl.create({
+        message: `You exited the group`,
+        duration: 2000,
+        color: 'medium'
+      });
+      toast.present();
 
-        const memberData = memberSnap.val();
-        const updatedMemberData = {
-          ...memberData,
-          status: 'inactive',
-          removedAt: new Date().toLocaleString()
-        };
-
-        await update(ref(db, memberPath), { status: 'inactive' });
-        await set(ref(db, pastMemberPath), updatedMemberData);
-        await remove(ref(db, memberPath));
-
-        const toast = await this.toastCtrl.create({
-          message: `You exited the group`,
-          duration: 2000,
-          color: 'medium'
-        });
-        toast.present();
-
-        this.router.navigate(['/home-screen']);
-      } catch (error) {
-        console.error('Error exiting group:', error);
-        const toast = await this.toastCtrl.create({
-          message: `You exited the group`,
-          duration: 2000,
-          color: 'medium'
-        });
-        await toast.present();
-      }
+      this.router.navigate(['/home-screen']);
+    } catch (error) {
+      console.error('Error exiting group:', error);
+      const toast = await this.toastCtrl.create({
+        message: `You exited the group`,
+        duration: 2000,
+        color: 'medium'
+      });
+      await toast.present();
     }
   }
+}
+
+private async handleClearChat() {
+  try {
+    const userId = await this.authService.authData?.userId;
+    console.log("userID sdsdfgsdgsdfgertgryrtytr", userId); 
+    if (!userId) return;
+
+    // Show confirmation alert
+    const alert = await this.alertCtrl.create({
+      header: 'Clear Chat',
+      message: 'Are you sure you want to clear all messages? This cannot be undone.',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        },
+        {
+          text: 'Clear',
+          handler: async () => {
+            await this.clearChatMessages(userId);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+
+  } catch (error) {
+    console.error('Error in handleClearChat:', error);
+  }
+}
+
+// ✅ Clear Chat Implementation (Soft Delete)
+private async clearChatMessages(userId: string) {
+  try {
+    const roomId = this.chatType === 'group' 
+      ? this.receiverId 
+      : this.getRoomId(userId, this.receiverId);
+
+    if (!roomId) {
+      console.error('Room ID not found');
+      return;
+    }
+
+    await this.chatService.deleteChatForUser(roomId, userId);
+
+    // Clear local messages array (UI ko refresh karne ke liye)
+    this.messages = [];
+
+    // Show success toast
+    const toast = await this.toastCtrl.create({
+      message: 'Chat cleared successfully',
+      duration: 2000,
+      color: 'success'
+    });
+    await toast.present();
+
+    console.log('✅ Chat cleared for user:', userId);
+
+  } catch (error) {
+    console.error('❌ Error clearing chat:', error);
+    
+    const toast = await this.toastCtrl.create({
+      message: 'Failed to clear chat',
+      duration: 2000,
+      color: 'danger'
+    });
+    await toast.present();
+  }
+}
 
   async checkIfBlocked() {
     this.senderId = this.authService.authData?.userId || this.senderId;

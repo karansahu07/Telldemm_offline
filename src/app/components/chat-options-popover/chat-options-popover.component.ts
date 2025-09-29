@@ -20,9 +20,9 @@ export class ChatOptionsPopoverComponent {
 
   get menuOptions() {
     if (this.chatType === 'group') {
-      return ['Group Info','Group Media','Search','Add Members', 'Exit Group'];
+      return ['Group Info','Group Media','Search','Add Members', 'Exit Group', 'clear chat'];
     } else {
-      return ['View Contact', 'Search', 'Mute Notifications wip'];
+      return ['View Contact', 'Search', 'Mute Notifications wip', 'clear chat'];
     }
   }
 }

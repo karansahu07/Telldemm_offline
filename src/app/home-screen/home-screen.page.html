@@ -1,75 +1,165 @@
 <ion-header [translucent]="true">
-  <ion-toolbar class="telldemm">
-    <ion-title>
-      <img src="assets/images/TELLDEMM.svg" alt="Logo" />
-    </ion-title>
+  <!-- ✅ Selection Mode Header -->
+  <ion-toolbar *ngIf="selectedChats.length > 0; else normalHomeHeader">
+    <ion-buttons slot="start">
+      <ion-button (click)="clearChatSelection()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-title>{{ selectedChats.length }}</ion-title>
 
     <ion-buttons slot="end">
-      <ion-button (click)="scanBarcode()" [attr.aria-label]="'home.actions.scan' | translate">
-        <img src="assets/images/qr-code.svg" alt="" />
-      </ion-button>
+      <!-- Single pinned user -->
+      <ng-container *ngIf="selectionMeta.isSinglePinned">
+        <ion-button (click)="onUnpinSelected()">
+          <ion-icon name="pin"></ion-icon>
+        </ion-button>
+        <ion-button (click)="onExportSelected()">
+          <ion-icon name="download-outline"></ion-icon>
+        </ion-button>
+        <ion-button (click)="onMoreSelected($event)">
+          <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+        </ion-button>
+      </ng-container>
 
-      <ion-button (click)="openCamera()" [attr.aria-label]="'home.actions.camera' | translate">
-        <img src="assets/images/camera.svg" alt="" />
-      </ion-button>
+      <!-- Single user (regular) -->
+      <ng-container *ngIf="selectionMeta.isSingleUser">
+        <ion-button (click)="onPinSelected()">
+          <ion-icon name="pin-outline"></ion-icon>
+        </ion-button>
+        <ion-button (click)="onDeleteSelected()">
+          <ion-icon name="trash-outline"></ion-icon>
+        </ion-button>
+        <ion-button (click)="onMuteSelected()">
+          <ion-icon name="notifications-off-outline"></ion-icon>
+        </ion-button>
+        <ion-button (click)="onExportSelected()">
+          <ion-icon name="download-outline"></ion-icon>
+        </ion-button>
+        <ion-button (click)="onMoreSelected($event)">
+          <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+        </ion-button>
+      </ng-container>
 
-      <ion-button (click)="presentPopover($event)" [attr.aria-label]="'home.actions.menu' | translate">
-        <img src="assets/images/dots (1).svg" alt="" />
-      </ion-button>
+      <!-- Multiple users only -->
+      <ng-container *ngIf="selectionMeta.isMultiUsersOnly">
+        <ion-button (click)="onPinSelected()">
+          <ion-icon name="pin-outline"></ion-icon>
+        </ion-button>
+        <ion-button (click)="onDeleteSelected()">
+          <ion-icon name="trash-outline"></ion-icon>
+        </ion-button>
+        <ion-button (click)="onExportSelected()">
+          <ion-icon name="download-outline"></ion-icon>
+        </ion-button>
+        <ion-button (click)="onMoreSelected($event)">
+          <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+        </ion-button>
+      </ng-container>
+
+      <!-- Includes any group (no delete/mute in screenshots) -->
+      <ng-container *ngIf="selectionMeta.includesGroup && !selectionMeta.includesCommunity">
+        <ion-button (click)="onPinSelected()">
+          <ion-icon name="pin-outline"></ion-icon>
+        </ion-button>
+        <ion-button (click)="onExportSelected()">
+          <ion-icon name="download-outline"></ion-icon>
+        </ion-button>
+        <ion-button (click)="onMoreSelected($event)">
+          <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+        </ion-button>
+      </ng-container>
+
+      <!-- Any community selected -->
+      <ng-container *ngIf="selectionMeta.includesCommunity">
+        <ion-button (click)="onPinSelected()">
+          <ion-icon name="pin-outline"></ion-icon>
+        </ion-button>
+        <ion-button (click)="onExportSelected()">
+          <ion-icon name="download-outline"></ion-icon>
+        </ion-button>
+        <ion-button (click)="onMoreSelected($event)">
+          <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+        </ion-button>
+      </ng-container>
     </ion-buttons>
   </ion-toolbar>
 
-  <ion-toolbar>
-    <div class="main-header">
-      <div class="container">
-        <input
-          type="text"
-          id="searchInput"
-          [(ngModel)]="searchText"
-          [placeholder]="'home.search.placeholder' | translate"
-          [attr.aria-label]="'home.search.placeholder' | translate" />
-      </div>
-    </div>
+  <!-- 🔁 Normal header -->
+  <ng-template #normalHomeHeader>
+    <ion-toolbar class="telldemm">
+      <ion-title>
+        <img src="assets/images/TELLDEMM.svg" alt="Logo" />
+      </ion-title>
 
-    <div class="main-filters">
-      <div class="filters">
-        <button class="filter-link"
-                [ngClass]="{ 'active-filter': selectedFilter === 'all' }"
-                (click)="setFilter('all')">
-          {{ 'home.filters.all' | translate }}
-        </button>
-        <button class="filter-link"
-                [ngClass]="{ 'active-filter': selectedFilter === 'read' }"
-                (click)="setFilter('read')">
-          {{ 'home.filters.read' | translate }}
-        </button>
-        <button class="filter-link"
-                [ngClass]="{ 'active-filter': selectedFilter === 'unread' }"
-                (click)="setFilter('unread')">
-          {{ 'home.filters.unread' | translate }}
-        </button>
-        <button class="filter-link"
-                [ngClass]="{ 'active-filter': selectedFilter === 'groups' }"
-                (click)="setFilter('groups')">
-          {{ 'home.filters.groups' | translate }}
-        </button>
-      </div>
-    </div>
+      <ion-buttons slot="end">
+        <ion-button (click)="scanBarcode()" [attr.aria-label]="'home.actions.scan' | translate">
+          <img src="assets/images/qr-code.svg" alt="" />
+        </ion-button>
 
-    <div *ngIf="toggleGroupCreator" class="group-creator">
-      <ion-input [(ngModel)]="newGroupName"
-                 [placeholder]="'home.groupCreator.placeholder' | translate">
-      </ion-input>
-      <ion-list>
-        <ng-container *ngFor="let user of chatList">
-          <ion-item *ngIf="!user.group">
-            <ion-label>{{ user.name }}</ion-label>
-            <ion-checkbox [(ngModel)]="user.selected"></ion-checkbox>
-          </ion-item>
-        </ng-container>
-      </ion-list>
-    </div>
-  </ion-toolbar>
+        <ion-button (click)="openCamera()" [attr.aria-label]="'home.actions.camera' | translate">
+          <img src="assets/images/camera.svg" alt="" />
+        </ion-button>
+
+        <ion-button (click)="presentPopover($event)" [attr.aria-label]="'home.actions.menu' | translate">
+          <img src="assets/images/dots (1).svg" alt="" />
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+
+    <ion-toolbar>
+      <div class="main-header">
+        <div class="container">
+          <input
+            type="text"
+            id="searchInput"
+            [(ngModel)]="searchText"
+            [placeholder]="'home.search.placeholder' | translate"
+            [attr.aria-label]="'home.search.placeholder' | translate" />
+        </div>
+      </div>
+
+      <div class="main-filters">
+        <div class="filters">
+          <button class="filter-link"
+                  [ngClass]="{ 'active-filter': selectedFilter === 'all' }"
+                  (click)="setFilter('all')">
+            {{ 'home.filters.all' | translate }}
+          </button>
+          <button class="filter-link"
+                  [ngClass]="{ 'active-filter': selectedFilter === 'read' }"
+                  (click)="setFilter('read')">
+            {{ 'home.filters.read' | translate }}
+          </button>
+          <button class="filter-link"
+                  [ngClass]="{ 'active-filter': selectedFilter === 'unread' }"
+                  (click)="setFilter('unread')">
+            {{ 'home.filters.unread' | translate }}
+          </button>
+          <button class="filter-link"
+                  [ngClass]="{ 'active-filter': selectedFilter === 'groups' }"
+                  (click)="setFilter('groups')">
+            {{ 'home.filters.groups' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="toggleGroupCreator" class="group-creator">
+        <ion-input [(ngModel)]="newGroupName"
+                   [placeholder]="'home.groupCreator.placeholder' | translate">
+        </ion-input>
+        <ion-list>
+          <ng-container *ngFor="let user of chatList">
+            <ion-item *ngIf="!user.group">
+              <ion-label>{{ user.name }}</ion-label>
+              <ion-checkbox [(ngModel)]="user.selected"></ion-checkbox>
+            </ion-item>
+          </ng-container>
+        </ion-list>
+      </div>
+    </ion-toolbar>
+  </ng-template>
 </ion-header>
 
 <ion-content [fullscreen]="true">
@@ -87,9 +177,21 @@
   </ion-list>
 
   <ion-list *ngIf="!isLoading">
-    <ion-item *ngFor="let chat of filteredChats" (click)="openChat(chat)">
+    <ion-item
+      *ngFor="let chat of filteredChats"
+      [class.selected]="isChatSelected(chat)"
+      (click)="onChatRowClick(chat, $event)"
+      (touchstart)="startHomeLongPress(chat)"
+      (touchend)="cancelHomeLongPress()"
+      (touchmove)="cancelHomeLongPress()">
+
+      <!-- Selection indicator when selection mode on -->
+      <div slot="start" class="select-tick" *ngIf="selectedChats.length > 0" (click)="toggleChatSelection(chat, $event)">
+        <ion-icon [name]="isChatSelected(chat) ? 'checkmark-circle' : 'ellipse-outline'"></ion-icon>
+      </div>
+
       <ion-avatar slot="start"
-                  (click)="openImagePopup(getChatAvatarUrl(chat) || 'assets/images/user.jfif'); $event.stopPropagation()">
+                  (click)="selectedChats.length ? toggleChatSelection(chat, $event) : openImagePopup(getChatAvatarUrl(chat) || 'assets/images/user.jfif'); $event.stopPropagation()">
         <ng-container *ngIf="getChatAvatarUrl(chat) as img; else initialsTpl">
           <img [src]="img" [alt]="getChatAlt(chat)" (error)="onAvatarError(chat)" />
         </ng-container>
@@ -101,6 +203,7 @@
       <ion-label>
         <p class="chat-message" style="font-weight:600; margin:0;">
           {{ chat.name }}
+          <ion-icon *ngIf="chat.pinned" name="pin" style="margin-left:6px; opacity:.7;"></ion-icon>
         </p>
 
         <p [ngClass]="chat.isTyping ? 'typing-text' : ''" style="margin:0; display:flex; align-items:center; gap:6px;">
@@ -134,7 +237,6 @@
         <ion-badge *ngIf="chat.unreadCount > 0" color="danger" class="unread-badge">
           {{ chat.unreadCount }}
         </ion-badge>
-
         <ion-icon *ngIf="chat.isCommunity" name="chevron-forward-outline" style="color:#bdbdbd; margin-left:8px;"></ion-icon>
       </div>
     </ion-item>
@@ -163,3 +265,4 @@
 </ion-content>
 
 <app-footer-tabs [totalUnreadCount]="totalUnreadCount"></app-footer-tabs>
+

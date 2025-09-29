@@ -28,6 +28,7 @@ import { TypingService } from '../services/typing.service';
 import { Resetapp } from '../services/resetapp';
 import { VersionCheck } from '../services/version-check';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { MenuHomePopoverComponent } from '../components/menu-home-popover/menu-home-popover.component';
 
 @Component({
   selector: 'app-home-screen',
@@ -59,6 +60,9 @@ export class HomeScreenPage implements OnInit, OnDestroy {
   // typing listeners: map roomId -> unsubscribe fn
   private typingUnsubs: Map<string, () => void> = new Map();
   private communityUnreadSubs: Map<string, any> = new Map();
+
+  selectedChats: any[] = [];
+  private longPressTimer: any = null;
 
   constructor(
     private router: Router,
@@ -298,6 +302,343 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     this.selectedImage = null;
     this.showPopup = false;
   }
+
+    /* ===== Image popup shortcuts ===== */
+  // goToUserAbout() { this.showPopup = false; setTimeout(() => this.router.navigate(['/profile-screen']), 100); }
+  // async goToUserchat() { this.showPopup = false; setTimeout(async () => {}, 100); }
+  // goToUsercall() { this.showPopup = false; setTimeout(() => this.router.navigate(['/calls-screen']), 100); }
+  // goToUservideocall() { this.showPopup = false; setTimeout(() => this.router.navigate(['/calling-screen']), 100); }
+  // openImagePopup(profile_picture_url: string) { this.selectedImage = profile_picture_url; this.showPopup = true; }
+  // closeImagePopup() { this.selectedImage = null; this.showPopup = false; }
+
+  /* ===== Selection mode logic ===== */
+  isChatSelected(chat: any): boolean {
+    return this.selectedChats.some(c =>
+      c.receiver_Id === chat.receiver_Id &&
+      !!c.isCommunity === !!chat.isCommunity &&
+      !!c.group === !!chat.group
+    );
+  }
+  toggleChatSelection(chat: any, ev?: Event) {
+    if (ev) ev.stopPropagation();
+    const idx = this.selectedChats.findIndex(c =>
+      c.receiver_Id === chat.receiver_Id &&
+      !!c.isCommunity === !!chat.isCommunity &&
+      !!c.group === !!chat.group
+    );
+    if (idx > -1) this.selectedChats.splice(idx, 1);
+    else this.selectedChats.push(chat);
+    if (this.selectedChats.length === 0) this.clearChatSelection();
+  }
+  clearChatSelection() { this.selectedChats = []; this.cancelHomeLongPress(); }
+  onChatRowClick(chat: any, ev: Event) {
+    if (this.selectedChats.length > 0) { this.toggleChatSelection(chat, ev); return; }
+    this.openChat(chat);
+  }
+  startHomeLongPress(chat: any) {
+    this.cancelHomeLongPress();
+    this.longPressTimer = setTimeout(() => {
+      if (!this.isChatSelected(chat)) this.selectedChats = [chat];
+    }, 500);
+  }
+  cancelHomeLongPress() {
+    if (this.longPressTimer) { clearTimeout(this.longPressTimer); this.longPressTimer = null; }
+  }
+
+  /* ===== Selection meta (for header icon logic) ===== */
+  get selectionMeta() {
+    const sel = this.selectedChats || [];
+    const count = sel.length;
+    const includesCommunity = sel.some(c => c.isCommunity);
+    const includesGroup = sel.some(c => c.group && !c.isCommunity);
+    const includesUser = sel.some(c => !c.group && !c.isCommunity);
+    const onlyUsers = includesUser && !includesGroup && !includesCommunity && sel.every(c => !c.group && !c.isCommunity);
+    return {
+      count,
+      includesCommunity,
+      includesGroup,
+      includesUser,
+      isSingleUser: count === 1 && onlyUsers && !(sel[0]?.pinned === true),
+      isSinglePinned: count === 1 && onlyUsers && (sel[0]?.pinned === true),
+      isMultiUsersOnly: count > 1 && onlyUsers
+    };
+  }
+
+  /* ===== Selection actions (stubbed to local flags; wire to backend if needed) ===== */
+  async onPinSelected() {
+    for (const c of this.selectedChats) { c.pinned = true; }
+    this.clearChatSelection();
+  }
+  async onUnpinSelected() {
+    const c = this.selectedChats[0];
+    if (c) c.pinned = false;
+    this.clearChatSelection();
+  }
+  // async onDeleteSelected() {
+  //   const deletables = this.selectedChats.filter(c => !c.isCommunity);
+  //   if (deletables.length === 0) { this.clearChatSelection(); return; }
+  //   for (const c of deletables) {
+  //     this.chatList = this.chatList.filter(row =>
+  //       !(row.receiver_Id === c.receiver_Id && !!row.group === !!c.group && !!row.isCommunity === !!c.isCommunity)
+  //     );
+  //   }
+  //   this.clearChatSelection();
+  // }
+
+  // delete chat code start
+ async onDeleteSelected() {
+  try {
+    const deletables = this.selectedChats.filter(c => !c.isCommunity);
+    
+    if (deletables.length === 0) {
+      const alert = await this.alertCtrl.create({
+        header: 'Can\'t Delete',
+        message: 'Communities cannot be deleted from here',
+        buttons: ['OK']
+      });
+      await alert.present();
+      this.clearChatSelection();
+      return;
+    }
+    
+    const alert = await this.alertCtrl.create({
+      header: 'Delete Chat',
+      message: deletables.length === 1 
+        ? 'Delete this chat?' 
+        : `Delete ${deletables.length} chats?`,
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        },
+        {
+          text: 'Delete',
+          handler: async () => {
+            await this.deleteChatsForMe(deletables);
+          }
+        },
+        // Delete for Everyone - only for single private chat
+        // ...(deletables.length === 1 && !deletables[0].group ? [{
+        //   text: 'Delete for Everyone',
+        //   cssClass: 'danger-button',
+        //   handler: async () => {
+        //     await this.deleteChatsForEveryone(deletables);
+        //   }
+        // }] : [])
+      ]
+    });
+    
+    await alert.present();
+    
+  } catch (error) {
+    console.error('❌ Delete error:', error);
+    this.clearChatSelection();
+  }
+}
+
+// Delete for Me (soft delete) - UPDATED
+private async deleteChatsForMe(chats: any[]) {
+  try {
+    const userId = this.senderUserId;
+    if (!userId) return;
+    
+    for (const chat of chats) {
+      const roomId = chat.group 
+        ? chat.receiver_Id 
+        : this.getRoomId(userId, chat.receiver_Id);
+      
+      // Mark messages as deleted for this user in Firebase
+      await this.firebaseChatService.deleteChatForUser(roomId, userId);
+      
+      // ✅ CRITICAL: Remove from local chatList (placeholder bhi remove)
+      this.chatList = this.chatList.filter(c => 
+        !(c.receiver_Id === chat.receiver_Id && 
+          !!c.group === !!chat.group && 
+          !!c.isCommunity === !!chat.isCommunity)
+      );
+      
+      // Stop typing listener to prevent memory leaks
+      this.stopTypingListenerForChat(chat);
+      
+      // Unsubscribe from unread count listener if exists
+      const unreadSub = this.unreadSubs.find(sub => {
+        // Find subscription related to this chat
+        return true; // You can add more specific logic if needed
+      });
+      if (unreadSub) {
+        unreadSub.unsubscribe();
+        this.unreadSubs = this.unreadSubs.filter(s => s !== unreadSub);
+      }
+    }
+    
+    console.log('✅ Chats deleted for me (placeholder removed)');
+    this.clearChatSelection();
+    
+  } catch (error) {
+    console.error('❌ Error deleting chats:', error);
+  }
+}
+
+// Delete for Everyone (hard delete) - same as before
+private async deleteChatsForEveryone(chats: any[]) {
+  try {
+    const userId = this.senderUserId;
+    if (!userId) return;
+    
+    for (const chat of chats) {
+      if (chat.group) {
+        await this.firebaseChatService.deleteGroup(chat.receiver_Id);
+      } else {
+        const roomId = this.getRoomId(userId, chat.receiver_Id);
+        await this.firebaseChatService.deleteChatPermanently(roomId);
+      }
+      
+      // Remove from local chatList
+      this.chatList = this.chatList.filter(c => 
+        !(c.receiver_Id === chat.receiver_Id && 
+          !!c.group === !!chat.group)
+      );
+      
+      this.stopTypingListenerForChat(chat);
+    }
+    
+    console.log('✅ Chats deleted for everyone');
+    this.clearChatSelection();
+    
+  } catch (error) {
+    console.error('❌ Error deleting chats permanently:', error);
+  }
+}
+//delete chat code end here
+  async onMuteSelected() {
+    const c = this.selectedChats[0]; if (c) c.muted = true;
+    this.clearChatSelection();
+  }
+  async onExportSelected() {
+    console.log('Export threads:', this.selectedChats.map(c => c.receiver_Id));
+    this.clearChatSelection();
+  }
+
+//   async onMoreSelected(ev: any) {
+//   const pop = await this.popoverCtrl.create({
+//     component: MenuHomePopoverComponent,
+//     event: ev,
+//     translucent: true,
+//     componentProps: {
+//       canLock: true,                  
+//       allSelected: this.selectedChats.length === this.filteredChats.length
+//     }
+//   });
+//   await pop.present();
+
+//   const { data } = await pop.onDidDismiss();
+//   if (!data?.action) return;
+
+//   switch (data.action) {
+//     case 'markRead':
+//       // await this.markSelectedAsRead();
+//       break;
+//     case 'selectAll':
+//       // this.selectAllVisible();
+//       break;
+//     case 'lockChats':
+//       // await this.lockSelectedChats();
+//       break;
+//     case 'favorite':
+//       // await this.addSelectedToFavorites();
+//       break;
+//     case 'addToList':
+//       // await this.addSelectedToList();
+//       break;
+//   }
+// }
+
+
+async onMoreSelected(ev: any) {
+  const sel = this.selectedChats || [];
+  const users = sel.filter(c => !c.group && !c.isCommunity);
+  const groups = sel.filter(c => c.group && !c.isCommunity);
+  const comms  = sel.filter(c => c.isCommunity);
+
+  const isSingleUser      = users.length === 1 && groups.length === 0 && comms.length === 0;
+  const isSingleGroup     = groups.length === 1 && users.length === 0 && comms.length === 0;
+
+  const pop = await this.popoverCtrl.create({
+    component: MenuHomePopoverComponent,
+    event: ev,
+    translucent: true,
+    componentProps: {
+      canLock: true,
+      allSelected: this.selectedChats.length === this.filteredChats.length,
+      isSingleUser,
+      isMultiUsers: users.length > 1 && groups.length === 0 && comms.length === 0,
+      isSingleGroup,
+      isMultiGroups: groups.length > 1 && users.length === 0 && comms.length === 0,
+      isSingleCommunity: comms.length === 1 && users.length === 0 && groups.length === 0
+    }
+  });
+  await pop.present();
+
+  const { data } = await pop.onDidDismiss();
+  if (!data?.action) return;
+
+  switch (data.action) {
+    case 'viewContact':
+      this.openSelectedContactProfile();
+      break;
+
+    case 'groupInfo':
+      this.openSelectedGroupInfo();
+      break;
+
+    // existing cases
+    case 'markRead':       /* ... */ break;
+    case 'selectAll':      /* ... */ break;
+    case 'lockChat':
+    case 'lockChats':      /* ... */ break;
+    case 'favorite':       /* ... */ break;
+    case 'addToList':      /* ... */ break;
+
+    case 'exitGroup':      /* ... */ break;
+    case 'exitGroups':     /* ... */ break;
+    case 'exitCommunity':  /* ... */ break;
+    case 'communityInfo':  /* ... */ break;
+  }
+}
+
+private openSelectedContactProfile(): void {
+  const sel = this.selectedChats.filter(c => !c.group && !c.isCommunity);
+  const chat = sel[0];
+  if (!chat) return;
+
+  const queryParams: any = {
+    receiverId: chat.receiver_Id,
+    receiver_phone: chat.receiver_phone,
+    receiver_name: chat.name,
+    isGroup: false
+  };
+
+  this.router.navigate(['/profile-screen'], { queryParams });
+  this.clearChatSelection();
+}
+
+private openSelectedGroupInfo(): void {
+  const sel = this.selectedChats.filter(c => c.group && !c.isCommunity);
+  const chat = sel[0];
+  if (!chat) return;
+
+  const queryParams: any = {
+    receiverId: chat.receiver_Id,
+    receiver_phone: '',
+    receiver_name: chat.group_name || chat.name,
+    isGroup: true
+  };
+
+  this.router.navigate(['/profile-screen'], { queryParams });
+  this.clearChatSelection();
+}
+
+
 
   async prepareAndNavigateToChat(chat: any) {
     try {
