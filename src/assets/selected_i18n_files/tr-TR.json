@@ -516,5 +516,38 @@
         "cta": "Şikayet et"
       }
     }
+  },"invite": {
+    "header": "Bir arkadaş davet et",
+    "actions": {
+      "search": "Kişileri ara",
+      "shareLink": "Uygulama bağlantısını paylaş",
+      "fromContacts": "Kişilerden davet et",
+      "invite": "Davet et"
+    },
+    "share": {
+      "title": "Bu uygulamada bana katıl!",
+      "subtitle": "Uygulama indirme bağlantısını herhangi bir uygulama ile gönder",
+      "body": "Bu harika uygulamaya göz at. Buradan indir:",
+      "button": "Paylaş",
+      "success": "Bağlantı paylaşıldı",
+      "copied": "Bağlantı kopyalandı"
+    },
+    "contacts": {
+      "title": "Kişilerden",
+      "subtitle": "Telefon rehberinizden doğrudan davet edin",
+      "header": "Kişilerden",
+      "notOnApp": "Henüz uygulamada değil"
+    },
+    "title": "Bu uygulamada bana katıl!",
+    "text": "Bu harika uygulamaya göz at. Buradan indir:",
+    "dialogTitle": "Uygulama bağlantısını paylaş",
+    "toasts": {
+      "openContacts": "Kişiler açılıyor...",
+      "searchContacts": "Kişi arama seçildi.",
+      "invited": "{{phone}} numarasına davet gönderildi"
+    },
+    "errors": {
+      "shareFailed": "Paylaşım sayfası açılamadı."
+    }
   }
 }

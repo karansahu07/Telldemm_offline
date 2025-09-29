@@ -539,5 +539,38 @@
         "cta": "Denunciar"
       }
     }
+  },"invite": {
+    "header": "Convidar um amigo",
+    "actions": {
+      "search": "Procurar contactos",
+      "shareLink": "Partilhar link da app",
+      "fromContacts": "Convidar dos contactos",
+      "invite": "Convidar"
+    },
+    "share": {
+      "title": "Junta-te a mim nesta app!",
+      "subtitle": "Envia o link de download da app através de qualquer aplicação",
+      "body": "Vê esta aplicação incrível. Descarrega aqui:",
+      "button": "Partilhar",
+      "success": "Link partilhado",
+      "copied": "Link copiado"
+    },
+    "contacts": {
+      "title": "Dos Contactos",
+      "subtitle": "Convida diretamente da tua lista telefónica",
+      "header": "Dos contactos",
+      "notOnApp": "Ainda não está na app"
+    },
+    "title": "Junta-te a mim nesta app!",
+    "text": "Vê esta aplicação incrível. Descarrega aqui:",
+    "dialogTitle": "Partilhar link da app",
+    "toasts": {
+      "openContacts": "A abrir contactos...",
+      "searchContacts": "Pesquisa de contactos tocada.",
+      "invited": "Convite enviado para {{phone}}"
+    },
+    "errors": {
+      "shareFailed": "Não foi possível abrir a folha de partilha."
+    }
   }
 }

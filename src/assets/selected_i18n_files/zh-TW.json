@@ -541,6 +541,39 @@
         "cta": "檢舉"
       }
     }
+  },"invite": {
+    "header": "邀請好友",
+    "actions": {
+      "search": "搜尋聯絡人",
+      "shareLink": "分享應用程式連結",
+      "fromContacts": "從聯絡人邀請",
+      "invite": "邀請"
+    },
+    "share": {
+      "title": "快來加入我使用這個應用程式！",
+      "subtitle": "透過任意應用程式傳送下載連結",
+      "body": "看看這個很棒的應用程式。從這裡下載：",
+      "button": "分享",
+      "success": "連結已分享",
+      "copied": "連結已複製"
+    },
+    "contacts": {
+      "title": "從聯絡人",
+      "subtitle": "直接從通訊錄邀請",
+      "header": "從聯絡人",
+      "notOnApp": "尚未使用此應用程式"
+    },
+    "title": "快來加入我使用這個應用程式！",
+    "text": "看看這個很棒的應用程式。從這裡下載：",
+    "dialogTitle": "分享應用程式連結",
+    "toasts": {
+      "openContacts": "正在開啟聯絡人...",
+      "searchContacts": "已點擊搜尋聯絡人。",
+      "invited": "已向 {{phone}} 傳送邀請"
+    },
+    "errors": {
+      "shareFailed": "無法開啟分享頁面。"
+    }
   }
 
 }

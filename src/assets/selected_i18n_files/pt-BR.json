@@ -539,5 +539,38 @@
         "cta": "Denunciar"
       }
     }
+  },"invite": {
+    "header": "Convidar um amigo",
+    "actions": {
+      "search": "Procurar contatos",
+      "shareLink": "Compartilhar link do app",
+      "fromContacts": "Convidar dos contatos",
+      "invite": "Convidar"
+    },
+    "share": {
+      "title": "Junte-se a mim neste app!",
+      "subtitle": "Envie o link de download do app por qualquer aplicativo",
+      "body": "Confira este aplicativo incrível. Baixe aqui:",
+      "button": "Compartilhar",
+      "success": "Link compartilhado",
+      "copied": "Link copiado"
+    },
+    "contacts": {
+      "title": "Dos Contatos",
+      "subtitle": "Convide diretamente da sua agenda",
+      "header": "Dos contatos",
+      "notOnApp": "Ainda não está no app"
+    },
+    "title": "Junte-se a mim neste app!",
+    "text": "Confira este aplicativo incrível. Baixe aqui:",
+    "dialogTitle": "Compartilhar link do app",
+    "toasts": {
+      "openContacts": "Abrindo contatos...",
+      "searchContacts": "Pesquisa de contatos tocada.",
+      "invited": "Convite enviado para {{phone}}"
+    },
+    "errors": {
+      "shareFailed": "Não foi possível abrir a folha de compartilhamento."
+    }
   }
 }

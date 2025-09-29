@@ -540,5 +540,38 @@
         "cta": "Melden"
       }
     }
+  }, "invite": {
+    "header": "Einen Freund einladen",
+    "actions": {
+      "search": "Kontakte durchsuchen",
+      "shareLink": "App-Link teilen",
+      "fromContacts": "Aus Kontakten einladen",
+      "invite": "Einladen"
+    },
+    "share": {
+      "title": "Begleite mich in dieser App!",
+      "subtitle": "App-Download-Link über eine beliebige App senden",
+      "body": "Schau dir diese tolle App an. Lade sie hier herunter:",
+      "button": "Teilen",
+      "success": "Link geteilt",
+      "copied": "Link kopiert"
+    },
+    "contacts": {
+      "title": "Aus Kontakten",
+      "subtitle": "Direkt aus deinem Telefonbuch einladen",
+      "header": "Aus Kontakten",
+      "notOnApp": "Noch nicht in der App"
+    },
+    "title": "Begleite mich in dieser App!",
+    "text": "Schau dir diese tolle App an. Lade sie hier herunter:",
+    "dialogTitle": "App-Link teilen",
+    "toasts": {
+      "openContacts": "Kontakte werden geöffnet...",
+      "searchContacts": "Kontaktsuche angetippt.",
+      "invited": "Einladung an {{phone}} gesendet"
+    },
+    "errors": {
+      "shareFailed": "Teilen-Sheet konnte nicht geöffnet werden."
+    }
   }
 }

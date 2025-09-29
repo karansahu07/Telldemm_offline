@@ -541,5 +541,38 @@
         "cta": "举报"
       }
     }
+  },"invite": {
+    "header": "邀请好友",
+    "actions": {
+      "search": "搜索联系人",
+      "shareLink": "分享应用链接",
+      "fromContacts": "从联系人邀请",
+      "invite": "邀请"
+    },
+    "share": {
+      "title": "快来加入我使用这个应用！",
+      "subtitle": "通过任意应用发送下载链接",
+      "body": "看看这个很棒的应用。在这里下载：",
+      "button": "分享",
+      "success": "链接已分享",
+      "copied": "链接已复制"
+    },
+    "contacts": {
+      "title": "来自联系人",
+      "subtitle": "直接从通讯录邀请",
+      "header": "来自联系人",
+      "notOnApp": "还未使用此应用"
+    },
+    "title": "快来加入我使用这个应用！",
+    "text": "看看这个很棒的应用。在这里下载：",
+    "dialogTitle": "分享应用链接",
+    "toasts": {
+      "openContacts": "正在打开联系人...",
+      "searchContacts": "已点击搜索联系人。",
+      "invited": "已向 {{phone}} 发送邀请"
+    },
+    "errors": {
+      "shareFailed": "无法打开分享界面。"
+    }
   }
 }

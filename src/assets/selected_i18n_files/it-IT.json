@@ -539,5 +539,38 @@
         "cta": "Segnala"
       }
     }
+  }, "invite": {
+    "header": "Invita un amico",
+    "actions": {
+      "search": "Cerca contatti",
+      "shareLink": "Condividi link app",
+      "fromContacts": "Invita dai contatti",
+      "invite": "Invita"
+    },
+    "share": {
+      "title": "Unisciti a me su questa app!",
+      "subtitle": "Invia il link per scaricare l’app tramite qualsiasi app",
+      "body": "Guarda questa fantastica app. Scaricala qui:",
+      "button": "Condividi",
+      "success": "Link condiviso",
+      "copied": "Link copiato"
+    },
+    "contacts": {
+      "title": "Dai contatti",
+      "subtitle": "Invita direttamente dalla tua rubrica",
+      "header": "Dai contatti",
+      "notOnApp": "Non ancora sull’app"
+    },
+    "title": "Unisciti a me su questa app!",
+    "text": "Guarda questa fantastica app. Scaricala qui:",
+    "dialogTitle": "Condividi link app",
+    "toasts": {
+      "openContacts": "Apertura contatti...",
+      "searchContacts": "Ricerca contatti toccata.",
+      "invited": "Invito inviato a {{phone}}"
+    },
+    "errors": {
+      "shareFailed": "Impossibile aprire il foglio di condivisione."
+    }
   }
 }

@@ -540,5 +540,38 @@
         "cta": "Signaler"
       }
     }
+  },"invite": {
+    "header": "Inviter un ami",
+    "actions": {
+      "search": "Rechercher des contacts",
+      "shareLink": "Partager le lien de l’application",
+      "fromContacts": "Inviter depuis les contacts",
+      "invite": "Inviter"
+    },
+    "share": {
+      "title": "Rejoins-moi sur cette application !",
+      "subtitle": "Envoie le lien de téléchargement via n’importe quelle application",
+      "body": "Découvre cette super application. Télécharge-la ici :",
+      "button": "Partager",
+      "success": "Lien partagé",
+      "copied": "Lien copié"
+    },
+    "contacts": {
+      "title": "Depuis les contacts",
+      "subtitle": "Invitez directement depuis votre répertoire",
+      "header": "Depuis les contacts",
+      "notOnApp": "Pas encore sur l’application"
+    },
+    "title": "Rejoins-moi sur cette application !",
+    "text": "Découvre cette super application. Télécharge-la ici :",
+    "dialogTitle": "Partager le lien de l’application",
+    "toasts": {
+      "openContacts": "Ouverture des contacts…",
+      "searchContacts": "Recherche de contacts lancée.",
+      "invited": "Invitation envoyée à {{phone}}"
+    },
+    "errors": {
+      "shareFailed": "Impossible d’ouvrir la feuille de partage."
+    }
   }
 }

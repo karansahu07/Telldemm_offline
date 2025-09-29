@@ -539,5 +539,38 @@
         "cta": "Reportar"
       }
     }
+  },"invite": {
+    "header": "Invitar a un amigo",
+    "actions": {
+      "search": "Buscar contactos",
+      "shareLink": "Compartir enlace de la app",
+      "fromContacts": "Invitar desde contactos",
+      "invite": "Invitar"
+    },
+    "share": {
+      "title": "¡Únete a mí en esta app!",
+      "subtitle": "Envía el enlace de descarga por cualquier aplicación",
+      "body": "Mira esta increíble app. Descárgala aquí:",
+      "button": "Compartir",
+      "success": "Enlace compartido",
+      "copied": "Enlace copiado"
+    },
+    "contacts": {
+      "title": "Desde contactos",
+      "subtitle": "Invita directamente desde tu agenda",
+      "header": "Desde contactos",
+      "notOnApp": "Aún no está en la app"
+    },
+    "title": "¡Únete a mí en esta app!",
+    "text": "Mira esta increíble app. Descárgala aquí:",
+    "dialogTitle": "Compartir enlace de la app",
+    "toasts": {
+      "openContacts": "Abriendo contactos...",
+      "searchContacts": "Búsqueda de contactos seleccionada.",
+      "invited": "Invitación enviada a {{phone}}"
+    },
+    "errors": {
+      "shareFailed": "No se pudo abrir la hoja de compartir."
+    }
   }
 }

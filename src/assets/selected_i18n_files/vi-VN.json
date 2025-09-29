@@ -515,5 +515,38 @@
         "cta": "Báo cáo"
       }
     }
+  },"invite": {
+    "header": "Mời bạn bè",
+    "actions": {
+      "search": "Tìm kiếm liên hệ",
+      "shareLink": "Chia sẻ liên kết ứng dụng",
+      "fromContacts": "Mời từ danh bạ",
+      "invite": "Mời"
+    },
+    "share": {
+      "title": "Tham gia với tôi trên ứng dụng này!",
+      "subtitle": "Gửi liên kết tải xuống qua bất kỳ ứng dụng nào",
+      "body": "Hãy thử ứng dụng tuyệt vời này. Tải xuống tại đây:",
+      "button": "Chia sẻ",
+      "success": "Đã chia sẻ liên kết",
+      "copied": "Đã sao chép liên kết"
+    },
+    "contacts": {
+      "title": "Từ danh bạ",
+      "subtitle": "Mời trực tiếp từ danh bạ điện thoại của bạn",
+      "header": "Từ danh bạ",
+      "notOnApp": "Chưa có trong ứng dụng"
+    },
+    "title": "Tham gia với tôi trên ứng dụng này!",
+    "text": "Hãy thử ứng dụng tuyệt vời này. Tải xuống tại đây:",
+    "dialogTitle": "Chia sẻ liên kết ứng dụng",
+    "toasts": {
+      "openContacts": "Đang mở danh bạ...",
+      "searchContacts": "Đã chạm vào tìm kiếm liên hệ.",
+      "invited": "Đã gửi lời mời đến {{phone}}"
+    },
+    "errors": {
+      "shareFailed": "Không thể mở bảng chia sẻ."
+    }
   }
 }

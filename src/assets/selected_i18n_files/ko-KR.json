@@ -539,5 +539,38 @@
         "cta": "신고"
       }
     }
+  },"invite": {
+    "header": "친구 초대",
+    "actions": {
+      "search": "연락처 검색",
+      "shareLink": "앱 링크 공유",
+      "fromContacts": "연락처에서 초대",
+      "invite": "초대"
+    },
+    "share": {
+      "title": "이 앱에서 함께 하자!",
+      "subtitle": "어떤 앱으로든 다운로드 링크 보내기",
+      "body": "이 멋진 앱을 확인해 보세요. 여기서 다운로드:",
+      "button": "공유",
+      "success": "링크가 공유되었습니다",
+      "copied": "링크가 복사되었습니다"
+    },
+    "contacts": {
+      "title": "연락처에서",
+      "subtitle": "전화번호부에서 직접 초대",
+      "header": "연락처에서",
+      "notOnApp": "아직 앱에 없음"
+    },
+    "title": "이 앱에서 함께 하자!",
+    "text": "이 멋진 앱을 확인해 보세요. 여기서 다운로드:",
+    "dialogTitle": "앱 링크 공유",
+    "toasts": {
+      "openContacts": "연락처 여는 중...",
+      "searchContacts": "연락처 검색 탭됨.",
+      "invited": "{{phone}} 에게 초대장을 보냈습니다"
+    },
+    "errors": {
+      "shareFailed": "공유 시트를 열 수 없습니다."
+    }
   }
 }

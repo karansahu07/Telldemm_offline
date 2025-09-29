@@ -542,5 +542,38 @@
         "cta": "Report"
       }
     }
+  },"invite": {
+    "header": "Invite a Friend",
+    "actions": {
+      "search": "Search contacts",
+      "shareLink": "Share app link",
+      "fromContacts": "Invite from contacts",
+      "invite": "Invite"
+    },
+    "share": {
+      "title": "Join me on this app!",
+      "subtitle": "Send app download link via any app",
+      "body": "Check out this awesome app. Download it here:",
+      "button": "Share",
+      "success": "Link shared",
+      "copied": "Link copied"
+    },
+    "contacts": {
+      "title": "From Contacts",
+      "subtitle": "Invite directly from your phonebook",
+      "header": "From contacts",
+      "notOnApp": "Not on the app yet"
+    },
+    "title": "Join me on this app!",
+    "text": "Check out this awesome app. Download it here:",
+    "dialogTitle": "Share App Link",
+    "toasts": {
+      "openContacts": "Opening contacts...",
+      "searchContacts": "Search contacts tapped.",
+      "invited": "Invitation sent to {{phone}}"
+    },
+    "errors": {
+      "shareFailed": "Could not open share sheet."
+    }
   }
 }

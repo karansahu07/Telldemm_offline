@@ -539,5 +539,38 @@
         "cta": "報告"
       }
     }
+  },"invite": {
+    "header": "友達を招待",
+    "actions": {
+      "search": "連絡先を検索",
+      "shareLink": "アプリリンクを共有",
+      "fromContacts": "連絡先から招待",
+      "invite": "招待"
+    },
+    "share": {
+      "title": "このアプリで一緒に使おう！",
+      "subtitle": "任意のアプリでダウンロードリンクを送信",
+      "body": "この素晴らしいアプリをチェックしてね。ここからダウンロード：",
+      "button": "共有",
+      "success": "リンクを共有しました",
+      "copied": "リンクをコピーしました"
+    },
+    "contacts": {
+      "title": "連絡先から",
+      "subtitle": "電話帳から直接招待",
+      "header": "連絡先から",
+      "notOnApp": "まだアプリにいません"
+    },
+    "title": "このアプリで一緒に使おう！",
+    "text": "この素晴らしいアプリをチェックしてね。ここからダウンロード：",
+    "dialogTitle": "アプリリンクを共有",
+    "toasts": {
+      "openContacts": "連絡先を開いています...",
+      "searchContacts": "連絡先検索をタップしました。",
+      "invited": "{{phone}} に招待を送りました"
+    },
+    "errors": {
+      "shareFailed": "共有シートを開けませんでした。"
+    }
   }
 }
