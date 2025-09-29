@@ -238,3 +238,17 @@ swiper-container {
 .slider-swip {
   min-width: 75px;
 }
+
+.work-img {
+  display: flex;
+  align-items: center;       /* vertical center */
+  justify-content: center;   /* horizontal center (optional) */
+  height: 100%;              /* or set a specific height, e.g. 300px or 100vh */
+}
+
+/* keep image responsive */
+.work-img img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}

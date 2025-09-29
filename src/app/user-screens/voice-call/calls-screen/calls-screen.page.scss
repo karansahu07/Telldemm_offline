@@ -110,3 +110,17 @@ ion-badge {
     align-items: center;
     width: 100%;
 }
+.work-img {
+  display: flex;
+  align-items: center;       /* vertical center */
+  justify-content: center;   /* horizontal center (optional) */
+  height: 100%;              /* or set a specific height, e.g. 300px or 100vh */
+  /* If you want it to fill viewport: height: 100vh; */
+}
+
+/* keep image responsive */
+.work-img img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}

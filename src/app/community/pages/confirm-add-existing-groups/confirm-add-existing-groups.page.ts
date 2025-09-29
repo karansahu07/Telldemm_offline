@@ -82,55 +82,55 @@ async addToCommunity() {
     const newMemberIds = new Set<string>();
 
     // 1) Link groups into community and collect members from each selected group
-    for (const gid of ids) {
-      updates[`/communities/${this.communityId}/groups/${gid}`] = true;
-      updates[`/groups/${gid}/communityId`] = this.communityId;
+    // for (const gid of ids) {
+    //   updates[`/communities/${this.communityId}/groups/${gid}`] = true;
+    //   updates[`/groups/${gid}/communityId`] = this.communityId;
 
-      try {
-        const g = await this.firebaseService.getGroupInfo(gid);
-        if (g && g.members) {
-          Object.keys(g.members).forEach(mid => {
-            if (mid) newMemberIds.add(mid);
-          });
-        }
-      } catch (err) {
-        console.warn('Failed to load group members for', gid, err);
-      }
+    //   try {
+    //     const g = await this.firebaseService.getGroupInfo(gid);
+    //     if (g && g.members) {
+    //       Object.keys(g.members).forEach(mid => {
+    //         if (mid) newMemberIds.add(mid);
+    //       });
+    //     }
+    //   } catch (err) {
+    //     console.warn('Failed to load group members for', gid, err);
+    //   }
+    // }
+
+    for (const gid of ids) {
+  // Link in Firebase
+  updates[`/communities/${this.communityId}/groups/${gid}`] = true;
+  updates[`/groups/${gid}/communityId`] = this.communityId;
+
+  try {
+    // Load full group from Firebase to read backendGroupId + members
+    const g: any = await this.firebaseService.getGroupInfo(gid);
+
+    // ✅ pick backendGroupId for API
+    const backendGroupId = g?.backendGroupId ?? g?.backend_group_id ?? null;
+    if (backendGroupId == null) {
+      console.warn(`No backendGroupId for group ${gid}; skipping backend add`);
+    } else {
+      // requester_id = current user
+      const requesterIdNum = Number(this.userId);
+      // communityId might be string; API accepts number|string
+      await firstValueFrom(
+        
+        this.api.addGroupToCommunity(this.communityId as string, String(backendGroupId), requesterIdNum)
+      );
     }
 
-//     for (const gid of ids) {
-//   // Link in Firebase
-//   updates[`/communities/${this.communityId}/groups/${gid}`] = true;
-//   updates[`/groups/${gid}/communityId`] = this.communityId;
-
-//   try {
-//     // Load full group from Firebase to read backendGroupId + members
-//     const g: any = await this.firebaseService.getGroupInfo(gid);
-
-//     // ✅ pick backendGroupId for API
-//     const backendGroupId = g?.backendGroupId ?? g?.backend_group_id ?? null;
-//     if (backendGroupId == null) {
-//       console.warn(`No backendGroupId for group ${gid}; skipping backend add`);
-//     } else {
-//       // requester_id = current user
-//       const requesterIdNum = Number(this.userId);
-//       // communityId might be string; API accepts number|string
-//       await firstValueFrom(
-        
-//         this.api.addGroupToCommunity(this.communityId as string, String(backendGroupId), requesterIdNum)
-//       );
-//     }
-
-//     // collect members
-//     if (g && g.members) {
-//       Object.keys(g.members).forEach(mid => {
-//         if (mid) newMemberIds.add(mid);
-//       });
-//     }
-//   } catch (err) {
-//     console.warn('Failed while processing group', gid, err);
-//   }
-// }
+    // collect members
+    if (g && g.members) {
+      Object.keys(g.members).forEach(mid => {
+        if (mid) newMemberIds.add(mid);
+      });
+    }
+  } catch (err) {
+    console.warn('Failed while processing group', gid, err);
+  }
+}
 
     
 
