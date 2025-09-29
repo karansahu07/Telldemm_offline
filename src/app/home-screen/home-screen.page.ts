@@ -366,7 +366,13 @@ export class HomeScreenPage implements OnInit, OnDestroy {
 
   /* ===== Selection actions (stubbed to local flags; wire to backend if needed) ===== */
   async onPinSelected() {
-    for (const c of this.selectedChats) { c.pinned = true; }
+    // for (const c of this.selectedChats) { c.pinned = true; }
+     const alert = await this.alertCtrl.create({
+    header: 'Pin Chat',
+    message: '📌 Work in progress',
+    buttons: ['OK']
+  });
+  await alert.present();
     this.clearChatSelection();
   }
   async onUnpinSelected() {
@@ -511,11 +517,23 @@ private async deleteChatsForEveryone(chats: any[]) {
 }
 //delete chat code end here
   async onMuteSelected() {
-    const c = this.selectedChats[0]; if (c) c.muted = true;
+    // const c = this.selectedChats[0]; if (c) c.muted = true;
+     const alert = await this.alertCtrl.create({
+    header: 'Mute notification',
+    message: 'Work in progress',
+    buttons: ['OK']
+  });
+  await alert.present();
     this.clearChatSelection();
   }
   async onExportSelected() {
-    console.log('Export threads:', this.selectedChats.map(c => c.receiver_Id));
+    // console.log('Export threads:', this.selectedChats.map(c => c.receiver_Id));
+     const alert = await this.alertCtrl.create({
+    header: 'Archieved chat',
+    message: 'Work in progress',
+    buttons: ['OK']
+  });
+  await alert.present();
     this.clearChatSelection();
   }
 
