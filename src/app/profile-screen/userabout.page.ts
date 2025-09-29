@@ -250,39 +250,56 @@ openExternalLink(url: string) {
     this.isScrolled = scrollTop > 10;
   }
 
-  // goBackToChat() {
-  //   this.router.navigate(['/chatting-screen'], {
-  //     queryParams: {
-  //       receiverId: this.receiverId,
-  //       receiver_phone: this.receiver_phone,
-  //       isGroup: this.isGroup,
-  //       communityId: this.communityId
-  //     }
-  //   });
-  // }
+//   goBackToChat() {
+//   if (this.communityId) {
+//     // 👈 agar communityId present hai
+//     this.router.navigate(['/community-chat'], {
+//       queryParams: {
+//         receiverId: this.receiverId,
+//         receiver_phone: this.receiver_phone,
+//         isGroup: this.isGroup,
+//         communityId: this.communityId
+//       }
+//     });
+//   } else {
+//     // 👈 normal chat screen
+//     this.router.navigate(['/chatting-screen'], {
+//       queryParams: {
+//         receiverId: this.receiverId,
+//         receiver_phone: this.receiver_phone,
+//         isGroup: this.isGroup
+//       }
+//     });
+//   }
+// }
 
-  goBackToChat() {
-  if (this.communityId) {
-    // 👈 agar communityId present hai
-    this.router.navigate(['/community-chat'], {
-      queryParams: {
-        receiverId: this.receiverId,
-        receiver_phone: this.receiver_phone,
-        isGroup: this.isGroup,
-        communityId: this.communityId
-      }
-    });
-  } else {
-    // 👈 normal chat screen
-    this.router.navigate(['/chatting-screen'], {
-      queryParams: {
-        receiverId: this.receiverId,
-        receiver_phone: this.receiver_phone,
-        isGroup: this.isGroup
-      }
-    });
+goBackToChat() {
+  try {
+    this.navCtrl.back();
+  } catch (err) {
+    console.warn('navCtrl.back() failed, fallback:', err);
+
+    if (this.communityId) {
+      this.router.navigate(['/community-chat'], {
+        queryParams: {
+          receiverId: this.receiverId,
+          receiver_phone: this.receiver_phone,
+          isGroup: this.isGroup,
+          communityId: this.communityId
+        }
+      });
+    } else {
+      this.router.navigate(['/chatting-screen'], {
+        queryParams: {
+          receiverId: this.receiverId,
+          receiver_phone: this.receiver_phone,
+          isGroup: this.isGroup
+        }
+      });
+    }
   }
 }
+
 
 
   openProfileDp() {
