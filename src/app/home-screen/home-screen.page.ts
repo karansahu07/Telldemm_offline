@@ -63,6 +63,8 @@ export class HomeScreenPage implements OnInit, OnDestroy {
 
   selectedChats: any[] = [];
   private longPressTimer: any = null;
+  private readonly MAX_PINNED = 3;
+  private pinUnsub: (() => void) | null = null;
 
   constructor(
     private router: Router,
@@ -86,6 +88,8 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     this.senderUserId = this.authService.authData?.userId || '';
 
     await this.loadData();
+    await this.syncPinnedFromServer();
+    await this.startPinListener();
     this.trackRouteChanges();
   }
 
@@ -110,55 +114,6 @@ export class HomeScreenPage implements OnInit, OnDestroy {
       this.sender_name = this.authService.authData?.name || '';
     }
   }
-
-  // private async checkForceLogout(): Promise<void> {
-  //   try {
-  //     const uidStr = this.senderUserId || this.authService.authData?.userId;
-  //     const uid = Number(uidStr);
-  //     if (!uid) return;
-
-  //     this.service.checkUserLogout(uid).subscribe({
-  //       next: async (res: any) => {
-  //         if (!res) return;
-
-  //         const force = Number(res.force_logout);
-
-  //         // ✅ force_logout = 1 → do nothing
-  //         if (force === 0) {
-  //           console.log('check-logout: force_logout=1 → user stays logged in.');
-  //           return;
-  //         }
-
-  //         // ✅ force_logout = 0 → show alert + call resetApp()
-  //         if (force === 1) {
-  //           const alert = await this.alertCtrl.create({
-  //             header: 'Logout',
-  //             message: 'Session timed out/expired.',
-  //             backdropDismiss: false,
-  //             buttons: [
-  //               {
-  //                 text: 'OK',
-  //                 handler: () => {
-  //                   try {
-  //                     this.resetapp.resetApp();
-  //                   } catch (e) {
-  //                     console.error('resetApp() failed', e);
-  //                   }
-  //                 }
-  //               }
-  //             ]
-  //           });
-  //           await alert.present();
-  //         }
-  //       },
-  //       error: (err) => {
-  //         console.warn('checkUserLogout API error:', err);
-  //       }
-  //     });
-  //   } catch (err) {
-  //     console.warn('checkForceLogout unexpected error:', err);
-  //   }
-  // }
 
 
   //this is for testing
@@ -263,6 +218,9 @@ export class HomeScreenPage implements OnInit, OnDestroy {
       try { unsub(); } catch (e) { }
     });
     this.typingUnsubs.clear();
+    
+    try { this.pinUnsub?.(); } catch {}
+  this.pinUnsub = null;
   }
 
   goToUserAbout() {
@@ -365,31 +323,124 @@ export class HomeScreenPage implements OnInit, OnDestroy {
   }
 
   /* ===== Selection actions (stubbed to local flags; wire to backend if needed) ===== */
-  async onPinSelected() {
-    // for (const c of this.selectedChats) { c.pinned = true; }
-     const alert = await this.alertCtrl.create({
-    header: 'Pin Chat',
-    message: '📌 Work in progress',
-    buttons: ['OK']
-  });
-  await alert.present();
-    this.clearChatSelection();
-  }
-  async onUnpinSelected() {
-    const c = this.selectedChats[0];
-    if (c) c.pinned = false;
-    this.clearChatSelection();
-  }
-  // async onDeleteSelected() {
-  //   const deletables = this.selectedChats.filter(c => !c.isCommunity);
-  //   if (deletables.length === 0) { this.clearChatSelection(); return; }
-  //   for (const c of deletables) {
-  //     this.chatList = this.chatList.filter(row =>
-  //       !(row.receiver_Id === c.receiver_Id && !!row.group === !!c.group && !!row.isCommunity === !!c.isCommunity)
-  //     );
-  //   }
+  // async onPinSelected() {
+  //   // for (const c of this.selectedChats) { c.pinned = true; }
+  //    const alert = await this.alertCtrl.create({
+  //   header: 'Pin Chat',
+  //   message: '📌 Work in progress',
+  //   buttons: ['OK']
+  // });
+  // await alert.present();
   //   this.clearChatSelection();
   // }
+
+  async onPinSelected() {
+  const userId = this.senderUserId || this.authService.authData?.userId || '';
+  if (!userId) { this.clearChatSelection(); return; }
+
+  const db = getDatabase();
+
+  // only chats (no communities)
+  const candidates = this.selectedChats.filter(c => !c.isCommunity);
+
+  // count current pinned (in full list)
+  const currentPinned = this.chatList.filter(c => c.pinned).length;
+
+  let pinsAdded = 0;
+  for (const chat of candidates) {
+    if (chat.pinned) continue; // already pinned
+
+    if (currentPinned + pinsAdded >= this.MAX_PINNED) {
+      const alert = await this.alertCtrl.create({
+        header: 'Pin Chat',
+        message: `You can only pin up to ${this.MAX_PINNED} chats.`,
+        buttons: ['OK']
+      });
+      await alert.present();
+      break;
+    }
+
+    const key = this.getPinKey(chat);
+    try {
+      const pinnedAt = Date.now();
+      await set(rtdbRef(db, `pinnedChats/${userId}/${key}`), { pinnedAt });
+      chat.pinned = true;
+      chat.pinnedAt = pinnedAt;
+      pinsAdded++;
+    } catch {}
+  }
+
+  this.clearChatSelection();
+}
+
+private getPinKey(chat: any): string {
+  // groups use groupId; 1:1 uses the same roomId you already use
+  if (chat.group) return String(chat.receiver_Id);
+  const me = this.senderUserId || this.authService.authData?.userId || '';
+  return this.getRoomId(me, String(chat.receiver_Id));
+}
+
+private async syncPinnedFromServer(): Promise<void> {
+  try {
+    const userId = this.senderUserId || this.authService.authData?.userId || '';
+    if (!userId) return;
+
+    const db = getDatabase();
+    const snap = await get(rtdbRef(db, `pinnedChats/${userId}`));
+    const map = snap.exists() ? snap.val() : {};
+
+    // reset pin flags locally
+    this.chatList.forEach(c => { c.pinned = false; c.pinnedAt = 0; });
+
+    // apply from server
+    this.chatList.forEach(c => {
+      const k = this.getPinKey(c);
+      if (map && map[k]) {
+        c.pinned = true;
+        c.pinnedAt = Number(map[k]?.pinnedAt || 0);
+      }
+    });
+  } catch {}
+}
+
+async onUnpinSelected() {
+  const userId = this.senderUserId || this.authService.authData?.userId || '';
+  if (!userId) { this.clearChatSelection(); return; }
+
+  const db = getDatabase();
+
+  // unpin the first selected (you can loop if you want multi-unpin)
+  const chat = this.selectedChats[0];
+  if (!chat) { this.clearChatSelection(); return; }
+
+  try {
+    const key = this.getPinKey(chat);
+    await remove(rtdbRef(db, `pinnedChats/${userId}/${key}`));
+    chat.pinned = false;
+    chat.pinnedAt = 0;
+  } catch {}
+
+  this.clearChatSelection();
+}
+
+private startPinListener() {
+  if (this.pinUnsub) return;
+  const userId = this.senderUserId || this.authService.authData?.userId || '';
+  if (!userId) return;
+
+  const db = getDatabase();
+  const ref = rtdbRef(db, `pinnedChats/${userId}`);
+  const unsub = rtdbOnValue(ref, (snap) => {
+    const map = snap.exists() ? snap.val() : {};
+    this.chatList.forEach(c => {
+      const k = this.getPinKey(c);
+      if (map[k]) { c.pinned = true; c.pinnedAt = Number(map[k].pinnedAt || 0); }
+      else { c.pinned = false; c.pinnedAt = 0; }
+    });
+  });
+  this.pinUnsub = () => { try { rtdbOff(ref); } catch {} };
+}
+
 
   // delete chat code start
  async onDeleteSelected() {
@@ -1337,35 +1388,73 @@ private async exitGroup(groupId: string): Promise<void> {
      return { previewText: this.translate.instant('home.preview.deleted'), timestamp: last?.timestamp || '' };
   }
 
+  // get filteredChats() {
+  //   this.chatList.sort((a: any, b: any) => {
+  //     const ta = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+  //     const tb = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+  //     return tb - ta;
+  //   });
+  //   let filtered = this.chatList;
+
+  //   if (this.selectedFilter === 'read') {
+  //     filtered = filtered.filter(chat => !chat.unread && !chat.group);
+  //   } else if (this.selectedFilter === 'unread') {
+  //     filtered = filtered.filter(chat => chat.unread && !chat.group);
+  //   } else if (this.selectedFilter === 'groups') {
+  //     filtered = filtered.filter(chat => chat.group);
+  //   }
+
+  //   if (this.searchText.trim() !== '') {
+  //     const searchLower = this.searchText.toLowerCase();
+  //     filtered = filtered.filter(chat =>
+  //       (chat.name || '').toLowerCase().includes(searchLower) ||
+  //       (chat.message || '').toLowerCase().includes(searchLower)
+  //     );
+  //   }
+
+  //   // console.log("filtered",filtered);
+  //   return filtered;
+  //   // Sort by unread count (highest first)
+  //   // return filtered.sort((a, b) => b.unreadCount - a.unreadCount);
+  // }
+
   get filteredChats() {
-    this.chatList.sort((a: any, b: any) => {
-      const ta = a.timestamp ? new Date(a.timestamp).getTime() : 0;
-      const tb = b.timestamp ? new Date(b.timestamp).getTime() : 0;
-      return tb - ta;
-    });
-    let filtered = this.chatList;
+  let filtered = this.chatList;
 
-    if (this.selectedFilter === 'read') {
-      filtered = filtered.filter(chat => !chat.unread && !chat.group);
-    } else if (this.selectedFilter === 'unread') {
-      filtered = filtered.filter(chat => chat.unread && !chat.group);
-    } else if (this.selectedFilter === 'groups') {
-      filtered = filtered.filter(chat => chat.group);
-    }
-
-    if (this.searchText.trim() !== '') {
-      const searchLower = this.searchText.toLowerCase();
-      filtered = filtered.filter(chat =>
-        (chat.name || '').toLowerCase().includes(searchLower) ||
-        (chat.message || '').toLowerCase().includes(searchLower)
-      );
-    }
-
-    // console.log("filtered",filtered);
-    return filtered;
-    // Sort by unread count (highest first)
-    // return filtered.sort((a, b) => b.unreadCount - a.unreadCount);
+  if (this.selectedFilter === 'read') {
+    filtered = filtered.filter(chat => !chat.unread && !chat.group);
+  } else if (this.selectedFilter === 'unread') {
+    filtered = filtered.filter(chat => chat.unread && !chat.group);
+  } else if (this.selectedFilter === 'groups') {
+    filtered = filtered.filter(chat => chat.group);
   }
+
+  if (this.searchText.trim() !== '') {
+    const q = this.searchText.toLowerCase();
+    filtered = filtered.filter(chat =>
+      (chat.name || '').toLowerCase().includes(q) ||
+      (chat.message || '').toLowerCase().includes(q)
+    );
+  }
+
+  // WhatsApp-like: pinned first (by pinnedAt desc), then by last activity desc
+  return [...filtered].sort((a: any, b: any) => {
+    const ap = a.pinned ? 1 : 0;
+    const bp = b.pinned ? 1 : 0;
+    if (ap !== bp) return bp - ap; // pinned first
+
+    if (ap === 1 && bp === 1) {
+      const pa = Number(a.pinnedAt || 0);
+      const pb = Number(b.pinnedAt || 0);
+      if (pa !== pb) return pb - pa; // newest pin first
+    }
+
+    const ta = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+    const tb = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+    return tb - ta; // newest activity first
+  });
+}
+
 
   get totalUnreadCount(): number {
     return this.chatList.reduce((sum, chat) => sum + (chat.unreadCount || 0), 0);
