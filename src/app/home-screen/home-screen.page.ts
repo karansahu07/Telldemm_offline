@@ -23,7 +23,7 @@ import { NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 
 // Firebase modular imports
-import { getDatabase, ref as rtdbRef, onValue as rtdbOnValue, off as rtdbOff, get } from 'firebase/database';
+import { getDatabase, ref as rtdbRef, onValue as rtdbOnValue, off as rtdbOff, get, update, remove, set } from 'firebase/database';
 import { TypingService } from '../services/typing.service';
 import { Resetapp } from '../services/resetapp';
 import { VersionCheck } from '../services/version-check';
@@ -599,8 +599,13 @@ async onMoreSelected(ev: any) {
     case 'favorite':       /* ... */ break;
     case 'addToList':      /* ... */ break;
 
-    case 'exitGroup':      /* ... */ break;
-    case 'exitGroups':     /* ... */ break;
+    case 'exitGroup':
+  await this.confirmAndExitSingleSelectedGroup();
+  break;
+
+   case 'exitGroups':
+  await this.confirmAndExitMultipleSelectedGroups();
+  break;
     case 'exitCommunity':  /* ... */ break;
     case 'communityInfo':  /* ... */ break;
   }
@@ -637,6 +642,155 @@ private openSelectedGroupInfo(): void {
   this.router.navigate(['/profile-screen'], { queryParams });
   this.clearChatSelection();
 }
+
+/** Exit ONE selected group (with confirm) */
+private async confirmAndExitSingleSelectedGroup(): Promise<void> {
+  const sel = this.selectedChats.filter(c => c.group && !c.isCommunity);
+  const chat = sel[0];
+  if (!chat) return;
+
+  const alert = await this.alertCtrl.create({
+    header: 'Exit Group',
+    message: `Are you sure you want to exit "${chat.group_name || chat.name}"?`,
+    buttons: [
+      { text: 'Cancel', role: 'cancel' },
+      {
+        text: 'Exit',
+        handler: async () => {
+          await this.exitGroup(chat.receiver_Id);
+          // remove row from UI
+          this.chatList = this.chatList.filter(c => !(c.receiver_Id === chat.receiver_Id && c.group && !c.isCommunity));
+          this.stopTypingListenerForChat(chat);
+          // unsubscribe unread for this group
+          this.unreadSubs = this.unreadSubs.filter(s => {
+            try { /* keep; we don’t track per-row ref here */ return true; } catch { return true; }
+          });
+          this.clearChatSelection();
+
+          const t = await this.alertCtrl.create({
+            header: 'Exited',
+            message: 'You exited the group.',
+            buttons: ['OK']
+          });
+          await t.present();
+        }
+      }
+    ]
+  });
+  await alert.present();
+}
+
+/** Exit MANY selected groups (with confirm) */
+private async confirmAndExitMultipleSelectedGroups(): Promise<void> {
+  const groups = this.selectedChats.filter(c => c.group && !c.isCommunity);
+  if (groups.length === 0) return;
+
+  const alert = await this.alertCtrl.create({
+    header: 'Exit Groups',
+    message: `Exit ${groups.length} selected groups?`,
+    buttons: [
+      { text: 'Cancel', role: 'cancel' },
+      {
+        text: 'Exit',
+        handler: async () => {
+          let success = 0, fail = 0;
+          for (const g of groups) {
+            try {
+              await this.exitGroup(g.receiver_Id);
+              // remove from UI and cleanup listeners
+              this.chatList = this.chatList.filter(c => !(c.receiver_Id === g.receiver_Id && c.group && !c.isCommunity));
+              this.stopTypingListenerForChat(g);
+              success++;
+            } catch (e) {
+              console.warn('exit group failed:', g.receiver_Id, e);
+              fail++;
+            }
+          }
+          this.clearChatSelection();
+
+          const msg = fail === 0
+            ? `Exited ${success} groups`
+            : `Exited ${success} groups, ${fail} failed`;
+          const done = await this.alertCtrl.create({ header: 'Done', message: msg, buttons: ['OK'] });
+          await done.present();
+        }
+      }
+    ]
+  });
+  await alert.present();
+}
+
+/** Core: exit a group and reassign admin if needed */
+private async exitGroup(groupId: string): Promise<void> {
+  const userId = this.senderUserId || this.authService.authData?.userId || '';
+  if (!groupId || !userId) throw new Error('Missing groupId/userId');
+
+  const db = getDatabase();
+
+  // 🔹 Read my member record
+  const memberPath = `groups/${groupId}/members/${userId}`;
+  const memberSnap = await get(rtdbRef(db, memberPath));
+  if (!memberSnap.exists()) {
+    // already not a member
+    return;
+  }
+
+  const myMember = memberSnap.val();
+  const wasAdmin = String(myMember?.role || '').toLowerCase() === 'admin';
+
+  // 🔹 Move to pastmembers, then remove from members
+  const pastMemberPath = `groups/${groupId}/pastmembers/${userId}`;
+  const updatedMember = {
+    ...myMember,
+    status: 'inactive',
+    removedAt: new Date().toISOString()
+  };
+
+  await Promise.all([
+    set(rtdbRef(db, pastMemberPath), updatedMember),
+    (async () => {
+      try { await update(rtdbRef(db, memberPath), { status: 'inactive' }); } catch {}
+      await remove(rtdbRef(db, memberPath));
+    })()
+  ]);
+
+  // 🔹 If I was admin, check if any admins remain
+  if (wasAdmin) {
+    const membersSnap = await get(rtdbRef(db, `groups/${groupId}/members`));
+    if (membersSnap.exists()) {
+      const members = membersSnap.val() || {};
+      const remainingIds: string[] = Object.keys(members).filter(mid => String(mid) !== String(userId));
+
+      if (remainingIds.length > 0) {
+        // check if another admin already exists
+        const otherAdmins = remainingIds.filter(mid =>
+          String(members[mid]?.role || '').toLowerCase() === 'admin'
+        );
+
+        if (otherAdmins.length === 0) {
+          const nonAdmins = remainingIds.filter(mid =>
+            String(members[mid]?.role || '').toLowerCase() !== 'admin'
+          );
+          const pool = nonAdmins.length > 0 ? nonAdmins : remainingIds;
+          const newAdminId = pool[Math.floor(Math.random() * pool.length)];
+
+          await update(rtdbRef(db, `groups/${groupId}/members/${newAdminId}`), { role: 'admin' });
+          console.log(`Assigned new admin: ${newAdminId}`);
+        } else {
+          console.log('Another admin already exists, no reassignment needed.');
+        }
+      }
+    }
+  }
+
+  // 🔹 Optional: clear my unread count node
+  try {
+    await this.firebaseChatService.resetUnreadCount(groupId, userId);
+  } catch (e) {
+    console.warn('resetUnreadCount failed:', e);
+  }
+}
+
 
 
 

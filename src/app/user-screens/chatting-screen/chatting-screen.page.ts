@@ -472,52 +472,91 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     });
 
   } else if (option === 'Exit Group') {
-    if (!groupId || !userId) {
-      console.error('Missing groupId or userId');
-      return;
-    }
-
-    const db = getDatabase();
-    const memberPath = `groups/${groupId}/members/${userId}`;
-    const pastMemberPath = `groups/${groupId}/pastmembers/${userId}`;
-
-    try {
-      const memberSnap = await get(ref(db, memberPath));
-
-      if (!memberSnap.exists()) {
-        console.error('Member data not found in Firebase');
-        return;
-      }
-
-      const memberData = memberSnap.val();
-      const updatedMemberData = {
-        ...memberData,
-        status: 'inactive',
-        removedAt: new Date().toLocaleString()
-      };
-
-      await update(ref(db, memberPath), { status: 'inactive' });
-      await set(ref(db, pastMemberPath), updatedMemberData);
-      await remove(ref(db, memberPath));
-
-      const toast = await this.toastCtrl.create({
-        message: `You exited the group`,
-        duration: 2000,
-        color: 'medium'
-      });
-      toast.present();
-
-      this.router.navigate(['/home-screen']);
-    } catch (error) {
-      console.error('Error exiting group:', error);
-      const toast = await this.toastCtrl.create({
-        message: `You exited the group`,
-        duration: 2000,
-        color: 'medium'
-      });
-      await toast.present();
-    }
+  if (!this.roomId || !this.senderId) {
+    console.error('Missing groupId or userId');
+    return;
   }
+
+  const db = getDatabase();
+  const groupId = this.roomId;
+  const userId = this.senderId;
+
+  // 🟢 Confirmation Alert
+  const alert = await this.alertCtrl.create({
+    header: 'Exit Group',
+    message: 'Are you sure you want to exit this group?',
+    buttons: [
+      { text: 'Cancel', role: 'cancel' },
+      {
+        text: 'Exit',
+        handler: async () => {
+          try {
+            const memberPath = `groups/${groupId}/members/${userId}`;
+            const pastMemberPath = `groups/${groupId}/pastmembers/${userId}`;
+
+            const memberSnap = await get(ref(db, memberPath));
+            if (!memberSnap.exists()) {
+              console.error('Member data not found');
+              return;
+            }
+
+            const memberData = memberSnap.val();
+            const wasAdmin = memberData.role === 'admin';
+
+            // ✅ Step 1: Move user to pastmembers
+            const updatedMemberData = {
+              ...memberData,
+              status: 'inactive',
+              removedAt: new Date().toISOString()
+            };
+
+            await set(ref(db, pastMemberPath), updatedMemberData);
+            await remove(ref(db, memberPath));
+
+            // ✅ Step 2: If user was admin, assign a new random admin
+            if (wasAdmin) {
+              const membersSnap = await get(ref(db, `groups/${groupId}/members`));
+              if (membersSnap.exists()) {
+                const members = membersSnap.val();
+                const memberIds = Object.keys(members);
+
+                if (memberIds.length > 0) {
+                  const randomId = memberIds[Math.floor(Math.random() * memberIds.length)];
+                  await update(ref(db, `groups/${groupId}/members/${randomId}`), {
+                    role: 'admin'
+                  });
+                  console.log(`👑 New admin assigned: ${randomId}`);
+                }
+              }
+            }
+
+            // ✅ Toast + navigate
+            const toast = await this.toastCtrl.create({
+              message: 'You exited the group',
+              duration: 2000,
+              color: 'medium'
+            });
+            toast.present();
+
+            this.router.navigate(['/home-screen']);
+
+          } catch (error) {
+            console.error('Error exiting group:', error);
+            const toast = await this.toastCtrl.create({
+              message: 'Failed to exit group',
+              duration: 2000,
+              color: 'danger'
+            });
+            toast.present();
+          }
+        }
+      }
+    ]
+  });
+
+  await alert.present();
+}
+
 }
 
 private async handleClearChat() {
