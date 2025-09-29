@@ -429,5 +429,91 @@
     "createChannels": "Kanal oluştur (WIP)",
     "statusPrivacy": "Durum gizliliği (WIP)",
     "clearCallLogs": "Çağrı kayıtlarını temizle (WIP)"
+  },"userabout": {
+    "members": "ممبرز",
+    "group": "گروپ",
+    "groups": "گروپس",
+    "inCommon": "مشترکہ",
+    "toolbar": {
+      "message": "پیغام",
+      "call": "کال",
+      "video": "ویڈیو",
+      "add": "شامل کریں"
+    },
+    "defaults": {
+      "heyThere": "ہیلو! میں Telldemm استعمال کر رہا ہوں۔",
+      "noGroupDescription": "گروپ کی کوئی وضاحت نہیں۔",
+      "unknown": "نامعلوم",
+      "unknownDate": "نامعلوم تاریخ",
+      "unnamedGroup": "بے نام گروپ"
+    },
+    "updatedOn": "اپ ڈیٹ کیا گیا",
+    "createdByOn": "{{name}} نے بنایا",
+    "media": {
+      "title": "میڈیا، لنکس اور دستاویزات"
+    },
+    "notifications": "اطلاعات",
+    "mediaVisibility": "میڈیا کی مرئیت",
+    "encryption": {
+      "title": "انکرپشن",
+      "subtitle": "پیغامات اور کالز اینڈ ٹو اینڈ انکرپٹڈ ہیں۔ تصدیق کیلئے ٹیپ کریں۔"
+    },
+    "disappearing": "غائب ہونے والے پیغامات",
+    "chatLock": {
+      "title": "چیٹ لاک",
+      "subtitle": "اس ڈیوائس پر اس چیٹ کو لاک اور چھپائیں۔"
+    },
+    "advancedPrivacy": {
+      "title": "اعلی چیٹ پرائیویسی",
+      "off": "بند"
+    },
+    "createGroupWith": "{{name}} کے ساتھ گروپ بنائیں",
+    "commonGroupWith": "{{name}} کے ساتھ مشترکہ گروپ",
+    "groupMembers": "گروپ ممبران",
+    "addMembers": "ممبران شامل کریں",
+    "groupAdmin": "گروپ ایڈمن",
+    "viewPastMembers": "سابقہ ممبران دیکھیں",
+    "addToFavourites": "پسندیدہ میں شامل کریں",
+    "addToList": "فہرست میں شامل کریں",
+    "block": "{{name}} کو بلاک کریں",
+    "unblock": "{{name}} کو ان بلاک کریں",
+    "report": "{{name}} کی رپورٹ کریں",
+    "actions": {
+      "message": "پیغام",
+      "dismissAdmin": "ایڈمن سے ہٹائیں",
+      "makeAdmin": "ایڈمن بنائیں",
+      "removeFromGroup": "گروپ سے ہٹائیں"
+    },
+    "toasts": {
+      "madeAdmin": "{{name}} اب ایڈمن ہے",
+      "dismissedAdmin": "{{name}} اب ایڈمن نہیں ہے",
+      "removedFromGroup": "{{name}} کو گروپ سے ہٹا دیا گیا",
+      "blocked": "{{name}} کو بلاک کر دیا گیا ہے۔",
+      "unblocked": "{{name}} کو ان بلاک کر دیا گیا ہے۔",
+      "reported": "{{name}} کی رپورٹ ہو گئی ہے۔",
+      "reportedAndBlocked": "{{name}} کی رپورٹ ہو گئی اور بلاک کر دیا گیا۔"
+    },
+    "errors": {
+      "makeAdmin": "{{name}} کو ایڈمن بنانے میں ناکام",
+      "dismissAdmin": "{{name}} کو ہٹانے میں ناکام",
+      "removeMember": "ممبر کو ہٹانے میں خرابی"
+    },
+    "alerts": {
+      "block": {
+        "header": "رابطہ بلاک کریں",
+        "message": "آپ کو اب {{name}} سے پیغامات یا کالز نہیں ملیں گی۔",
+        "cta": "بلاک کریں"
+      },
+      "unblock": {
+        "header": "رابطہ ان بلاک کریں",
+        "message": "کیا آپ واقعی {{name}} کو ان بلاک کرنا چاہتے ہیں؟"
+      },
+      "report": {
+        "header": "رابطہ رپورٹ کریں",
+        "message": "آخری 5 پیغامات {{name}} سے رپورٹ کیے جائیں گے۔ کیا آپ اس صارف کو بھی بلاک کرنا چاہتے ہیں؟",
+        "alsoBlock": "رابطہ کو بھی بلاک کریں",
+        "cta": "رپورٹ"
+      }
+    }
   }
 }

@@ -454,5 +454,91 @@
     "createChannels": "Kanäle erstellen (WIP)",
     "statusPrivacy": "Status-Datenschutz (WIP)",
     "clearCallLogs": "Anrufliste löschen (WIP)"
+  },"userabout": {
+    "members": "Mitglieder",
+    "group": "Gruppe",
+    "groups": "Gruppen",
+    "inCommon": "Gemeinsam",
+    "toolbar": {
+      "message": "Nachricht",
+      "call": "Anruf",
+      "video": "Video",
+      "add": "Hinzufügen"
+    },
+    "defaults": {
+      "heyThere": "Hallo! Ich benutze Telldemm.",
+      "noGroupDescription": "Keine Gruppenbeschreibung.",
+      "unknown": "Unbekannt",
+      "unknownDate": "Unbekanntes Datum",
+      "unnamedGroup": "Unbenannte Gruppe"
+    },
+    "updatedOn": "Aktualisiert am",
+    "createdByOn": "Erstellt von {{name}} am",
+    "media": {
+      "title": "Medien, Links und Dokumente"
+    },
+    "notifications": "Benachrichtigungen",
+    "mediaVisibility": "Mediensichtbarkeit",
+    "encryption": {
+      "title": "Verschlüsselung",
+      "subtitle": "Nachrichten und Anrufe sind Ende-zu-Ende verschlüsselt. Tippen zum Überprüfen."
+    },
+    "disappearing": "Verschwindende Nachrichten",
+    "chatLock": {
+      "title": "Chat-Sperre",
+      "subtitle": "Diesen Chat auf diesem Gerät sperren und ausblenden."
+    },
+    "advancedPrivacy": {
+      "title": "Erweiterte Chat-Datenschutz",
+      "off": "Aus"
+    },
+    "createGroupWith": "Gruppe mit {{name}} erstellen",
+    "commonGroupWith": "Gemeinsame Gruppe mit {{name}}",
+    "groupMembers": "Gruppenmitglieder",
+    "addMembers": "Mitglieder hinzufügen",
+    "groupAdmin": "Gruppenadmin",
+    "viewPastMembers": "Frühere Mitglieder anzeigen",
+    "addToFavourites": "Zu Favoriten hinzufügen",
+    "addToList": "Zur Liste hinzufügen",
+    "block": "{{name}} blockieren",
+    "unblock": "{{name}} entsperren",
+    "report": "{{name}} melden",
+    "actions": {
+      "message": "Nachricht",
+      "dismissAdmin": "Als Admin entfernen",
+      "makeAdmin": "Zum Admin machen",
+      "removeFromGroup": "Aus der Gruppe entfernen"
+    },
+    "toasts": {
+      "madeAdmin": "{{name}} ist jetzt Admin",
+      "dismissedAdmin": "{{name}} ist kein Admin mehr",
+      "removedFromGroup": "{{name}} wurde aus der Gruppe entfernt",
+      "blocked": "{{name}} wurde blockiert.",
+      "unblocked": "{{name}} wurde entsperrt.",
+      "reported": "{{name}} wurde gemeldet.",
+      "reportedAndBlocked": "{{name}} wurde gemeldet und blockiert."
+    },
+    "errors": {
+      "makeAdmin": "Fehler: Konnte {{name}} nicht zum Admin machen",
+      "dismissAdmin": "Fehler: Konnte {{name}} nicht als Admin entfernen",
+      "removeMember": "Fehler beim Entfernen des Mitglieds"
+    },
+    "alerts": {
+      "block": {
+        "header": "Kontakt blockieren",
+        "message": "Sie werden keine Nachrichten oder Anrufe mehr von {{name}} erhalten.",
+        "cta": "Blockieren"
+      },
+      "unblock": {
+        "header": "Kontakt entsperren",
+        "message": "Möchten Sie {{name}} wirklich entsperren?"
+      },
+      "report": {
+        "header": "Kontakt melden",
+        "message": "Die letzten 5 Nachrichten von {{name}} werden gemeldet. Möchten Sie diesen Benutzer auch blockieren?",
+        "alsoBlock": "Kontakt auch blockieren",
+        "cta": "Melden"
+      }
+    }
   }
 }

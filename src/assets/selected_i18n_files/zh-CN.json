@@ -455,5 +455,91 @@
     "statusPrivacy": "状态隐私 (WIP)",
     "clearCallLogs": "清除通话记录 (WIP)"
   }
-
+,"userabout": {
+    "members": "成员",
+    "group": "群组",
+    "groups": "群组",
+    "inCommon": "共同",
+    "toolbar": {
+      "message": "消息",
+      "call": "通话",
+      "video": "视频",
+      "add": "添加"
+    },
+    "defaults": {
+      "heyThere": "嗨！我正在使用 Telldemm。",
+      "noGroupDescription": "没有群组描述。",
+      "unknown": "未知",
+      "unknownDate": "未知日期",
+      "unnamedGroup": "未命名群组"
+    },
+    "updatedOn": "更新于",
+    "createdByOn": "由 {{name}} 创建于",
+    "media": {
+      "title": "媒体、链接和文档"
+    },
+    "notifications": "通知",
+    "mediaVisibility": "媒体可见性",
+    "encryption": {
+      "title": "加密",
+      "subtitle": "消息和通话已端到端加密。点击验证。"
+    },
+    "disappearing": "阅后即焚消息",
+    "chatLock": {
+      "title": "聊天锁",
+      "subtitle": "在此设备上锁定并隐藏此聊天。"
+    },
+    "advancedPrivacy": {
+      "title": "高级聊天隐私",
+      "off": "关闭"
+    },
+    "createGroupWith": "与 {{name}} 创建群组",
+    "commonGroupWith": "与 {{name}} 的共同群组",
+    "groupMembers": "群组成员",
+    "addMembers": "添加成员",
+    "groupAdmin": "群组管理员",
+    "viewPastMembers": "查看过去的成员",
+    "addToFavourites": "添加到收藏夹",
+    "addToList": "添加到列表",
+    "block": "屏蔽 {{name}}",
+    "unblock": "取消屏蔽 {{name}}",
+    "report": "举报 {{name}}",
+    "actions": {
+      "message": "消息",
+      "dismissAdmin": "解除管理员",
+      "makeAdmin": "设为管理员",
+      "removeFromGroup": "从群组中移除"
+    },
+    "toasts": {
+      "madeAdmin": "{{name}} 现在是管理员",
+      "dismissedAdmin": "{{name}} 已不再是管理员",
+      "removedFromGroup": "{{name}} 已从群组中移除",
+      "blocked": "{{name}} 已被屏蔽。",
+      "unblocked": "{{name}} 已被取消屏蔽。",
+      "reported": "{{name}} 已被举报。",
+      "reportedAndBlocked": "{{name}} 已被举报并屏蔽。"
+    },
+    "errors": {
+      "makeAdmin": "无法将 {{name}} 设为管理员",
+      "dismissAdmin": "无法解除 {{name}} 的管理员身份",
+      "removeMember": "移除成员时出错"
+    },
+    "alerts": {
+      "block": {
+        "header": "屏蔽联系人",
+        "message": "您将不再接收来自 {{name}} 的消息或通话。",
+        "cta": "屏蔽"
+      },
+      "unblock": {
+        "header": "取消屏蔽联系人",
+        "message": "您确定要取消屏蔽 {{name}} 吗？"
+      },
+      "report": {
+        "header": "举报联系人",
+        "message": "将举报来自 {{name}} 的最近 5 条消息。是否还要屏蔽此用户？",
+        "alsoBlock": "同时屏蔽联系人",
+        "cta": "举报"
+      }
+    }
+  }
 }

@@ -453,5 +453,91 @@
     "createChannels": "สร้างช่อง (WIP)",
     "statusPrivacy": "ความเป็นส่วนตัวของสถานะ (WIP)",
     "clearCallLogs": "ล้างประวัติการโทร (WIP)"
+  },"userabout": {
+    "members": "สมาชิก",
+    "group": "กลุ่ม",
+    "groups": "กลุ่ม",
+    "inCommon": "ที่มีร่วมกัน",
+    "toolbar": {
+      "message": "ข้อความ",
+      "call": "โทร",
+      "video": "วิดีโอ",
+      "add": "เพิ่ม"
+    },
+    "defaults": {
+      "heyThere": "สวัสดี! ฉันกำลังใช้ Telldemm",
+      "noGroupDescription": "ไม่มีคำอธิบายกลุ่ม",
+      "unknown": "ไม่ทราบ",
+      "unknownDate": "ไม่ทราบวันที่",
+      "unnamedGroup": "กลุ่มไม่มีชื่อ"
+    },
+    "updatedOn": "อัปเดตเมื่อ",
+    "createdByOn": "สร้างโดย {{name}} เมื่อ",
+    "media": {
+      "title": "สื่อ, ลิงก์ และเอกสาร"
+    },
+    "notifications": "การแจ้งเตือน",
+    "mediaVisibility": "การแสดงสื่อ",
+    "encryption": {
+      "title": "การเข้ารหัส",
+      "subtitle": "ข้อความและการโทรถูกเข้ารหัสแบบ end-to-end แตะเพื่อตรวจสอบ"
+    },
+    "disappearing": "ข้อความหายไป",
+    "chatLock": {
+      "title": "ล็อกแชท",
+      "subtitle": "ล็อกและซ่อนแชทนี้บนอุปกรณ์นี้"
+    },
+    "advancedPrivacy": {
+      "title": "ความเป็นส่วนตัวขั้นสูง",
+      "off": "ปิด"
+    },
+    "createGroupWith": "สร้างกลุ่มกับ {{name}}",
+    "commonGroupWith": "กลุ่มที่มีร่วมกับ {{name}}",
+    "groupMembers": "สมาชิกกลุ่ม",
+    "addMembers": "เพิ่มสมาชิก",
+    "groupAdmin": "ผู้ดูแลกลุ่ม",
+    "viewPastMembers": "ดูสมาชิกที่ผ่านมา",
+    "addToFavourites": "เพิ่มในรายการโปรด",
+    "addToList": "เพิ่มในรายการ",
+    "block": "บล็อก {{name}}",
+    "unblock": "ยกเลิกการบล็อก {{name}}",
+    "report": "รายงาน {{name}}",
+    "actions": {
+      "message": "ข้อความ",
+      "dismissAdmin": "ลบสิทธิ์ผู้ดูแล",
+      "makeAdmin": "ตั้งเป็นผู้ดูแล",
+      "removeFromGroup": "นำออกจากกลุ่ม"
+    },
+    "toasts": {
+      "madeAdmin": "{{name}} ตอนนี้เป็นผู้ดูแลแล้ว",
+      "dismissedAdmin": "{{name}} ไม่ใช่ผู้ดูแลอีกต่อไป",
+      "removedFromGroup": "{{name}} ถูกนำออกจากกลุ่ม",
+      "blocked": "{{name}} ถูกบล็อกแล้ว",
+      "unblocked": "{{name}} ถูกยกเลิกการบล็อกแล้ว",
+      "reported": "{{name}} ถูกแจ้งรายงานแล้ว",
+      "reportedAndBlocked": "{{name}} ถูกแจ้งรายงานและบล็อกแล้ว"
+    },
+    "errors": {
+      "makeAdmin": "ไม่สามารถตั้ง {{name}} เป็นผู้ดูแลได้",
+      "dismissAdmin": "ไม่สามารถลบสิทธิ์ผู้ดูแลของ {{name}} ได้",
+      "removeMember": "เกิดข้อผิดพลาดในการลบสมาชิก"
+    },
+    "alerts": {
+      "block": {
+        "header": "บล็อกผู้ติดต่อ",
+        "message": "คุณจะไม่ได้รับข้อความหรือสายจาก {{name}} อีกต่อไป",
+        "cta": "บล็อก"
+      },
+      "unblock": {
+        "header": "ยกเลิกการบล็อกผู้ติดต่อ",
+        "message": "คุณแน่ใจหรือไม่ว่าต้องการยกเลิกการบล็อก {{name}}?"
+      },
+      "report": {
+        "header": "รายงานผู้ติดต่อ",
+        "message": "ข้อความล่าสุด 5 ข้อความจาก {{name}} จะถูกรายงาน คุณต้องการบล็อกผู้ใช้นี้ด้วยหรือไม่?",
+        "alsoBlock": "บล็อกผู้ติดต่อด้วย",
+        "cta": "รายงาน"
+      }
+    }
   }
 }

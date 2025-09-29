@@ -455,6 +455,92 @@
     "createChannels": "建立頻道 (WIP)",
     "statusPrivacy": "狀態隱私 (WIP)",
     "clearCallLogs": "清除通話紀錄 (WIP)"
+  },"userabout": {
+    "members": "成員",
+    "group": "群組",
+    "groups": "群組",
+    "inCommon": "共同",
+    "toolbar": {
+      "message": "訊息",
+      "call": "通話",
+      "video": "影片",
+      "add": "新增"
+    },
+    "defaults": {
+      "heyThere": "嗨！我正在使用 Telldemm。",
+      "noGroupDescription": "沒有群組描述。",
+      "unknown": "未知",
+      "unknownDate": "未知日期",
+      "unnamedGroup": "未命名群組"
+    },
+    "updatedOn": "更新於",
+    "createdByOn": "由 {{name}} 建立於",
+    "media": {
+      "title": "媒體、連結和文件"
+    },
+    "notifications": "通知",
+    "mediaVisibility": "媒體可見性",
+    "encryption": {
+      "title": "加密",
+      "subtitle": "訊息和通話已端對端加密。點擊驗證。"
+    },
+    "disappearing": "消失的訊息",
+    "chatLock": {
+      "title": "聊天鎖定",
+      "subtitle": "在此裝置上鎖定並隱藏此聊天。"
+    },
+    "advancedPrivacy": {
+      "title": "進階聊天隱私",
+      "off": "關閉"
+    },
+    "createGroupWith": "與 {{name}} 建立群組",
+    "commonGroupWith": "與 {{name}} 的共同群組",
+    "groupMembers": "群組成員",
+    "addMembers": "新增成員",
+    "groupAdmin": "群組管理員",
+    "viewPastMembers": "檢視過去的成員",
+    "addToFavourites": "加入最愛",
+    "addToList": "加入清單",
+    "block": "封鎖 {{name}}",
+    "unblock": "解除封鎖 {{name}}",
+    "report": "檢舉 {{name}}",
+    "actions": {
+      "message": "訊息",
+      "dismissAdmin": "解除管理員",
+      "makeAdmin": "設為管理員",
+      "removeFromGroup": "從群組中移除"
+    },
+    "toasts": {
+      "madeAdmin": "{{name}} 現在是管理員",
+      "dismissedAdmin": "{{name}} 不再是管理員",
+      "removedFromGroup": "{{name}} 已被移出群組",
+      "blocked": "{{name}} 已被封鎖。",
+      "unblocked": "{{name}} 已被解除封鎖。",
+      "reported": "{{name}} 已被檢舉。",
+      "reportedAndBlocked": "{{name}} 已被檢舉並封鎖。"
+    },
+    "errors": {
+      "makeAdmin": "無法將 {{name}} 設為管理員",
+      "dismissAdmin": "無法解除 {{name}} 的管理員身份",
+      "removeMember": "移除成員時發生錯誤"
+    },
+    "alerts": {
+      "block": {
+        "header": "封鎖聯絡人",
+        "message": "您將不再收到來自 {{name}} 的訊息或通話。",
+        "cta": "封鎖"
+      },
+      "unblock": {
+        "header": "解除封鎖聯絡人",
+        "message": "您確定要解除封鎖 {{name}} 嗎？"
+      },
+      "report": {
+        "header": "檢舉聯絡人",
+        "message": "將檢舉來自 {{name}} 的最近 5 則訊息。您是否也要封鎖此使用者？",
+        "alsoBlock": "同時封鎖聯絡人",
+        "cta": "檢舉"
+      }
+    }
   }
 
 }

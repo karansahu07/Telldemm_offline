@@ -453,5 +453,91 @@
     "createChannels": "Создать каналы (WIP)",
     "statusPrivacy": "Приватность статуса (WIP)",
     "clearCallLogs": "Очистить журнал звонков (WIP)"
+  },"userabout": {
+    "members": "Участники",
+    "group": "Группа",
+    "groups": "Группы",
+    "inCommon": "Общее",
+    "toolbar": {
+      "message": "Сообщение",
+      "call": "Звонок",
+      "video": "Видео",
+      "add": "Добавить"
+    },
+    "defaults": {
+      "heyThere": "Привет! Я использую Telldemm.",
+      "noGroupDescription": "Описание группы отсутствует.",
+      "unknown": "Неизвестно",
+      "unknownDate": "Неизвестная дата",
+      "unnamedGroup": "Безымянная группа"
+    },
+    "updatedOn": "Обновлено",
+    "createdByOn": "Создано {{name}}",
+    "media": {
+      "title": "Медиа, ссылки и документы"
+    },
+    "notifications": "Уведомления",
+    "mediaVisibility": "Видимость медиа",
+    "encryption": {
+      "title": "Шифрование",
+      "subtitle": "Сообщения и звонки зашифрованы сквозным методом. Нажмите, чтобы проверить."
+    },
+    "disappearing": "Исчезающие сообщения",
+    "chatLock": {
+      "title": "Блокировка чата",
+      "subtitle": "Заблокируйте и скройте этот чат на этом устройстве."
+    },
+    "advancedPrivacy": {
+      "title": "Расширенная конфиденциальность чата",
+      "off": "Выкл."
+    },
+    "createGroupWith": "Создать группу с {{name}}",
+    "commonGroupWith": "Общая группа с {{name}}",
+    "groupMembers": "Участники группы",
+    "addMembers": "Добавить участников",
+    "groupAdmin": "Админ группы",
+    "viewPastMembers": "Просмотреть бывших участников",
+    "addToFavourites": "Добавить в избранное",
+    "addToList": "Добавить в список",
+    "block": "Заблокировать {{name}}",
+    "unblock": "Разблокировать {{name}}",
+    "report": "Пожаловаться на {{name}}",
+    "actions": {
+      "message": "Сообщение",
+      "dismissAdmin": "Снять с админа",
+      "makeAdmin": "Назначить админом",
+      "removeFromGroup": "Удалить из группы"
+    },
+    "toasts": {
+      "madeAdmin": "{{name}} теперь админ",
+      "dismissedAdmin": "{{name}} больше не админ",
+      "removedFromGroup": "{{name}} удалён из группы",
+      "blocked": "{{name}} был заблокирован.",
+      "unblocked": "{{name}} был разблокирован.",
+      "reported": "{{name}} был пожалован.",
+      "reportedAndBlocked": "{{name}} был пожалован и заблокирован."
+    },
+    "errors": {
+      "makeAdmin": "Не удалось назначить {{name}} админом",
+      "dismissAdmin": "Не удалось снять {{name}} с админа",
+      "removeMember": "Ошибка при удалении участника"
+    },
+    "alerts": {
+      "block": {
+        "header": "Заблокировать контакт",
+        "message": "Вы больше не будете получать сообщения или звонки от {{name}}.",
+        "cta": "Заблокировать"
+      },
+      "unblock": {
+        "header": "Разблокировать контакт",
+        "message": "Вы уверены, что хотите разблокировать {{name}}?"
+      },
+      "report": {
+        "header": "Пожаловаться на контакт",
+        "message": "Последние 5 сообщений от {{name}} будут отправлены на проверку. Хотите также заблокировать этого пользователя?",
+        "alsoBlock": "Также заблокировать контакт",
+        "cta": "Пожаловаться"
+      }
+    }
   }
 }

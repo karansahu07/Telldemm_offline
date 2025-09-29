@@ -453,5 +453,91 @@
     "createChannels": "Crea canali (WIP)",
     "statusPrivacy": "Privacy stato (WIP)",
     "clearCallLogs": "Cancella registro chiamate (WIP)"
+  },"userabout": {
+    "members": "Membri",
+    "group": "Gruppo",
+    "groups": "Gruppi",
+    "inCommon": "In comune",
+    "toolbar": {
+      "message": "Messaggio",
+      "call": "Chiamata",
+      "video": "Video",
+      "add": "Aggiungi"
+    },
+    "defaults": {
+      "heyThere": "Ciao! Sto usando Telldemm.",
+      "noGroupDescription": "Nessuna descrizione del gruppo.",
+      "unknown": "Sconosciuto",
+      "unknownDate": "Data sconosciuta",
+      "unnamedGroup": "Gruppo senza nome"
+    },
+    "updatedOn": "Aggiornato il",
+    "createdByOn": "Creato da {{name}} il",
+    "media": {
+      "title": "Media, link e documenti"
+    },
+    "notifications": "Notifiche",
+    "mediaVisibility": "Visibilità dei media",
+    "encryption": {
+      "title": "Crittografia",
+      "subtitle": "Messaggi e chiamate sono crittografati end-to-end. Tocca per verificare."
+    },
+    "disappearing": "Messaggi effimeri",
+    "chatLock": {
+      "title": "Blocco chat",
+      "subtitle": "Blocca e nascondi questa chat su questo dispositivo."
+    },
+    "advancedPrivacy": {
+      "title": "Privacy chat avanzata",
+      "off": "Disattivato"
+    },
+    "createGroupWith": "Crea gruppo con {{name}}",
+    "commonGroupWith": "Gruppo in comune con {{name}}",
+    "groupMembers": "Membri del gruppo",
+    "addMembers": "Aggiungi membri",
+    "groupAdmin": "Amministratore del gruppo",
+    "viewPastMembers": "Visualizza ex membri",
+    "addToFavourites": "Aggiungi ai preferiti",
+    "addToList": "Aggiungi alla lista",
+    "block": "Blocca {{name}}",
+    "unblock": "Sblocca {{name}}",
+    "report": "Segnala {{name}}",
+    "actions": {
+      "message": "Messaggio",
+      "dismissAdmin": "Rimuovi da Admin",
+      "makeAdmin": "Rendi Admin",
+      "removeFromGroup": "Rimuovi dal gruppo"
+    },
+    "toasts": {
+      "madeAdmin": "{{name}} è ora admin",
+      "dismissedAdmin": "{{name}} non è più admin",
+      "removedFromGroup": "{{name}} è stato rimosso dal gruppo",
+      "blocked": "{{name}} è stato bloccato.",
+      "unblocked": "{{name}} è stato sbloccato.",
+      "reported": "{{name}} è stato segnalato.",
+      "reportedAndBlocked": "{{name}} è stato segnalato e bloccato."
+    },
+    "errors": {
+      "makeAdmin": "Impossibile rendere {{name}} admin",
+      "dismissAdmin": "Impossibile rimuovere {{name}} come admin",
+      "removeMember": "Errore durante la rimozione del membro"
+    },
+    "alerts": {
+      "block": {
+        "header": "Blocca contatto",
+        "message": "Non riceverai più messaggi o chiamate da {{name}}.",
+        "cta": "Blocca"
+      },
+      "unblock": {
+        "header": "Sblocca contatto",
+        "message": "Sei sicuro di voler sbloccare {{name}}?"
+      },
+      "report": {
+        "header": "Segnala contatto",
+        "message": "Gli ultimi 5 messaggi da {{name}} saranno segnalati. Vuoi anche bloccare questo utente?",
+        "alsoBlock": "Blocca anche il contatto",
+        "cta": "Segnala"
+      }
+    }
   }
 }

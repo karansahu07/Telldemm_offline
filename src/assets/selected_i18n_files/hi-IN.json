@@ -453,5 +453,91 @@
     "createChannels": "चैनल बनाएं (WIP)",
     "statusPrivacy": "स्टेटस गोपनीयता (WIP)",
     "clearCallLogs": "कॉल लॉग्स साफ करें (WIP)"
+  },"userabout": {
+    "members": "सदस्य",
+    "group": "समूह",
+    "groups": "समूह",
+    "inCommon": "साझा",
+    "toolbar": {
+      "message": "संदेश",
+      "call": "कॉल",
+      "video": "वीडियो",
+      "add": "जोड़ें"
+    },
+    "defaults": {
+      "heyThere": "नमस्ते! मैं Telldemm का उपयोग कर रहा हूँ।",
+      "noGroupDescription": "कोई समूह विवरण नहीं।",
+      "unknown": "अज्ञात",
+      "unknownDate": "अज्ञात तिथि",
+      "unnamedGroup": "बेनाम समूह"
+    },
+    "updatedOn": "अपडेट किया गया",
+    "createdByOn": "{{name}} द्वारा बनाया गया",
+    "media": {
+      "title": "मीडिया, लिंक और दस्तावेज़"
+    },
+    "notifications": "सूचनाएँ",
+    "mediaVisibility": "मीडिया दृश्यता",
+    "encryption": {
+      "title": "एन्क्रिप्शन",
+      "subtitle": "संदेश और कॉल एंड-टू-एंड एन्क्रिप्टेड हैं। सत्यापित करने के लिए टैप करें।"
+    },
+    "disappearing": "गायब होने वाले संदेश",
+    "chatLock": {
+      "title": "चैट लॉक",
+      "subtitle": "इस डिवाइस पर इस चैट को लॉक और छिपाएँ।"
+    },
+    "advancedPrivacy": {
+      "title": "उन्नत चैट गोपनीयता",
+      "off": "बंद"
+    },
+    "createGroupWith": "{{name}} के साथ समूह बनाएँ",
+    "commonGroupWith": "{{name}} के साथ साझा समूह",
+    "groupMembers": "समूह सदस्य",
+    "addMembers": "सदस्य जोड़ें",
+    "groupAdmin": "समूह व्यवस्थापक",
+    "viewPastMembers": "पिछले सदस्यों को देखें",
+    "addToFavourites": "पसंदीदा में जोड़ें",
+    "addToList": "सूची में जोड़ें",
+    "block": "{{name}} को ब्लॉक करें",
+    "unblock": "{{name}} को अनब्लॉक करें",
+    "report": "{{name}} की रिपोर्ट करें",
+    "actions": {
+      "message": "संदेश",
+      "dismissAdmin": "व्यवस्थापक से हटाएँ",
+      "makeAdmin": "व्यवस्थापक बनाएँ",
+      "removeFromGroup": "समूह से हटाएँ"
+    },
+    "toasts": {
+      "madeAdmin": "{{name}} अब व्यवस्थापक है",
+      "dismissedAdmin": "{{name}} अब व्यवस्थापक नहीं है",
+      "removedFromGroup": "{{name}} को समूह से हटाया गया",
+      "blocked": "{{name}} ब्लॉक कर दिया गया है।",
+      "unblocked": "{{name}} अनब्लॉक कर दिया गया है।",
+      "reported": "{{name}} रिपोर्ट किया गया है।",
+      "reportedAndBlocked": "{{name}} रिपोर्ट और ब्लॉक कर दिया गया है।"
+    },
+    "errors": {
+      "makeAdmin": "{{name}} को व्यवस्थापक बनाने में विफल",
+      "dismissAdmin": "{{name}} को हटाने में विफल",
+      "removeMember": "सदस्य को हटाने में त्रुटि"
+    },
+    "alerts": {
+      "block": {
+        "header": "संपर्क ब्लॉक करें",
+        "message": "आपको अब {{name}} से संदेश या कॉल प्राप्त नहीं होंगे।",
+        "cta": "ब्लॉक"
+      },
+      "unblock": {
+        "header": "संपर्क अनब्लॉक करें",
+        "message": "क्या आप वाकई {{name}} को अनब्लॉक करना चाहते हैं?"
+      },
+      "report": {
+        "header": "संपर्क की रिपोर्ट करें",
+        "message": "पिछले 5 संदेश {{name}} से रिपोर्ट किए जाएंगे। क्या आप इस उपयोगकर्ता को ब्लॉक भी करना चाहते हैं?",
+        "alsoBlock": "संपर्क को भी ब्लॉक करें",
+        "cta": "रिपोर्ट"
+      }
+    }
   }
 }

@@ -453,5 +453,91 @@
     "createChannels": "チャンネルを作成 (WIP)",
     "statusPrivacy": "ステータスのプライバシー (WIP)",
     "clearCallLogs": "通話履歴を消去 (WIP)"
+  },"userabout": {
+    "members": "メンバー",
+    "group": "グループ",
+    "groups": "グループ",
+    "inCommon": "共通",
+    "toolbar": {
+      "message": "メッセージ",
+      "call": "通話",
+      "video": "ビデオ",
+      "add": "追加"
+    },
+    "defaults": {
+      "heyThere": "こんにちは！Telldemmを使っています。",
+      "noGroupDescription": "グループの説明はありません。",
+      "unknown": "不明",
+      "unknownDate": "不明な日付",
+      "unnamedGroup": "無名グループ"
+    },
+    "updatedOn": "更新日",
+    "createdByOn": "{{name}} が作成した日",
+    "media": {
+      "title": "メディア、リンク、ドキュメント"
+    },
+    "notifications": "通知",
+    "mediaVisibility": "メディアの表示",
+    "encryption": {
+      "title": "暗号化",
+      "subtitle": "メッセージと通話はエンドツーエンドで暗号化されています。タップして確認してください。"
+    },
+    "disappearing": "消えるメッセージ",
+    "chatLock": {
+      "title": "チャットロック",
+      "subtitle": "このデバイスでこのチャットをロックして非表示にします。"
+    },
+    "advancedPrivacy": {
+      "title": "高度なチャットプライバシー",
+      "off": "オフ"
+    },
+    "createGroupWith": "{{name}} とグループを作成",
+    "commonGroupWith": "{{name}} と共通のグループ",
+    "groupMembers": "グループメンバー",
+    "addMembers": "メンバーを追加",
+    "groupAdmin": "グループ管理者",
+    "viewPastMembers": "過去のメンバーを見る",
+    "addToFavourites": "お気に入りに追加",
+    "addToList": "リストに追加",
+    "block": "{{name}} をブロック",
+    "unblock": "{{name}} のブロックを解除",
+    "report": "{{name}} を報告",
+    "actions": {
+      "message": "メッセージ",
+      "dismissAdmin": "管理者から削除",
+      "makeAdmin": "管理者にする",
+      "removeFromGroup": "グループから削除"
+    },
+    "toasts": {
+      "madeAdmin": "{{name}} は管理者になりました",
+      "dismissedAdmin": "{{name}} は管理者ではなくなりました",
+      "removedFromGroup": "{{name}} はグループから削除されました",
+      "blocked": "{{name}} はブロックされました。",
+      "unblocked": "{{name}} のブロックを解除しました。",
+      "reported": "{{name}} は報告されました。",
+      "reportedAndBlocked": "{{name}} は報告され、ブロックされました。"
+    },
+    "errors": {
+      "makeAdmin": "{{name}} を管理者にできませんでした",
+      "dismissAdmin": "{{name}} を管理者から削除できませんでした",
+      "removeMember": "メンバーの削除中にエラーが発生しました"
+    },
+    "alerts": {
+      "block": {
+        "header": "連絡先をブロック",
+        "message": "{{name}} からのメッセージや通話は受信しなくなります。",
+        "cta": "ブロック"
+      },
+      "unblock": {
+        "header": "連絡先のブロックを解除",
+        "message": "{{name}} のブロックを解除してもよろしいですか？"
+      },
+      "report": {
+        "header": "連絡先を報告",
+        "message": "{{name}} からの直近5件のメッセージが報告されます。このユーザーをブロックしますか？",
+        "alsoBlock": "連絡先もブロック",
+        "cta": "報告"
+      }
+    }
   }
 }

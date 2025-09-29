@@ -455,6 +455,92 @@
     "createChannels": "চ্যানেল তৈরি করুন (WIP)",
     "statusPrivacy": "স্ট্যাটাস প্রাইভেসি (WIP)",
     "clearCallLogs": "কল লগ মুছুন (WIP)"
+  },"userabout": {
+    "members": "সদস্য",
+    "group": "গ্রুপ",
+    "groups": "গ্রুপসমূহ",
+    "inCommon": "কমন",
+    "toolbar": {
+      "message": "বার্তা",
+      "call": "কল",
+      "video": "ভিডিও",
+      "add": "যোগ করুন"
+    },
+    "defaults": {
+      "heyThere": "হ্যালো! আমি Telldemm ব্যবহার করছি।",
+      "noGroupDescription": "কোনো গ্রুপ বিবরণ নেই।",
+      "unknown": "অজানা",
+      "unknownDate": "অজানা তারিখ",
+      "unnamedGroup": "নামহীন গ্রুপ"
+    },
+    "updatedOn": "আপডেট হয়েছে",
+    "createdByOn": "{{name}} দ্বারা তৈরি করা হয়েছে",
+    "media": {
+      "title": "মিডিয়া, লিঙ্ক এবং ডকস"
+    },
+    "notifications": "নোটিফিকেশন",
+    "mediaVisibility": "মিডিয়া দৃশ্যমানতা",
+    "encryption": {
+      "title": "এনক্রিপশন",
+      "subtitle": "বার্তা এবং কল প্রান্ত-থেকে-প্রান্ত এনক্রিপ্ট করা। যাচাই করতে ট্যাপ করুন।"
+    },
+    "disappearing": "অদৃশ্য বার্তা",
+    "chatLock": {
+      "title": "চ্যাট লক",
+      "subtitle": "এই ডিভাইসে এই চ্যাট লক এবং লুকান।"
+    },
+    "advancedPrivacy": {
+      "title": "উন্নত চ্যাট গোপনীয়তা",
+      "off": "বন্ধ"
+    },
+    "createGroupWith": "{{name}} এর সাথে গ্রুপ তৈরি করুন",
+    "commonGroupWith": "{{name}} এর সাথে সাধারণ গ্রুপ",
+    "groupMembers": "গ্রুপ সদস্যরা",
+    "addMembers": "সদস্য যোগ করুন",
+    "groupAdmin": "গ্রুপ অ্যাডমিন",
+    "viewPastMembers": "পূর্ববর্তী সদস্যদের দেখুন",
+    "addToFavourites": "পছন্দের তালিকায় যোগ করুন",
+    "addToList": "তালিকায় যোগ করুন",
+    "block": "{{name}} কে ব্লক করুন",
+    "unblock": "{{name}} কে আনব্লক করুন",
+    "report": "{{name}} রিপোর্ট করুন",
+    "actions": {
+      "message": "বার্তা",
+      "dismissAdmin": "অ্যাডমিন থেকে সরান",
+      "makeAdmin": "অ্যাডমিন করুন",
+      "removeFromGroup": "গ্রুপ থেকে সরান"
+    },
+    "toasts": {
+      "madeAdmin": "{{name}} এখন অ্যাডমিন",
+      "dismissedAdmin": "{{name}} আর অ্যাডমিন নয়",
+      "removedFromGroup": "{{name}} গ্রুপ থেকে সরানো হয়েছে",
+      "blocked": "{{name}} ব্লক করা হয়েছে।",
+      "unblocked": "{{name}} আনব্লক করা হয়েছে।",
+      "reported": "{{name}} রিপোর্ট করা হয়েছে।",
+      "reportedAndBlocked": "{{name}} রিপোর্ট এবং ব্লক করা হয়েছে।"
+    },
+    "errors": {
+      "makeAdmin": "{{name}} কে অ্যাডমিন করতে ব্যর্থ",
+      "dismissAdmin": "{{name}} কে অ্যাডমিন থেকে সরাতে ব্যর্থ",
+      "removeMember": "সদস্য সরানোর সময় ত্রুটি ঘটেছে"
+    },
+    "alerts": {
+      "block": {
+        "header": "কন্টাক্ট ব্লক করুন",
+        "message": "আপনি আর {{name}} থেকে বার্তা বা কল পাবেন না।",
+        "cta": "ব্লক"
+      },
+      "unblock": {
+        "header": "কন্টাক্ট আনব্লক করুন",
+        "message": "আপনি কি নিশ্চিত যে {{name}} কে আনব্লক করতে চান?"
+      },
+      "report": {
+        "header": "কন্টাক্ট রিপোর্ট করুন",
+        "message": "{{name}} এর সর্বশেষ 5 বার্তা রিপোর্ট করা হবে। আপনি কি এই ব্যবহারকারীকে ব্লক করতে চান?",
+        "alsoBlock": "কন্টাক্টকেও ব্লক করুন",
+        "cta": "রিপোর্ট"
+      }
+    }
   }
 
 

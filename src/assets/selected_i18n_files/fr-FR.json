@@ -454,5 +454,91 @@
     "createChannels": "Créer des chaînes (WIP)",
     "statusPrivacy": "Confidentialité du statut (WIP)",
     "clearCallLogs": "Effacer l’historique des appels (WIP)"
+  }, "userabout": {
+    "members": "Membres",
+    "group": "Groupe",
+    "groups": "Groupes",
+    "inCommon": "En commun",
+    "toolbar": {
+      "message": "Message",
+      "call": "Appel",
+      "video": "Vidéo",
+      "add": "Ajouter"
+    },
+    "defaults": {
+      "heyThere": "Salut ! J’utilise Telldemm.",
+      "noGroupDescription": "Pas de description de groupe.",
+      "unknown": "Inconnu",
+      "unknownDate": "Date inconnue",
+      "unnamedGroup": "Groupe sans nom"
+    },
+    "updatedOn": "Mis à jour le",
+    "createdByOn": "Créé par {{name}} le",
+    "media": {
+      "title": "Médias, liens et documents"
+    },
+    "notifications": "Notifications",
+    "mediaVisibility": "Visibilité des médias",
+    "encryption": {
+      "title": "Chiffrement",
+      "subtitle": "Les messages et appels sont chiffrés de bout en bout. Touchez pour vérifier."
+    },
+    "disappearing": "Messages éphémères",
+    "chatLock": {
+      "title": "Verrouillage de chat",
+      "subtitle": "Verrouiller et masquer cette discussion sur cet appareil."
+    },
+    "advancedPrivacy": {
+      "title": "Confidentialité avancée",
+      "off": "Désactivé"
+    },
+    "createGroupWith": "Créer un groupe avec {{name}}",
+    "commonGroupWith": "Groupe en commun avec {{name}}",
+    "groupMembers": "Membres du groupe",
+    "addMembers": "Ajouter des membres",
+    "groupAdmin": "Administrateur du groupe",
+    "viewPastMembers": "Voir les anciens membres",
+    "addToFavourites": "Ajouter aux favoris",
+    "addToList": "Ajouter à la liste",
+    "block": "Bloquer {{name}}",
+    "unblock": "Débloquer {{name}}",
+    "report": "Signaler {{name}}",
+    "actions": {
+      "message": "Message",
+      "dismissAdmin": "Rétrograder de l’admin",
+      "makeAdmin": "Nommer admin",
+      "removeFromGroup": "Retirer du groupe"
+    },
+    "toasts": {
+      "madeAdmin": "{{name}} est maintenant admin",
+      "dismissedAdmin": "{{name}} n’est plus admin",
+      "removedFromGroup": "{{name}} a été retiré du groupe",
+      "blocked": "{{name}} a été bloqué.",
+      "unblocked": "{{name}} a été débloqué.",
+      "reported": "{{name}} a été signalé.",
+      "reportedAndBlocked": "{{name}} a été signalé et bloqué."
+    },
+    "errors": {
+      "makeAdmin": "Impossible de nommer {{name}} admin",
+      "dismissAdmin": "Impossible de rétrograder {{name}}",
+      "removeMember": "Erreur lors du retrait du membre"
+    },
+    "alerts": {
+      "block": {
+        "header": "Bloquer le contact",
+        "message": "Vous ne recevrez plus de messages ou d’appels de {{name}}.",
+        "cta": "Bloquer"
+      },
+      "unblock": {
+        "header": "Débloquer le contact",
+        "message": "Voulez-vous vraiment débloquer {{name}} ?"
+      },
+      "report": {
+        "header": "Signaler le contact",
+        "message": "Les 5 derniers messages de {{name}} seront signalés. Voulez-vous aussi bloquer cet utilisateur ?",
+        "alsoBlock": "Bloquer aussi le contact",
+        "cta": "Signaler"
+      }
+    }
   }
 }

@@ -453,5 +453,91 @@
     "createChannels": "ચેનલ્સ બનાવો (WIP)",
     "statusPrivacy": "સ્ટેટસ પ્રાઈવસી (WIP)",
     "clearCallLogs": "કૉલ લોગ્સ સાફ કરો (WIP)"
+  }, "userabout": {
+    "members": "સભ્યો",
+    "group": "ગ્રુપ",
+    "groups": "ગ્રુપ્સ",
+    "inCommon": "સામાન્ય",
+    "toolbar": {
+      "message": "સંદેશ",
+      "call": "કૉલ",
+      "video": "વિડિયો",
+      "add": "ઉમેરો"
+    },
+    "defaults": {
+      "heyThere": "હાય! હું Telldemm નો ઉપયોગ કરી રહ્યો છું.",
+      "noGroupDescription": "કોઈ ગ્રુપ વર્ણન નથી.",
+      "unknown": "અજ્ઞાત",
+      "unknownDate": "અજ્ઞાત તારીખ",
+      "unnamedGroup": "નામ વિનાનું ગ્રુપ"
+    },
+    "updatedOn": "પર અપડેટ થયું",
+    "createdByOn": "{{name}} દ્વારા બનાવવામાં આવ્યું",
+    "media": {
+      "title": "મીડિયા, લિંક્સ અને દસ્તાવેજો"
+    },
+    "notifications": "સૂચનાઓ",
+    "mediaVisibility": "મીડિયા દૃશ્યતા",
+    "encryption": {
+      "title": "એન્ક્રિપ્શન",
+      "subtitle": "સંદેશાઓ અને કૉલ્સ એન્ડ-ટુ-એન્ડ એન્ક્રિપ્ટ થયેલા છે. ચકાસવા માટે ટૅપ કરો."
+    },
+    "disappearing": "ગાયબ થતી સંદેશાઓ",
+    "chatLock": {
+      "title": "ચેટ લૉક",
+      "subtitle": "આ ઉપકરણ પર આ ચેટ લૉક કરો અને છુપાવો."
+    },
+    "advancedPrivacy": {
+      "title": "ઉન્નત ચેટ ગોપનીયતા",
+      "off": "બંધ"
+    },
+    "createGroupWith": "{{name}} સાથે ગ્રુપ બનાવો",
+    "commonGroupWith": "{{name}} સાથે સામાન્ય ગ્રુપ",
+    "groupMembers": "ગ્રુપ સભ્યો",
+    "addMembers": "સભ્યો ઉમેરો",
+    "groupAdmin": "ગ્રુપ એડમિન",
+    "viewPastMembers": "ભૂતકાળના સભ્યો જુઓ",
+    "addToFavourites": "ફેવરિટ્સમાં ઉમેરો",
+    "addToList": "યાદીમાં ઉમેરો",
+    "block": "{{name}} ને બ્લોક કરો",
+    "unblock": "{{name}} ને અનબ્લોક કરો",
+    "report": "{{name}} ને રિપોર્ટ કરો",
+    "actions": {
+      "message": "સંદેશ",
+      "dismissAdmin": "એડમિનમાંથી દૂર કરો",
+      "makeAdmin": "એડમિન બનાવો",
+      "removeFromGroup": "ગ્રુપમાંથી દૂર કરો"
+    },
+    "toasts": {
+      "madeAdmin": "{{name}} હવે એડમિન છે",
+      "dismissedAdmin": "{{name}} હવે એડમિન નથી",
+      "removedFromGroup": "{{name}} ગ્રુપમાંથી દૂર કરવામાં આવ્યો છે",
+      "blocked": "{{name}} ને બ્લોક કરવામાં આવ્યો છે.",
+      "unblocked": "{{name}} ને અનબ્લોક કરવામાં આવ્યો છે.",
+      "reported": "{{name}} ને રિપોર્ટ કરવામાં આવ્યો છે.",
+      "reportedAndBlocked": "{{name}} ને રિપોર્ટ અને બ્લોક કરવામાં આવ્યો છે."
+    },
+    "errors": {
+      "makeAdmin": "{{name}} ને એડમિન બનાવવા નિષ્ફળ",
+      "dismissAdmin": "{{name}} ને એડમિનમાંથી દૂર કરવામાં નિષ્ફળ",
+      "removeMember": "સભ્યને દૂર કરતી વખતે ભૂલ"
+    },
+    "alerts": {
+      "block": {
+        "header": "સંપર્કને બ્લોક કરો",
+        "message": "તમે હવે {{name}} પાસેથી સંદેશાઓ અથવા કૉલ્સ પ્રાપ્ત નહીં કરો.",
+        "cta": "બ્લોક"
+      },
+      "unblock": {
+        "header": "સંપર્કને અનબ્લોક કરો",
+        "message": "શું તમે ખરેખર {{name}} ને અનબ્લોક કરવા માંગો છો?"
+      },
+      "report": {
+        "header": "સંપર્કને રિપોર્ટ કરો",
+        "message": "{{name}} ના છેલ્લા 5 સંદેશાઓ રિપોર્ટ કરવામાં આવશે. શું તમે આ યુઝરને પણ બ્લોક કરવા માંગો છો?",
+        "alsoBlock": "સંપર્કને પણ બ્લોક કરો",
+        "cta": "રિપોર્ટ"
+      }
+    }
   }
 }

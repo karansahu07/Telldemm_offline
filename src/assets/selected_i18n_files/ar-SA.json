@@ -455,5 +455,92 @@
     "createChannels": "إنشاء قنوات (WIP)",
     "statusPrivacy": "خصوصية الحالة (WIP)",
     "clearCallLogs": "مسح سجلات المكالمات (WIP)"
+  },
+   "userabout": {
+    "members": "الأعضاء",
+    "group": "مجموعة",
+    "groups": "المجموعات",
+    "inCommon": "مشترك",
+    "toolbar": {
+      "message": "رسالة",
+      "call": "مكالمة",
+      "video": "فيديو",
+      "add": "إضافة"
+    },
+    "defaults": {
+      "heyThere": "مرحبًا! أنا أستخدم Telldemm.",
+      "noGroupDescription": "لا يوجد وصف للمجموعة.",
+      "unknown": "غير معروف",
+      "unknownDate": "تاريخ غير معروف",
+      "unnamedGroup": "مجموعة بدون اسم"
+    },
+    "updatedOn": "تم التحديث في",
+    "createdByOn": "تم الإنشاء بواسطة {{name}} في",
+    "media": {
+      "title": "الوسائط والروابط والمستندات"
+    },
+    "notifications": "الإشعارات",
+    "mediaVisibility": "إظهار الوسائط",
+    "encryption": {
+      "title": "التشفير",
+      "subtitle": "الرسائل والمكالمات مشفرة من طرف إلى طرف. اضغط للتحقق."
+    },
+    "disappearing": "الرسائل المختفية",
+    "chatLock": {
+      "title": "قفل الدردشة",
+      "subtitle": "اقفل وأخفِ هذه الدردشة على هذا الجهاز."
+    },
+    "advancedPrivacy": {
+      "title": "خصوصية الدردشة المتقدمة",
+      "off": "متوقف"
+    },
+    "createGroupWith": "إنشاء مجموعة مع {{name}}",
+    "commonGroupWith": "مجموعة مشتركة مع {{name}}",
+    "groupMembers": "أعضاء المجموعة",
+    "addMembers": "إضافة أعضاء",
+    "groupAdmin": "مسؤول المجموعة",
+    "viewPastMembers": "عرض الأعضاء السابقين",
+    "addToFavourites": "إضافة إلى المفضلة",
+    "addToList": "إضافة إلى القائمة",
+    "block": "حظر {{name}}",
+    "unblock": "إلغاء حظر {{name}}",
+    "report": "الإبلاغ عن {{name}}",
+    "actions": {
+      "message": "رسالة",
+      "dismissAdmin": "إزالة من المسؤولين",
+      "makeAdmin": "تعيين كمسؤول",
+      "removeFromGroup": "إزالة من المجموعة"
+    },
+    "toasts": {
+      "madeAdmin": "{{name}} أصبح مسؤولاً الآن",
+      "dismissedAdmin": "{{name}} لم يعد مسؤولاً",
+      "removedFromGroup": "{{name}} تمت إزالته من المجموعة",
+      "blocked": "{{name}} تم حظره.",
+      "unblocked": "{{name}} تم إلغاء حظره.",
+      "reported": "{{name}} تم الإبلاغ عنه.",
+      "reportedAndBlocked": "{{name}} تم الإبلاغ عنه وحظره."
+    },
+    "errors": {
+      "makeAdmin": "فشل في تعيين {{name}} كمسؤول",
+      "dismissAdmin": "فشل في إزالة {{name}} من المسؤولين",
+      "removeMember": "حدث خطأ أثناء إزالة العضو"
+    },
+    "alerts": {
+      "block": {
+        "header": "حظر جهة الاتصال",
+        "message": "لن تتلقى رسائل أو مكالمات من {{name}} بعد الآن.",
+        "cta": "حظر"
+      },
+      "unblock": {
+        "header": "إلغاء حظر جهة الاتصال",
+        "message": "هل أنت متأكد أنك تريد إلغاء حظر {{name}}؟"
+      },
+      "report": {
+        "header": "الإبلاغ عن جهة الاتصال",
+        "message": "سيتم الإبلاغ عن آخر 5 رسائل من {{name}}. هل تريد أيضًا حظر هذا المستخدم؟",
+        "alsoBlock": "أيضًا حظر جهة الاتصال",
+        "cta": "إبلاغ"
+      }
+    }
   }
 }

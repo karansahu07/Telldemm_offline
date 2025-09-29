@@ -454,5 +454,91 @@
     "createChannels": "Create channels (WIP)",
     "statusPrivacy": "Status Privacy (WIP)",
     "clearCallLogs": "Clear call logs (WIP)"
+  },"userabout": {
+    "members": "Members",
+    "group": "Group",
+    "groups": "Groups",
+    "inCommon": "In Common",
+    "toolbar": {
+      "message": "Message",
+      "call": "Call",
+      "video": "Video",
+      "add": "Add"
+    },
+    "defaults": {
+      "heyThere": "Hey there! I am using Telldemm.",
+      "noGroupDescription": "No group description.",
+      "unknown": "Unknown",
+      "unknownDate": "Unknown Date",
+      "unnamedGroup": "Unnamed Group"
+    },
+    "updatedOn": "Updated on",
+    "createdByOn": "Created by {{name}} on",
+    "media": {
+      "title": "Media, Links, and Docs"
+    },
+    "notifications": "Notifications",
+    "mediaVisibility": "Media Visibility",
+    "encryption": {
+      "title": "Encryption",
+      "subtitle": "Messages and calls are end-to-end encrypted. Tap to verify."
+    },
+    "disappearing": "Disappearing messages",
+    "chatLock": {
+      "title": "Chat lock",
+      "subtitle": "Lock and hide this chat on this device."
+    },
+    "advancedPrivacy": {
+      "title": "Advanced Chat Privacy",
+      "off": "Off"
+    },
+    "createGroupWith": "Create group with {{name}}",
+    "commonGroupWith": "Common group with {{name}}",
+    "groupMembers": "Group Members",
+    "addMembers": "Add Members",
+    "groupAdmin": "Group Admin",
+    "viewPastMembers": "View Past Members",
+    "addToFavourites": "Add to Favourites",
+    "addToList": "Add to list",
+    "block": "Block {{name}}",
+    "unblock": "Unblock {{name}}",
+    "report": "Report {{name}}",
+    "actions": {
+      "message": "Message",
+      "dismissAdmin": "Dismiss as Admin",
+      "makeAdmin": "Make Admin",
+      "removeFromGroup": "Remove from Group"
+    },
+    "toasts": {
+      "madeAdmin": "{{name}} is now an Admin",
+      "dismissedAdmin": "{{name}} is no longer an Admin",
+      "removedFromGroup": "{{name}} removed from group",
+      "blocked": "{{name}} has been blocked.",
+      "unblocked": "{{name}} has been unblocked.",
+      "reported": "{{name}} has been reported.",
+      "reportedAndBlocked": "{{name}} has been reported and blocked."
+    },
+    "errors": {
+      "makeAdmin": "Failed to make {{name}} admin",
+      "dismissAdmin": "Failed to dismiss {{name}} as admin",
+      "removeMember": "Error removing member"
+    },
+    "alerts": {
+      "block": {
+        "header": "Block Contact",
+        "message": "You will no longer receive messages or calls from {{name}}.",
+        "cta": "Block"
+      },
+      "unblock": {
+        "header": "Unblock Contact",
+        "message": "Are you sure you want to unblock {{name}}?"
+      },
+      "report": {
+        "header": "Report Contact",
+        "message": "The last 5 messages from {{name}} will be reported. Do you also want to block this user?",
+        "alsoBlock": "Also block contact",
+        "cta": "Report"
+      }
+    }
   }
 }

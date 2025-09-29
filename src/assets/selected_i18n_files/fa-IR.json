@@ -400,5 +400,91 @@
     "createChannels": "ایجاد کانال‌ها (WIP)",
     "statusPrivacy": "حریم خصوصی وضعیت (WIP)",
     "clearCallLogs": "پاک کردن تاریخچه تماس‌ها (WIP)"
+  },"userabout": {
+    "members": "اعضا",
+    "group": "گروه",
+    "groups": "گروه‌ها",
+    "inCommon": "مشترک",
+    "toolbar": {
+      "message": "پیام",
+      "call": "تماس",
+      "video": "ویدیو",
+      "add": "افزودن"
+    },
+    "defaults": {
+      "heyThere": "سلام! من از Telldemm استفاده می‌کنم.",
+      "noGroupDescription": "هیچ توضیحی برای گروه وجود ندارد.",
+      "unknown": "ناشناخته",
+      "unknownDate": "تاریخ ناشناخته",
+      "unnamedGroup": "گروه بی‌نام"
+    },
+    "updatedOn": "به‌روزرسانی شده در",
+    "createdByOn": "ایجاد شده توسط {{name}} در",
+    "media": {
+      "title": "رسانه، لینک‌ها و اسناد"
+    },
+    "notifications": "اعلان‌ها",
+    "mediaVisibility": "نمایش رسانه",
+    "encryption": {
+      "title": "رمزگذاری",
+      "subtitle": "پیام‌ها و تماس‌ها از ابتدا تا انتها رمزگذاری شده‌اند. برای بررسی ضربه بزنید."
+    },
+    "disappearing": "پیام‌های ناپدیدشونده",
+    "chatLock": {
+      "title": "قفل گفتگو",
+      "subtitle": "این گفتگو را در این دستگاه قفل و مخفی کنید."
+    },
+    "advancedPrivacy": {
+      "title": "حریم خصوصی پیشرفته",
+      "off": "خاموش"
+    },
+    "createGroupWith": "ایجاد گروه با {{name}}",
+    "commonGroupWith": "گروه مشترک با {{name}}",
+    "groupMembers": "اعضای گروه",
+    "addMembers": "افزودن اعضا",
+    "groupAdmin": "مدیر گروه",
+    "viewPastMembers": "مشاهده اعضای گذشته",
+    "addToFavourites": "افزودن به علاقه‌مندی‌ها",
+    "addToList": "افزودن به لیست",
+    "block": "مسدود کردن {{name}}",
+    "unblock": "رفع مسدودیت {{name}}",
+    "report": "گزارش {{name}}",
+    "actions": {
+      "message": "پیام",
+      "dismissAdmin": "حذف از مدیران",
+      "makeAdmin": "مدیر کردن",
+      "removeFromGroup": "حذف از گروه"
+    },
+    "toasts": {
+      "madeAdmin": "{{name}} اکنون مدیر است",
+      "dismissedAdmin": "{{name}} دیگر مدیر نیست",
+      "removedFromGroup": "{{name}} از گروه حذف شد",
+      "blocked": "{{name}} مسدود شد.",
+      "unblocked": "{{name}} رفع مسدودیت شد.",
+      "reported": "{{name}} گزارش شد.",
+      "reportedAndBlocked": "{{name}} گزارش و مسدود شد."
+    },
+    "errors": {
+      "makeAdmin": "ناموفق در مدیر کردن {{name}}",
+      "dismissAdmin": "ناموفق در حذف {{name}} از مدیران",
+      "removeMember": "خطا در حذف عضو"
+    },
+    "alerts": {
+      "block": {
+        "header": "مسدود کردن مخاطب",
+        "message": "دیگر پیامی یا تماسی از {{name}} دریافت نخواهید کرد.",
+        "cta": "مسدود کردن"
+      },
+      "unblock": {
+        "header": "رفع مسدودیت مخاطب",
+        "message": "آیا مطمئن هستید که می‌خواهید {{name}} را رفع مسدودیت کنید؟"
+      },
+      "report": {
+        "header": "گزارش مخاطب",
+        "message": "آخرین 5 پیام از {{name}} گزارش خواهد شد. آیا می‌خواهید این کاربر را نیز مسدود کنید؟",
+        "alsoBlock": "همچنین مخاطب را مسدود کن",
+        "cta": "گزارش"
+      }
+    }
   }
 }

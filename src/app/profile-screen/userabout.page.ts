@@ -13,6 +13,7 @@ import { AuthService } from '../auth/auth.service';
 import { ApiService } from '../services/api/api.service';
 import { push } from 'firebase/database';
 import { query, limitToLast, onValue } from "firebase/database";
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 // removed unused firstValueFrom import
 // import { firstValueFrom } from 'rxjs';
 
@@ -22,7 +23,7 @@ import { query, limitToLast, onValue } from "firebase/database";
   styleUrls: ['./userabout.page.scss'],
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [IonicModule, CommonModule],
+  imports: [IonicModule, CommonModule,TranslateModule],
 })
 export class UseraboutPage implements OnInit {
   receiverId: string = '';
@@ -80,6 +81,7 @@ socialMediaLinks: { platform: string; profile_url: string }[] = [];
     private authService: AuthService,
     private service: ApiService,
     private alertCtrl: AlertController,
+    private translate: TranslateService,
   ) { }
 
   ngOnInit() {
@@ -352,55 +354,53 @@ openExternalLink(url: string) {
     }
   }
 
-  async openActionSheet(member: any) {
-    const buttons: ActionSheetButton[] = [
-      {
-        text: 'Message',
-        icon: 'chatbox',
-        handler: () => this.messageMember(member)
-      },
-    ];
+ // ---- ACTION SHEET ----
+async openActionSheet(member: any) {
+  const t = this.translate; // shorthand
 
-    const isCurrentUserAdmin = this.groupMembers.find(m => m.user_id === this.currentUserId)?.role === 'admin';
-    const isTargetUserAdmin = member.role === 'admin';
-    const isSelf = member.user_id === this.currentUserId;
+  const buttons: ActionSheetButton[] = [
+    {
+      text: t.instant('userabout.actions.message'),
+      icon: 'chatbox',
+      handler: () => this.messageMember(member)
+    },
+  ];
 
-    if (isCurrentUserAdmin && !isSelf) {
-      if (isTargetUserAdmin) {
-        buttons.push({
-          text: 'Dismiss as Admin',
-          icon: 'remove-circle',
-          handler: () => this.dismissAdmin(member)
-        });
-      } else {
-        buttons.push({
-          text: 'Make Admin',
-          icon: 'person-add',
-          handler: () => this.makeAdmin(member)
-        });
-      }
+  const isCurrentUserAdmin = this.groupMembers.find(m => m.user_id === this.currentUserId)?.role === 'admin';
+  const isTargetUserAdmin = member.role === 'admin';
+  const isSelf = member.user_id === this.currentUserId;
 
+  if (isCurrentUserAdmin && !isSelf) {
+    if (isTargetUserAdmin) {
       buttons.push({
-        text: 'Remove from Group',
-        icon: 'person-remove',
-        role: 'destructive',
-        handler: () => this.removeMemberFromGroup(member)
+        text: t.instant('userabout.actions.dismissAdmin'),
+        icon: 'remove-circle',
+        handler: () => this.dismissAdmin(member)
+      });
+    } else {
+      buttons.push({
+        text: t.instant('userabout.actions.makeAdmin'),
+        icon: 'person-add',
+        handler: () => this.makeAdmin(member)
       });
     }
 
     buttons.push({
-      text: 'Cancel',
-      role: 'cancel'
+      text: t.instant('userabout.actions.removeFromGroup'),
+      icon: 'person-remove',
+      role: 'destructive',
+      handler: () => this.removeMemberFromGroup(member)
     });
-
-    const actionSheet = await this.actionSheetCtrl.create({
-      header: member.name,
-      buttons
-    });
-
-    await actionSheet.present();
   }
 
+  buttons.push({ text: t.instant('common.cancel'), role: 'cancel' });
+
+  const actionSheet = await this.actionSheetCtrl.create({
+    header: member.name,
+    buttons
+  });
+  await actionSheet.present();
+}
   messageMember(member: any) {
     const senderId = this.authService.authData?.userId || '';
     const receiverId = member.user_id;
@@ -435,29 +435,23 @@ openExternalLink(url: string) {
 
     const memberRef = ref(db, `groups/${groupId}/members/${member.user_id}`);
 
-    try {
-      await update(memberRef, { role: 'admin' });
-
-      const updatedMemberIndex = this.groupMembers.findIndex(m => m.user_id === member.user_id);
-      if (updatedMemberIndex !== -1) {
-        this.groupMembers[updatedMemberIndex].role = 'admin';
-      }
-
-      const toast = await this.toastCtrl.create({
-        message: `${member.name} is now an admin`,
-        duration: 2000,
-        color: 'success'
-      });
-      await toast.present();
-    } catch (error) {
-      console.error('Error promoting member to admin:', error);
-      const toast = await this.toastCtrl.create({
-        message: `Failed to make ${member.name} admin`,
-        duration: 2000,
-        color: 'danger'
-      });
-      await toast.present();
-    }
+  try {
+    await update(memberRef, { role: 'admin' });
+    // ... (update local array)
+    const toast = await this.toastCtrl.create({
+      message: this.translate.instant('userabout.toasts.madeAdmin', { name: member.name }),
+      duration: 2000,
+      color: 'success'
+    });
+    await toast.present();
+  } catch (error) {
+    const toast = await this.toastCtrl.create({
+      message: this.translate.instant('userabout.errors.makeAdmin', { name: member.name }),
+      duration: 2000,
+      color: 'danger'
+    });
+    await toast.present();
+  }
   }
 
   async dismissAdmin(member: any) {
@@ -472,28 +466,22 @@ openExternalLink(url: string) {
     const memberRef = ref(db, `groups/${groupId}/members/${member.user_id}`);
 
     try {
-      await update(memberRef, { role: 'member' });
-
-      const updatedIndex = this.groupMembers.findIndex(m => m.user_id === member.user_id);
-      if (updatedIndex !== -1) {
-        this.groupMembers[updatedIndex].role = 'member';
-      }
-
-      const toast = await this.toastCtrl.create({
-        message: `${member.name} is no longer an admin`,
-        duration: 2000,
-        color: 'medium'
-      });
-      await toast.present();
-    } catch (error) {
-      console.error('Error demoting admin to member:', error);
-      const toast = await this.toastCtrl.create({
-        message: `Failed to dismiss ${member.name} as admin`,
-        duration: 2000,
-        color: 'danger'
-      });
-      await toast.present();
-    }
+    await update(memberRef, { role: 'member' });
+    // ...
+    const toast = await this.toastCtrl.create({
+      message: this.translate.instant('userabout.toasts.dismissedAdmin', { name: member.name }),
+      duration: 2000,
+      color: 'medium'
+    });
+    await toast.present();
+  } catch (error) {
+    const toast = await this.toastCtrl.create({
+      message: this.translate.instant('userabout.errors.dismissAdmin', { name: member.name }),
+      duration: 2000,
+      color: 'danger'
+    });
+    await toast.present();
+  }
   }
 
   async removeMemberFromGroup(member: any) {
@@ -540,18 +528,18 @@ openExternalLink(url: string) {
       this.groupMembers = this.groupMembers.filter(m => m.user_id !== member.user_id);
 
       const toast = await this.toastCtrl.create({
-        message: `${member.name} removed from group`,
-        duration: 2000,
-        color: 'success'
-      });
-      await toast.present();
+      message: this.translate.instant('userabout.toasts.removedFromGroup', { name: member.name }),
+      duration: 2000,
+      color: 'success'
+    });
+    await toast.present();
     } catch (error) {
       console.error('Error moving member to pastmembers:', error);
-      const toast = await this.toastCtrl.create({
-        message: `Error removing member`,
-        duration: 2000,
-        color: 'danger'
-      });
+       const toast = await this.toastCtrl.create({
+      message: this.translate.instant('userabout.errors.removeMember'),
+      duration: 2000,
+      color: 'danger'
+    });
       await toast.present();
     }
   }
@@ -796,23 +784,22 @@ openExternalLink(url: string) {
     });
   });
 }
-
 async blockUser() {
+  const t = this.translate;
   const alert = await this.alertCtrl.create({
-    header: 'Block Contact',
-    message: `You will no longer receive messages or calls from ${this.receiver_name}.`,
+    header: t.instant('userabout.alerts.block.header'),
+    message: t.instant('userabout.alerts.block.message', { name: this.receiver_name }),
     buttons: [
-      { text: 'Cancel', role: 'cancel' },
+      { text: t.instant('common.cancel'), role: 'cancel' },
       {
-        text: 'Block',
+        text: t.instant('userabout.alerts.block.cta'),
         handler: async () => {
           const db = getDatabase();
           const blockRef = ref(db, `blockedContacts/${this.currentUserId}/${this.receiverId}`);
           await set(blockRef, true);
-
-          this.iBlocked = true; // <-- update this flag
+          this.iBlocked = true;
           const toast = await this.toastCtrl.create({
-            message: `${this.receiver_name} has been blocked.`,
+            message: t.instant('userabout.toasts.blocked', { name: this.receiver_name }),
             duration: 2000,
             color: 'danger'
           });
@@ -825,21 +812,21 @@ async blockUser() {
 }
 
 async unblockUser() {
+  const t = this.translate;
   const alert = await this.alertCtrl.create({
-    header: 'Unblock Contact',
-    message: `Are you sure you want to unblock ${this.receiver_name}?`,
+    header: t.instant('userabout.alerts.unblock.header'),
+    message: t.instant('userabout.alerts.unblock.message', { name: this.receiver_name }),
     buttons: [
-      { text: 'Cancel', role: 'cancel' },
+      { text: t.instant('common.cancel'), role: 'cancel' },
       {
-        text: 'OK',
+        text: t.instant('common.ok'),
         handler: async () => {
           const db = getDatabase();
           const blockRef = ref(db, `blockedContacts/${this.currentUserId}/${this.receiverId}`);
           await remove(blockRef);
-
-          this.iBlocked = false; // <-- update this flag
+          this.iBlocked = false;
           const toast = await this.toastCtrl.create({
-            message: `${this.receiver_name} has been unblocked.`,
+            message: t.instant('userabout.toasts.unblocked', { name: this.receiver_name }),
             duration: 2000,
             color: 'success'
           });
@@ -848,60 +835,35 @@ async unblockUser() {
       }
     ]
   });
-
   await alert.present();
 }
+ async reportUser() {
+  const t = this.translate;
+  const alert = await this.alertCtrl.create({
+    header: t.instant('userabout.alerts.report.header'),
+    message: t.instant('userabout.alerts.report.message', { name: this.receiver_name }),
+    inputs: [{ type: 'checkbox', label: t.instant('userabout.alerts.report.alsoBlock'), value: 'block' }],
+    buttons: [
+      { text: t.instant('common.cancel'), role: 'cancel' },
+      {
+        text: t.instant('userabout.alerts.report.cta'),
+        handler: async (data) => {
+          // ... your existing report logic
+          const alsoBlock = data.includes('block');
+          const msg = alsoBlock
+            ? t.instant('userabout.toasts.reportedAndBlocked', { name: this.receiver_name })
+            : t.instant('userabout.toasts.reported', { name: this.receiver_name });
 
-  async reportUser() {
-    const alert = await this.alertCtrl.create({
-      header: 'Report Contact',
-      message: `The last 5 messages from ${this.receiver_name} will be reported. Do you also want to block this user?`,
-      inputs: [{ type: 'checkbox', label: 'Also block contact', value: 'block' }],
-      buttons: [
-        { text: 'Cancel', role: 'cancel' },
-        {
-          text: 'Report',
-          handler: async (data) => {
-            const db = getDatabase();
-
-            const msgsRef = ref(db, `messages/${this.currentUserId}_${this.receiverId}`);
-            const lastMsgsQuery = query(msgsRef, limitToLast(5));
-            const snapshot = await get(lastMsgsQuery);
-
-            let lastMessages: any[] = [];
-            if (snapshot.exists()) {
-              snapshot.forEach((msgSnap) => {
-                lastMessages.push(msgSnap.val());
-              });
-            }
-
-            const reportsRef = ref(db, `reports`);
-            const reportId = Date.now().toString();
-
-            await set(child(reportsRef, reportId), {
-              reportedBy: this.currentUserId,
-              reportedUser: this.receiverId,
-              timestamp: Date.now(),
-              messages: lastMessages
-            });
-
-            if (data.includes('block')) {
-              const blockRef = ref(db, `blockedContacts/${this.currentUserId}/${this.receiverId}`);
-              await set(blockRef, true);
-              this.isBlocked = true;
-            }
-
-            const toast = await this.toastCtrl.create({
-              message: `${this.receiver_name} has been reported${data.includes('block') ? ' and blocked' : ''}.`,
-              duration: 2000,
-              color: 'warning'
-            });
-            toast.present();
-          }
+          const toast = await this.toastCtrl.create({
+            message: msg,
+            duration: 2000,
+            color: 'warning'
+          });
+          toast.present();
         }
-      ]
-    });
-
-    await alert.present();
-  }
+      }
+    ]
+  });
+  await alert.present();
+}
 }

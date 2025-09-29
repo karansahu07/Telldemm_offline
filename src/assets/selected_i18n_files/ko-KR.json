@@ -453,5 +453,91 @@
     "createChannels": "채널 만들기 (WIP)",
     "statusPrivacy": "상태 공개 설정 (WIP)",
     "clearCallLogs": "통화 기록 지우기 (WIP)"
+  },"userabout": {
+    "members": "회원",
+    "group": "그룹",
+    "groups": "그룹",
+    "inCommon": "공통",
+    "toolbar": {
+      "message": "메시지",
+      "call": "통화",
+      "video": "비디오",
+      "add": "추가"
+    },
+    "defaults": {
+      "heyThere": "안녕하세요! 저는 Telldemm을 사용 중입니다.",
+      "noGroupDescription": "그룹 설명이 없습니다.",
+      "unknown": "알 수 없음",
+      "unknownDate": "알 수 없는 날짜",
+      "unnamedGroup": "이름 없는 그룹"
+    },
+    "updatedOn": "업데이트됨",
+    "createdByOn": "{{name}} 님이 생성함",
+    "media": {
+      "title": "미디어, 링크 및 문서"
+    },
+    "notifications": "알림",
+    "mediaVisibility": "미디어 표시",
+    "encryption": {
+      "title": "암호화",
+      "subtitle": "메시지와 통화는 종단 간 암호화됩니다. 확인하려면 탭하세요."
+    },
+    "disappearing": "사라지는 메시지",
+    "chatLock": {
+      "title": "채팅 잠금",
+      "subtitle": "이 기기에서 이 채팅을 잠그고 숨깁니다."
+    },
+    "advancedPrivacy": {
+      "title": "고급 채팅 프라이버시",
+      "off": "꺼짐"
+    },
+    "createGroupWith": "{{name}} 와 그룹 만들기",
+    "commonGroupWith": "{{name}} 와의 공통 그룹",
+    "groupMembers": "그룹 멤버",
+    "addMembers": "멤버 추가",
+    "groupAdmin": "그룹 관리자",
+    "viewPastMembers": "지난 멤버 보기",
+    "addToFavourites": "즐겨찾기에 추가",
+    "addToList": "목록에 추가",
+    "block": "{{name}} 차단",
+    "unblock": "{{name}} 차단 해제",
+    "report": "{{name}} 신고",
+    "actions": {
+      "message": "메시지",
+      "dismissAdmin": "관리자 해제",
+      "makeAdmin": "관리자로 지정",
+      "removeFromGroup": "그룹에서 제거"
+    },
+    "toasts": {
+      "madeAdmin": "{{name}} 님이 이제 관리자입니다",
+      "dismissedAdmin": "{{name}} 님은 더 이상 관리자가 아닙니다",
+      "removedFromGroup": "{{name}} 님이 그룹에서 제거되었습니다",
+      "blocked": "{{name}} 님이 차단되었습니다.",
+      "unblocked": "{{name}} 님 차단이 해제되었습니다.",
+      "reported": "{{name}} 님이 신고되었습니다.",
+      "reportedAndBlocked": "{{name}} 님이 신고 및 차단되었습니다."
+    },
+    "errors": {
+      "makeAdmin": "{{name}} 님을 관리자 지정 실패",
+      "dismissAdmin": "{{name}} 님 관리자 해제 실패",
+      "removeMember": "멤버 제거 중 오류 발생"
+    },
+    "alerts": {
+      "block": {
+        "header": "연락처 차단",
+        "message": "{{name}} 님의 메시지나 전화를 더 이상 받지 않습니다.",
+        "cta": "차단"
+      },
+      "unblock": {
+        "header": "연락처 차단 해제",
+        "message": "{{name}} 님 차단을 정말 해제하시겠습니까?"
+      },
+      "report": {
+        "header": "연락처 신고",
+        "message": "{{name}} 님의 최근 5개 메시지가 신고됩니다. 이 사용자를 차단하시겠습니까?",
+        "alsoBlock": "연락처도 차단",
+        "cta": "신고"
+      }
+    }
   }
 }

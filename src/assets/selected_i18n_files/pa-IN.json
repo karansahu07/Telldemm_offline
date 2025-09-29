@@ -454,5 +454,91 @@
     "createChannels": "ਚੈਨਲ ਬਣਾਓ (WIP)",
     "statusPrivacy": "ਸਟੇਟਸ ਪਰਾਈਵੇਸੀ (WIP)",
     "clearCallLogs": "ਕਾਲ ਲਾਗਸ ਸਾਫ ਕਰੋ (WIP)"
+  },"userabout": {
+    "members": "ਮੈਂਬਰ",
+    "group": "ਗਰੁੱਪ",
+    "groups": "ਗਰੁੱਪਸ",
+    "inCommon": "ਸਾਂਝੇ",
+    "toolbar": {
+      "message": "ਸੁਨੇਹਾ",
+      "call": "ਕਾਲ",
+      "video": "ਵੀਡੀਓ",
+      "add": "ਜੋੜੋ"
+    },
+    "defaults": {
+      "heyThere": "ਹੈਲੋ! ਮੈਂ Telldemm ਵਰਤ ਰਿਹਾ ਹਾਂ।",
+      "noGroupDescription": "ਕੋਈ ਗਰੁੱਪ ਵੇਰਵਾ ਨਹੀਂ।",
+      "unknown": "ਅਣਜਾਣ",
+      "unknownDate": "ਅਣਜਾਣ ਤਾਰੀਖ",
+      "unnamedGroup": "ਬਿਨਾਂ ਨਾਮ ਵਾਲਾ ਗਰੁੱਪ"
+    },
+    "updatedOn": "ਅੱਪਡੇਟ ਕੀਤਾ ਗਿਆ",
+    "createdByOn": "{{name}} ਦੁਆਰਾ ਬਣਾਇਆ ਗਿਆ",
+    "media": {
+      "title": "ਮੀਡੀਆ, ਲਿੰਕ ਅਤੇ ਦਸਤਾਵੇਜ਼"
+    },
+    "notifications": "ਸੂਚਨਾਵਾਂ",
+    "mediaVisibility": "ਮੀਡੀਆ ਦ੍ਰਿਸ਼ਯਤਾ",
+    "encryption": {
+      "title": "ਇੰਕ੍ਰਿਪਸ਼ਨ",
+      "subtitle": "ਸੁਨੇਹੇ ਅਤੇ ਕਾਲਾਂ ਐਂਡ-ਟੂ-ਐਂਡ ਇੰਕ੍ਰਿਪਟ ਕੀਤੀਆਂ ਗਈਆਂ ਹਨ। ਪੁਸ਼ਟੀ ਕਰਨ ਲਈ ਟੈਪ ਕਰੋ।"
+    },
+    "disappearing": "ਗਾਇਬ ਹੋਣ ਵਾਲੇ ਸੁਨੇਹੇ",
+    "chatLock": {
+      "title": "ਚੈਟ ਲੌਕ",
+      "subtitle": "ਇਸ ਡਿਵਾਈਸ 'ਤੇ ਇਸ ਚੈਟ ਨੂੰ ਲੌਕ ਅਤੇ ਛੁਪਾਓ।"
+    },
+    "advancedPrivacy": {
+      "title": "ਉੱਚ ਚੈਟ ਗੋਪਨੀਯਤਾ",
+      "off": "ਬੰਦ"
+    },
+    "createGroupWith": "{{name}} ਨਾਲ ਗਰੁੱਪ ਬਣਾਓ",
+    "commonGroupWith": "{{name}} ਨਾਲ ਸਾਂਝਾ ਗਰੁੱਪ",
+    "groupMembers": "ਗਰੁੱਪ ਮੈਂਬਰ",
+    "addMembers": "ਮੈਂਬਰ ਜੋੜੋ",
+    "groupAdmin": "ਗਰੁੱਪ ਐਡਮਿਨ",
+    "viewPastMembers": "ਪਿਛਲੇ ਮੈਂਬਰ ਵੇਖੋ",
+    "addToFavourites": "ਪਸੰਦ ਵਿੱਚ ਜੋੜੋ",
+    "addToList": "ਸੂਚੀ ਵਿੱਚ ਜੋੜੋ",
+    "block": "{{name}} ਨੂੰ ਬਲੌਕ ਕਰੋ",
+    "unblock": "{{name}} ਨੂੰ ਅਨਬਲੌਕ ਕਰੋ",
+    "report": "{{name}} ਦੀ ਰਿਪੋਰਟ ਕਰੋ",
+    "actions": {
+      "message": "ਸੁਨੇਹਾ",
+      "dismissAdmin": "ਐਡਮਿਨ ਤੋਂ ਹਟਾਓ",
+      "makeAdmin": "ਐਡਮਿਨ ਬਣਾਓ",
+      "removeFromGroup": "ਗਰੁੱਪ ਤੋਂ ਹਟਾਓ"
+    },
+    "toasts": {
+      "madeAdmin": "{{name}} ਹੁਣ ਐਡਮਿਨ ਹੈ",
+      "dismissedAdmin": "{{name}} ਹੁਣ ਐਡਮਿਨ ਨਹੀਂ ਹੈ",
+      "removedFromGroup": "{{name}} ਨੂੰ ਗਰੁੱਪ ਤੋਂ ਹਟਾਇਆ ਗਿਆ ਹੈ",
+      "blocked": "{{name}} ਨੂੰ ਬਲੌਕ ਕੀਤਾ ਗਿਆ ਹੈ।",
+      "unblocked": "{{name}} ਨੂੰ ਅਨਬਲੌਕ ਕੀਤਾ ਗਿਆ ਹੈ।",
+      "reported": "{{name}} ਦੀ ਰਿਪੋਰਟ ਕੀਤੀ ਗਈ ਹੈ।",
+      "reportedAndBlocked": "{{name}} ਦੀ ਰਿਪੋਰਟ ਅਤੇ ਬਲੌਕ ਕੀਤਾ ਗਿਆ ਹੈ।"
+    },
+    "errors": {
+      "makeAdmin": "{{name}} ਨੂੰ ਐਡਮਿਨ ਬਣਾਉਣ ਵਿੱਚ ਅਸਫਲ",
+      "dismissAdmin": "{{name}} ਨੂੰ ਹਟਾਉਣ ਵਿੱਚ ਅਸਫਲ",
+      "removeMember": "ਮੈਂਬਰ ਨੂੰ ਹਟਾਉਣ ਵਿੱਚ ਗਲਤੀ"
+    },
+    "alerts": {
+      "block": {
+        "header": "ਸੰਪਰਕ ਬਲੌਕ ਕਰੋ",
+        "message": "ਤੁਹਾਨੂੰ ਹੁਣ {{name}} ਤੋਂ ਸੁਨੇਹੇ ਜਾਂ ਕਾਲਾਂ ਨਹੀਂ ਮਿਲਣਗੀਆਂ।",
+        "cta": "ਬਲੌਕ"
+      },
+      "unblock": {
+        "header": "ਸੰਪਰਕ ਅਨਬਲੌਕ ਕਰੋ",
+        "message": "ਕੀ ਤੁਸੀਂ ਯਕੀਨਨ {{name}} ਨੂੰ ਅਨਬਲੌਕ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?"
+      },
+      "report": {
+        "header": "ਸੰਪਰਕ ਦੀ ਰਿਪੋਰਟ ਕਰੋ",
+        "message": "ਆਖਰੀ 5 ਸੁਨੇਹੇ {{name}} ਤੋਂ ਰਿਪੋਰਟ ਕੀਤੇ ਜਾਣਗੇ। ਕੀ ਤੁਸੀਂ ਇਸ ਯੂਜ਼ਰ ਨੂੰ ਵੀ ਬਲੌਕ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?",
+        "alsoBlock": "ਸੰਪਰਕ ਨੂੰ ਵੀ ਬਲੌਕ ਕਰੋ",
+        "cta": "ਰਿਪੋਰਟ"
+      }
+    }
   }
 }

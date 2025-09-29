@@ -429,5 +429,91 @@
     "createChannels": "Tạo kênh (WIP)",
     "statusPrivacy": "Quyền riêng tư trạng thái (WIP)",
     "clearCallLogs": "Xóa nhật ký cuộc gọi (WIP)"
+  },"userabout": {
+    "members": "Thành viên",
+    "group": "Nhóm",
+    "groups": "Các nhóm",
+    "inCommon": "Chung",
+    "toolbar": {
+      "message": "Tin nhắn",
+      "call": "Cuộc gọi",
+      "video": "Video",
+      "add": "Thêm"
+    },
+    "defaults": {
+      "heyThere": "Xin chào! Tôi đang sử dụng Telldemm.",
+      "noGroupDescription": "Không có mô tả nhóm.",
+      "unknown": "Không rõ",
+      "unknownDate": "Ngày không rõ",
+      "unnamedGroup": "Nhóm chưa đặt tên"
+    },
+    "updatedOn": "Đã cập nhật vào",
+    "createdByOn": "Được tạo bởi {{name}} vào",
+    "media": {
+      "title": "Phương tiện, liên kết và tài liệu"
+    },
+    "notifications": "Thông báo",
+    "mediaVisibility": "Hiển thị phương tiện",
+    "encryption": {
+      "title": "Mã hóa",
+      "subtitle": "Tin nhắn và cuộc gọi được mã hóa đầu cuối. Nhấn để xác minh."
+    },
+    "disappearing": "Tin nhắn tự biến mất",
+    "chatLock": {
+      "title": "Khóa trò chuyện",
+      "subtitle": "Khóa và ẩn trò chuyện này trên thiết bị này."
+    },
+    "advancedPrivacy": {
+      "title": "Quyền riêng tư nâng cao",
+      "off": "Tắt"
+    },
+    "createGroupWith": "Tạo nhóm với {{name}}",
+    "commonGroupWith": "Nhóm chung với {{name}}",
+    "groupMembers": "Thành viên nhóm",
+    "addMembers": "Thêm thành viên",
+    "groupAdmin": "Quản trị viên nhóm",
+    "viewPastMembers": "Xem thành viên trước đây",
+    "addToFavourites": "Thêm vào yêu thích",
+    "addToList": "Thêm vào danh sách",
+    "block": "Chặn {{name}}",
+    "unblock": "Bỏ chặn {{name}}",
+    "report": "Báo cáo {{name}}",
+    "actions": {
+      "message": "Tin nhắn",
+      "dismissAdmin": "Xóa quyền quản trị",
+      "makeAdmin": "Làm quản trị viên",
+      "removeFromGroup": "Xóa khỏi nhóm"
+    },
+    "toasts": {
+      "madeAdmin": "{{name}} bây giờ là quản trị viên",
+      "dismissedAdmin": "{{name}} không còn là quản trị viên",
+      "removedFromGroup": "{{name}} đã bị xóa khỏi nhóm",
+      "blocked": "{{name}} đã bị chặn.",
+      "unblocked": "{{name}} đã được bỏ chặn.",
+      "reported": "{{name}} đã bị báo cáo.",
+      "reportedAndBlocked": "{{name}} đã bị báo cáo và chặn."
+    },
+    "errors": {
+      "makeAdmin": "Không thể làm {{name}} thành quản trị viên",
+      "dismissAdmin": "Không thể xóa quyền quản trị của {{name}}",
+      "removeMember": "Lỗi khi xóa thành viên"
+    },
+    "alerts": {
+      "block": {
+        "header": "Chặn liên hệ",
+        "message": "Bạn sẽ không còn nhận tin nhắn hay cuộc gọi từ {{name}} nữa.",
+        "cta": "Chặn"
+      },
+      "unblock": {
+        "header": "Bỏ chặn liên hệ",
+        "message": "Bạn có chắc chắn muốn bỏ chặn {{name}}?"
+      },
+      "report": {
+        "header": "Báo cáo liên hệ",
+        "message": "5 tin nhắn gần nhất từ {{name}} sẽ được báo cáo. Bạn cũng muốn chặn người dùng này không?",
+        "alsoBlock": "Cũng chặn liên hệ",
+        "cta": "Báo cáo"
+      }
+    }
   }
 }

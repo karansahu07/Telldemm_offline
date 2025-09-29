@@ -430,5 +430,91 @@
     "createChannels": "Kanal oluştur (WIP)",
     "statusPrivacy": "Durum gizliliği (WIP)",
     "clearCallLogs": "Çağrı kayıtlarını temizle (WIP)"
+  },"userabout": {
+    "members": "Üyeler",
+    "group": "Grup",
+    "groups": "Gruplar",
+    "inCommon": "Ortak",
+    "toolbar": {
+      "message": "Mesaj",
+      "call": "Ara",
+      "video": "Video",
+      "add": "Ekle"
+    },
+    "defaults": {
+      "heyThere": "Merhaba! Telldemm kullanıyorum.",
+      "noGroupDescription": "Grup açıklaması yok.",
+      "unknown": "Bilinmiyor",
+      "unknownDate": "Bilinmeyen Tarih",
+      "unnamedGroup": "İsimsiz Grup"
+    },
+    "updatedOn": "Güncellendi",
+    "createdByOn": "{{name}} tarafından oluşturuldu",
+    "media": {
+      "title": "Medya, bağlantılar ve belgeler"
+    },
+    "notifications": "Bildirimler",
+    "mediaVisibility": "Medya Görünürlüğü",
+    "encryption": {
+      "title": "Şifreleme",
+      "subtitle": "Mesajlar ve aramalar uçtan uca şifrelenmiştir. Doğrulamak için dokunun."
+    },
+    "disappearing": "Kaybolan mesajlar",
+    "chatLock": {
+      "title": "Sohbet kilidi",
+      "subtitle": "Bu sohbeti bu cihazda kilitleyin ve gizleyin."
+    },
+    "advancedPrivacy": {
+      "title": "Gelişmiş Sohbet Gizliliği",
+      "off": "Kapalı"
+    },
+    "createGroupWith": "{{name}} ile grup oluştur",
+    "commonGroupWith": "{{name}} ile ortak grup",
+    "groupMembers": "Grup Üyeleri",
+    "addMembers": "Üye Ekle",
+    "groupAdmin": "Grup yöneticisi",
+    "viewPastMembers": "Geçmiş üyeleri gör",
+    "addToFavourites": "Favorilere ekle",
+    "addToList": "Listeye ekle",
+    "block": "{{name}} engelle",
+    "unblock": "{{name}} engeli kaldır",
+    "report": "{{name}} şikayet et",
+    "actions": {
+      "message": "Mesaj",
+      "dismissAdmin": "Yöneticilikten çıkar",
+      "makeAdmin": "Yönetici yap",
+      "removeFromGroup": "Gruptan çıkar"
+    },
+    "toasts": {
+      "madeAdmin": "{{name}} artık yönetici",
+      "dismissedAdmin": "{{name}} artık yönetici değil",
+      "removedFromGroup": "{{name}} gruptan çıkarıldı",
+      "blocked": "{{name}} engellendi.",
+      "unblocked": "{{name}} engeli kaldırıldı.",
+      "reported": "{{name}} şikayet edildi.",
+      "reportedAndBlocked": "{{name}} şikayet edilip engellendi."
+    },
+    "errors": {
+      "makeAdmin": "{{name}} yönetici yapılamadı",
+      "dismissAdmin": "{{name}} yöneticilikten çıkarılamadı",
+      "removeMember": "Üye çıkarılırken hata oluştu"
+    },
+    "alerts": {
+      "block": {
+        "header": "Kişiyi engelle",
+        "message": "Artık {{name}}’den mesaj veya arama almayacaksınız.",
+        "cta": "Engelle"
+      },
+      "unblock": {
+        "header": "Kişi engelini kaldır",
+        "message": "{{name}} engelini kaldırmak istediğinize emin misiniz?"
+      },
+      "report": {
+        "header": "Kişiyi şikayet et",
+        "message": "Son 5 mesaj {{name}} tarafından bildirilecek. Bu kullanıcıyı da engellemek istiyor musunuz?",
+        "alsoBlock": "Kişiyi de engelle",
+        "cta": "Şikayet et"
+      }
+    }
   }
 }
