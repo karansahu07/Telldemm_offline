@@ -574,6 +574,30 @@
       "shareFailed": "Impossible d’ouvrir la feuille de partage."
     }
   },"community": {
+    "manageGroups": {
+    "title": "Gérer les groupes",
+    "groups": "groupes",
+    "createNew": "Créer un nouveau groupe",
+    "addExisting": "Ajouter des groupes existants",
+    "info": "Les membres peuvent suggérer des groupes existants pour approbation de l’admin et ajouter de nouveaux groupes directement. Voir dans",
+    "settingsLink": "Paramètres de la communauté",
+    "listHeader": "Groupes dans cette communauté",
+    "loading": "Chargement des groupes...",
+    "empty": "Aucun groupe trouvé pour cette communauté",
+    "members": "membres",
+    "unnamedGroup": "Groupe sans nom",
+    "remove": {
+      "header": "Supprimer le groupe de la communauté",
+      "message": "Voulez-vous supprimer ce groupe de la communauté ? Le groupe restera mais n’appartiendra plus à la communauté.",
+      "alsoRemoveMembers": "Supprimer également les membres de ce groupe de la communauté et du groupe",
+      "cta": "Supprimer",
+      "aria": "Supprimer le groupe de la communauté"
+    },
+    "toasts": {
+      "removed": "Groupe supprimé de la communauté et membres mis à jour",
+      "removeFailed": "Échec de la suppression du groupe. Réessayez."
+    }
+  },
     "title": "Communautés",
     "actions": {
       "qr": "Ouvrir les actions QR",

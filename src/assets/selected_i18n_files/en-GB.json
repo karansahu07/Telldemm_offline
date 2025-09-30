@@ -574,6 +574,30 @@
       "shareFailed": "Could not open share sheet."
     }
   }, "community": {
+    "manageGroups": {
+    "title": "Manage groups",
+    "groups": "groups",
+    "createNew": "Create new group",
+    "addExisting": "Add existing groups",
+    "info": "Members can suggest existing groups for admin approval and add new groups directly. View in",
+    "settingsLink": "Community settings",
+    "listHeader": "Groups in this community",
+    "loading": "Loading groups...",
+    "empty": "No groups found for this community",
+    "members": "members",
+    "unnamedGroup": "Unnamed group",
+    "remove": {
+      "header": "Remove group from community",
+      "message": "Do you want to remove this group from the community? The group will remain but will no longer belong to the community.",
+      "alsoRemoveMembers": "Also remove members of this group from the community and from the group",
+      "cta": "Remove",
+      "aria": "Remove group from community"
+    },
+    "toasts": {
+      "removed": "Group removed from community and members updated",
+      "removeFailed": "Failed to remove group. Try again."
+    }
+  },
     "title": "Communities",
     "actions": {
       "qr": "Open QR actions",

@@ -575,6 +575,30 @@
       "shareFailed": "无法打开分享界面。"
     }
   },"community": {
+    "manageGroups": {
+    "title": "管理群组",
+    "groups": "群组",
+    "createNew": "创建新群组",
+    "addExisting": "添加现有群组",
+    "info": "成员可以建议现有群组供管理员批准，并可直接添加新群组。查看于",
+    "settingsLink": "社区设置",
+    "listHeader": "此社区中的群组",
+    "loading": "正在加载群组...",
+    "empty": "未找到该社区的群组",
+    "members": "成员",
+    "unnamedGroup": "未命名群组",
+    "remove": {
+      "header": "从社区移除群组",
+      "message": "您要将此群组从社区中移除吗？群组将保留，但不再属于该社区。",
+      "alsoRemoveMembers": "同时将该群组的成员从社区和群组中移除",
+      "cta": "移除",
+      "aria": "从社区移除群组"
+    },
+    "toasts": {
+      "removed": "群组已从社区移除，成员已更新",
+      "removeFailed": "无法移除群组。请重试。"
+    }
+  },
     "title": "社区",
     "actions": {
       "qr": "打开二维码操作",

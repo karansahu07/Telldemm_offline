@@ -573,6 +573,30 @@
       "shareFailed": "Impossibile aprire il foglio di condivisione."
     }
   },"community": {
+     "manageGroups": {
+    "title": "Gestisci gruppi",
+    "groups": "gruppi",
+    "createNew": "Crea nuovo gruppo",
+    "addExisting": "Aggiungi gruppi esistenti",
+    "info": "I membri possono suggerire gruppi esistenti per l’approvazione dell’admin e aggiungere nuovi gruppi direttamente. Visualizza in",
+    "settingsLink": "Impostazioni della community",
+    "listHeader": "Gruppi in questa community",
+    "loading": "Caricamento gruppi...",
+    "empty": "Nessun gruppo trovato per questa community",
+    "members": "membri",
+    "unnamedGroup": "Gruppo senza nome",
+    "remove": {
+      "header": "Rimuovi gruppo dalla community",
+      "message": "Vuoi rimuovere questo gruppo dalla community? Il gruppo rimarrà ma non farà più parte della community.",
+      "alsoRemoveMembers": "Rimuovi anche i membri di questo gruppo dalla community e dal gruppo",
+      "cta": "Rimuovi",
+      "aria": "Rimuovi gruppo dalla community"
+    },
+    "toasts": {
+      "removed": "Gruppo rimosso dalla community e membri aggiornati",
+      "removeFailed": "Impossibile rimuovere il gruppo. Riprova."
+    }
+  },
     "title": "Comunità",
     "actions": {
       "qr": "Apri azioni QR",

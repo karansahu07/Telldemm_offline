@@ -574,6 +574,30 @@
       "shareFailed": "No se pudo abrir la hoja de compartir."
     }
   },"community": {
+     "manageGroups": {
+    "title": "Gestionar grupos",
+    "groups": "grupos",
+    "createNew": "Crear nuevo grupo",
+    "addExisting": "Añadir grupos existentes",
+    "info": "Los miembros pueden sugerir grupos existentes para la aprobación del administrador y añadir nuevos grupos directamente. Ver en",
+    "settingsLink": "Configuración de la comunidad",
+    "listHeader": "Grupos en esta comunidad",
+    "loading": "Cargando grupos...",
+    "empty": "No se encontraron grupos para esta comunidad",
+    "members": "miembros",
+    "unnamedGroup": "Grupo sin nombre",
+    "remove": {
+      "header": "Eliminar grupo de la comunidad",
+      "message": "¿Quieres eliminar este grupo de la comunidad? El grupo permanecerá pero ya no pertenecerá a la comunidad.",
+      "alsoRemoveMembers": "También eliminar a los miembros de este grupo de la comunidad y del grupo",
+      "cta": "Eliminar",
+      "aria": "Eliminar grupo de la comunidad"
+    },
+    "toasts": {
+      "removed": "Grupo eliminado de la comunidad y miembros actualizados",
+      "removeFailed": "No se pudo eliminar el grupo. Inténtalo de nuevo."
+    }
+  },
     "title": "Comunidades",
     "actions": {
       "qr": "Abrir acciones QR",

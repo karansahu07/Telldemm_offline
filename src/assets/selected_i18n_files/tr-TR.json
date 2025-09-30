@@ -550,6 +550,30 @@
       "shareFailed": "Paylaşım sayfası açılamadı."
     }
   },"community": {
+    "manageGroups": {
+    "title": "Grupları yönet",
+    "groups": "gruplar",
+    "createNew": "Yeni grup oluştur",
+    "addExisting": "Mevcut grupları ekle",
+    "info": "Üyeler mevcut grupları yönetici onayı için önerebilir ve yeni grupları doğrudan ekleyebilir. Görüntüle:",
+    "settingsLink": "Topluluk ayarları",
+    "listHeader": "Bu topluluktaki gruplar",
+    "loading": "Gruplar yükleniyor...",
+    "empty": "Bu topluluk için grup bulunamadı",
+    "members": "üyeler",
+    "unnamedGroup": "Adsız grup",
+    "remove": {
+      "header": "Grubu topluluktan kaldır",
+      "message": "Bu grubu topluluktan kaldırmak istiyor musunuz? Grup kalacak ancak artık topluluğa ait olmayacak.",
+      "alsoRemoveMembers": "Bu grubun üyelerini de topluluktan ve gruptan kaldır",
+      "cta": "Kaldır",
+      "aria": "Grubu topluluktan kaldır"
+    },
+    "toasts": {
+      "removed": "Grup topluluktan kaldırıldı ve üyeler güncellendi",
+      "removeFailed": "Grup kaldırılamadı. Tekrar deneyin."
+    }
+  },
     "title": "Topluluklar",
     "actions": {
       "qr": "QR işlemlerini aç",

@@ -573,6 +573,30 @@
       "shareFailed": "Não foi possível abrir a folha de partilha."
     }
   },"community": {
+    "manageGroups": {
+    "title": "Gerir grupos",
+    "groups": "grupos",
+    "createNew": "Criar novo grupo",
+    "addExisting": "Adicionar grupos existentes",
+    "info": "Os membros podem sugerir grupos existentes para aprovação do administrador e adicionar novos grupos diretamente. Ver em",
+    "settingsLink": "Definições da comunidade",
+    "listHeader": "Grupos nesta comunidade",
+    "loading": "A carregar grupos...",
+    "empty": "Nenhum grupo encontrado para esta comunidade",
+    "members": "membros",
+    "unnamedGroup": "Grupo sem nome",
+    "remove": {
+      "header": "Remover grupo da comunidade",
+      "message": "Deseja remover este grupo da comunidade? O grupo permanecerá mas deixará de pertencer à comunidade.",
+      "alsoRemoveMembers": "Remover também os membros deste grupo da comunidade e do grupo",
+      "cta": "Remover",
+      "aria": "Remover grupo da comunidade"
+    },
+    "toasts": {
+      "removed": "Grupo removido da comunidade e membros atualizados",
+      "removeFailed": "Falha ao remover grupo. Tente novamente."
+    }
+  },
     "title": "Comunidades",
     "actions": {
       "qr": "Abrir ações de QR",

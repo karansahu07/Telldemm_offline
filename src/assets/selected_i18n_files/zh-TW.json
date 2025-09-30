@@ -575,6 +575,30 @@
       "shareFailed": "無法開啟分享頁面。"
     }
   },"community": {
+     "manageGroups": {
+    "title": "管理群組",
+    "groups": "群組",
+    "createNew": "建立新群組",
+    "addExisting": "新增現有群組",
+    "info": "成員可以建議現有群組以供管理員批准，並可直接新增新群組。查看於",
+    "settingsLink": "社群設定",
+    "listHeader": "此社群中的群組",
+    "loading": "正在載入群組...",
+    "empty": "未找到此社群的群組",
+    "members": "成員",
+    "unnamedGroup": "未命名群組",
+    "remove": {
+      "header": "從社群中移除群組",
+      "message": "要從社群中移除此群組嗎？群組將保留，但不再屬於此社群。",
+      "alsoRemoveMembers": "同時將此群組的成員從社群和群組中移除",
+      "cta": "移除",
+      "aria": "從社群中移除群組"
+    },
+    "toasts": {
+      "removed": "群組已從社群中移除並更新成員",
+      "removeFailed": "移除群組失敗。請再試一次。"
+    }
+  },
     "title": "社群",
     "actions": {
       "qr": "開啟 QR 操作",

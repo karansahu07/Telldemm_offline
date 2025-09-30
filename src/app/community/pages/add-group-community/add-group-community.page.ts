@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { AlertController, IonicModule, NavController, ToastController } from '@ionic/angular';
 import { ActivatedRoute } from '@angular/router';
 import { FirebaseChatService } from 'src/app/services/firebase-chat.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-add-group-community',
   templateUrl: './add-group-community.page.html',
   styleUrls: ['./add-group-community.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule]
+  imports: [IonicModule, CommonModule,TranslateModule]
 })
 export class AddGroupCommunityPage implements OnInit {
   communityId: string | null = null;
@@ -23,11 +24,10 @@ export class AddGroupCommunityPage implements OnInit {
     private firebaseService: FirebaseChatService,
     private navCtrl: NavController,
     private toastCtrl : ToastController,
-    private alertCtrl: AlertController
+    private alertCtrl: AlertController, private translate: TranslateService
   ) {}
 
-  ngOnInit() {
-    // read communityId from query params
+ ngOnInit() {
     this.route.queryParams.subscribe(params => {
       const cid = params['communityId'] || params['id'];
       if (cid) {
@@ -37,39 +37,27 @@ export class AddGroupCommunityPage implements OnInit {
     });
   }
 
-    goToCreateNewGroup() {
-    const communityId = this.communityId;
+  goToCreateNewGroup() {
     this.navCtrl.navigateForward(['/create-new-group'], {
-      queryParams: { communityId, communityName: this.communityName }
+      queryParams: { communityId: this.communityId, communityName: this.communityName }
     });
   }
 
-  async loadGroupsForCommunity() {
+ async loadGroupsForCommunity() {
     if (!this.communityId) return;
     this.loading = true;
     this.groupsInCommunity = [];
 
     try {
-      // optional: fetch community meta to show name if you want
-      // const comm = await this.firebaseService.getCommunityInfo?.(this.communityId as string).catch(() => null);
-      // if (comm) {
-      //   this.communityName = comm.name || '';
-      // }
-
-      // get group ids under community
       const groupIds = await this.firebaseService.getGroupsInCommunity(this.communityId);
-      if (!groupIds || groupIds.length === 0) {
-        this.loading = false;
-        return;
-      }
+      if (!groupIds || groupIds.length === 0) return;
 
-      // fetch each group's details
       for (const gid of groupIds) {
         const g = await this.firebaseService.getGroupInfo(gid);
         if (!g) continue;
         this.groupsInCommunity.push({
           id: gid,
-          name: g.name || 'Unnamed group',
+          name: g.name || this.translate.instant('community.manageGroups.unnamedGroup'), // 👈 localized fallback
           type: g.type || 'normal',
           membersCount: g.membersCount || (g.members ? Object.keys(g.members).length : 0)
         });
@@ -84,49 +72,45 @@ export class AddGroupCommunityPage implements OnInit {
 
 
 async removeGroupFromCommunity(groupId: string) {
-  if (!this.communityId || !groupId) return;
+ if (!this.communityId || !groupId) return;
 
-  // show confirmation with checkbox
-  const alert = await this.alertCtrl.create({
-    header: 'Remove group from community',
-    message: 'Do you want to remove this group from the community? The group will remain but will no longer belong to the community.',
-    inputs: [
-      {
-        name: 'removeMembers',
-        type: 'checkbox',
-        label: 'Also remove members of this group from the community and from the group',
-        value: 'removeMembers',
-        checked: false
-      }
-    ],
-    buttons: [
-      { text: 'Cancel', role: 'cancel' },
-      { text: 'Remove', role: 'ok' }
-    ]
-  });
-  await alert.present();
+    const t = this.translate;
 
-  const res = await alert.onDidDismiss();
-  if (res.role === 'cancel') return;
+    // confirmation
+    const alert = await this.alertCtrl.create({
+      header: t.instant('community.manageGroups.remove.header'),
+      message: t.instant('community.manageGroups.remove.message'),
+      inputs: [
+        {
+          name: 'removeMembers',
+          type: 'checkbox',
+          label: t.instant('community.manageGroups.remove.alsoRemoveMembers'),
+          value: 'removeMembers',
+          checked: false
+        }
+      ],
+      buttons: [
+        { text: t.instant('community.actions.cancel'), role: 'cancel' },
+        { text: t.instant('community.manageGroups.remove.cta'), role: 'ok' }
+      ]
+    });
+    await alert.present();
 
-  // normalize checkbox result
-  let checked = false;
-  try {
-    const data = res?.data;
-    if (Array.isArray((data as any)?.values)) {
-      checked = (data as any).values.includes('removeMembers');
-    } else if (Array.isArray((data as any)?.data)) {
-      checked = (data as any).data.includes('removeMembers');
-    } else if (Array.isArray(data)) {
-      checked = data.includes('removeMembers');
-    } else {
-      checked = !!((data as any).removeMembers);
-    }
-  } catch (e) {
-    checked = false;
-  }
+    const res = await alert.onDidDismiss();
+    if (res.role === 'cancel') return;
 
-  this.loading = true;
+  // normalize checkbox value
+    let checked = false;
+    try {
+      const data: any = res?.data;
+      checked =
+        Array.isArray(data?.values) ? data.values.includes('removeMembers') :
+        Array.isArray(data?.data)   ? data.data.includes('removeMembers')   :
+        Array.isArray(data)         ? data.includes('removeMembers')        :
+        !!data?.removeMembers;
+    } catch { checked = false; }
+
+    this.loading = true;
 
   try {
     const updates: any = {};
@@ -312,50 +296,43 @@ if (announcementGroupId && toRemoveFromGroup.length > 0) {
       // updates[`/groups/${groupId}/membersCount`] = newGroupCount;
     }
 
-    // commit updates atomically (use helper if available)
     if (typeof (this.firebaseService as any).bulkUpdate === 'function') {
-      await (this.firebaseService as any).bulkUpdate(updates);
-    } else if (typeof (this.firebaseService as any).setPath === 'function') {
-      // fallback non-atomic
-      const promises = Object.keys(updates).map(p => (this.firebaseService as any).setPath(p, updates[p]));
-      await Promise.all(promises);
-    } else {
-      throw new Error('bulkUpdate or setPath helper not found on FirebaseChatService');
-    }
+        await (this.firebaseService as any).bulkUpdate(updates);
+      } else if (typeof (this.firebaseService as any).setPath === 'function') {
+        const promises = Object.keys(updates).map(p => (this.firebaseService as any).setPath(p, updates[p]));
+        await Promise.all(promises);
+      } else {
+        throw new Error('bulkUpdate or setPath helper not found on FirebaseChatService');
+      }
 
     const successToast = await this.toastCtrl.create({
-      message: 'Group removed from community and members updated',
-      duration: 2000,
-      color: 'success'
-    });
-    await successToast.present();
+        message: t.instant('community.manageGroups.toasts.removed'),
+        duration: 2000,
+        color: 'success'
+      });
+      await successToast.present();
 
-    // refresh UI
-    await this.loadGroupsForCommunity();
+      await this.loadGroupsForCommunity();
   } catch (err) {
     console.error('removeGroupFromCommunity failed', err);
-    const errToast = await this.toastCtrl.create({
-      message: 'Failed to remove group. Try again.',
-      duration: 3000,
-      color: 'danger'
+      const errToast = await this.toastCtrl.create({
+        message: t.instant('community.manageGroups.toasts.removeFailed'),
+        duration: 3000,
+        color: 'danger'
+      });
+      await errToast.present();
+    } finally {
+      this.loading = false;
+    }
+}
+
+
+
+
+
+ goToAddExistingGroups() {
+    this.navCtrl.navigateForward(['/add-existing-groups'], {
+      queryParams: { communityId: this.route.snapshot.queryParamMap.get('communityId') }
     });
-    await errToast.present();
-  } finally {
-    this.loading = false;
   }
-}
-
-
-
-
-
-  goToAddExistingGroups() {
-  // get communityId if available
-  const communityId = this.route.snapshot.queryParamMap.get('communityId');
-
-  // navigate to add-existing-groups page and pass communityId
-  this.navCtrl.navigateForward(['/add-existing-groups'], {
-    queryParams: { communityId }
-  });
-}
 }

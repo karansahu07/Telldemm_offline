@@ -549,6 +549,30 @@
       "shareFailed": "Không thể mở bảng chia sẻ."
     }
   },"community": {
+     "manageGroups": {
+    "title": "Quản lý nhóm",
+    "groups": "nhóm",
+    "createNew": "Tạo nhóm mới",
+    "addExisting": "Thêm nhóm hiện có",
+    "info": "Thành viên có thể đề xuất nhóm hiện có để quản trị viên phê duyệt và thêm nhóm mới trực tiếp. Xem trong",
+    "settingsLink": "Cài đặt cộng đồng",
+    "listHeader": "Nhóm trong cộng đồng này",
+    "loading": "Đang tải nhóm...",
+    "empty": "Không tìm thấy nhóm nào cho cộng đồng này",
+    "members": "thành viên",
+    "unnamedGroup": "Nhóm chưa đặt tên",
+    "remove": {
+      "header": "Xóa nhóm khỏi cộng đồng",
+      "message": "Bạn có muốn xóa nhóm này khỏi cộng đồng không? Nhóm vẫn tồn tại nhưng sẽ không còn thuộc về cộng đồng.",
+      "alsoRemoveMembers": "Cũng xóa các thành viên của nhóm này khỏi cộng đồng và nhóm",
+      "cta": "Xóa",
+      "aria": "Xóa nhóm khỏi cộng đồng"
+    },
+    "toasts": {
+      "removed": "Nhóm đã được xóa khỏi cộng đồng và thành viên đã được cập nhật",
+      "removeFailed": "Không thể xóa nhóm. Vui lòng thử lại."
+    }
+  },
     "title": "Cộng đồng",
     "actions": {
       "qr": "Mở hành động QR",

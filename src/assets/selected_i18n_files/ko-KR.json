@@ -573,6 +573,30 @@
       "shareFailed": "공유 시트를 열 수 없습니다."
     }
   },"community": {
+     "manageGroups": {
+    "title": "그룹 관리",
+    "groups": "그룹",
+    "createNew": "새 그룹 만들기",
+    "addExisting": "기존 그룹 추가",
+    "info": "회원은 기존 그룹을 관리자 승인을 위해 제안하거나 새 그룹을 직접 추가할 수 있습니다. 보기:",
+    "settingsLink": "커뮤니티 설정",
+    "listHeader": "이 커뮤니티의 그룹",
+    "loading": "그룹 불러오는 중...",
+    "empty": "이 커뮤니티에 그룹이 없습니다",
+    "members": "회원",
+    "unnamedGroup": "이름 없는 그룹",
+    "remove": {
+      "header": "커뮤니티에서 그룹 제거",
+      "message": "이 그룹을 커뮤니티에서 제거하시겠습니까? 그룹은 유지되지만 커뮤니티에 속하지 않습니다.",
+      "alsoRemoveMembers": "이 그룹의 구성원도 커뮤니티와 그룹에서 제거",
+      "cta": "제거",
+      "aria": "커뮤니티에서 그룹 제거"
+    },
+    "toasts": {
+      "removed": "그룹이 커뮤니티에서 제거되었고 멤버가 업데이트되었습니다",
+      "removeFailed": "그룹 제거에 실패했습니다. 다시 시도하세요."
+    }
+  },
     "title": "커뮤니티",
     "actions": {
       "qr": "QR 작업 열기",

@@ -574,6 +574,30 @@
       "shareFailed": "Teilen-Sheet konnte nicht geöffnet werden."
     }
   },"community": {
+    "manageGroups": {
+    "title": "Gruppen verwalten",
+    "groups": "Gruppen",
+    "createNew": "Neue Gruppe erstellen",
+    "addExisting": "Vorhandene Gruppen hinzufügen",
+    "info": "Mitglieder können bestehende Gruppen zur Genehmigung durch den Admin vorschlagen und neue Gruppen direkt hinzufügen. Anzeigen in",
+    "settingsLink": "Community-Einstellungen",
+    "listHeader": "Gruppen in dieser Community",
+    "loading": "Gruppen werden geladen...",
+    "empty": "Keine Gruppen für diese Community gefunden",
+    "members": "Mitglieder",
+    "unnamedGroup": "Unbenannte Gruppe",
+    "remove": {
+      "header": "Gruppe aus Community entfernen",
+      "message": "Möchten Sie diese Gruppe aus der Community entfernen? Die Gruppe bleibt bestehen, gehört aber nicht mehr zur Community.",
+      "alsoRemoveMembers": "Auch Mitglieder dieser Gruppe aus der Community und der Gruppe entfernen",
+      "cta": "Entfernen",
+      "aria": "Gruppe aus Community entfernen"
+    },
+    "toasts": {
+      "removed": "Gruppe aus Community entfernt und Mitglieder aktualisiert",
+      "removeFailed": "Entfernen der Gruppe fehlgeschlagen. Versuchen Sie es erneut."
+    }
+  },
     "title": "Communitys",
     "actions": {
       "qr": "QR-Aktionen öffnen",

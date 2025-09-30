@@ -3,70 +3,80 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/"></ion-back-button>
     </ion-buttons>
-    <ion-title class="no-padding">Manage groups</ion-title>
-    <p class="group-count">{{ groupsInCommunity.length }} groups</p>
+
+    <ion-title class="no-padding">
+      {{ 'community.manageGroups.title' | translate }}
+    </ion-title>
+
+    <p class="group-count">
+      {{ groupsInCommunity.length }} {{ 'community.manageGroups.groups' | translate }}
+    </p>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-
-
-  <ion-item button detail="false" lines="none" (click)="goToCreateNewGroup()">
-  <div slot="start" class="custom-icon">
-    <ion-icon name="people-outline" class="multiple"></ion-icon>
-  </div>
-  <ion-label>
-    <h2>Create new group</h2>
-  </ion-label>
-</ion-item>
-
- 
+  <!-- Create new group -->
+  <ion-item button detail="false" lines="none" (click)="goToCreateNewGroup()"
+            [attr.aria-label]="'community.manageGroups.createNew' | translate">
+    <div slot="start" class="custom-icon">
+      <ion-icon name="people-outline" class="multiple"></ion-icon>
+    </div>
+    <ion-label>
+      <h2>{{ 'community.manageGroups.createNew' | translate }}</h2>
+    </ion-label>
+  </ion-item>
 
   <!-- Add existing group -->
-<ion-item button detail="false" lines="none" (click)="goToAddExistingGroups()">
-  <div slot="start" class="custom-icon">
-    <ion-icon name="add-outline" color="success"></ion-icon>
-  </div>
-  <ion-label>
-    <h2>Add existing groups</h2>
-  </ion-label>
-</ion-item>
-
+  <ion-item button detail="false" lines="none" (click)="goToAddExistingGroups()"
+            [attr.aria-label]="'community.manageGroups.addExisting' | translate">
+    <div slot="start" class="custom-icon">
+      <ion-icon name="add-outline" color="success"></ion-icon>
+    </div>
+    <ion-label>
+      <h2>{{ 'community.manageGroups.addExisting' | translate }}</h2>
+    </ion-label>
+  </ion-item>
 
   <!-- Info text -->
   <p class="info-text">
-    Members can suggest existing groups for admin approval and add new groups
-    directly. View in <span class="link-text">Community settings</span>
+    {{ 'community.manageGroups.info' | translate }}
+    <span class="link-text">{{ 'community.manageGroups.settingsLink' | translate }}</span>
   </p>
 
   <p class="divider"></p>
 
-  <!-- Groups in this community -->
+  <!-- Groups list -->
   <ion-list>
     <ion-list-header>
-      <ion-label>Groups in this community</ion-label>
+      <ion-label>{{ 'community.manageGroups.listHeader' | translate }}</ion-label>
     </ion-list-header>
 
     <!-- Loading state -->
     <ion-item *ngIf="loading">
-      <ion-label>Loading groups...</ion-label>
+      <ion-label>{{ 'community.manageGroups.loading' | translate }}</ion-label>
     </ion-item>
 
-    <!-- If no groups -->
+    <!-- Empty state -->
     <ion-item *ngIf="!loading && groupsInCommunity.length === 0">
-      <ion-label>No groups found for this community</ion-label>
+      <ion-label>{{ 'community.manageGroups.empty' | translate }}</ion-label>
     </ion-item>
 
     <!-- Dynamic groups -->
     <ion-item *ngFor="let g of groupsInCommunity" lines="none">
-      <ion-avatar slot="start" [ngClass]="{'avatar-green': g.type === 'announcement','avatar-gray': g.type !== 'announcement'}">
+      <ion-avatar slot="start"
+                  [ngClass]="{'avatar-green': g.type === 'announcement', 'avatar-gray': g.type !== 'announcement'}">
         <ion-icon [name]="g.type === 'announcement' ? 'megaphone-outline' : 'chatbubble-ellipses-outline'"></ion-icon>
       </ion-avatar>
+
       <ion-label>
         <h2><strong>{{ g.name }}</strong></h2>
-        <p *ngIf="g.membersCount"> {{ g.membersCount }} members</p>
+        <p *ngIf="g.membersCount">
+          {{ g.membersCount }} {{ 'community.manageGroups.members' | translate }}
+        </p>
       </ion-label>
-      <ion-button fill="clear" slot="end" (click)="removeGroupFromCommunity(g.id)">
+
+      <ion-button fill="clear" slot="end" (click)="removeGroupFromCommunity(g.id)"
+                  [attr.aria-label]="'community.manageGroups.remove.aria' | translate">
         <ion-icon name="close-outline" color="dark"></ion-icon>
       </ion-button>
     </ion-item>
