@@ -572,5 +572,26 @@
     "errors": {
       "shareFailed": "ไม่สามารถเปิดแผ่นการแชร์ได้"
     }
+  },"community": {
+    "title": "ชุมชน",
+    "actions": {
+      "qr": "เปิดการทำงาน QR",
+      "menu": "เปิดเมนู"
+    },
+    "newCommunity": "ชุมชนใหม่",
+    "unnamedCommunity": "ชุมชนไม่มีชื่อ",
+    "viewAll": "ดูทั้งหมด",
+    "groupType": {
+      "normal": "กลุ่มปกติ",
+      "announcement": "กลุ่มประกาศ"
+    },
+    "newGroup": {
+      "header": "กลุ่มใหม่",
+      "placeholder": "ชื่อกลุ่ม",
+      "create": "สร้าง"
+    },
+    "toasts": {
+      "groupCreated": "สร้างกลุ่มแล้ว"
+    }
   }
 }

@@ -573,5 +573,26 @@
     "errors": {
       "shareFailed": "Teilen-Sheet konnte nicht geöffnet werden."
     }
+  },"community": {
+    "title": "Communitys",
+    "actions": {
+      "qr": "QR-Aktionen öffnen",
+      "menu": "Menü öffnen"
+    },
+    "newCommunity": "Neue Community",
+    "unnamedCommunity": "Unbenannte Community",
+    "viewAll": "Alle anzeigen",
+    "groupType": {
+      "normal": "Normale Gruppe",
+      "announcement": "Ankündigungsgruppe"
+    },
+    "newGroup": {
+      "header": "Neue Gruppe",
+      "placeholder": "Gruppenname",
+      "create": "Erstellen"
+    },
+    "toasts": {
+      "groupCreated": "Gruppe erstellt"
+    }
   }
 }

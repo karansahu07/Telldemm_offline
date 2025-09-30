@@ -572,5 +572,26 @@
     "errors": {
       "shareFailed": "공유 시트를 열 수 없습니다."
     }
+  },"community": {
+    "title": "커뮤니티",
+    "actions": {
+      "qr": "QR 작업 열기",
+      "menu": "메뉴 열기"
+    },
+    "newCommunity": "새 커뮤니티",
+    "unnamedCommunity": "이름 없는 커뮤니티",
+    "viewAll": "모두 보기",
+    "groupType": {
+      "normal": "일반 그룹",
+      "announcement": "공지 그룹"
+    },
+    "newGroup": {
+      "header": "새 그룹",
+      "placeholder": "그룹 이름",
+      "create": "생성"
+    },
+    "toasts": {
+      "groupCreated": "그룹이 생성되었습니다"
+    }
   }
 }

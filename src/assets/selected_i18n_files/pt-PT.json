@@ -572,5 +572,26 @@
     "errors": {
       "shareFailed": "Não foi possível abrir a folha de partilha."
     }
+  },"community": {
+    "title": "Comunidades",
+    "actions": {
+      "qr": "Abrir ações de QR",
+      "menu": "Abrir menu"
+    },
+    "newCommunity": "Nova comunidade",
+    "unnamedCommunity": "Comunidade sem nome",
+    "viewAll": "Ver tudo",
+    "groupType": {
+      "normal": "Grupo normal",
+      "announcement": "Grupo de anúncios"
+    },
+    "newGroup": {
+      "header": "Novo grupo",
+      "placeholder": "Nome do grupo",
+      "create": "Criar"
+    },
+    "toasts": {
+      "groupCreated": "Grupo criado"
+    }
   }
 }

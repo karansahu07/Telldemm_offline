@@ -572,5 +572,26 @@
     "errors": {
       "shareFailed": "பகிரும் தாளைத் திறக்க முடியவில்லை."
     }
+  },"community": {
+    "title": "சமூகங்கள்",
+    "actions": {
+      "qr": "QR செயல்களைத் திறக்கவும்",
+      "menu": "மெனுவைத் திறக்கவும்"
+    },
+    "newCommunity": "புதிய சமூகங்கள்",
+    "unnamedCommunity": "பெயரிடப்படாத சமூகங்கள்",
+    "viewAll": "அனைத்தையும் பார்க்க",
+    "groupType": {
+      "normal": "சாதாரண குழு",
+      "announcement": "அறிவிப்பு குழு"
+    },
+    "newGroup": {
+      "header": "புதிய குழு",
+      "placeholder": "குழு பெயர்",
+      "create": "உருவாக்கு"
+    },
+    "toasts": {
+      "groupCreated": "குழு உருவாக்கப்பட்டது"
+    }
   }
 }

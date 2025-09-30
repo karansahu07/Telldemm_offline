@@ -572,5 +572,26 @@
     "errors": {
       "shareFailed": "共有シートを開けませんでした。"
     }
+  },"community": {
+    "title": "コミュニティ",
+    "actions": {
+      "qr": "QRアクションを開く",
+      "menu": "メニューを開く"
+    },
+    "newCommunity": "新しいコミュニティ",
+    "unnamedCommunity": "名前のないコミュニティ",
+    "viewAll": "すべて表示",
+    "groupType": {
+      "normal": "通常グループ",
+      "announcement": "お知らせグループ"
+    },
+    "newGroup": {
+      "header": "新しいグループ",
+      "placeholder": "グループ名",
+      "create": "作成"
+    },
+    "toasts": {
+      "groupCreated": "グループが作成されました"
+    }
   }
 }

@@ -549,5 +549,26 @@
     "errors": {
       "shareFailed": "Paylaşım sayfası açılamadı."
     }
+  },"community": {
+    "title": "Topluluklar",
+    "actions": {
+      "qr": "QR işlemlerini aç",
+      "menu": "Menüyü aç"
+    },
+    "newCommunity": "Yeni topluluk",
+    "unnamedCommunity": "Adsız Topluluk",
+    "viewAll": "Hepsini gör",
+    "groupType": {
+      "normal": "Normal Grup",
+      "announcement": "Duyuru Grubu"
+    },
+    "newGroup": {
+      "header": "Yeni Grup",
+      "placeholder": "Grup Adı",
+      "create": "Oluştur"
+    },
+    "toasts": {
+      "groupCreated": "Grup oluşturuldu"
+    }
   }
 }

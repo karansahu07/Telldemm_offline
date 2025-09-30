@@ -575,5 +575,26 @@
     "errors": {
       "shareFailed": "تعذّر فتح نافذة المشاركة."
     }
+  },"community": {
+    "title": "المجتمعات",
+    "actions": {
+      "qr": "فتح إجراءات QR",
+      "menu": "فتح القائمة"
+    },
+    "newCommunity": "مجتمع جديد",
+    "unnamedCommunity": "مجتمع بدون اسم",
+    "viewAll": "عرض الكل",
+    "groupType": {
+      "normal": "مجموعة عادية",
+      "announcement": "مجموعة إعلانات"
+    },
+    "newGroup": {
+      "header": "مجموعة جديدة",
+      "placeholder": "اسم المجموعة",
+      "create": "إنشاء"
+    },
+    "toasts": {
+      "groupCreated": "تم إنشاء المجموعة"
+    }
   }
 }

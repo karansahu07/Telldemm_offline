@@ -574,5 +574,26 @@
     "errors": {
       "shareFailed": "无法打开分享界面。"
     }
+  },"community": {
+    "title": "社区",
+    "actions": {
+      "qr": "打开二维码操作",
+      "menu": "打开菜单"
+    },
+    "newCommunity": "新社区",
+    "unnamedCommunity": "未命名社区",
+    "viewAll": "查看全部",
+    "groupType": {
+      "normal": "普通群组",
+      "announcement": "公告群组"
+    },
+    "newGroup": {
+      "header": "新建群组",
+      "placeholder": "群组名称",
+      "create": "创建"
+    },
+    "toasts": {
+      "groupCreated": "群组已创建"
+    }
   }
 }

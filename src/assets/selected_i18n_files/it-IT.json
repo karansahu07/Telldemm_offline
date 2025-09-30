@@ -572,5 +572,26 @@
     "errors": {
       "shareFailed": "Impossibile aprire il foglio di condivisione."
     }
+  },"community": {
+    "title": "Comunità",
+    "actions": {
+      "qr": "Apri azioni QR",
+      "menu": "Apri menu"
+    },
+    "newCommunity": "Nuova comunità",
+    "unnamedCommunity": "Comunità senza nome",
+    "viewAll": "Vedi tutto",
+    "groupType": {
+      "normal": "Gruppo normale",
+      "announcement": "Gruppo annunci"
+    },
+    "newGroup": {
+      "header": "Nuovo gruppo",
+      "placeholder": "Nome del gruppo",
+      "create": "Crea"
+    },
+    "toasts": {
+      "groupCreated": "Gruppo creato"
+    }
   }
 }

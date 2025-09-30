@@ -574,6 +574,27 @@
     "errors": {
       "shareFailed": "無法開啟分享頁面。"
     }
+  },"community": {
+    "title": "社群",
+    "actions": {
+      "qr": "開啟 QR 操作",
+      "menu": "開啟選單"
+    },
+    "newCommunity": "新社群",
+    "unnamedCommunity": "未命名社群",
+    "viewAll": "查看全部",
+    "groupType": {
+      "normal": "一般群組",
+      "announcement": "公告群組"
+    },
+    "newGroup": {
+      "header": "新群組",
+      "placeholder": "群組名稱",
+      "create": "建立"
+    },
+    "toasts": {
+      "groupCreated": "群組已建立"
+    }
   }
 
 }

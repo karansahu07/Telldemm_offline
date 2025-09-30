@@ -573,5 +573,26 @@
     "errors": {
       "shareFailed": "Could not open share sheet."
     }
+  }, "community": {
+    "title": "Communities",
+    "actions": {
+      "qr": "Open QR actions",
+      "menu": "Open menu"
+    },
+    "newCommunity": "New community",
+    "unnamedCommunity": "Unnamed Community",
+    "viewAll": "View all",
+    "groupType": {
+      "normal": "Normal Group",
+      "announcement": "Announcement Group"
+    },
+    "newGroup": {
+      "header": "New Group",
+      "placeholder": "Group Name",
+      "create": "Create"
+    },
+    "toasts": {
+      "groupCreated": "Group created"
+    }
   }
 }

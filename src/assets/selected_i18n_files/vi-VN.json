@@ -548,5 +548,26 @@
     "errors": {
       "shareFailed": "Không thể mở bảng chia sẻ."
     }
+  },"community": {
+    "title": "Cộng đồng",
+    "actions": {
+      "qr": "Mở hành động QR",
+      "menu": "Mở menu"
+    },
+    "newCommunity": "Cộng đồng mới",
+    "unnamedCommunity": "Cộng đồng chưa đặt tên",
+    "viewAll": "Xem tất cả",
+    "groupType": {
+      "normal": "Nhóm thường",
+      "announcement": "Nhóm thông báo"
+    },
+    "newGroup": {
+      "header": "Nhóm mới",
+      "placeholder": "Tên nhóm",
+      "create": "Tạo"
+    },
+    "toasts": {
+      "groupCreated": "Đã tạo nhóm"
+    }
   }
 }

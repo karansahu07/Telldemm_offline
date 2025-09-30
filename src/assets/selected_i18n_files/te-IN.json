@@ -572,5 +572,26 @@
     "errors": {
       "shareFailed": "షేర్ షీట్‌ను తెరవలేకపోయాం."
     }
+  },"community": {
+    "title": "సమూహాలు",
+    "actions": {
+      "qr": "QR చర్యలను తెరవండి",
+      "menu": "మెనూను తెరవండి"
+    },
+    "newCommunity": "కొత్త కమ్యూనిటీ",
+    "unnamedCommunity": "పేరు లేని కమ్యూనిటీ",
+    "viewAll": "అన్నీ చూడండి",
+    "groupType": {
+      "normal": "సాధారణ గ్రూప్",
+      "announcement": "ప్రకటన గ్రూప్"
+    },
+    "newGroup": {
+      "header": "కొత్త గ్రూప్",
+      "placeholder": "గ్రూప్ పేరు",
+      "create": "సృష్టించండి"
+    },
+    "toasts": {
+      "groupCreated": "గ్రూప్ సృష్టించబడింది"
+    }
   }
 }

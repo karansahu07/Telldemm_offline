@@ -574,6 +574,27 @@
     "errors": {
       "shareFailed": "শেয়ার শীট খোলা যায়নি।"
     }
+  },"community": {
+    "title": "কমিউনিটি",
+    "actions": {
+      "qr": "QR অ্যাকশন খুলুন",
+      "menu": "মেনু খুলুন"
+    },
+    "newCommunity": "নতুন কমিউনিটি",
+    "unnamedCommunity": "নামহীন কমিউনিটি",
+    "viewAll": "সব দেখুন",
+    "groupType": {
+      "normal": "সাধারণ গ্রুপ",
+      "announcement": "ঘোষণা গ্রুপ"
+    },
+    "newGroup": {
+      "header": "নতুন গ্রুপ",
+      "placeholder": "গ্রুপের নাম",
+      "create": "তৈরি করুন"
+    },
+    "toasts": {
+      "groupCreated": "গ্রুপ তৈরি হয়েছে"
+    }
   }
 
 

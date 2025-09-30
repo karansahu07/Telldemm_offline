@@ -572,5 +572,26 @@
     "errors": {
       "shareFailed": "Не удалось открыть окно общего доступа."
     }
+  },"community": {
+    "title": "Сообщества",
+    "actions": {
+      "qr": "Открыть действия QR",
+      "menu": "Открыть меню"
+    },
+    "newCommunity": "Новое сообщество",
+    "unnamedCommunity": "Сообщество без имени",
+    "viewAll": "Посмотреть все",
+    "groupType": {
+      "normal": "Обычная группа",
+      "announcement": "Группа объявлений"
+    },
+    "newGroup": {
+      "header": "Новая группа",
+      "placeholder": "Название группы",
+      "create": "Создать"
+    },
+    "toasts": {
+      "groupCreated": "Группа создана"
+    }
   }
 }

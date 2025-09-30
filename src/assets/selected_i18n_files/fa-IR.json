@@ -519,5 +519,26 @@
     "errors": {
       "shareFailed": "امکان باز کردن صفحه اشتراک‌گذاری وجود ندارد."
     }
+  }, "community": {
+    "title": "انجمن‌ها",
+    "actions": {
+      "qr": "باز کردن اقدامات QR",
+      "menu": "باز کردن منو"
+    },
+    "newCommunity": "انجمن جدید",
+    "unnamedCommunity": "انجمن بدون نام",
+    "viewAll": "مشاهده همه",
+    "groupType": {
+      "normal": "گروه عادی",
+      "announcement": "گروه اطلاع‌رسانی"
+    },
+    "newGroup": {
+      "header": "گروه جدید",
+      "placeholder": "نام گروه",
+      "create": "ایجاد"
+    },
+    "toasts": {
+      "groupCreated": "گروه ایجاد شد"
+    }
   }
 }

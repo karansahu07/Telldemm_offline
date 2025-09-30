@@ -548,5 +548,26 @@
     "errors": {
       "shareFailed": "شیئر شیٹ نہیں کھل سکی۔"
     }
+  },"community": {
+    "title": "کمیونٹیز",
+    "actions": {
+      "qr": "QR ایکشنز کھولیں",
+      "menu": "مینو کھولیں"
+    },
+    "newCommunity": "نئی کمیونٹی",
+    "unnamedCommunity": "بے نام کمیونٹی",
+    "viewAll": "سب دیکھیں",
+    "groupType": {
+      "normal": "عام گروپ",
+      "announcement": "اعلانیہ گروپ"
+    },
+    "newGroup": {
+      "header": "نیا گروپ",
+      "placeholder": "گروپ کا نام",
+      "create": "بنائیں"
+    },
+    "toasts": {
+      "groupCreated": "گروپ بنایا گیا"
+    }
   }
 }

@@ -573,5 +573,26 @@
     "errors": {
       "shareFailed": "ਸ਼ੇਅਰ ਸ਼ੀਟ ਨਹੀਂ ਖੁੱਲ ਸਕੀ।"
     }
+  },"community": {
+    "title": "ਕਮਿਊਨਿਟੀਆਂ",
+    "actions": {
+      "qr": "QR ਕਾਰਵਾਈਆਂ ਖੋਲ੍ਹੋ",
+      "menu": "ਮੇਨੂ ਖੋਲ੍ਹੋ"
+    },
+    "newCommunity": "ਨਵੀਂ ਕਮਿਊਨਿਟੀ",
+    "unnamedCommunity": "ਬਿਨਾਂ ਨਾਮ ਵਾਲੀ ਕਮਿਊਨਿਟੀ",
+    "viewAll": "ਸਭ ਵੇਖੋ",
+    "groupType": {
+      "normal": "ਸਧਾਰਨ ਸਮੂਹ",
+      "announcement": "ਐਲਾਨ ਸਮੂਹ"
+    },
+    "newGroup": {
+      "header": "ਨਵਾਂ ਸਮੂਹ",
+      "placeholder": "ਸਮੂਹ ਦਾ ਨਾਮ",
+      "create": "ਬਣਾਓ"
+    },
+    "toasts": {
+      "groupCreated": "ਸਮੂਹ ਬਣਾਇਆ ਗਿਆ"
+    }
   }
 }

@@ -572,5 +572,26 @@
     "errors": {
       "shareFailed": "શેર શીટ ખોલી શક્યા નથી."
     }
+  }, "community": {
+    "title": "સમુદાયો",
+    "actions": {
+      "qr": "QR ક્રિયાઓ ખોલો",
+      "menu": "મેનૂ ખોલો"
+    },
+    "newCommunity": "નવો સમુદાય",
+    "unnamedCommunity": "નામ વિનાનો સમુદાય",
+    "viewAll": "બધું જુઓ",
+    "groupType": {
+      "normal": "સામાન્ય જૂથ",
+      "announcement": "જાહેરાત જૂથ"
+    },
+    "newGroup": {
+      "header": "નવો જૂથ",
+      "placeholder": "જૂથનું નામ",
+      "create": "બનાવો"
+    },
+    "toasts": {
+      "groupCreated": "જૂથ બનાવાયું"
+    }
   }
 }

@@ -573,5 +573,26 @@
     "errors": {
       "shareFailed": "Impossible d’ouvrir la feuille de partage."
     }
+  },"community": {
+    "title": "Communautés",
+    "actions": {
+      "qr": "Ouvrir les actions QR",
+      "menu": "Ouvrir le menu"
+    },
+    "newCommunity": "Nouvelle communauté",
+    "unnamedCommunity": "Communauté sans nom",
+    "viewAll": "Voir tout",
+    "groupType": {
+      "normal": "Groupe normal",
+      "announcement": "Groupe d’annonces"
+    },
+    "newGroup": {
+      "header": "Nouveau groupe",
+      "placeholder": "Nom du groupe",
+      "create": "Créer"
+    },
+    "toasts": {
+      "groupCreated": "Groupe créé"
+    }
   }
 }

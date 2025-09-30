@@ -572,5 +572,26 @@
     "errors": {
       "shareFailed": "शेयर शीट नहीं खोली जा सकी।"
     }
+  },"community": {
+    "title": "समुदाय",
+    "actions": {
+      "qr": "QR क्रियाएँ खोलें",
+      "menu": "मेनू खोलें"
+    },
+    "newCommunity": "नया समुदाय",
+    "unnamedCommunity": "बेनाम समुदाय",
+    "viewAll": "सभी देखें",
+    "groupType": {
+      "normal": "साधारण समूह",
+      "announcement": "घोषणा समूह"
+    },
+    "newGroup": {
+      "header": "नया समूह",
+      "placeholder": "समूह का नाम",
+      "create": "बनाएँ"
+    },
+    "toasts": {
+      "groupCreated": "समूह बनाया गया"
+    }
   }
 }
