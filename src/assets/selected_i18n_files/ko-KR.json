@@ -593,5 +593,19 @@
     "toasts": {
       "groupCreated": "그룹이 생성되었습니다"
     }
+  },"community_menu_component": {
+    "info": "커뮤니티 정보",
+    "invite": "회원 초대",
+    "settings": "커뮤니티 설정"
+  },
+  "group_preview_modal_component": {
+    "close": "닫기",
+    "groupIcon": "그룹 아이콘",
+    "createdBy": "{{name}} 님이 생성함",
+    "noMembers": "아직 멤버가 없습니다",
+    "noDescription": "설명 없음",
+    "communityLabel": "커뮤니티:",
+    "joinNote": "참여하면 즉시 멤버가 됩니다.",
+    "joinCta": "그룹 참여"
   }
 }

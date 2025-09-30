@@ -593,5 +593,19 @@
     "toasts": {
       "groupCreated": "Grupo creado"
     }
+  }, "community_menu_component": {
+    "info": "Información de la comunidad",
+    "invite": "Invitar miembros",
+    "settings": "Configuración de la comunidad"
+  },
+  "group_preview_modal_component": {
+    "close": "Cerrar",
+    "groupIcon": "Ícono del grupo",
+    "createdBy": "Creado por {{name}}",
+    "noMembers": "Aún no hay miembros",
+    "noDescription": "Sin descripción",
+    "communityLabel": "Comunidad:",
+    "joinNote": "Al unirte te conviertes en miembro inmediatamente.",
+    "joinCta": "Unirse al grupo"
   }
 }

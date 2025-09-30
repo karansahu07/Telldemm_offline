@@ -593,5 +593,19 @@
     "toasts": {
       "groupCreated": "જૂથ બનાવાયું"
     }
+  },"community_menu_component": {
+    "info": "સમુદાય માહિતી",
+    "invite": "સભ્યોને આમંત્રણ આપો",
+    "settings": "સમુદાય સેટિંગ્સ"
+  },
+  "group_preview_modal_component": {
+    "close": "બંધ કરો",
+    "groupIcon": "જૂથ આઇકન",
+    "createdBy": "{{name}} દ્વારા બનાવવામાં આવ્યું",
+    "noMembers": "હજુ સુધી કોઈ સભ્યો નથી",
+    "noDescription": "કોઈ વર્ણન નથી",
+    "communityLabel": "સમુદાય:",
+    "joinNote": "જોડાતા જ તમે તરત જ સભ્ય બની જશો.",
+    "joinCta": "જૂથમાં જોડાઓ"
   }
 }

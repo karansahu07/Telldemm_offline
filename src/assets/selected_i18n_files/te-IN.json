@@ -593,5 +593,19 @@
     "toasts": {
       "groupCreated": "గ్రూప్ సృష్టించబడింది"
     }
+  },"community_menu_component": {
+    "info": "సమూహ సమాచారం",
+    "invite": "సభ్యులను ఆహ్వానించండి",
+    "settings": "సమూహ సెట్టింగ్‌లు"
+  },
+  "group_preview_modal_component": {
+    "close": "మూసివేయి",
+    "groupIcon": "గ్రూప్ ఐకాన్",
+    "createdBy": "{{name}} సృష్టించారు",
+    "noMembers": "ఇప్పటికీ సభ్యులు లేరు",
+    "noDescription": "వివరణ లేదు",
+    "communityLabel": "సమూహం:",
+    "joinNote": "చేరిన వెంటనే మీరు సభ్యుడవుతారు.",
+    "joinCta": "గ్రూప్‌లో చేరండి"
   }
 }

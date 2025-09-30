@@ -569,5 +569,19 @@
     "toasts": {
       "groupCreated": "Đã tạo nhóm"
     }
+  },"community_menu_component": {
+    "info": "Thông tin cộng đồng",
+    "invite": "Mời thành viên",
+    "settings": "Cài đặt cộng đồng"
+  },
+  "group_preview_modal_component": {
+    "close": "Đóng",
+    "groupIcon": "Biểu tượng nhóm",
+    "createdBy": "Được tạo bởi {{name}}",
+    "noMembers": "Chưa có thành viên nào",
+    "noDescription": "Không có mô tả",
+    "communityLabel": "Cộng đồng:",
+    "joinNote": "Khi tham gia, bạn sẽ trở thành thành viên ngay lập tức.",
+    "joinCta": "Tham gia nhóm"
   }
 }

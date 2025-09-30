@@ -1,56 +1,11 @@
-<!-- <ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-button fill="clear" (click)="close()">
-        <ion-icon name="close"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-    <ion-title></ion-title>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content class="ion-padding">
-  <div style="text-align:center; margin-top:8px;">
-    <ion-avatar class="big-avatar">
-      <ion-icon name="people-outline"></ion-icon>
-    </ion-avatar>
-
-    <h2 style="margin-top:12px;">{{ group?.name }}</h2>
-    <p class="muted">{{ createdByText }}</p>
-    <p class="muted" style="margin-top:6px;">Community: {{ communityName }}</p>
-  </div>
-
-  <div style="margin-top:18px;">
-    <h3>Members</h3>
-    <div class="members-list">
-      <ng-container *ngIf="memberKeys?.length; else noMembers">
-        <div *ngFor="let k of memberKeys | slice:0:8" class="member-avatar-wrap">
-          <ion-avatar class="small-avatar">
-            <div class="avatar-initials">{{ initialsFor(memberObj(k)) }}</div>
-          </ion-avatar>
-        </div>
-        <div *ngIf="memberKeys.length > 8" class="more-badge">+{{memberKeys.length - 8}}</div>
-      </ng-container>
-      <ng-template #noMembers>
-        <p class="muted">No members yet</p>
-      </ng-template>
-    </div>
-  </div>
-
-  <div style="margin-top:20px;">
-    <p class="muted">By joining you become a member immediately.</p>
-  </div>
-
-  <div class="join-wrap">
-    <ion-button expand="block" shape="round" (click)="join()">Join</ion-button>
-  </div>
-</ion-content> -->
-
-
 <ion-header translucent class="modal-header">
   <div class="drag-handle"></div>
   <ion-buttons slot="start">
-    <ion-button fill="clear" (click)="close()">
+    <ion-button
+      fill="clear"
+      (click)="close()"
+      [attr.aria-label]="'group_preview_modal_component.close' | translate"
+    >
       <ion-icon name="close"></ion-icon>
     </ion-button>
   </ion-buttons>
@@ -58,46 +13,69 @@
 
 <ion-content class="modal-content" scrollY="true">
   <div class="top-block">
-    <ion-avatar class="group-avatar">
+    <ion-avatar class="group-avatar" [attr.aria-label]="'group_preview_modal_component.groupIcon' | translate">
       <ion-icon name="people-outline"></ion-icon>
     </ion-avatar>
 
     <h2 class="group-title">{{ group?.name }}</h2>
-    <p class="created-by">{{ createdByText }}<span *ngIf="group?.createdAt">, {{ (group?.createdAt | date) }}</span></p>
+
+    <p class="created-by">
+      {{ createdByText }}
+      <span *ngIf="group?.createdAt">
+        , {{ (group?.createdAt | date) }}
+      </span>
+    </p>
 
     <div class="members-row">
       <ng-container *ngIf="memberKeys?.length; else noMembers">
         <div class="avatars">
           <ng-container *ngFor="let k of memberKeys | slice:0:8">
             <ion-avatar class="member-avatar">
-              <ng-container *ngIf="memberObj(k)?.avatar">
-                <img [src]="memberObj(k)?.avatar" alt="avatar" (error)="setDefaultAvatar($event)" />
+              <ng-container *ngIf="memberObj(k)?.avatar; else initialsTpl">
+                <img
+                  [src]="memberObj(k)?.avatar"
+                  alt=""
+                  (error)="setDefaultAvatar($event)"
+                />
               </ng-container>
-              <ng-container *ngIf="!memberObj(k)?.avatar">
+              <ng-template #initialsTpl>
                 <div class="avatar-initials">{{ initialsFor(memberObj(k)) }}</div>
-              </ng-container>
+              </ng-template>
             </ion-avatar>
           </ng-container>
           <div class="more-count" *ngIf="memberKeys.length > 8">+{{ memberKeys.length - 8 }}</div>
         </div>
       </ng-container>
+
       <ng-template #noMembers>
-        <p class="no-members">No members yet</p>
+        <p class="no-members">{{ 'group_preview_modal_component.noMembers' | translate }}</p>
       </ng-template>
     </div>
   </div>
 
   <div class="description">
-    <p>{{ group?.description || 'No description' }}</p>
+    <p>{{ group?.description || ('group_preview_modal_component.noDescription' | translate) }}</p>
   </div>
 
   <div class="info-note">
-    <p>Community: {{ communityName }}</p>
-    <p class="small-note">By joining you become a member immediately.</p>
+    <p>
+      {{ 'group_preview_modal_component.communityLabel' | translate }} {{ communityName }}
+    </p>
+    <p class="small-note">
+      {{ 'group_preview_modal_component.joinNote' | translate }}
+    </p>
   </div>
 
   <div class="join-row">
-    <ion-button expand="block" shape="round" (click)="join()" class="join-btn">Join Group</ion-button>
+    <ion-button
+      expand="block"
+      shape="round"
+      (click)="join()"
+      class="join-btn"
+      [attr.aria-label]="'group_preview_modal_component.joinCta' | translate"
+    >
+      {{ 'group_preview_modal_component.joinCta' | translate }}
+    </ion-button>
   </div>
 
   <div style="height: 20px;"></div>

@@ -593,5 +593,19 @@
     "toasts": {
       "groupCreated": "குழு உருவாக்கப்பட்டது"
     }
+  },"community_menu_component": {
+    "info": "சமூகத் தகவல்",
+    "invite": "உறுப்பினர்களை அழைக்கவும்",
+    "settings": "சமூக அமைப்புகள்"
+  },
+  "group_preview_modal_component": {
+    "close": "மூடு",
+    "groupIcon": "குழு சின்னம்",
+    "createdBy": "{{name}} உருவாக்கியது",
+    "noMembers": "இன்னும் உறுப்பினர்கள் இல்லை",
+    "noDescription": "விளக்கம் இல்லை",
+    "communityLabel": "சமூகம்:",
+    "joinNote": "சேரும்போது, ​​நீங்கள் உடனடியாக உறுப்பினராகிவிடுவீர்கள்.",
+    "joinCta": "குழுவில் சேரவும்"
   }
 }

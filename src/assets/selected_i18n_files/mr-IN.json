@@ -572,7 +572,7 @@
     "errors": {
       "shareFailed": "शेअर शीट उघडता आली नाही."
     }
-  },{
+  },
   "community": {
     "title": "समुदाय",
     "actions": {
@@ -594,5 +594,19 @@
     "toasts": {
       "groupCreated": "गट तयार केला गेला"
     }
+  },"community_menu_component": {
+    "info": "समुदाय माहिती",
+    "invite": "सदस्यांना आमंत्रित करा",
+    "settings": "समुदाय सेटिंग्ज"
+  },
+  "group_preview_modal_component": {
+    "close": "बंद करा",
+    "groupIcon": "गट चिन्ह",
+    "createdBy": "{{name}} यांनी तयार केले",
+    "noMembers": "अजून कोणतेही सदस्य नाहीत",
+    "noDescription": "वर्णन उपलब्ध नाही",
+    "communityLabel": "समुदाय:",
+    "joinNote": "जोडताच आपण लगेच सदस्य व्हाल.",
+    "joinCta": "गटात सामील व्हा"
   }
 }

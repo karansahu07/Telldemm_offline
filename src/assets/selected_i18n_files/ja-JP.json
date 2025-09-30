@@ -593,5 +593,19 @@
     "toasts": {
       "groupCreated": "グループが作成されました"
     }
+  },"community_menu_component": {
+    "info": "コミュニティ情報",
+    "invite": "メンバーを招待",
+    "settings": "コミュニティ設定"
+  },
+  "group_preview_modal_component": {
+    "close": "閉じる",
+    "groupIcon": "グループアイコン",
+    "createdBy": "{{name}} によって作成",
+    "noMembers": "まだメンバーがいません",
+    "noDescription": "説明なし",
+    "communityLabel": "コミュニティ:",
+    "joinNote": "参加するとすぐにメンバーになります。",
+    "joinCta": "グループに参加"
   }
 }

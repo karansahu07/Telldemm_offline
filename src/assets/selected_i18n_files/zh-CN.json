@@ -595,5 +595,19 @@
     "toasts": {
       "groupCreated": "群组已创建"
     }
+  }, "community_menu_component": {
+    "info": "社区信息",
+    "invite": "邀请成员",
+    "settings": "社区设置"
+  },
+  "group_preview_modal_component": {
+    "close": "关闭",
+    "groupIcon": "群组图标",
+    "createdBy": "由 {{name}} 创建",
+    "noMembers": "暂无成员",
+    "noDescription": "没有描述",
+    "communityLabel": "社区：",
+    "joinNote": "加入后您将立即成为成员。",
+    "joinCta": "加入群组"
   }
 }

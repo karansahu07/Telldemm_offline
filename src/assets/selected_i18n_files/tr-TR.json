@@ -570,5 +570,19 @@
     "toasts": {
       "groupCreated": "Grup oluşturuldu"
     }
+  },"community_menu_component": {
+    "info": "Topluluk bilgisi",
+    "invite": "Üye davet et",
+    "settings": "Topluluk ayarları"
+  },
+  "group_preview_modal_component": {
+    "close": "Kapat",
+    "groupIcon": "Grup simgesi",
+    "createdBy": "{{name}} tarafından oluşturuldu",
+    "noMembers": "Henüz üye yok",
+    "noDescription": "Açıklama yok",
+    "communityLabel": "Topluluk:",
+    "joinNote": "Katıldığınızda hemen üye olursunuz.",
+    "joinCta": "Gruba Katıl"
   }
 }

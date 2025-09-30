@@ -593,5 +593,19 @@
     "toasts": {
       "groupCreated": "Группа создана"
     }
+  },"community_menu_component": {
+    "info": "Информация о сообществе",
+    "invite": "Пригласить участников",
+    "settings": "Настройки сообщества"
+  },
+  "group_preview_modal_component": {
+    "close": "Закрыть",
+    "groupIcon": "Иконка группы",
+    "createdBy": "Создано {{name}}",
+    "noMembers": "Пока нет участников",
+    "noDescription": "Описание отсутствует",
+    "communityLabel": "Сообщество:",
+    "joinNote": "Присоединившись, вы сразу станете участником.",
+    "joinCta": "Присоединиться к группе"
   }
 }

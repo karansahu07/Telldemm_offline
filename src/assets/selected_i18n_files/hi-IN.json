@@ -593,5 +593,19 @@
     "toasts": {
       "groupCreated": "समूह बनाया गया"
     }
+  },"community_menu_component": {
+    "info": "समुदाय जानकारी",
+    "invite": "सदस्यों को आमंत्रित करें",
+    "settings": "समुदाय सेटिंग्स"
+  },
+  "group_preview_modal_component": {
+    "close": "बंद करें",
+    "groupIcon": "समूह आइकन",
+    "createdBy": "{{name}} द्वारा बनाया गया",
+    "noMembers": "अभी तक कोई सदस्य नहीं",
+    "noDescription": "कोई विवरण नहीं",
+    "communityLabel": "समुदाय:",
+    "joinNote": "जुड़ते ही आप तुरंत सदस्य बन जाएंगे।",
+    "joinCta": "समूह से जुड़ें"
   }
 }

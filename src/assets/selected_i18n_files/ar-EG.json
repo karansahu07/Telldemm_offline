@@ -596,5 +596,19 @@
     "toasts": {
       "groupCreated": "تم إنشاء المجموعة"
     }
+  },"community_menu_component": {
+    "info": "معلومات المجتمع",
+    "invite": "دعوة الأعضاء",
+    "settings": "إعدادات المجتمع"
+  },
+  "group_preview_modal_component": {
+    "close": "إغلاق",
+    "groupIcon": "أيقونة المجموعة",
+    "createdBy": "أنشأه {{name}}",
+    "noMembers": "لا يوجد أعضاء حتى الآن",
+    "noDescription": "لا يوجد وصف",
+    "communityLabel": "المجتمع:",
+    "joinNote": "بانضمامك تصبح عضوًا فورًا.",
+    "joinCta": "انضم إلى المجموعة"
   }
 }

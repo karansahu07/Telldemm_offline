@@ -593,5 +593,19 @@
     "toasts": {
       "groupCreated": "สร้างกลุ่มแล้ว"
     }
+  },"community_menu_component": {
+    "info": "ข้อมูลชุมชน",
+    "invite": "เชิญสมาชิก",
+    "settings": "การตั้งค่าชุมชน"
+  },
+  "group_preview_modal_component": {
+    "close": "ปิด",
+    "groupIcon": "ไอคอนกลุ่ม",
+    "createdBy": "สร้างโดย {{name}}",
+    "noMembers": "ยังไม่มีสมาชิก",
+    "noDescription": "ไม่มีคำอธิบาย",
+    "communityLabel": "ชุมชน:",
+    "joinNote": "เมื่อเข้าร่วมคุณจะกลายเป็นสมาชิกทันที",
+    "joinCta": "เข้าร่วมกลุ่ม"
   }
 }

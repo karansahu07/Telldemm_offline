@@ -594,5 +594,19 @@
     "toasts": {
       "groupCreated": "ਸਮੂਹ ਬਣਾਇਆ ਗਿਆ"
     }
+  },"community_menu_component": {
+    "info": "ਕਮਿਊਨਿਟੀ ਜਾਣਕਾਰੀ",
+    "invite": "ਮੈਂਬਰਾਂ ਨੂੰ ਸੱਦੋ",
+    "settings": "ਕਮਿਊਨਿਟੀ ਸੈਟਿੰਗਾਂ"
+  },
+  "group_preview_modal_component": {
+    "close": "ਬੰਦ ਕਰੋ",
+    "groupIcon": "ਗਰੁੱਪ ਆਈਕਨ",
+    "createdBy": "{{name}} ਦੁਆਰਾ ਬਣਾਇਆ ਗਿਆ",
+    "noMembers": "ਹਾਲੇ ਤੱਕ ਕੋਈ ਮੈਂਬਰ ਨਹੀਂ",
+    "noDescription": "ਕੋਈ ਵਰਣਨ ਨਹੀਂ",
+    "communityLabel": "ਕਮਿਊਨਿਟੀ:",
+    "joinNote": "ਜੁੜਦੇ ਹੀ ਤੁਸੀਂ ਤੁਰੰਤ ਮੈਂਬਰ ਬਣ ਜਾਵੋਗੇ।",
+    "joinCta": "ਗਰੁੱਪ ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਵੋ"
   }
 }

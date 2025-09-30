@@ -569,5 +569,19 @@
     "toasts": {
       "groupCreated": "گروپ بنایا گیا"
     }
+  },"community_menu_component": {
+    "info": "کمیونٹی معلومات",
+    "invite": "ممبران کو مدعو کریں",
+    "settings": "کمیونٹی سیٹنگز"
+  },
+  "group_preview_modal_component": {
+    "close": "بند کریں",
+    "groupIcon": "گروپ آئیکن",
+    "createdBy": "{{name}} نے بنایا",
+    "noMembers": "ابھی تک کوئی ممبر نہیں",
+    "noDescription": "کوئی تفصیل نہیں",
+    "communityLabel": "کمیونٹی:",
+    "joinNote": "شامل ہوتے ہی آپ فوراً ممبر بن جائیں گے۔",
+    "joinCta": "گروپ میں شامل ہوں"
   }
 }

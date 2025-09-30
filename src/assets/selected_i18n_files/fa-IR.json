@@ -540,5 +540,19 @@
     "toasts": {
       "groupCreated": "گروه ایجاد شد"
     }
+  }, "community_menu_component": {
+    "info": "اطلاعات انجمن",
+    "invite": "دعوت اعضا",
+    "settings": "تنظیمات انجمن"
+  },
+  "group_preview_modal_component": {
+    "close": "بستن",
+    "groupIcon": "آیکون گروه",
+    "createdBy": "ایجاد شده توسط {{name}}",
+    "noMembers": "هنوز هیچ عضوی وجود ندارد",
+    "noDescription": "توضیحی وجود ندارد",
+    "communityLabel": "انجمن:",
+    "joinNote": "با پیوستن، بلافاصله عضو می‌شوید.",
+    "joinCta": "پیوستن به گروه"
   }
 }

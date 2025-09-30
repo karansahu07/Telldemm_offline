@@ -595,6 +595,20 @@
     "toasts": {
       "groupCreated": "গ্রুপ তৈরি হয়েছে"
     }
+  },"community_menu_component": {
+    "info": "কমিউনিটি তথ্য",
+    "invite": "সদস্য আমন্ত্রণ করুন",
+    "settings": "কমিউনিটি সেটিংস"
+  },
+  "group_preview_modal_component": {
+    "close": "বন্ধ করুন",
+    "groupIcon": "গ্রুপ আইকন",
+    "createdBy": "{{name}} দ্বারা তৈরি",
+    "noMembers": "এখনও কোনো সদস্য নেই",
+    "noDescription": "কোনো বিবরণ নেই",
+    "communityLabel": "কমিউনিটি:",
+    "joinNote": "যোগদান করলে আপনি সাথে সাথেই সদস্য হবেন।",
+    "joinCta": "গ্রুপে যোগ দিন"
   }
 
 

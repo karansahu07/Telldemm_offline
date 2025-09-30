@@ -62,13 +62,14 @@
 import { Component, Input } from '@angular/core';
 import { IonicModule, ModalController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-group-preview-modal',
   templateUrl: './group-preview-modal.component.html',
   styleUrls: ['./group-preview-modal.component.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule]
+  imports: [IonicModule, CommonModule, TranslateModule],
 })
 export class GroupPreviewModalComponent {
   @Input() group: any;
@@ -77,7 +78,10 @@ export class GroupPreviewModalComponent {
   @Input() currentUserName = '';
   @Input() currentUserPhone = '';
 
-  constructor(private modalCtrl: ModalController) {}
+  constructor(
+    private modalCtrl: ModalController,
+    private translate: TranslateService
+  ) {}
 
   get memberKeys(): string[] {
     if (!this.group || !this.group.rawMembers) return [];
@@ -92,7 +96,6 @@ export class GroupPreviewModalComponent {
     const n: string = mem?.name || '';
     if (!n) return mem?.phone_number ? String(mem.phone_number).slice(-2) : 'U';
 
-    // explicit types for callbacks to satisfy noImplicitAny
     const initials = n
       .split(' ')
       .map((s: string) => (s && s.length > 0 ? s[0] : ''))
@@ -104,13 +107,18 @@ export class GroupPreviewModalComponent {
     return initials || 'U';
   }
 
+  /**
+   * Localized "Created by {{name}}"
+   * (Date is appended in the template with Angular date pipe)
+   */
   get createdByText(): string {
-    // if group.createdByName exists use it, otherwise fall back to createdBy id
-    const name = this.group?.createdByName || this.group?.createdBy || this.group?.created_by || '';
+    const name =
+      this.group?.createdByName ||
+      this.group?.createdBy ||
+      this.group?.created_by ||
+      '';
     if (!name) return '';
-    // if createdAt exists you can format it here; keeping simple as before
-    const createdAt = this.group?.createdAt ? `, ${new Date(this.group.createdAt).toLocaleDateString()}` : '';
-    return `Created by ${name}${createdAt}`;
+    return this.translate.instant('group_preview_modal_component.createdBy', { name });
   }
 
   close(): void {
@@ -125,17 +133,13 @@ export class GroupPreviewModalComponent {
     try {
       const img = event?.target as HTMLImageElement | null;
       if (!img) return;
-      img.onerror = null; // avoid infinite loop if fallback missing
+      img.onerror = null;
       img.src = this.avatarFallbackUrl();
     } catch (e) {
-      // swallow errors - this is non-critical
       console.warn('setDefaultAvatar error', e);
     }
   }
 
-  /**
-   * Provide a fallback image path (change to your asset if needed).
-   */
   avatarFallbackUrl(): string {
     return 'assets/images/user.jfif';
   }
