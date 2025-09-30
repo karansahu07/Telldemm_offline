@@ -558,9 +558,10 @@
     "unnamedCommunity": "Cộng đồng chưa đặt tên",
     "viewAll": "Xem tất cả",
     "groupType": {
-      "normal": "Nhóm thường",
-      "announcement": "Nhóm thông báo"
-    },
+    "normal": "Nhóm thường",
+    "announcement": "Nhóm thông báo",
+    "general": "Nhóm chung"
+  },
     "newGroup": {
       "header": "Nhóm mới",
       "placeholder": "Tên nhóm",

@@ -558,10 +558,11 @@
     "newCommunity": "Yeni topluluk",
     "unnamedCommunity": "Adsız Topluluk",
     "viewAll": "Hepsini gör",
-    "groupType": {
-      "normal": "Normal Grup",
-      "announcement": "Duyuru Grubu"
-    },
+   "groupType": {
+    "normal": "Normal Grup",
+    "announcement": "Duyuru Grubu",
+    "general": "Genel Grup"
+  },
     "newGroup": {
       "header": "Yeni Grup",
       "placeholder": "Grup Adı",

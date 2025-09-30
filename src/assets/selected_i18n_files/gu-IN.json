@@ -582,9 +582,10 @@
     "unnamedCommunity": "નામ વિનાનો સમુદાય",
     "viewAll": "બધું જુઓ",
     "groupType": {
-      "normal": "સામાન્ય જૂથ",
-      "announcement": "જાહેરાત જૂથ"
-    },
+    "normal": "સામાન્ય જૂથ",
+    "announcement": "જાહેરાત જૂથ",
+    "general": "જનરલ જૂથ"
+  },
     "newGroup": {
       "header": "નવો જૂથ",
       "placeholder": "જૂથનું નામ",

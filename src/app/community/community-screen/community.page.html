@@ -1,85 +1,14 @@
-<!-- <ion-header [translucent]="true">
-  <ion-toolbar class="tooler">
-
-    <ion-title slot="start" class="ion-text-start">Communities</ion-title>
-
-    
-    <ion-buttons slot="end">
-      <ion-button fill="clear">
-        <ion-img src="assets/images/qr-code.svg" class="toolbar-icon"></ion-img>
-      </ion-button>
-      <ion-button fill="clear" (click)="presentPopover($event)">
-        <ion-img src="assets/images/dots (1).svg" class="toolbar-icon"></ion-img>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content [fullscreen]="true">
-  <div class="info-banner">
-    <img src="assets/images/idea.png" class="info-icon" />
-    <div class="info-text">
-      <h3>Communities are moving</h3>
-      <p>
-        View and create communities from the Chats tab, and organise them with a
-        list. <br />
-        <span class="highlight">Add communities list</span>
-      </p>
-    </div>
-  </div>
-
-  <ion-content class="light-theme">
-   
-    <ion-item lines="none" class="new-community">
-      <ion-avatar slot="start">
-        <img src="assets/images/profile.png" />
-        <ion-icon name="add-circle" class="add-icon"></ion-icon>
-      </ion-avatar>
-      <ion-label>
-        <h2>New community</h2>
-      </ion-label>
-    </ion-item>
-
-    
-    <ion-item lines="none" class="community-card">
-      <ion-avatar slot="start">
-        <img src="assets/images/user.jfif" />
-      </ion-avatar>
-
-      <ion-label>
-        <h2 class="community-title">ISKCON Yamuna Nagar Community</h2>
-        <div class="announcement-line">
-          <span class="message-preview">~ Sarva Aanand Das:</span>
-          <ion-icon name="image-outline" class="icon-red"></ion-icon>
-          <span class="message-preview">Photo</span>
-        </div>
-      </ion-label>
-
-      <div class="right-info">
-        <span class="timestamp">9:11 am</span>
-        <ion-icon name="ellipse" class="dot-green"></ion-icon>
-      </div>
-    </ion-item>
-
-    <ion-item lines="none" class="view-all-row" button detail="false">
-      <ion-icon name="chevron-forward-outline" class="view-all-icon"></ion-icon>
-      <span class="view-all-text">View all</span>
-    </ion-item>
-  </ion-content>
-</ion-content>
-<app-footer-tabs></app-footer-tabs> -->
-
-
-
 <ion-header [translucent]="true">
   <ion-toolbar class="tooler">
-    <ion-title slot="start" class="ion-text-start">Communities</ion-title>
+    <ion-title slot="start" class="ion-text-start">
+      {{ 'community.title' | translate }}
+    </ion-title>
 
     <ion-buttons slot="end">
-      <ion-button fill="clear">
+      <ion-button fill="clear" [attr.aria-label]="'community.actions.qr' | translate">
         <ion-img src="assets/images/qr-code.svg" class="toolbar-icon"></ion-img>
       </ion-button>
-      <ion-button fill="clear" (click)="presentPopover($event)">
+      <ion-button fill="clear" (click)="presentPopover($event)" [attr.aria-label]="'community.actions.menu' | translate">
         <ion-img src="assets/images/dots (1).svg" class="toolbar-icon"></ion-img>
       </ion-button>
     </ion-buttons>
@@ -87,34 +16,18 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <!-- <div class="info-banner">
-    <img src="assets/images/idea.png" class="info-icon" />
-    <div class="info-text">
-      <h3>Communities are moving</h3>
-      <p>
-        View and create communities from the Chats tab, and organise them with a list. <br />
-        <span class="highlight">Add communities list</span>
-      </p>
-    </div>
-  </div> -->
-
-  <ion-content>
-
-  <!-- New community button -->
-  <ion-item lines="none" class="new-community" button (click)="createCommunityPrompt()">
+  <ion-item lines="none" class="new-community" button (click)="createCommunityPrompt()"
+            [attr.aria-label]="'community.newCommunity' | translate">
     <ion-avatar slot="start">
       <img src="assets/images/profile.png" />
       <ion-icon name="add-circle" class="add-icon"></ion-icon>
     </ion-avatar>
     <ion-label>
-      <h2>New community</h2>
+      <h2>{{ 'community.newCommunity' | translate }}</h2>
     </ion-label>
   </ion-item>
 
-  <!-- Communities list -->
   <ng-container *ngFor="let community of joinedCommunities">
-
-    <!-- Community header -->
     <ion-item class="community-item">
       <ion-avatar slot="start">
         <img [src]="community.icon" />
@@ -124,40 +37,21 @@
       </ion-label>
     </ion-item>
 
-    <!-- Groups inside this community -->
     <ion-list lines="none" class="group-list">
       <ion-item *ngFor="let group of community.groups" button (click)="goToGroupChat(group.id)">
-        <ion-icon
-          slot="start"
-          [name]="group.type === 'announcement' ? 'megaphone-outline' : 'chatbox-outline'">
+        <ion-icon slot="start"
+                  [name]="group.type === 'announcement' ? 'megaphone-outline' : 'chatbox-outline'">
         </ion-icon>
         <ion-label>
           <h3>{{ group.name }}</h3>
-          <p>{{ group.type | titlecase }}</p>
+          <p>{{ ('community.groupType.' + (group.type || 'normal')) | translate }}</p>
         </ion-label>
       </ion-item>
     </ion-list>
 
-    <!-- Optional: View all -->
-    <!-- <ion-item lines="none" button detail="false">
-      <ion-label color="primary">View all</ion-label>
-    </ion-item> -->
-
-    <!-- Optional: View all -->
-<ion-item 
-  lines="none" 
-  button 
-  detail="false" 
-  (click)="goToAddGroupCommunity(community)">
-  <ion-label color="primary">View all</ion-label>
-</ion-item>
-
-
+    <ion-item lines="none" button detail="false" (click)="goToAddGroupCommunity(community)"
+              [attr.aria-label]="'community.viewAll' | translate">
+      <ion-label color="primary">{{ 'community.viewAll' | translate }}</ion-label>
+    </ion-item>
   </ng-container>
-
 </ion-content>
-
-
-</ion-content>
-
-<app-footer-tabs></app-footer-tabs>

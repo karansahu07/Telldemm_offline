@@ -584,10 +584,11 @@
     "newCommunity": "مجتمع جديد",
     "unnamedCommunity": "مجتمع بدون اسم",
     "viewAll": "عرض الكل",
-    "groupType": {
-      "normal": "مجموعة عادية",
-      "announcement": "مجموعة إعلانات"
-    },
+   "groupType": {
+    "normal": "مجموعة عادية",
+    "announcement": "مجموعة إعلانات",
+    "general": "مجموعة عامة"
+  },
     "newGroup": {
       "header": "مجموعة جديدة",
       "placeholder": "اسم المجموعة",

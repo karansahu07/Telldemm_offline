@@ -558,9 +558,10 @@
     "unnamedCommunity": "بے نام کمیونٹی",
     "viewAll": "سب دیکھیں",
     "groupType": {
-      "normal": "عام گروپ",
-      "announcement": "اعلانیہ گروپ"
-    },
+    "normal": "عام گروپ",
+    "announcement": "اعلانیہ گروپ",
+    "general": "جنرل گروپ"
+  },
     "newGroup": {
       "header": "نیا گروپ",
       "placeholder": "گروپ کا نام",

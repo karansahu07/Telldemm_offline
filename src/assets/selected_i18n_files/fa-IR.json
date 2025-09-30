@@ -529,9 +529,10 @@
     "unnamedCommunity": "انجمن بدون نام",
     "viewAll": "مشاهده همه",
     "groupType": {
-      "normal": "گروه عادی",
-      "announcement": "گروه اطلاع‌رسانی"
-    },
+    "normal": "گروه عادی",
+    "announcement": "گروه اطلاعیه",
+    "general": "گروه عمومی"
+  },
     "newGroup": {
       "header": "گروه جدید",
       "placeholder": "نام گروه",

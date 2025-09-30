@@ -582,9 +582,10 @@
     "unnamedCommunity": "이름 없는 커뮤니티",
     "viewAll": "모두 보기",
     "groupType": {
-      "normal": "일반 그룹",
-      "announcement": "공지 그룹"
-    },
+    "normal": "일반 그룹",
+    "announcement": "공지 그룹",
+    "general": "공용 그룹"
+  },
     "newGroup": {
       "header": "새 그룹",
       "placeholder": "그룹 이름",

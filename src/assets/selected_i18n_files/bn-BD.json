@@ -584,9 +584,10 @@
     "unnamedCommunity": "নামহীন কমিউনিটি",
     "viewAll": "সব দেখুন",
     "groupType": {
-      "normal": "সাধারণ গ্রুপ",
-      "announcement": "ঘোষণা গ্রুপ"
-    },
+    "normal": "সাধারণ গ্রুপ",
+    "announcement": "ঘোষণা গ্রুপ",
+    "general": "জেনারেল গ্রুপ"
+  },
     "newGroup": {
       "header": "নতুন গ্রুপ",
       "placeholder": "গ্রুপের নাম",

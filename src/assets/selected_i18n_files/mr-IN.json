@@ -582,10 +582,11 @@
     "newCommunity": "नवीन समुदाय",
     "unnamedCommunity": "नाव नसलेला समुदाय",
     "viewAll": "सर्व पहा",
-    "groupType": {
-      "normal": "सामान्य गट",
-      "announcement": "जाहिरात गट"
-    },
+     "groupType": {
+    "normal": "सामान्य गट",
+    "announcement": "जाहिरात गट",
+    "general": "जनरल गट"
+  },
     "newGroup": {
       "header": "नवीन गट",
       "placeholder": "गटाचे नाव",

@@ -585,9 +585,10 @@
     "unnamedCommunity": "Unnamed Community",
     "viewAll": "View all",
     "groupType": {
-      "normal": "Normal Group",
-      "announcement": "Announcement Group"
-    },
+    "normal": "Normal Group",
+    "announcement": "Announcement Group",
+    "general": "General Group"
+  },
     "newGroup": {
       "header": "New Group",
       "placeholder": "Group Name",

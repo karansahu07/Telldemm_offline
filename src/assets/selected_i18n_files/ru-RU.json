@@ -582,9 +582,10 @@
     "unnamedCommunity": "Сообщество без имени",
     "viewAll": "Посмотреть все",
     "groupType": {
-      "normal": "Обычная группа",
-      "announcement": "Группа объявлений"
-    },
+    "normal": "Обычная группа",
+    "announcement": "Группа для объявлений",
+    "general": "Общая группа"
+  },
     "newGroup": {
       "header": "Новая группа",
       "placeholder": "Название группы",

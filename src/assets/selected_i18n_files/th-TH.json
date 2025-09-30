@@ -581,10 +581,11 @@
     "newCommunity": "ชุมชนใหม่",
     "unnamedCommunity": "ชุมชนไม่มีชื่อ",
     "viewAll": "ดูทั้งหมด",
-    "groupType": {
-      "normal": "กลุ่มปกติ",
-      "announcement": "กลุ่มประกาศ"
-    },
+     "groupType": {
+    "normal": "กลุ่มปกติ",
+    "announcement": "กลุ่มประกาศ",
+    "general": "กลุ่มทั่วไป"
+  },
     "newGroup": {
       "header": "กลุ่มใหม่",
       "placeholder": "ชื่อกลุ่ม",

@@ -584,9 +584,10 @@
     "unnamedCommunity": "未命名社群",
     "viewAll": "查看全部",
     "groupType": {
-      "normal": "一般群組",
-      "announcement": "公告群組"
-    },
+    "normal": "普通群組",
+    "announcement": "公告群組",
+    "general": "一般群組"
+  },
     "newGroup": {
       "header": "新群組",
       "placeholder": "群組名稱",

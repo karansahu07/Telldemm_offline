@@ -582,9 +582,10 @@
     "unnamedCommunity": "பெயரிடப்படாத சமூகங்கள்",
     "viewAll": "அனைத்தையும் பார்க்க",
     "groupType": {
-      "normal": "சாதாரண குழு",
-      "announcement": "அறிவிப்பு குழு"
-    },
+    "normal": "சாதாரண குழு",
+    "announcement": "அறிவிப்பு குழு",
+    "general": "ஜெனரல் குழு"
+  },
     "newGroup": {
       "header": "புதிய குழு",
       "placeholder": "குழு பெயர்",

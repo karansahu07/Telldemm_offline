@@ -581,10 +581,11 @@
     "newCommunity": "新しいコミュニティ",
     "unnamedCommunity": "名前のないコミュニティ",
     "viewAll": "すべて表示",
-    "groupType": {
-      "normal": "通常グループ",
-      "announcement": "お知らせグループ"
-    },
+   "groupType": {
+    "normal": "通常グループ",
+    "announcement": "お知らせグループ",
+    "general": "一般グループ"
+  },
     "newGroup": {
       "header": "新しいグループ",
       "placeholder": "グループ名",

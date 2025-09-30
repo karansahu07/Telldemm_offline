@@ -581,10 +581,11 @@
     "newCommunity": "नया समुदाय",
     "unnamedCommunity": "बेनाम समुदाय",
     "viewAll": "सभी देखें",
-    "groupType": {
-      "normal": "साधारण समूह",
-      "announcement": "घोषणा समूह"
-    },
+     "groupType": {
+    "normal": "सामान्य समूह",
+    "announcement": "घोषणा समूह",
+    "general": "जनरल समूह"
+  },
     "newGroup": {
       "header": "नया समूह",
       "placeholder": "समूह का नाम",

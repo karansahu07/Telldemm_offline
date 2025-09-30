@@ -583,9 +583,10 @@
     "unnamedCommunity": "Unbenannte Community",
     "viewAll": "Alle anzeigen",
     "groupType": {
-      "normal": "Normale Gruppe",
-      "announcement": "Ankündigungsgruppe"
-    },
+    "normal": "Normale Gruppe",
+    "announcement": "Ankündigungsgruppe",
+    "general": "Allgemeine Gruppe"
+  },
     "newGroup": {
       "header": "Neue Gruppe",
       "placeholder": "Gruppenname",

@@ -581,10 +581,11 @@
     "newCommunity": "కొత్త కమ్యూనిటీ",
     "unnamedCommunity": "పేరు లేని కమ్యూనిటీ",
     "viewAll": "అన్నీ చూడండి",
-    "groupType": {
-      "normal": "సాధారణ గ్రూప్",
-      "announcement": "ప్రకటన గ్రూప్"
-    },
+   "groupType": {
+    "normal": "సాధారణ గ్రూప్",
+    "announcement": "ప్రకటన గ్రూప్",
+    "general": "జనరల్ గ్రూప్"
+  },
     "newGroup": {
       "header": "కొత్త గ్రూప్",
       "placeholder": "గ్రూప్ పేరు",

@@ -583,9 +583,10 @@
     "unnamedCommunity": "ਬਿਨਾਂ ਨਾਮ ਵਾਲੀ ਕਮਿਊਨਿਟੀ",
     "viewAll": "ਸਭ ਵੇਖੋ",
     "groupType": {
-      "normal": "ਸਧਾਰਨ ਸਮੂਹ",
-      "announcement": "ਐਲਾਨ ਸਮੂਹ"
-    },
+    "normal": "सामान्य गट",
+    "announcement": "जाहिरात गट",
+    "general": "जनरल गट"
+  },
     "newGroup": {
       "header": "ਨਵਾਂ ਸਮੂਹ",
       "placeholder": "ਸਮੂਹ ਦਾ ਨਾਮ",

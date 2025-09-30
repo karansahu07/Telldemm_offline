@@ -13,13 +13,14 @@ import { FooterTabsComponent } from '../../components/footer-tabs/footer-tabs.co
  import { FirebaseChatService } from '../../services/firebase-chat.service';
 import { AuthService } from '../../auth/auth.service';
 import { get, ref } from 'firebase/database';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-community',
   templateUrl: './community.page.html',
   styleUrls: ['./community.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FooterTabsComponent],
+  imports: [IonicModule, CommonModule, FooterTabsComponent,TranslateModule],
 })
 export class CommunityPage implements OnInit {
 //  userId = localStorage.getItem('userId') || '';
@@ -35,7 +36,8 @@ export class CommunityPage implements OnInit {
     private firebaseService: FirebaseChatService,
     private alertCtrl: AlertController,
     private toastCtrl: ToastController,
-    private authService: AuthService
+    private authService: AuthService,
+    private translate: TranslateService 
   ) {}
 
   ngOnInit() {
@@ -65,17 +67,15 @@ export class CommunityPage implements OnInit {
   //   }
   // }
 
-  async loadUserCommunities() {
+ async loadUserCommunities() {
   this.joinedCommunities = [];
   const communityIds = await this.firebaseService.getUserCommunities(this.userId);
 
   for (const cid of communityIds) {
-    // fetch community info
     const commSnap = await get(ref(this.firebaseService['db'], `communities/${cid}`));
     if (!commSnap.exists()) continue;
     const commData = commSnap.val();
 
-    // fetch groups in this community
     const groupIds = await this.firebaseService.getGroupsInCommunity(cid);
     const groups: any[] = [];
     for (const gid of groupIds) {
@@ -91,7 +91,7 @@ export class CommunityPage implements OnInit {
 
     this.joinedCommunities.push({
       id: cid,
-      name: commData.name || 'Unnamed Community',
+      name: commData.name || this.translate.instant('community.unnamedCommunity'),
       icon: commData.icon || 'assets/images/user.jfif',
       groups
     });
@@ -170,56 +170,36 @@ export class CommunityPage implements OnInit {
     }
   }
 
-  async createGroupInCommunityPrompt() {
-    const alert = await this.alertCtrl.create({
-      header: 'New Group',
-      inputs: [
-        { name: 'name', type: 'text', placeholder: 'Group Name' },
-        {
-          name: 'type',
-          type: 'radio',
-          label: 'Normal Group',
-          value: 'normal',
-          checked: true,
+ async createGroupInCommunityPrompt() {
+  const t = this.translate;
+  const alert = await this.alertCtrl.create({
+    header: t.instant('community.newGroup.header'),
+    inputs: [
+      { name: 'name', type: 'text', placeholder: t.instant('community.newGroup.placeholder') },
+      { name: 'type', type: 'radio', label: t.instant('community.groupType.normal'), value: 'normal', checked: true },
+      { name: 'type', type: 'radio', label: t.instant('community.groupType.announcement'), value: 'announcement' },
+    ],
+    buttons: [
+      { text: t.instant('community.actions.cancel'), role: 'cancel' },
+      {
+        text: t.instant('community.newGroup.create'),
+        handler: async (data) => {
+          if (!data?.name || !this.selectedCommunity) return;
+          const groupId = 'group_' + Date.now();
+          await this.firebaseService.createGroup(groupId, data.name, [this.userId], this.selectedCommunity.id);
+          this.openCommunityGroups(this.selectedCommunity);
+          const toast = await this.toastCtrl.create({
+            message: t.instant('community.toasts.groupCreated'),
+            duration: 2000,
+            color: 'success',
+          });
+          toast.present();
         },
-        {
-          name: 'type',
-          type: 'radio',
-          label: 'Announcement Group',
-          value: 'announcement',
-        },
-      ],
-      buttons: [
-        { text: 'Cancel', role: 'cancel' },
-        {
-          text: 'Create',
-          handler: async (data) => {
-            if (!data.name || !this.selectedCommunity) return;
-
-            const groupId = 'group_' + Date.now();
-            const isAnn = data.type === 'announcement';
-            await this.firebaseService.createGroup(
-              groupId,
-              data.name,
-              [this.userId],
-              this.selectedCommunity.id,
-              // isAnn
-            );
-
-            this.openCommunityGroups(this.selectedCommunity);
-
-            const toast = await this.toastCtrl.create({
-              message: 'Group created',
-              duration: 2000,
-              color: 'success',
-            });
-            toast.present();
-          },
-        },
-      ],
-    });
-    await alert.present();
-  }
+      },
+    ],
+  });
+  await alert.present();
+}
 
   goToGroupChat(groupId: string) {
     this.router.navigate(['/chatting-screen', groupId]);
