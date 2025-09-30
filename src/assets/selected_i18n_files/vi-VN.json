@@ -583,5 +583,23 @@
     "communityLabel": "Cộng đồng:",
     "joinNote": "Khi tham gia, bạn sẽ trở thành thành viên ngay lập tức.",
     "joinCta": "Tham gia nhóm"
+  }, "add_existing_groups_page": {
+    "header": "Thêm nhóm hiện có",
+    "actions": {
+      "search": "Tìm kiếm nhóm",
+      "confirm": "Xác nhận lựa chọn",
+      "removeChip": "Xóa nhóm đã chọn"
+    },
+    "of": "trên",
+    "selected": "đã chọn",
+    "banner": "Tất cả mọi người trong nhóm sẽ được thêm vào cộng đồng.",
+    "listHeader": "Những nhóm bạn là quản trị viên",
+    "loading": "Đang tải nhóm...",
+    "empty": "Không tìm thấy nhóm quản trị",
+    "checkboxLabel": "Chọn nhóm",
+    "unnamedGroup": "Nhóm chưa đặt tên",
+    "toasts": {
+      "selectAtLeastOne": "Chọn ít nhất một nhóm"
+    }
   }
 }

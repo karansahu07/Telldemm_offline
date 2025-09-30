@@ -607,5 +607,23 @@
     "communityLabel": "コミュニティ:",
     "joinNote": "参加するとすぐにメンバーになります。",
     "joinCta": "グループに参加"
+  },"add_existing_groups_page": {
+    "header": "既存のグループを追加",
+    "actions": {
+      "search": "グループを検索",
+      "confirm": "選択を確認",
+      "removeChip": "選択したグループを削除"
+    },
+    "of": "の",
+    "selected": "選択済み",
+    "banner": "グループ内の全員がコミュニティに追加されます。",
+    "listHeader": "あなたが管理者のグループ",
+    "loading": "グループを読み込み中...",
+    "empty": "管理者グループが見つかりません",
+    "checkboxLabel": "グループを選択",
+    "unnamedGroup": "名前のないグループ",
+    "toasts": {
+      "selectAtLeastOne": "少なくとも1つのグループを選択してください"
+    }
   }
 }

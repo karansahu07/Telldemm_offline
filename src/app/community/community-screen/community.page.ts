@@ -10,19 +10,19 @@ import {
 } from '@ionic/angular';
 import { MenuPopoverComponent } from '../../components/menu-popover/menu-popover.component';
 import { FooterTabsComponent } from '../../components/footer-tabs/footer-tabs.component';
-import { FirebaseChatService } from '../../services/firebase-chat.service';
+ import { FirebaseChatService } from '../../services/firebase-chat.service';
 import { AuthService } from '../../auth/auth.service';
 import { get, ref } from 'firebase/database';
-import { TranslateModule, TranslateService } from '@ngx-translate/core'; // 👈 add
 
 @Component({
   selector: 'app-community',
   templateUrl: './community.page.html',
   styleUrls: ['./community.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FooterTabsComponent, TranslateModule], // 👈 add
+  imports: [IonicModule, CommonModule, FooterTabsComponent],
 })
 export class CommunityPage implements OnInit {
+//  userId = localStorage.getItem('userId') || '';
   userId = this.authService.authData?.userId as string;
   joinedCommunities: any[] = [];
   selectedCommunity: any = null;
@@ -35,8 +35,7 @@ export class CommunityPage implements OnInit {
     private firebaseService: FirebaseChatService,
     private alertCtrl: AlertController,
     private toastCtrl: ToastController,
-    private authService: AuthService,
-    private translate: TranslateService, // 👈 inject
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -52,42 +51,107 @@ export class CommunityPage implements OnInit {
     await popover.present();
   }
 
+  // async loadUserCommunities() {
+  //   this.joinedCommunities = [];
+  //   const communityIds = await this.firebaseService.getUserCommunities(this.userId);
+
+  //   for (const id of communityIds) {
+  //     const snapshot = await this.firebaseService.getGroupInfo(id);
+  //     this.joinedCommunities.push({
+  //       id,
+  //       name: snapshot?.name || 'Unnamed Community',
+  //       icon: 'assets/images/user.jfif',
+  //     });
+  //   }
+  // }
+
   async loadUserCommunities() {
-    this.joinedCommunities = [];
-    const communityIds = await this.firebaseService.getUserCommunities(this.userId);
+  this.joinedCommunities = [];
+  const communityIds = await this.firebaseService.getUserCommunities(this.userId);
 
-    for (const cid of communityIds) {
-      const commSnap = await get(ref(this.firebaseService['db'], `communities/${cid}`));
-      if (!commSnap.exists()) continue;
-      const commData = commSnap.val();
+  for (const cid of communityIds) {
+    // fetch community info
+    const commSnap = await get(ref(this.firebaseService['db'], `communities/${cid}`));
+    if (!commSnap.exists()) continue;
+    const commData = commSnap.val();
 
-      // groups in this community
-      const groupIds = await this.firebaseService.getGroupsInCommunity(cid);
-      const groups: any[] = [];
-      for (const gid of groupIds) {
-        const gData = await this.firebaseService.getGroupInfo(gid);
-        if (gData) {
-          groups.push({
-            id: gid,
-            name: gData.name,
-            type: gData.type || 'normal',
-          });
-        }
+    // fetch groups in this community
+    const groupIds = await this.firebaseService.getGroupsInCommunity(cid);
+    const groups: any[] = [];
+    for (const gid of groupIds) {
+      const gData = await this.firebaseService.getGroupInfo(gid);
+      if (gData) {
+        groups.push({
+          id: gid,
+          name: gData.name,
+          type: gData.type || 'normal',
+        });
       }
-
-      this.joinedCommunities.push({
-        id: cid,
-        name: commData.name || this.translate.instant('community.unnamedCommunity'), // 👈 localized fallback
-        icon: commData.icon || 'assets/images/user.jfif',
-        groups
-      });
     }
-  }
 
-  createCommunityPrompt() {
-    // redirect to page (text handled there)
-    this.router.navigate(['/new-community']);
+    this.joinedCommunities.push({
+      id: cid,
+      name: commData.name || 'Unnamed Community',
+      icon: commData.icon || 'assets/images/user.jfif',
+      groups
+    });
   }
+}
+
+
+  // async createCommunityPrompt() {
+  //   const alert = await this.alertCtrl.create({
+  //     header: 'New Community',
+  //     inputs: [
+  //       { name: 'name', type: 'text', placeholder: 'Community Name' },
+  //       { name: 'description', type: 'text', placeholder: 'Community Description' },
+  //     ],
+  //     buttons: [
+  //       { text: 'Cancel', role: 'cancel' },
+  //       {
+  //         text: 'Create',
+  //         handler: async (data) => {
+  //           if (data.name) {
+  //             const communityId = 'community_' + Date.now();
+  //             await this.firebaseService.createCommunity(
+  //               communityId,
+  //               data.name,
+  //               data.description,
+  //               this.userId
+  //             );
+  //             await this.firebaseService.addUserToCommunity(this.userId, communityId);
+
+  //             // Create announcement group automatically
+  //             const groupId = 'group_' + Date.now();
+  //             await this.firebaseService.createGroup(
+  //               groupId,
+  //               'Announcements',
+  //               [this.userId],
+  //               communityId,
+  //               // true
+  //             );
+
+  //             this.loadUserCommunities();
+
+  //             const toast = await this.toastCtrl.create({
+  //               message: 'Community created successfully',
+  //               duration: 2000,
+  //               color: 'success',
+  //             });
+  //             toast.present();
+  //           }
+  //         },
+  //       },
+  //     ],
+  //   });
+
+  //   await alert.present();
+  // }
+
+  async createCommunityPrompt() {
+  // instead of showing a popup, redirect to new page
+  this.router.navigate(['/new-community']);
+}
 
   async openCommunityGroups(community: any) {
     this.selectedCommunity = community;
@@ -100,52 +164,52 @@ export class CommunityPage implements OnInit {
         this.communityGroups.push({
           id: gid,
           name: groupData.name,
-          type: groupData.type || 'normal',
+          type: groupData.type,
         });
       }
     }
   }
 
   async createGroupInCommunityPrompt() {
-    const t = this.translate;
-
     const alert = await this.alertCtrl.create({
-      header: t.instant('community.newGroup.header'),
+      header: 'New Group',
       inputs: [
-        { name: 'name', type: 'text', placeholder: t.instant('community.newGroup.placeholder') },
+        { name: 'name', type: 'text', placeholder: 'Group Name' },
         {
           name: 'type',
           type: 'radio',
-          label: t.instant('community.groupType.normal'),
+          label: 'Normal Group',
           value: 'normal',
           checked: true,
         },
         {
           name: 'type',
           type: 'radio',
-          label: t.instant('community.groupType.announcement'),
+          label: 'Announcement Group',
           value: 'announcement',
         },
       ],
       buttons: [
-        { text: t.instant('common.cancel'), role: 'cancel' },
+        { text: 'Cancel', role: 'cancel' },
         {
-          text: t.instant('community.newGroup.create'),
-          handler: async (data: any) => {
-            if (!data?.name || !this.selectedCommunity) return;
+          text: 'Create',
+          handler: async (data) => {
+            if (!data.name || !this.selectedCommunity) return;
 
             const groupId = 'group_' + Date.now();
+            const isAnn = data.type === 'announcement';
             await this.firebaseService.createGroup(
               groupId,
               data.name,
               [this.userId],
               this.selectedCommunity.id,
+              // isAnn
             );
 
             this.openCommunityGroups(this.selectedCommunity);
 
             const toast = await this.toastCtrl.create({
-              message: t.instant('community.toasts.groupCreated'),
+              message: 'Group created',
               duration: 2000,
               color: 'success',
             });
@@ -162,8 +226,9 @@ export class CommunityPage implements OnInit {
   }
 
   goToAddGroupCommunity(community: any) {
-    this.router.navigate(['/community-detail'], {
-      queryParams: { communityId: community.id }
-    });
-  }
+  this.router.navigate(['/community-detail'], {
+    queryParams: { communityId: community.id }
+  });
+}
+
 }

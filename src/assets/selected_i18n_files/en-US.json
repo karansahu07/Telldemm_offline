@@ -607,5 +607,23 @@
     "communityLabel": "Community:",
     "joinNote": "By joining you become a member immediately.",
     "joinCta": "Join Group"
+  },"add_existing_groups_page": {
+    "header": "Add existing groups",
+    "actions": {
+      "search": "Search groups",
+      "confirm": "Confirm selection",
+      "removeChip": "Remove selected group"
+    },
+    "of": "of",
+    "selected": "selected",
+    "banner": "Everyone in the groups will be added to the community.",
+    "listHeader": "Groups you're an admin of",
+    "loading": "Loading groups...",
+    "empty": "No admin groups found",
+    "checkboxLabel": "Select group",
+    "unnamedGroup": "Unnamed group",
+    "toasts": {
+      "selectAtLeastOne": "Select at least one group"
+    }
   }
 }

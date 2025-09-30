@@ -608,5 +608,24 @@
     "communityLabel": "समुदाय:",
     "joinNote": "जोडताच आपण लगेच सदस्य व्हाल.",
     "joinCta": "गटात सामील व्हा"
+  },"add_existing_groups_page": {
+    "header": "विद्यमान गट जोडा",
+    "actions": {
+      "search": "गट शोधा",
+      "confirm": "निवड पुष्टी करा",
+      "removeChip": "निवडलेला गट काढा"
+    },
+    "of": "पैकी",
+    "selected": "निवडलेले",
+    "banner": "गटातील सर्वांना समुदायात जोडले जाईल.",
+    "listHeader": "ज्या गटांचे आपण प्रशासक आहात",
+    "loading": "गट लोड होत आहेत...",
+    "empty": "कोणतेही प्रशासक गट आढळले नाहीत",
+    "checkboxLabel": "गट निवडा",
+    "unnamedGroup": "नाव नसलेला गट",
+    "toasts": {
+      "selectAtLeastOne": "किमान एक गट निवडा"
+    }
   }
+
 }

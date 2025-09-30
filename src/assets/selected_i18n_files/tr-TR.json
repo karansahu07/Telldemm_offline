@@ -584,5 +584,23 @@
     "communityLabel": "Topluluk:",
     "joinNote": "Katıldığınızda hemen üye olursunuz.",
     "joinCta": "Gruba Katıl"
+  },  "add_existing_groups_page": {
+    "header": "Mevcut grupları ekle",
+    "actions": {
+      "search": "Grupları ara",
+      "confirm": "Seçimi onayla",
+      "removeChip": "Seçilen grubu kaldır"
+    },
+    "of": "üzerinden",
+    "selected": "seçildi",
+    "banner": "Gruplardaki herkes topluluğa eklenecek.",
+    "listHeader": "Yöneticisi olduğunuz gruplar",
+    "loading": "Gruplar yükleniyor...",
+    "empty": "Hiç yönetici grubu bulunamadı",
+    "checkboxLabel": "Grup seç",
+    "unnamedGroup": "Adsız grup",
+    "toasts": {
+      "selectAtLeastOne": "En az bir grup seçin"
+    }
   }
 }

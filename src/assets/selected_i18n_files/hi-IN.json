@@ -607,5 +607,23 @@
     "communityLabel": "समुदाय:",
     "joinNote": "जुड़ते ही आप तुरंत सदस्य बन जाएंगे।",
     "joinCta": "समूह से जुड़ें"
+  },"add_existing_groups_page": {
+    "header": "मौजूदा समूह जोड़ें",
+    "actions": {
+      "search": "समूह खोजें",
+      "confirm": "चयन की पुष्टि करें",
+      "removeChip": "चयनित समूह हटाएँ"
+    },
+    "of": "का",
+    "selected": "चयनित",
+    "banner": "समूहों के सभी लोग समुदाय में जोड़ दिए जाएंगे।",
+    "listHeader": "वे समूह जिनके आप एडमिन हैं",
+    "loading": "समूह लोड हो रहे हैं...",
+    "empty": "कोई एडमिन समूह नहीं मिला",
+    "checkboxLabel": "समूह चुनें",
+    "unnamedGroup": "बेनाम समूह",
+    "toasts": {
+      "selectAtLeastOne": "कम से कम एक समूह चुनें"
+    }
   }
 }

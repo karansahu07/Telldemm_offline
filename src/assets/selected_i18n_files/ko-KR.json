@@ -607,5 +607,23 @@
     "communityLabel": "커뮤니티:",
     "joinNote": "참여하면 즉시 멤버가 됩니다.",
     "joinCta": "그룹 참여"
+  },"add_existing_groups_page": {
+    "header": "기존 그룹 추가",
+    "actions": {
+      "search": "그룹 검색",
+      "confirm": "선택 확인",
+      "removeChip": "선택한 그룹 제거"
+    },
+    "of": "의",
+    "selected": "선택됨",
+    "banner": "그룹의 모든 사람이 커뮤니티에 추가됩니다.",
+    "listHeader": "당신이 관리자인 그룹",
+    "loading": "그룹 불러오는 중...",
+    "empty": "관리자 그룹을 찾을 수 없습니다",
+    "checkboxLabel": "그룹 선택",
+    "unnamedGroup": "이름 없는 그룹",
+    "toasts": {
+      "selectAtLeastOne": "최소한 하나의 그룹을 선택하세요"
+    }
   }
 }

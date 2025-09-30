@@ -609,5 +609,23 @@
     "communityLabel": "社区：",
     "joinNote": "加入后您将立即成为成员。",
     "joinCta": "加入群组"
+  }, "add_existing_groups_page": {
+    "header": "添加现有群组",
+    "actions": {
+      "search": "搜索群组",
+      "confirm": "确认选择",
+      "removeChip": "移除所选群组"
+    },
+    "of": "的",
+    "selected": "已选择",
+    "banner": "群组中的所有人都会被添加到社区。",
+    "listHeader": "您是管理员的群组",
+    "loading": "正在加载群组...",
+    "empty": "未找到管理员群组",
+    "checkboxLabel": "选择群组",
+    "unnamedGroup": "未命名群组",
+    "toasts": {
+      "selectAtLeastOne": "请至少选择一个群组"
+    }
   }
 }

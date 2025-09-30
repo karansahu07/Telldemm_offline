@@ -607,5 +607,23 @@
     "communityLabel": "સમુદાય:",
     "joinNote": "જોડાતા જ તમે તરત જ સભ્ય બની જશો.",
     "joinCta": "જૂથમાં જોડાઓ"
+  }, "add_existing_groups_page": {
+    "header": "મોજુદા જૂથો ઉમેરો",
+    "actions": {
+      "search": "જૂથો શોધો",
+      "confirm": "પસંદગીની પુષ્ટિ કરો",
+      "removeChip": "પસંદ કરેલ જૂથ દૂર કરો"
+    },
+    "of": "માંથી",
+    "selected": "પસંદ કરેલ",
+    "banner": "જૂથોમાંના બધા સભ્યો સમુદાયમાં ઉમેરાશે.",
+    "listHeader": "તમે એડમિન છો એવા જૂથો",
+    "loading": "જૂથો લોડ કરી રહ્યા છીએ...",
+    "empty": "કોઈ એડમિન જૂથ મળ્યા નથી",
+    "checkboxLabel": "જૂથ પસંદ કરો",
+    "unnamedGroup": "બિનનામનું જૂથ",
+    "toasts": {
+      "selectAtLeastOne": "ઓછામાં ઓછો એક જૂથ પસંદ કરો"
+    }
   }
 }

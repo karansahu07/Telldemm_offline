@@ -608,5 +608,23 @@
     "communityLabel": "Community:",
     "joinNote": "Durch Beitritt werden Sie sofort Mitglied.",
     "joinCta": "Gruppe beitreten"
+  },"add_existing_groups_page": {
+    "header": "Vorhandene Gruppen hinzufügen",
+    "actions": {
+      "search": "Gruppen suchen",
+      "confirm": "Auswahl bestätigen",
+      "removeChip": "Ausgewählte Gruppe entfernen"
+    },
+    "of": "von",
+    "selected": "ausgewählt",
+    "banner": "Alle Mitglieder der Gruppen werden zur Community hinzugefügt.",
+    "listHeader": "Gruppen, bei denen Sie Admin sind",
+    "loading": "Gruppen werden geladen...",
+    "empty": "Keine Admin-Gruppen gefunden",
+    "checkboxLabel": "Gruppe auswählen",
+    "unnamedGroup": "Unbenannte Gruppe",
+    "toasts": {
+      "selectAtLeastOne": "Wählen Sie mindestens eine Gruppe aus"
+    }
   }
 }

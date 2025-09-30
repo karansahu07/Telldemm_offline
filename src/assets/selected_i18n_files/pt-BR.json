@@ -607,5 +607,23 @@
     "communityLabel": "Comunidade:",
     "joinNote": "Ao entrar, você se torna membro imediatamente.",
     "joinCta": "Entrar no grupo"
+  },"add_existing_groups_page": {
+    "header": "Adicionar grupos existentes",
+    "actions": {
+      "search": "Pesquisar grupos",
+      "confirm": "Confirmar seleção",
+      "removeChip": "Remover grupo selecionado"
+    },
+    "of": "de",
+    "selected": "selecionado(s)",
+    "banner": "Todos nos grupos serão adicionados à comunidade.",
+    "listHeader": "Grupos dos quais você é administrador",
+    "loading": "Carregando grupos...",
+    "empty": "Nenhum grupo administrado encontrado",
+    "checkboxLabel": "Selecionar grupo",
+    "unnamedGroup": "Grupo sem nome",
+    "toasts": {
+      "selectAtLeastOne": "Selecione pelo menos um grupo"
+    }
   }
 }
