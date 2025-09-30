@@ -1,27 +1,3 @@
-<!-- <ion-list lines="none" class="menu-sheet">
-  <ion-item button detail="false" (click)="choose('markRead')">
-    <ion-label>Mark as read wip</ion-label>
-  </ion-item>
-
-  <ion-item button detail="false" (click)="choose('selectAll')" [disabled]="allSelected">
-    <ion-label>Select all wip</ion-label>
-  </ion-item>
-
-  <ion-item button detail="false" (click)="choose('lockChats')" [disabled]="!canLock">
-    <ion-label>Lock chats wip</ion-label>
-  </ion-item>
-
-  <ion-item button detail="false" (click)="choose('favorite')">
-    <ion-label>Add to Favorites wip</ion-label>
-  </ion-item>
-
-  <ion-item button detail="false" (click)="choose('addToList')">
-    <ion-label>Add to list wip</ion-label>
-  </ion-item>
-</ion-list> -->
-
-
-<!-- components/menu-home-popover/menu-home-popover.component.html -->
 <ion-list lines="none" class="menu-sheet">
 
   <!-- SINGLE USER / PRIVATE CHAT -->
@@ -36,7 +12,7 @@
       <ion-label>Mark as unread wip</ion-label>
     </ion-item>
     <ion-item button detail="false" (click)="choose('selectAll')" [disabled]="allSelected">
-      <ion-label>Select all wip</ion-label>
+      <ion-label>Select all</ion-label>
     </ion-item>
     <ion-item button detail="false" (click)="choose('lockChat')" [disabled]="!canLock">
       <ion-label>Lock chat wip</ion-label>
@@ -58,7 +34,7 @@
       <ion-label>Mark as read wip</ion-label>
     </ion-item>
     <ion-item button detail="false" (click)="choose('selectAll')" [disabled]="allSelected">
-      <ion-label>Select all wip</ion-label>
+      <ion-label>Select all</ion-label>
     </ion-item>
     <ion-item button detail="false" (click)="choose('lockChats')" [disabled]="!canLock">
       <ion-label>Lock chats wip</ion-label>
@@ -86,7 +62,7 @@
       <ion-label>Mark as unread wip</ion-label>
     </ion-item>
     <ion-item button detail="false" (click)="choose('selectAll')" [disabled]="allSelected">
-      <ion-label>Select all wip</ion-label>
+      <ion-label>Select all</ion-label>
     </ion-item>
     <ion-item button detail="false" (click)="choose('lockChat')" [disabled]="!canLock">
       <ion-label>Lock chat wip</ion-label>
@@ -108,7 +84,7 @@
       <ion-label>Mark as read wip</ion-label>
     </ion-item>
     <ion-item button detail="false" (click)="choose('selectAll')" [disabled]="allSelected">
-      <ion-label>Select all wip</ion-label>
+      <ion-label>Select all</ion-label>
     </ion-item>
     <ion-item button detail="false" (click)="choose('lockChats')" [disabled]="!canLock">
       <ion-label>Lock chats wip</ion-label>
@@ -144,7 +120,7 @@
 <!-- MIXED: private + group (no communities) -->
 <ng-container *ngIf="isMixedChats">
   <ion-item button detail="false" (click)="choose('markRead')">
-    <ion-label>Mark as read</ion-label>
+    <ion-label>Mark as read wip</ion-label>
   </ion-item>
 
   <ion-item button detail="false" (click)="choose('selectAll')" [disabled]="allSelected">
@@ -152,15 +128,15 @@
   </ion-item>
 
   <ion-item button detail="false" (click)="choose('lockChats')" [disabled]="!canLock">
-    <ion-label>Lock chats</ion-label>
+    <ion-label>Lock chats wip</ion-label>
   </ion-item>
 
   <ion-item button detail="false" (click)="choose('favorite')">
-    <ion-label>Add to Favorites</ion-label>
+    <ion-label>Add to Favorites wip</ion-label>
   </ion-item>
 
   <ion-item button detail="false" (click)="choose('addToList')">
-    <ion-label>Add to list</ion-label>
+    <ion-label>Add to list wip</ion-label>
   </ion-item>
 </ng-container>
 
