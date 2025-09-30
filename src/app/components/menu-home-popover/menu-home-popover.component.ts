@@ -56,6 +56,7 @@ export class MenuHomePopoverComponent {
   // common helpers
   @Input() canLock = true;
   @Input() allSelected = false;
+  @Input() isAllSelectedMode = false;
 
   // selection buckets (exactly one of these should be true)
   @Input() isSingleUser = false;
@@ -63,6 +64,7 @@ export class MenuHomePopoverComponent {
   @Input() isSingleGroup = false;
   @Input() isMultiGroups = false;
   @Input() isSingleCommunity = false;
+  @Input() isMixedChats = false;
 
   constructor(private popover: PopoverController) {}
 

@@ -128,7 +128,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
   //     console.log('Forecast ionViewDidEnter start')
   //     console.timeLog();
   // }
-    private async checkForceLogout(): Promise<void> {
+  private async checkForceLogout(): Promise<void> {
     try {
       const uidStr = this.senderUserId || this.authService.authData?.userId;
       const uid = Number(uidStr);
@@ -149,7 +149,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
                 {
                   text: this.translate.instant('common.ok'),
                   handler: () => {
-                    try { this.resetapp.resetApp(); } catch {}
+                    try { this.resetapp.resetApp(); } catch { }
                   }
                 }
               ]
@@ -157,9 +157,9 @@ export class HomeScreenPage implements OnInit, OnDestroy {
             await alert.present();
           }
         },
-        error: () => {}
+        error: () => { }
       });
-    } catch {}
+    } catch { }
   }
 
   private clearChatData() {
@@ -218,9 +218,9 @@ export class HomeScreenPage implements OnInit, OnDestroy {
       try { unsub(); } catch (e) { }
     });
     this.typingUnsubs.clear();
-    
-    try { this.pinUnsub?.(); } catch {}
-  this.pinUnsub = null;
+
+    try { this.pinUnsub?.(); } catch { }
+    this.pinUnsub = null;
   }
 
   goToUserAbout() {
@@ -261,14 +261,6 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     this.showPopup = false;
   }
 
-    /* ===== Image popup shortcuts ===== */
-  // goToUserAbout() { this.showPopup = false; setTimeout(() => this.router.navigate(['/profile-screen']), 100); }
-  // async goToUserchat() { this.showPopup = false; setTimeout(async () => {}, 100); }
-  // goToUsercall() { this.showPopup = false; setTimeout(() => this.router.navigate(['/calls-screen']), 100); }
-  // goToUservideocall() { this.showPopup = false; setTimeout(() => this.router.navigate(['/calling-screen']), 100); }
-  // openImagePopup(profile_picture_url: string) { this.selectedImage = profile_picture_url; this.showPopup = true; }
-  // closeImagePopup() { this.selectedImage = null; this.showPopup = false; }
-
   /* ===== Selection mode logic ===== */
   isChatSelected(chat: any): boolean {
     return this.selectedChats.some(c =>
@@ -277,17 +269,74 @@ export class HomeScreenPage implements OnInit, OnDestroy {
       !!c.group === !!chat.group
     );
   }
+  
+  // toggleChatSelection(chat: any, ev?: Event) {
+  //   if (ev) ev.stopPropagation();
+  //   const idx = this.selectedChats.findIndex(c =>
+  //     c.receiver_Id === chat.receiver_Id &&
+  //     !!c.isCommunity === !!chat.isCommunity &&
+  //     !!c.group === !!chat.group
+  //   );
+  //   if (idx > -1) this.selectedChats.splice(idx, 1);
+  //   else this.selectedChats.push(chat);
+  //   if (this.selectedChats.length === 0) this.clearChatSelection();
+  // }
+
   toggleChatSelection(chat: any, ev?: Event) {
     if (ev) ev.stopPropagation();
-    const idx = this.selectedChats.findIndex(c =>
-      c.receiver_Id === chat.receiver_Id &&
-      !!c.isCommunity === !!chat.isCommunity &&
-      !!c.group === !!chat.group
-    );
-    if (idx > -1) this.selectedChats.splice(idx, 1);
-    else this.selectedChats.push(chat);
-    if (this.selectedChats.length === 0) this.clearChatSelection();
+
+    const isCommunity = !!chat.isCommunity;
+    const already = this.selectedChats.find(c => this.sameItem(c, chat));
+
+    // --- COMMUNITY SELECTION RULES ---
+    if (isCommunity) {
+      // non-community already selected → ignore community tap
+      if (this.hasNonCommunitySelected()) return;
+
+      // community already selected
+      const previouslySelectedCommunity = this.selectedChats.find(c => !!c.isCommunity);
+      if (already) {
+        // tap again → unselect
+        this.selectedChats = this.selectedChats.filter(c => !this.sameItem(c, chat));
+      } else if (previouslySelectedCommunity) {
+        // switch to this community (never allow 2 communities together)
+        this.selectedChats = [chat];
+      } else {
+        // first community → single select
+        this.selectedChats = [chat];
+      }
+      if (this.selectedChats.length === 0) this.cancelHomeLongPress();
+      return;
+    }
+
+    // --- NON-COMMUNITY (PRIVATE/GROUP) RULES ---
+    // if a community is selected, clear it (community can’t coexist)
+    if (this.hasCommunitySelected()) this.selectedChats = [];
+
+    if (already) {
+      // toggle off
+      this.selectedChats = this.selectedChats.filter(c => !this.sameItem(c, chat));
+      if (this.selectedChats.length === 0) this.cancelHomeLongPress();
+    } else {
+      // add alongside other non-communities
+      this.selectedChats.push(chat);
+    }
   }
+
+  /** selection guards */
+  private hasCommunitySelected(): boolean {
+    return this.selectedChats.some(c => !!c.isCommunity);
+  }
+  private hasNonCommunitySelected(): boolean {
+    return this.selectedChats.some(c => !c.isCommunity);
+  }
+  private sameItem(a: any, b: any): boolean {
+    return a?.receiver_Id === b?.receiver_Id &&
+      !!a?.group === !!b?.group &&
+      !!a?.isCommunity === !!b?.isCommunity;
+  }
+
+
   clearChatSelection() { this.selectedChats = []; this.cancelHomeLongPress(); }
   onChatRowClick(chat: any, ev: Event) {
     if (this.selectedChats.length > 0) { this.toggleChatSelection(chat, ev); return; }
@@ -335,530 +384,528 @@ export class HomeScreenPage implements OnInit, OnDestroy {
   // }
 
   async onPinSelected() {
-  const userId = this.senderUserId || this.authService.authData?.userId || '';
-  if (!userId) { this.clearChatSelection(); return; }
+    const userId = this.senderUserId || this.authService.authData?.userId || '';
+    if (!userId) { this.clearChatSelection(); return; }
 
-  const db = getDatabase();
+    const db = getDatabase();
 
-  // only chats (no communities)
-  const candidates = this.selectedChats.filter(c => !c.isCommunity);
+    // only chats (no communities)
+    const candidates = this.selectedChats.filter(c => !c.isCommunity);
 
-  // count current pinned (in full list)
-  const currentPinned = this.chatList.filter(c => c.pinned).length;
+    // count current pinned (in full list)
+    const currentPinned = this.chatList.filter(c => c.pinned).length;
 
-  let pinsAdded = 0;
-  for (const chat of candidates) {
-    if (chat.pinned) continue; // already pinned
+    let pinsAdded = 0;
+    for (const chat of candidates) {
+      if (chat.pinned) continue; // already pinned
 
-    if (currentPinned + pinsAdded >= this.MAX_PINNED) {
-      const alert = await this.alertCtrl.create({
-        header: 'Pin Chat',
-        message: `You can only pin up to ${this.MAX_PINNED} chats.`,
-        buttons: ['OK']
-      });
-      await alert.present();
-      break;
+      if (currentPinned + pinsAdded >= this.MAX_PINNED) {
+        const alert = await this.alertCtrl.create({
+          header: 'Pin Chat',
+          message: `You can only pin up to ${this.MAX_PINNED} chats.`,
+          buttons: ['OK']
+        });
+        await alert.present();
+        break;
+      }
+
+      const key = this.getPinKey(chat);
+      try {
+        const pinnedAt = Date.now();
+        await set(rtdbRef(db, `pinnedChats/${userId}/${key}`), { pinnedAt });
+        chat.pinned = true;
+        chat.pinnedAt = pinnedAt;
+        pinsAdded++;
+      } catch { }
     }
 
-    const key = this.getPinKey(chat);
-    try {
-      const pinnedAt = Date.now();
-      await set(rtdbRef(db, `pinnedChats/${userId}/${key}`), { pinnedAt });
-      chat.pinned = true;
-      chat.pinnedAt = pinnedAt;
-      pinsAdded++;
-    } catch {}
+    this.clearChatSelection();
   }
 
-  this.clearChatSelection();
-}
+  private getPinKey(chat: any): string {
+    // groups use groupId; 1:1 uses the same roomId you already use
+    if (chat.group) return String(chat.receiver_Id);
+    const me = this.senderUserId || this.authService.authData?.userId || '';
+    return this.getRoomId(me, String(chat.receiver_Id));
+  }
 
-private getPinKey(chat: any): string {
-  // groups use groupId; 1:1 uses the same roomId you already use
-  if (chat.group) return String(chat.receiver_Id);
-  const me = this.senderUserId || this.authService.authData?.userId || '';
-  return this.getRoomId(me, String(chat.receiver_Id));
-}
+  private async syncPinnedFromServer(): Promise<void> {
+    try {
+      const userId = this.senderUserId || this.authService.authData?.userId || '';
+      if (!userId) return;
 
-private async syncPinnedFromServer(): Promise<void> {
-  try {
+      const db = getDatabase();
+      const snap = await get(rtdbRef(db, `pinnedChats/${userId}`));
+      const map = snap.exists() ? snap.val() : {};
+
+      // reset pin flags locally
+      this.chatList.forEach(c => { c.pinned = false; c.pinnedAt = 0; });
+
+      // apply from server
+      this.chatList.forEach(c => {
+        const k = this.getPinKey(c);
+        if (map && map[k]) {
+          c.pinned = true;
+          c.pinnedAt = Number(map[k]?.pinnedAt || 0);
+        }
+      });
+    } catch { }
+  }
+
+  async onUnpinSelected() {
+    const userId = this.senderUserId || this.authService.authData?.userId || '';
+    if (!userId) { this.clearChatSelection(); return; }
+
+    const db = getDatabase();
+
+    // unpin the first selected (you can loop if you want multi-unpin)
+    const chat = this.selectedChats[0];
+    if (!chat) { this.clearChatSelection(); return; }
+
+    try {
+      const key = this.getPinKey(chat);
+      await remove(rtdbRef(db, `pinnedChats/${userId}/${key}`));
+      chat.pinned = false;
+      chat.pinnedAt = 0;
+    } catch { }
+
+    this.clearChatSelection();
+  }
+
+  private startPinListener() {
+    if (this.pinUnsub) return;
     const userId = this.senderUserId || this.authService.authData?.userId || '';
     if (!userId) return;
 
     const db = getDatabase();
-    const snap = await get(rtdbRef(db, `pinnedChats/${userId}`));
-    const map = snap.exists() ? snap.val() : {};
-
-    // reset pin flags locally
-    this.chatList.forEach(c => { c.pinned = false; c.pinnedAt = 0; });
-
-    // apply from server
-    this.chatList.forEach(c => {
-      const k = this.getPinKey(c);
-      if (map && map[k]) {
-        c.pinned = true;
-        c.pinnedAt = Number(map[k]?.pinnedAt || 0);
-      }
+    const ref = rtdbRef(db, `pinnedChats/${userId}`);
+    const unsub = rtdbOnValue(ref, (snap) => {
+      const map = snap.exists() ? snap.val() : {};
+      this.chatList.forEach(c => {
+        const k = this.getPinKey(c);
+        if (map[k]) { c.pinned = true; c.pinnedAt = Number(map[k].pinnedAt || 0); }
+        else { c.pinned = false; c.pinnedAt = 0; }
+      });
     });
-  } catch {}
-}
-
-async onUnpinSelected() {
-  const userId = this.senderUserId || this.authService.authData?.userId || '';
-  if (!userId) { this.clearChatSelection(); return; }
-
-  const db = getDatabase();
-
-  // unpin the first selected (you can loop if you want multi-unpin)
-  const chat = this.selectedChats[0];
-  if (!chat) { this.clearChatSelection(); return; }
-
-  try {
-    const key = this.getPinKey(chat);
-    await remove(rtdbRef(db, `pinnedChats/${userId}/${key}`));
-    chat.pinned = false;
-    chat.pinnedAt = 0;
-  } catch {}
-
-  this.clearChatSelection();
-}
-
-private startPinListener() {
-  if (this.pinUnsub) return;
-  const userId = this.senderUserId || this.authService.authData?.userId || '';
-  if (!userId) return;
-
-  const db = getDatabase();
-  const ref = rtdbRef(db, `pinnedChats/${userId}`);
-  const unsub = rtdbOnValue(ref, (snap) => {
-    const map = snap.exists() ? snap.val() : {};
-    this.chatList.forEach(c => {
-      const k = this.getPinKey(c);
-      if (map[k]) { c.pinned = true; c.pinnedAt = Number(map[k].pinnedAt || 0); }
-      else { c.pinned = false; c.pinnedAt = 0; }
-    });
-  });
-  this.pinUnsub = () => { try { rtdbOff(ref); } catch {} };
-}
+    this.pinUnsub = () => { try { rtdbOff(ref); } catch { } };
+  }
 
 
   // delete chat code start
- async onDeleteSelected() {
-  try {
-    const deletables = this.selectedChats.filter(c => !c.isCommunity);
-    
-    if (deletables.length === 0) {
+  async onDeleteSelected() {
+    try {
+      const deletables = this.selectedChats.filter(c => !c.isCommunity);
+
+      if (deletables.length === 0) {
+        const alert = await this.alertCtrl.create({
+          header: 'Can\'t Delete',
+          message: 'Communities cannot be deleted from here',
+          buttons: ['OK']
+        });
+        await alert.present();
+        this.clearChatSelection();
+        return;
+      }
+
       const alert = await this.alertCtrl.create({
-        header: 'Can\'t Delete',
-        message: 'Communities cannot be deleted from here',
-        buttons: ['OK']
+        header: 'Delete Chat',
+        message: deletables.length === 1
+          ? 'Delete this chat?'
+          : `Delete ${deletables.length} chats?`,
+        buttons: [
+          {
+            text: 'Cancel',
+            role: 'cancel'
+          },
+          {
+            text: 'Delete',
+            handler: async () => {
+              await this.deleteChatsForMe(deletables);
+            }
+          },
+          // Delete for Everyone - only for single private chat
+          // ...(deletables.length === 1 && !deletables[0].group ? [{
+          //   text: 'Delete for Everyone',
+          //   cssClass: 'danger-button',
+          //   handler: async () => {
+          //     await this.deleteChatsForEveryone(deletables);
+          //   }
+          // }] : [])
+        ]
       });
+
       await alert.present();
+
+    } catch (error) {
+      console.error('❌ Delete error:', error);
       this.clearChatSelection();
-      return;
     }
-    
-    const alert = await this.alertCtrl.create({
-      header: 'Delete Chat',
-      message: deletables.length === 1 
-        ? 'Delete this chat?' 
-        : `Delete ${deletables.length} chats?`,
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel'
-        },
-        {
-          text: 'Delete',
-          handler: async () => {
-            await this.deleteChatsForMe(deletables);
-          }
-        },
-        // Delete for Everyone - only for single private chat
-        // ...(deletables.length === 1 && !deletables[0].group ? [{
-        //   text: 'Delete for Everyone',
-        //   cssClass: 'danger-button',
-        //   handler: async () => {
-        //     await this.deleteChatsForEveryone(deletables);
-        //   }
-        // }] : [])
-      ]
-    });
-    
-    await alert.present();
-    
-  } catch (error) {
-    console.error('❌ Delete error:', error);
-    this.clearChatSelection();
   }
-}
 
-// Delete for Me (soft delete) - UPDATED
-private async deleteChatsForMe(chats: any[]) {
-  try {
-    const userId = this.senderUserId;
-    if (!userId) return;
-    
-    for (const chat of chats) {
-      const roomId = chat.group 
-        ? chat.receiver_Id 
-        : this.getRoomId(userId, chat.receiver_Id);
-      
-      // Mark messages as deleted for this user in Firebase
-      await this.firebaseChatService.deleteChatForUser(roomId, userId);
-      
-      // ✅ CRITICAL: Remove from local chatList (placeholder bhi remove)
-      this.chatList = this.chatList.filter(c => 
-        !(c.receiver_Id === chat.receiver_Id && 
-          !!c.group === !!chat.group && 
-          !!c.isCommunity === !!chat.isCommunity)
-      );
-      
-      // Stop typing listener to prevent memory leaks
-      this.stopTypingListenerForChat(chat);
-      
-      // Unsubscribe from unread count listener if exists
-      const unreadSub = this.unreadSubs.find(sub => {
-        // Find subscription related to this chat
-        return true; // You can add more specific logic if needed
-      });
-      if (unreadSub) {
-        unreadSub.unsubscribe();
-        this.unreadSubs = this.unreadSubs.filter(s => s !== unreadSub);
-      }
-    }
-    
-    console.log('✅ Chats deleted for me (placeholder removed)');
-    this.clearChatSelection();
-    
-  } catch (error) {
-    console.error('❌ Error deleting chats:', error);
-  }
-}
+  // Delete for Me (soft delete) - UPDATED
+  private async deleteChatsForMe(chats: any[]) {
+    try {
+      const userId = this.senderUserId;
+      if (!userId) return;
 
-// Delete for Everyone (hard delete) - same as before
-private async deleteChatsForEveryone(chats: any[]) {
-  try {
-    const userId = this.senderUserId;
-    if (!userId) return;
-    
-    for (const chat of chats) {
-      if (chat.group) {
-        await this.firebaseChatService.deleteGroup(chat.receiver_Id);
-      } else {
-        const roomId = this.getRoomId(userId, chat.receiver_Id);
-        await this.firebaseChatService.deleteChatPermanently(roomId);
+      for (const chat of chats) {
+        const roomId = chat.group
+          ? chat.receiver_Id
+          : this.getRoomId(userId, chat.receiver_Id);
+
+        // Mark messages as deleted for this user in Firebase
+        await this.firebaseChatService.deleteChatForUser(roomId, userId);
+
+        // ✅ CRITICAL: Remove from local chatList (placeholder bhi remove)
+        this.chatList = this.chatList.filter(c =>
+          !(c.receiver_Id === chat.receiver_Id &&
+            !!c.group === !!chat.group &&
+            !!c.isCommunity === !!chat.isCommunity)
+        );
+
+        // Stop typing listener to prevent memory leaks
+        this.stopTypingListenerForChat(chat);
+
+        // Unsubscribe from unread count listener if exists
+        const unreadSub = this.unreadSubs.find(sub => {
+          // Find subscription related to this chat
+          return true; // You can add more specific logic if needed
+        });
+        if (unreadSub) {
+          unreadSub.unsubscribe();
+          this.unreadSubs = this.unreadSubs.filter(s => s !== unreadSub);
+        }
       }
-      
-      // Remove from local chatList
-      this.chatList = this.chatList.filter(c => 
-        !(c.receiver_Id === chat.receiver_Id && 
-          !!c.group === !!chat.group)
-      );
-      
-      this.stopTypingListenerForChat(chat);
+
+      console.log('✅ Chats deleted for me (placeholder removed)');
+      this.clearChatSelection();
+
+    } catch (error) {
+      console.error('❌ Error deleting chats:', error);
     }
-    
-    console.log('✅ Chats deleted for everyone');
-    this.clearChatSelection();
-    
-  } catch (error) {
-    console.error('❌ Error deleting chats permanently:', error);
   }
-}
-//delete chat code end here
+
+  // Delete for Everyone (hard delete) - same as before
+  private async deleteChatsForEveryone(chats: any[]) {
+    try {
+      const userId = this.senderUserId;
+      if (!userId) return;
+
+      for (const chat of chats) {
+        if (chat.group) {
+          await this.firebaseChatService.deleteGroup(chat.receiver_Id);
+        } else {
+          const roomId = this.getRoomId(userId, chat.receiver_Id);
+          await this.firebaseChatService.deleteChatPermanently(roomId);
+        }
+
+        // Remove from local chatList
+        this.chatList = this.chatList.filter(c =>
+          !(c.receiver_Id === chat.receiver_Id &&
+            !!c.group === !!chat.group)
+        );
+
+        this.stopTypingListenerForChat(chat);
+      }
+
+      console.log('✅ Chats deleted for everyone');
+      this.clearChatSelection();
+
+    } catch (error) {
+      console.error('❌ Error deleting chats permanently:', error);
+    }
+  }
+  //delete chat code end here
   async onMuteSelected() {
     // const c = this.selectedChats[0]; if (c) c.muted = true;
-     const alert = await this.alertCtrl.create({
-    header: 'Mute notification',
-    message: 'Work in progress',
-    buttons: ['OK']
-  });
-  await alert.present();
+    const alert = await this.alertCtrl.create({
+      header: 'Mute notification',
+      message: 'Work in progress',
+      buttons: ['OK']
+    });
+    await alert.present();
     this.clearChatSelection();
   }
   async onExportSelected() {
     // console.log('Export threads:', this.selectedChats.map(c => c.receiver_Id));
-     const alert = await this.alertCtrl.create({
-    header: 'Archieved chat',
-    message: 'Work in progress',
-    buttons: ['OK']
-  });
-  await alert.present();
+    const alert = await this.alertCtrl.create({
+      header: 'Archieved chat',
+      message: 'Work in progress',
+      buttons: ['OK']
+    });
+    await alert.present();
     this.clearChatSelection();
   }
 
-//   async onMoreSelected(ev: any) {
-//   const pop = await this.popoverCtrl.create({
-//     component: MenuHomePopoverComponent,
-//     event: ev,
-//     translucent: true,
-//     componentProps: {
-//       canLock: true,                  
-//       allSelected: this.selectedChats.length === this.filteredChats.length
-//     }
-//   });
-//   await pop.present();
 
-//   const { data } = await pop.onDidDismiss();
-//   if (!data?.action) return;
+  async onMoreSelected(ev: any) {
+    const sel = this.selectedChats || [];
+    const users = sel.filter(c => !c.group && !c.isCommunity);
+    const groups = sel.filter(c => c.group && !c.isCommunity);
+    const comms = sel.filter(c => c.isCommunity);
 
-//   switch (data.action) {
-//     case 'markRead':
-//       // await this.markSelectedAsRead();
-//       break;
-//     case 'selectAll':
-//       // this.selectAllVisible();
-//       break;
-//     case 'lockChats':
-//       // await this.lockSelectedChats();
-//       break;
-//     case 'favorite':
-//       // await this.addSelectedToFavorites();
-//       break;
-//     case 'addToList':
-//       // await this.addSelectedToList();
-//       break;
-//   }
-// }
+    const isSingleUser = users.length === 1 && groups.length === 0 && comms.length === 0;
+    const isSingleGroup = groups.length === 1 && users.length === 0 && comms.length === 0;
+    const isMixedChats = users.length > 0 && groups.length > 0 && comms.length === 0;
 
-
-async onMoreSelected(ev: any) {
-  const sel = this.selectedChats || [];
-  const users = sel.filter(c => !c.group && !c.isCommunity);
-  const groups = sel.filter(c => c.group && !c.isCommunity);
-  const comms  = sel.filter(c => c.isCommunity);
-
-  const isSingleUser      = users.length === 1 && groups.length === 0 && comms.length === 0;
-  const isSingleGroup     = groups.length === 1 && users.length === 0 && comms.length === 0;
-
-  const pop = await this.popoverCtrl.create({
-    component: MenuHomePopoverComponent,
-    event: ev,
-    translucent: true,
-    componentProps: {
-      canLock: true,
-      allSelected: this.selectedChats.length === this.filteredChats.length,
-      isSingleUser,
-      isMultiUsers: users.length > 1 && groups.length === 0 && comms.length === 0,
-      isSingleGroup,
-      isMultiGroups: groups.length > 1 && users.length === 0 && comms.length === 0,
-      isSingleCommunity: comms.length === 1 && users.length === 0 && groups.length === 0
-    }
-  });
-  await pop.present();
-
-  const { data } = await pop.onDidDismiss();
-  if (!data?.action) return;
-
-  switch (data.action) {
-    case 'viewContact':
-      this.openSelectedContactProfile();
-      break;
-
-    case 'groupInfo':
-      this.openSelectedGroupInfo();
-      break;
-
-    // existing cases
-    case 'markRead':       /* ... */ break;
-    case 'selectAll':      /* ... */ break;
-    case 'lockChat':
-    case 'lockChats':      /* ... */ break;
-    case 'favorite':       /* ... */ break;
-    case 'addToList':      /* ... */ break;
-
-    case 'exitGroup':
-  await this.confirmAndExitSingleSelectedGroup();
-  break;
-
-   case 'exitGroups':
-  await this.confirmAndExitMultipleSelectedGroups();
-  break;
-    case 'exitCommunity':  /* ... */ break;
-    case 'communityInfo':  /* ... */ break;
-  }
-}
-
-private openSelectedContactProfile(): void {
-  const sel = this.selectedChats.filter(c => !c.group && !c.isCommunity);
-  const chat = sel[0];
-  if (!chat) return;
-
-  const queryParams: any = {
-    receiverId: chat.receiver_Id,
-    receiver_phone: chat.receiver_phone,
-    receiver_name: chat.name,
-    isGroup: false
-  };
-
-  this.router.navigate(['/profile-screen'], { queryParams });
-  this.clearChatSelection();
-}
-
-private openSelectedGroupInfo(): void {
-  const sel = this.selectedChats.filter(c => c.group && !c.isCommunity);
-  const chat = sel[0];
-  if (!chat) return;
-
-  const queryParams: any = {
-    receiverId: chat.receiver_Id,
-    receiver_phone: '',
-    receiver_name: chat.group_name || chat.name,
-    isGroup: true
-  };
-
-  this.router.navigate(['/profile-screen'], { queryParams });
-  this.clearChatSelection();
-}
-
-/** Exit ONE selected group (with confirm) */
-private async confirmAndExitSingleSelectedGroup(): Promise<void> {
-  const sel = this.selectedChats.filter(c => c.group && !c.isCommunity);
-  const chat = sel[0];
-  if (!chat) return;
-
-  const alert = await this.alertCtrl.create({
-    header: 'Exit Group',
-    message: `Are you sure you want to exit "${chat.group_name || chat.name}"?`,
-    buttons: [
-      { text: 'Cancel', role: 'cancel' },
-      {
-        text: 'Exit',
-        handler: async () => {
-          await this.exitGroup(chat.receiver_Id);
-          // remove row from UI
-          this.chatList = this.chatList.filter(c => !(c.receiver_Id === chat.receiver_Id && c.group && !c.isCommunity));
-          this.stopTypingListenerForChat(chat);
-          // unsubscribe unread for this group
-          this.unreadSubs = this.unreadSubs.filter(s => {
-            try { /* keep; we don’t track per-row ref here */ return true; } catch { return true; }
-          });
-          this.clearChatSelection();
-
-          const t = await this.alertCtrl.create({
-            header: 'Exited',
-            message: 'You exited the group.',
-            buttons: ['OK']
-          });
-          await t.present();
-        }
+    const pop = await this.popoverCtrl.create({
+      component: MenuHomePopoverComponent,
+      event: ev,
+      translucent: true,
+      componentProps: {
+        canLock: true,
+        // allSelected: this.selectedChats.length === this.filteredChats.length,
+        allSelected: this.areAllVisibleSelected(),
+        isSingleUser,
+        isMultiUsers: users.length > 1 && groups.length === 0 && comms.length === 0,
+        isSingleGroup,
+        isMultiGroups: groups.length > 1 && users.length === 0 && comms.length === 0,
+        isSingleCommunity: comms.length === 1 && users.length === 0 && groups.length === 0,
+        isAllSelectedMode: this.areAllVisibleSelected(),
+        isMixedChats
       }
-    ]
-  });
-  await alert.present();
-}
+    });
+    await pop.present();
 
-/** Exit MANY selected groups (with confirm) */
-private async confirmAndExitMultipleSelectedGroups(): Promise<void> {
-  const groups = this.selectedChats.filter(c => c.group && !c.isCommunity);
-  if (groups.length === 0) return;
+    const { data } = await pop.onDidDismiss();
+    if (!data?.action) return;
 
-  const alert = await this.alertCtrl.create({
-    header: 'Exit Groups',
-    message: `Exit ${groups.length} selected groups?`,
-    buttons: [
-      { text: 'Cancel', role: 'cancel' },
-      {
-        text: 'Exit',
-        handler: async () => {
-          let success = 0, fail = 0;
-          for (const g of groups) {
-            try {
-              await this.exitGroup(g.receiver_Id);
-              // remove from UI and cleanup listeners
-              this.chatList = this.chatList.filter(c => !(c.receiver_Id === g.receiver_Id && c.group && !c.isCommunity));
-              this.stopTypingListenerForChat(g);
-              success++;
-            } catch (e) {
-              console.warn('exit group failed:', g.receiver_Id, e);
-              fail++;
-            }
+    switch (data.action) {
+      case 'viewContact':
+        this.openSelectedContactProfile();
+        break;
+
+      case 'groupInfo':
+        this.openSelectedGroupInfo();
+        break;
+
+      case 'markUnread':
+        break;
+      case 'markRead':       /* ... */ break;
+      case 'selectAll':
+        this.selectAllVisible();
+        break;
+      case 'lockChat':
+      case 'lockChats':      /* ... */ break;
+      case 'favorite':       /* ... */ break;
+      case 'addToList':      /* ... */ break;
+
+      case 'exitGroup':
+        await this.confirmAndExitSingleSelectedGroup();
+        break;
+
+      case 'exitGroups':
+        await this.confirmAndExitMultipleSelectedGroups();
+        break;
+      case 'exitCommunity':  /* ... */ break;
+      case 'communityInfo':  /* ... */ break;
+    }
+  }
+
+  private openSelectedContactProfile(): void {
+    const sel = this.selectedChats.filter(c => !c.group && !c.isCommunity);
+    const chat = sel[0];
+    if (!chat) return;
+
+    const queryParams: any = {
+      receiverId: chat.receiver_Id,
+      receiver_phone: chat.receiver_phone,
+      receiver_name: chat.name,
+      isGroup: false
+    };
+
+    this.router.navigate(['/profile-screen'], { queryParams });
+    this.clearChatSelection();
+  }
+
+  private openSelectedGroupInfo(): void {
+    const sel = this.selectedChats.filter(c => c.group && !c.isCommunity);
+    const chat = sel[0];
+    if (!chat) return;
+
+    const queryParams: any = {
+      receiverId: chat.receiver_Id,
+      receiver_phone: '',
+      receiver_name: chat.group_name || chat.name,
+      isGroup: true
+    };
+
+    this.router.navigate(['/profile-screen'], { queryParams });
+    this.clearChatSelection();
+  }
+
+  // returns only the currently visible chats that are NOT communities
+  private get visibleNonCommunityChats(): any[] {
+    return this.filteredChats.filter(c => !c.isCommunity);
+  }
+
+  // are all visible non-community chats currently selected?
+  private areAllVisibleSelected(): boolean {
+    const visible = this.visibleNonCommunityChats;
+    if (visible.length === 0) return false;
+    // compare by receiver_Id + group flag (community already excluded)
+    const key = (c: any) => `${c.receiver_Id}::${!!c.group}`;
+    const selectedKeys = new Set(this.selectedChats.map(key));
+    return visible.every(c => selectedKeys.has(key(c)));
+  }
+
+  // select all visible (non-community) chats; if already all selected, clear selection (toggle behavior)
+  private selectAllVisible(): void {
+    if (this.areAllVisibleSelected()) {
+      this.clearChatSelection();
+      return;
+    }
+    this.selectedChats = [...this.visibleNonCommunityChats];
+  }
+
+
+  /** Exit ONE selected group (with confirm) */
+  private async confirmAndExitSingleSelectedGroup(): Promise<void> {
+    const sel = this.selectedChats.filter(c => c.group && !c.isCommunity);
+    const chat = sel[0];
+    if (!chat) return;
+
+    const alert = await this.alertCtrl.create({
+      header: 'Exit Group',
+      message: `Are you sure you want to exit "${chat.group_name || chat.name}"?`,
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        {
+          text: 'Exit',
+          handler: async () => {
+            await this.exitGroup(chat.receiver_Id);
+            // remove row from UI
+            this.chatList = this.chatList.filter(c => !(c.receiver_Id === chat.receiver_Id && c.group && !c.isCommunity));
+            this.stopTypingListenerForChat(chat);
+            // unsubscribe unread for this group
+            this.unreadSubs = this.unreadSubs.filter(s => {
+              try { /* keep; we don’t track per-row ref here */ return true; } catch { return true; }
+            });
+            this.clearChatSelection();
+
+            const t = await this.alertCtrl.create({
+              header: 'Exited',
+              message: 'You exited the group.',
+              buttons: ['OK']
+            });
+            await t.present();
           }
-          this.clearChatSelection();
-
-          const msg = fail === 0
-            ? `Exited ${success} groups`
-            : `Exited ${success} groups, ${fail} failed`;
-          const done = await this.alertCtrl.create({ header: 'Done', message: msg, buttons: ['OK'] });
-          await done.present();
         }
-      }
-    ]
-  });
-  await alert.present();
-}
-
-/** Core: exit a group and reassign admin if needed */
-private async exitGroup(groupId: string): Promise<void> {
-  const userId = this.senderUserId || this.authService.authData?.userId || '';
-  if (!groupId || !userId) throw new Error('Missing groupId/userId');
-
-  const db = getDatabase();
-
-  // 🔹 Read my member record
-  const memberPath = `groups/${groupId}/members/${userId}`;
-  const memberSnap = await get(rtdbRef(db, memberPath));
-  if (!memberSnap.exists()) {
-    // already not a member
-    return;
+      ]
+    });
+    await alert.present();
   }
 
-  const myMember = memberSnap.val();
-  const wasAdmin = String(myMember?.role || '').toLowerCase() === 'admin';
+  /** Exit MANY selected groups (with confirm) */
+  private async confirmAndExitMultipleSelectedGroups(): Promise<void> {
+    const groups = this.selectedChats.filter(c => c.group && !c.isCommunity);
+    if (groups.length === 0) return;
 
-  // 🔹 Move to pastmembers, then remove from members
-  const pastMemberPath = `groups/${groupId}/pastmembers/${userId}`;
-  const updatedMember = {
-    ...myMember,
-    status: 'inactive',
-    removedAt: new Date().toISOString()
-  };
+    const alert = await this.alertCtrl.create({
+      header: 'Exit Groups',
+      message: `Exit ${groups.length} selected groups?`,
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        {
+          text: 'Exit',
+          handler: async () => {
+            let success = 0, fail = 0;
+            for (const g of groups) {
+              try {
+                await this.exitGroup(g.receiver_Id);
+                // remove from UI and cleanup listeners
+                this.chatList = this.chatList.filter(c => !(c.receiver_Id === g.receiver_Id && c.group && !c.isCommunity));
+                this.stopTypingListenerForChat(g);
+                success++;
+              } catch (e) {
+                console.warn('exit group failed:', g.receiver_Id, e);
+                fail++;
+              }
+            }
+            this.clearChatSelection();
 
-  await Promise.all([
-    set(rtdbRef(db, pastMemberPath), updatedMember),
-    (async () => {
-      try { await update(rtdbRef(db, memberPath), { status: 'inactive' }); } catch {}
-      await remove(rtdbRef(db, memberPath));
-    })()
-  ]);
+            const msg = fail === 0
+              ? `Exited ${success} groups`
+              : `Exited ${success} groups, ${fail} failed`;
+            const done = await this.alertCtrl.create({ header: 'Done', message: msg, buttons: ['OK'] });
+            await done.present();
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
 
-  // 🔹 If I was admin, check if any admins remain
-  if (wasAdmin) {
-    const membersSnap = await get(rtdbRef(db, `groups/${groupId}/members`));
-    if (membersSnap.exists()) {
-      const members = membersSnap.val() || {};
-      const remainingIds: string[] = Object.keys(members).filter(mid => String(mid) !== String(userId));
+  /** Core: exit a group and reassign admin if needed */
+  private async exitGroup(groupId: string): Promise<void> {
+    const userId = this.senderUserId || this.authService.authData?.userId || '';
+    if (!groupId || !userId) throw new Error('Missing groupId/userId');
 
-      if (remainingIds.length > 0) {
-        // check if another admin already exists
-        const otherAdmins = remainingIds.filter(mid =>
-          String(members[mid]?.role || '').toLowerCase() === 'admin'
-        );
+    const db = getDatabase();
 
-        if (otherAdmins.length === 0) {
-          const nonAdmins = remainingIds.filter(mid =>
-            String(members[mid]?.role || '').toLowerCase() !== 'admin'
+    // 🔹 Read my member record
+    const memberPath = `groups/${groupId}/members/${userId}`;
+    const memberSnap = await get(rtdbRef(db, memberPath));
+    if (!memberSnap.exists()) {
+      // already not a member
+      return;
+    }
+
+    const myMember = memberSnap.val();
+    const wasAdmin = String(myMember?.role || '').toLowerCase() === 'admin';
+
+    // 🔹 Move to pastmembers, then remove from members
+    const pastMemberPath = `groups/${groupId}/pastmembers/${userId}`;
+    const updatedMember = {
+      ...myMember,
+      status: 'inactive',
+      removedAt: new Date().toISOString()
+    };
+
+    await Promise.all([
+      set(rtdbRef(db, pastMemberPath), updatedMember),
+      (async () => {
+        try { await update(rtdbRef(db, memberPath), { status: 'inactive' }); } catch { }
+        await remove(rtdbRef(db, memberPath));
+      })()
+    ]);
+
+    // 🔹 If I was admin, check if any admins remain
+    if (wasAdmin) {
+      const membersSnap = await get(rtdbRef(db, `groups/${groupId}/members`));
+      if (membersSnap.exists()) {
+        const members = membersSnap.val() || {};
+        const remainingIds: string[] = Object.keys(members).filter(mid => String(mid) !== String(userId));
+
+        if (remainingIds.length > 0) {
+          // check if another admin already exists
+          const otherAdmins = remainingIds.filter(mid =>
+            String(members[mid]?.role || '').toLowerCase() === 'admin'
           );
-          const pool = nonAdmins.length > 0 ? nonAdmins : remainingIds;
-          const newAdminId = pool[Math.floor(Math.random() * pool.length)];
 
-          await update(rtdbRef(db, `groups/${groupId}/members/${newAdminId}`), { role: 'admin' });
-          console.log(`Assigned new admin: ${newAdminId}`);
-        } else {
-          console.log('Another admin already exists, no reassignment needed.');
+          if (otherAdmins.length === 0) {
+            const nonAdmins = remainingIds.filter(mid =>
+              String(members[mid]?.role || '').toLowerCase() !== 'admin'
+            );
+            const pool = nonAdmins.length > 0 ? nonAdmins : remainingIds;
+            const newAdminId = pool[Math.floor(Math.random() * pool.length)];
+
+            await update(rtdbRef(db, `groups/${groupId}/members/${newAdminId}`), { role: 'admin' });
+            console.log(`Assigned new admin: ${newAdminId}`);
+          } else {
+            console.log('Another admin already exists, no reassignment needed.');
+          }
         }
       }
     }
-  }
 
-  // 🔹 Optional: clear my unread count node
-  try {
-    await this.firebaseChatService.resetUnreadCount(groupId, userId);
-  } catch (e) {
-    console.warn('resetUnreadCount failed:', e);
+    // 🔹 Optional: clear my unread count node
+    try {
+      await this.firebaseChatService.resetUnreadCount(groupId, userId);
+    } catch (e) {
+      console.warn('resetUnreadCount failed:', e);
+    }
   }
-}
 
 
 
@@ -1065,7 +1112,7 @@ private async exitGroup(groupId: string): Promise<void> {
   //   const name = chat.group ? (chat.group_name || chat.name) : chat.name;
   //   return name || 'Profile';
   // }
-   getChatAlt(chat: any): string {
+  getChatAlt(chat: any): string {
     const name = chat.group ? (chat.group_name || chat.name) : chat.name;
     return name || this.translate.instant('home.alt.profile');
   }
@@ -1312,7 +1359,7 @@ private async exitGroup(groupId: string): Promise<void> {
       });
     } else if (isYesterday) {
       // return 'Yesterday';
-       return this.translate.instant('home.time.yesterday');
+      return this.translate.instant('home.time.yesterday');
     } else if (date.getFullYear() === now.getFullYear()) {
       return date.toLocaleDateString([], { day: 'numeric', month: 'short' });
     } else {
@@ -1351,14 +1398,14 @@ private async exitGroup(groupId: string): Promise<void> {
       //   }
       //   return { previewText: txt, timestamp: m.timestamp };
       // }
-       if (m.attachment?.type && m.attachment.type !== 'text') {
+      if (m.attachment?.type && m.attachment.type !== 'text') {
         let txt = this.translate.instant('home.preview.media.generic');
         switch ((m.attachment.type || '').toString()) {
           case 'image': txt = '📷 ' + this.translate.instant('home.preview.media.photo'); break;
           case 'video': txt = '🎥 ' + this.translate.instant('home.preview.media.video'); break;
           case 'audio': txt = '🎵 ' + this.translate.instant('home.preview.media.audio'); break;
-          case 'file':  txt = '📎 ' + this.translate.instant('home.preview.media.file');  break;
-          default:      txt = this.translate.instant('home.preview.media.generic');
+          case 'file': txt = '📎 ' + this.translate.instant('home.preview.media.file'); break;
+          default: txt = this.translate.instant('home.preview.media.generic');
         }
         return { previewText: txt, timestamp: m.timestamp };
       }
@@ -1378,14 +1425,14 @@ private async exitGroup(groupId: string): Promise<void> {
       } catch (err) {
         // can't decrypt -> show placeholder
         // return { previewText: '[Encrypted]', timestamp: m.timestamp };
-         return { previewText: this.translate.instant('home.preview.encrypted'), timestamp: m.timestamp };
+        return { previewText: this.translate.instant('home.preview.encrypted'), timestamp: m.timestamp };
       }
     }
 
     // If we reached here => no visible message found
     const last = messages[messages.length - 1];
     // return { previewText: 'This message was deleted', timestamp: last?.timestamp || '' };
-     return { previewText: this.translate.instant('home.preview.deleted'), timestamp: last?.timestamp || '' };
+    return { previewText: this.translate.instant('home.preview.deleted'), timestamp: last?.timestamp || '' };
   }
 
   // get filteredChats() {
@@ -1419,41 +1466,41 @@ private async exitGroup(groupId: string): Promise<void> {
   // }
 
   get filteredChats() {
-  let filtered = this.chatList;
+    let filtered = this.chatList;
 
-  if (this.selectedFilter === 'read') {
-    filtered = filtered.filter(chat => !chat.unread && !chat.group);
-  } else if (this.selectedFilter === 'unread') {
-    filtered = filtered.filter(chat => chat.unread && !chat.group);
-  } else if (this.selectedFilter === 'groups') {
-    filtered = filtered.filter(chat => chat.group);
-  }
-
-  if (this.searchText.trim() !== '') {
-    const q = this.searchText.toLowerCase();
-    filtered = filtered.filter(chat =>
-      (chat.name || '').toLowerCase().includes(q) ||
-      (chat.message || '').toLowerCase().includes(q)
-    );
-  }
-
-  // WhatsApp-like: pinned first (by pinnedAt desc), then by last activity desc
-  return [...filtered].sort((a: any, b: any) => {
-    const ap = a.pinned ? 1 : 0;
-    const bp = b.pinned ? 1 : 0;
-    if (ap !== bp) return bp - ap; // pinned first
-
-    if (ap === 1 && bp === 1) {
-      const pa = Number(a.pinnedAt || 0);
-      const pb = Number(b.pinnedAt || 0);
-      if (pa !== pb) return pb - pa; // newest pin first
+    if (this.selectedFilter === 'read') {
+      filtered = filtered.filter(chat => !chat.unread && !chat.group);
+    } else if (this.selectedFilter === 'unread') {
+      filtered = filtered.filter(chat => chat.unread && !chat.group);
+    } else if (this.selectedFilter === 'groups') {
+      filtered = filtered.filter(chat => chat.group);
     }
 
-    const ta = a.timestamp ? new Date(a.timestamp).getTime() : 0;
-    const tb = b.timestamp ? new Date(b.timestamp).getTime() : 0;
-    return tb - ta; // newest activity first
-  });
-}
+    if (this.searchText.trim() !== '') {
+      const q = this.searchText.toLowerCase();
+      filtered = filtered.filter(chat =>
+        (chat.name || '').toLowerCase().includes(q) ||
+        (chat.message || '').toLowerCase().includes(q)
+      );
+    }
+
+    // WhatsApp-like: pinned first (by pinnedAt desc), then by last activity desc
+    return [...filtered].sort((a: any, b: any) => {
+      const ap = a.pinned ? 1 : 0;
+      const bp = b.pinned ? 1 : 0;
+      if (ap !== bp) return bp - ap; // pinned first
+
+      if (ap === 1 && bp === 1) {
+        const pa = Number(a.pinnedAt || 0);
+        const pb = Number(b.pinnedAt || 0);
+        if (pa !== pb) return pb - pa; // newest pin first
+      }
+
+      const ta = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+      const tb = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+      return tb - ta; // newest activity first
+    });
+  }
 
 
   get totalUnreadCount(): number {
@@ -1704,7 +1751,7 @@ private async exitGroup(groupId: string): Promise<void> {
   //     document.body.classList.remove('scanner-active');
   //   }
   // }
-   async scanBarcode() {
+  async scanBarcode() {
     try {
       if (!Capacitor.isNativePlatform()) {
         alert(this.translate.instant('home.scan.onlyDevice'));
