@@ -550,3 +550,13 @@ ion-avatar img{
 
 ion-item.selected { --background: #e7bebe; }
   .select-tick { width:24px; display:flex; align-items:center; justify-content:center; margin-right:4px; }
+
+  .meta-list {
+  margin: 0px 0 0px;
+  ion-item {
+    --inner-padding-end: 8px;
+    --min-height: 40px;
+    ion-icon { opacity: .9; }
+    ion-badge { border-radius: 10px; }
+  }
+}

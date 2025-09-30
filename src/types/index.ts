@@ -166,3 +166,15 @@ export interface CreateCommunityResponse {
   message?: string;
   data?: any;
 }
+
+export type ArchItem = {
+  roomId: string;
+  isGroup: boolean;
+  otherUserId?: string;
+  name: string;
+  avatar?: string | null;
+  message: string;
+  time: string;
+  timestamp?: string;
+  unreadCount: number;
+};

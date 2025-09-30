@@ -342,7 +342,7 @@ import {
 } from '@angular/fire/database';
 import { ref as rtdbRef, update as rtdbUpdate, set as rtdbSet, get as rtdbGet } from 'firebase/database';
 import { runTransaction as rtdbRunTransaction } from 'firebase/database';
-import { firstValueFrom, Observable } from 'rxjs';
+import { firstValueFrom, Observable, take } from 'rxjs';
 import { getDatabase, remove, update } from 'firebase/database';
 // import { getStorage, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { Message, PinnedMessage } from 'src/types';
@@ -807,6 +807,10 @@ async setPath(path: string, value: any) {
       });
     });
   }
+
+  getUnreadCountOnce(roomId: string, userId: string): Promise<number> {
+  return firstValueFrom(this.listenToUnreadCount(roomId, userId).pipe(take(1)));
+}
 
   async getGroupMembers(groupId: string): Promise<string[]> {
     const snapshot = await get(ref(this.db, `groups/${groupId}/members`));

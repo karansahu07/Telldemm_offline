@@ -298,6 +298,10 @@ const routes: Routes = [
     path: 'message-info',
     loadChildren: () => import('./pages/message-info/message-info.module').then( m => m.MessageInfoPageModule)
   },
+  {
+    path: 'archieved-screen',
+    loadChildren: () => import('./pages/archieved-screen/archieved-screen.module').then( m => m.ArchievedScreenPageModule)
+  },
 
 
 

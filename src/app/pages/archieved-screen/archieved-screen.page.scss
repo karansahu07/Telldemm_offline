@@ -1,0 +1,31 @@
+.arch-toolbar {
+  --background: #f44336; /* red */
+  --color: #fff;
+}
+.arch-banner {
+  --background: #ffebee;
+  .banner-text {
+    padding: 10px 8px;
+    color: #c62828;
+    font-size: 14px;
+    text-align: center;
+  }
+}
+.arch-content {
+  .name { font-weight: 700; }
+  .preview { color:#666; margin-top:4px; }
+  .meta { display:flex; align-items:center; gap:8px; }
+  .time { font-size:12px; color:#888; text-align:right; }
+  .avatar-fallback {
+    width:40px;height:40px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    background:#ffcdd2;color:#b71c1c;font-weight:700;
+  }
+  .empty { text-align:center; color:#999; padding:16px 0; }
+}
+
+.select-tick {
+  margin-right: 8px;
+  display: flex; align-items: center;
+  ion-icon { font-size: 22px; }
+}

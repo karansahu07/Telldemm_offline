@@ -15,7 +15,7 @@
         <ion-button (click)="onUnpinSelected()">
           <ion-icon name="pin"></ion-icon>
         </ion-button>
-        <ion-button (click)="onExportSelected()">
+        <ion-button (click)="onArchievedSelected()">
           <ion-icon name="download-outline"></ion-icon>
         </ion-button>
         <ion-button (click)="onMoreSelected($event)">
@@ -34,7 +34,7 @@
         <ion-button (click)="onMuteSelected()">
           <ion-icon name="notifications-off-outline"></ion-icon>
         </ion-button>
-        <ion-button (click)="onExportSelected()">
+        <ion-button (click)="onArchievedSelected()">
           <ion-icon name="download-outline"></ion-icon>
         </ion-button>
         <ion-button (click)="onMoreSelected($event)">
@@ -50,7 +50,7 @@
         <ion-button (click)="onDeleteSelected()">
           <ion-icon name="trash-outline"></ion-icon>
         </ion-button>
-        <ion-button (click)="onExportSelected()">
+        <ion-button (click)="onArchievedSelected()">
           <ion-icon name="download-outline"></ion-icon>
         </ion-button>
         <ion-button (click)="onMoreSelected($event)">
@@ -63,7 +63,7 @@
         <ion-button (click)="onPinSelected()">
           <ion-icon name="pin-outline"></ion-icon>
         </ion-button>
-        <ion-button (click)="onExportSelected()">
+        <ion-button (click)="onArchievedSelected()">
           <ion-icon name="download-outline"></ion-icon>
         </ion-button>
         <ion-button (click)="onMoreSelected($event)">
@@ -76,7 +76,7 @@
         <ion-button (click)="onPinSelected()">
           <ion-icon name="pin-outline"></ion-icon>
         </ion-button>
-        <ion-button (click)="onExportSelected()">
+        <ion-button (click)="onArchievedSelected()">
           <ion-icon name="download-outline"></ion-icon>
         </ion-button>
         <ion-button (click)="onMoreSelected($event)">
@@ -111,10 +111,7 @@
     <ion-toolbar>
       <div class="main-header">
         <div class="container">
-          <input
-            type="text"
-            id="searchInput"
-            [(ngModel)]="searchText"
+          <input type="text" id="searchInput" [(ngModel)]="searchText"
             [placeholder]="'home.search.placeholder' | translate"
             [attr.aria-label]="'home.search.placeholder' | translate" />
         </div>
@@ -122,32 +119,27 @@
 
       <div class="main-filters">
         <div class="filters">
-          <button class="filter-link"
-                  [ngClass]="{ 'active-filter': selectedFilter === 'all' }"
-                  (click)="setFilter('all')">
+          <button class="filter-link" [ngClass]="{ 'active-filter': selectedFilter === 'all' }"
+            (click)="setFilter('all')">
             {{ 'home.filters.all' | translate }}
           </button>
-          <button class="filter-link"
-                  [ngClass]="{ 'active-filter': selectedFilter === 'read' }"
-                  (click)="setFilter('read')">
+          <button class="filter-link" [ngClass]="{ 'active-filter': selectedFilter === 'read' }"
+            (click)="setFilter('read')">
             {{ 'home.filters.read' | translate }}
           </button>
-          <button class="filter-link"
-                  [ngClass]="{ 'active-filter': selectedFilter === 'unread' }"
-                  (click)="setFilter('unread')">
+          <button class="filter-link" [ngClass]="{ 'active-filter': selectedFilter === 'unread' }"
+            (click)="setFilter('unread')">
             {{ 'home.filters.unread' | translate }}
           </button>
-          <button class="filter-link"
-                  [ngClass]="{ 'active-filter': selectedFilter === 'groups' }"
-                  (click)="setFilter('groups')">
+          <button class="filter-link" [ngClass]="{ 'active-filter': selectedFilter === 'groups' }"
+            (click)="setFilter('groups')">
             {{ 'home.filters.groups' | translate }}
           </button>
         </div>
       </div>
 
       <div *ngIf="toggleGroupCreator" class="group-creator">
-        <ion-input [(ngModel)]="newGroupName"
-                   [placeholder]="'home.groupCreator.placeholder' | translate">
+        <ion-input [(ngModel)]="newGroupName" [placeholder]="'home.groupCreator.placeholder' | translate">
         </ion-input>
         <ion-list>
           <ng-container *ngFor="let user of chatList">
@@ -176,22 +168,37 @@
     </ion-item>
   </ion-list>
 
+  <!-- Meta rows: Locked & Archived -->
+  <ion-list *ngIf="!isLoading && (lockedCount > 0 || archivedCount > 0)" lines="none" class="meta-list">
+
+    <ion-item *ngIf="lockedCount > 0" button detail="true" (click)="openLockedChats()">
+      <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+      <ion-label>Locked chats</ion-label>
+      <ion-badge slot="end" color="medium">{{ lockedCount }}</ion-badge>
+    </ion-item>
+
+    <ion-item *ngIf="archivedCount > 0" button detail="true" (click)="openArchived()">
+      <ion-icon name="archive-outline" slot="start"></ion-icon>
+      <ion-label>Archived</ion-label>
+      <ion-badge slot="end" color="medium">{{ archivedCount }}</ion-badge>
+    </ion-item>
+  </ion-list>
+
+
+
   <ion-list *ngIf="!isLoading">
-    <ion-item
-      *ngFor="let chat of filteredChats"
-      [class.selected]="isChatSelected(chat)"
-      (click)="onChatRowClick(chat, $event)"
-      (touchstart)="startHomeLongPress(chat)"
-      (touchend)="cancelHomeLongPress()"
+    <ion-item *ngFor="let chat of filteredChats" [class.selected]="isChatSelected(chat)"
+      (click)="onChatRowClick(chat, $event)" (touchstart)="startHomeLongPress(chat)" (touchend)="cancelHomeLongPress()"
       (touchmove)="cancelHomeLongPress()">
 
       <!-- Selection indicator when selection mode on -->
-      <div slot="start" class="select-tick" *ngIf="selectedChats.length > 0" (click)="toggleChatSelection(chat, $event)">
+      <div slot="start" class="select-tick" *ngIf="selectedChats.length > 0"
+        (click)="toggleChatSelection(chat, $event)">
         <ion-icon [name]="isChatSelected(chat) ? 'checkmark-circle' : 'ellipse-outline'"></ion-icon>
       </div>
 
       <ion-avatar slot="start"
-                  (click)="selectedChats.length ? toggleChatSelection(chat, $event) : openImagePopup(getChatAvatarUrl(chat) || 'assets/images/user.jfif'); $event.stopPropagation()">
+        (click)="selectedChats.length ? toggleChatSelection(chat, $event) : openImagePopup(getChatAvatarUrl(chat) || 'assets/images/user.jfif'); $event.stopPropagation()">
         <ng-container *ngIf="getChatAvatarUrl(chat) as img; else initialsTpl">
           <img [src]="img" [alt]="getChatAlt(chat)" (error)="onAvatarError(chat)" />
         </ng-container>
@@ -237,7 +244,8 @@
         <ion-badge *ngIf="chat.unreadCount > 0" color="danger" class="unread-badge">
           {{ chat.unreadCount }}
         </ion-badge>
-        <ion-icon *ngIf="chat.isCommunity" name="chevron-forward-outline" style="color:#bdbdbd; margin-left:8px;"></ion-icon>
+        <ion-icon *ngIf="chat.isCommunity" name="chevron-forward-outline"
+          style="color:#bdbdbd; margin-left:8px;"></ion-icon>
       </div>
     </ion-item>
   </ion-list>
@@ -249,7 +257,8 @@
   </ion-fab>
 
   <!-- Image Popup Modal -->
-  <ion-modal [isOpen]="showPopup" (didDismiss)="closeImagePopup()" [backdropDismiss]="true" cssClass="custom-blur-modal">
+  <ion-modal [isOpen]="showPopup" (didDismiss)="closeImagePopup()" [backdropDismiss]="true"
+    cssClass="custom-blur-modal">
     <ng-template>
       <div class="popup-container">
         <img [src]="selectedImage" [alt]="'home.alt.profile' | translate" class="popup-image" />
@@ -265,4 +274,3 @@
 </ion-content>
 
 <app-footer-tabs [totalUnreadCount]="totalUnreadCount"></app-footer-tabs>
-

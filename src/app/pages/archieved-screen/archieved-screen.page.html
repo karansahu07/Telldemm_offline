@@ -1,0 +1,97 @@
+<ion-header [translucent]="true">
+  <!-- Selection mode header -->
+  <ion-toolbar class="arch-toolbar" *ngIf="selected.length > 0; else normalHeader">
+    <ion-buttons slot="start">
+      <ion-button (click)="clearSelection()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-title>{{ selected.length }}</ion-title>
+
+    <ion-buttons slot="end">
+      <!-- Unarchive selected -->
+      <ion-button (click)="unarchiveSelected()">
+        <ion-icon name="archive-outline"></ion-icon>
+      </ion-button>
+      <ion-button>
+        <ion-icon name="ellipsis-vertical"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <!-- Normal header -->
+  <ng-template #normalHeader>
+    <ion-toolbar class="arch-toolbar">
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="/home"></ion-back-button>
+      </ion-buttons>
+      <ion-title>Archived</ion-title>
+      <ion-buttons slot="end">
+        <ion-button>
+          <ion-icon name="ellipsis-vertical"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+
+    <!-- info banner -->
+    <ion-toolbar class="arch-banner">
+      <div class="banner-text">
+        These chats stay archived when new messages are received. Tap to change
+      </div>
+    </ion-toolbar>
+  </ng-template>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="arch-content">
+  <ion-list *ngIf="isLoading">
+    <ion-item *ngFor="let i of [1,2,3]">
+      <ion-avatar slot="start">
+        <ion-skeleton-text animated style="width:40px;height:40px;border-radius:50%"></ion-skeleton-text>
+      </ion-avatar>
+      <ion-label>
+        <h3><ion-skeleton-text animated style="width:60%"></ion-skeleton-text></h3>
+        <p><ion-skeleton-text animated style="width:80%"></ion-skeleton-text></p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <ion-list *ngIf="!isLoading">
+    <ion-item
+      *ngFor="let it of items"
+      [class.selected]="isSelected(it)"
+      (click)="onRowClick(it, $event)"
+      (touchstart)="startLongPress(it)"
+      (touchend)="cancelLongPress()"
+      (touchmove)="cancelLongPress()">
+
+      <!-- selection tick when in selection mode -->
+      <div slot="start" class="select-tick" *ngIf="selected.length > 0" (click)="toggleSelection(it, $event)">
+        <ion-icon [name]="isSelected(it) ? 'checkmark-circle' : 'ellipse-outline'"></ion-icon>
+      </div>
+
+      <ion-avatar slot="start"
+                  (click)="selected.length ? toggleSelection(it, $event) : null">
+        <img *ngIf="it.avatar; else initials" [src]="it.avatar" alt="avatar" />
+        <ng-template #initials>
+          <div class="avatar-fallback">{{ (it.name||'?').slice(0,1) }}</div>
+        </ng-template>
+      </ion-avatar>
+
+      <ion-label>
+        <h3 class="name">{{ it.name }}</h3>
+        <p class="preview">{{ it.message }}</p>
+      </ion-label>
+
+      <div slot="end" class="meta">
+        <div class="time">{{ it.time }}</div>
+        <ion-badge *ngIf="it.unreadCount>0" color="danger">{{ it.unreadCount }}</ion-badge>
+        <!-- ✂️ removed per-row unarchive button -->
+      </div>
+    </ion-item>
+
+    <ion-item *ngIf="!items.length" lines="none">
+      <ion-label class="empty">No archived chats</ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>
