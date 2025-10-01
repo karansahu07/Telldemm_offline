@@ -921,6 +921,26 @@ async setPath(path: string, value: any) {
     await update(rtdbRef(db, '/'), updates);
   }
 
+   /** Remove the UI "unread" mark for a room (and zero the badge). */
+  async removeMarkAsUnread(roomId: string, userId: string): Promise<void> {
+    const db = getDatabase();
+    const updates: Record<string, any> = {};
+    updates[`unreadChats/${userId}/${roomId}`] = null;  // delete the flag
+    updates[`unreadCounts/${roomId}/${userId}`] = 0;    // reset badge
+    await update(rtdbRef(db, '/'), updates);
+  }
+
+  /** Bulk version (optional). */
+  async removeManyMarksAsUnread(roomIds: string[], userId: string): Promise<void> {
+    const db = getDatabase();
+    const updates: Record<string, any> = {};
+    for (const roomId of roomIds) {
+      updates[`unreadChats/${userId}/${roomId}`] = null;
+      updates[`unreadCounts/${roomId}/${userId}`] = 0;
+    }
+    await update(rtdbRef(db, '/'), updates);
+  }
+
   //delete msg
   deleteMessage(roomId: string, messageKey: string) {
     const messageRef = ref(this.db, `chats/${roomId}/${messageKey}`);

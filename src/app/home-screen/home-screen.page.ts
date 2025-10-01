@@ -204,19 +204,19 @@ export class HomeScreenPage implements OnInit, OnDestroy {
       const backButtonHandler = (ev: any) => ev.detail.register(10000, () => { });
       document.addEventListener('ionBackButton', backButtonHandler);
  
-      const alert = await this.alertCtrl.create({
-        header: 'Device Mismatch',
-        message: 'You are logged in on another device. Please login again.',
-        backdropDismiss: false,
-        keyboardClose: false,
-        buttons: [{
-          text: 'OK',
-          handler: () => {
-            this.resetapp.resetApp();
-          }
-        }]
-      });
- 
+            const alert = await this.alertCtrl.create({
+  header: 'Logged in on another device',
+  message: 'Your account is currently active on a different device. For security reasons, please log in again to continue.',
+  backdropDismiss: false,
+  keyboardClose: false,
+  buttons: [{
+    text: 'OK',
+    handler: () => {
+      this.resetapp.resetApp();
+    }
+  }]
+});
+  
       await alert.present();
  
       alert.onDidDismiss().then(() => {
@@ -393,18 +393,6 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     );
   }
 
-  // toggleChatSelection(chat: any, ev?: Event) {
-  //   if (ev) ev.stopPropagation();
-  //   const idx = this.selectedChats.findIndex(c =>
-  //     c.receiver_Id === chat.receiver_Id &&
-  //     !!c.isCommunity === !!chat.isCommunity &&
-  //     !!c.group === !!chat.group
-  //   );
-  //   if (idx > -1) this.selectedChats.splice(idx, 1);
-  //   else this.selectedChats.push(chat);
-  //   if (this.selectedChats.length === 0) this.clearChatSelection();
-  // }
-
   toggleChatSelection(chat: any, ev?: Event) {
     if (ev) ev.stopPropagation();
 
@@ -493,18 +481,6 @@ export class HomeScreenPage implements OnInit, OnDestroy {
       isMultiUsersOnly: count > 1 && onlyUsers
     };
   }
-
-  /* ===== Selection actions (stubbed to local flags; wire to backend if needed) ===== */
-  // async onPinSelected() {
-  //   // for (const c of this.selectedChats) { c.pinned = true; }
-  //    const alert = await this.alertCtrl.create({
-  //   header: 'Pin Chat',
-  //   message: '📌 Work in progress',
-  //   buttons: ['OK']
-  // });
-  // await alert.present();
-  //   this.clearChatSelection();
-  // }
 
   async onPinSelected() {
     const userId = this.senderUserId || this.authService.authData?.userId || '';
@@ -2145,55 +2121,48 @@ async markAsUnread() {
     this.selectedFilter = filter;
   }
 
-  // async openChat(chat: any) {
-  //   const receiverId = chat.receiver_Id;
-  //   const receiver_phone = chat.receiver_phone;
-  //   const receiver_name = chat.name;
-
-  //   await this.secureStorage.setItem('receiver_name', receiver_name);
-
-  //   if (chat.group) {
-  //     this.router.navigate(['/chatting-screen'], {
-  //       queryParams: { receiverId, isGroup: true }
-  //     });
-  //   } else {
-  //     const cleanPhone = receiverId;
-  //     await this.secureStorage.setItem('receiver_phone', receiver_phone);
-  //     this.router.navigate(['/chatting-screen'], {
-  //       queryParams: { receiverId: cleanPhone, receiver_phone }
-  //     });
-  //   }
-  // }
-
   async openChat(chat: any) {
-    const receiverId = chat.receiver_Id;
-    const receiver_phone = chat.receiver_phone;
-    const receiver_name = chat.name;
+  const receiverId   = chat.receiver_Id;
+  const receiverPhone = chat.receiver_phone;
+  const receiverName  = chat.name;
 
-    await this.secureStorage.setItem('receiver_name', receiver_name);
+  await this.secureStorage.setItem('receiver_name', receiverName);
 
-    // If this is a community row -> open community detail page
-    if (chat.isCommunity) {
-      // navigate to community-detail page with communityId
-      this.router.navigate(['/community-detail'], {
-        queryParams: { communityId: receiverId }
-      });
-      return;
-    }
+  // 👉 before navigating, clear "marked as unread" (if present)
+  const me = this.senderUserId || this.authService.authData?.userId || '';
+  if (me) {
+    const roomId = chat.group
+      ? String(chat.receiver_Id)
+      : this.getRoomId(String(me), String(chat.receiver_Id));
 
-    // existing behavior for group or private
-    if (chat.group) {
-      this.router.navigate(['/chatting-screen'], {
-        queryParams: { receiverId, isGroup: true }
-      });
-    } else {
-      const cleanPhone = receiverId;
-      await this.secureStorage.setItem('receiver_phone', receiver_phone);
-      this.router.navigate(['/chatting-screen'], {
-        queryParams: { receiverId: cleanPhone, receiver_phone }
-      });
+    // If this row shows unread, clear the UI unread flag/badge in RTDB
+    if (chat.unread || (chat.unreadCount ?? 0) > 0) {
+      try {
+        await this.firebaseChatService.removeMarkAsUnread(roomId, String(me));
+        // optimistic UI
+        chat.unread = false;
+        chat.unreadCount = 0;
+      } catch (_) { /* ignore */ }
     }
   }
+
+  // community routes as before
+  if (chat.isCommunity) {
+    this.router.navigate(['/community-detail'], { queryParams: { communityId: receiverId } });
+    return;
+  }
+
+  // existing behavior for group or private
+  if (chat.group) {
+    this.router.navigate(['/chatting-screen'], { queryParams: { receiverId, isGroup: true } });
+  } else {
+    await this.secureStorage.setItem('receiver_phone', receiverPhone);
+    this.router.navigate(['/chatting-screen'], {
+      queryParams: { receiverId: receiverId, receiver_phone: receiverPhone }
+    });
+  }
+}
+
 
   async loadUserCommunitiesForHome() {
     try {
@@ -2350,41 +2319,6 @@ async markAsUnread() {
     }
   }
 
-  // async scanBarcode() {
-  //   try {
-  //     if (!Capacitor.isNativePlatform()) {
-  //       alert('Barcode scanning only works on a real device.');
-  //       return;
-  //     }
-
-  //     const permission = await BarcodeScanner.checkPermission({ force: true });
-  //     if (!permission.granted) {
-  //       alert('Camera permission is required to scan barcodes.');
-  //       return;
-  //     }
-
-  //     await BarcodeScanner.prepare();
-  //     await BarcodeScanner.hideBackground();
-  //     document.body.classList.add('scanner-active');
-
-  //     const result = await BarcodeScanner.startScan();
-
-  //     if (result?.hasContent) {
-  //       // console.log('Scanned Result:', result.content);
-  //       this.scannedText = result.content;
-  //     } else {
-  //       alert('No barcode found.');
-  //     }
-
-  //   } catch (error) {
-  //     console.error('Barcode Scan Error:', error);
-  //     alert('Something went wrong during scanning.');
-  //   } finally {
-  //     await BarcodeScanner.showBackground();
-  //     await BarcodeScanner.stopScan();
-  //     document.body.classList.remove('scanner-active');
-  //   }
-  // }
   async scanBarcode() {
     try {
       if (!Capacitor.isNativePlatform()) {
