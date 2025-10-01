@@ -1,6 +1,6 @@
 <ion-header [translucent]="true">
   <!-- ✅ Selection Mode Header -->
-  <ion-toolbar *ngIf="selectedChats.length > 0; else normalHomeHeader">
+  <ion-toolbar *ngIf="isSelectionMode; else normalHomeHeader">
     <ion-buttons slot="start">
       <ion-button (click)="clearChatSelection()">
         <ion-icon name="arrow-back-outline"></ion-icon>
@@ -58,7 +58,7 @@
         </ion-button>
       </ng-container>
 
-      <!-- Includes any group (no delete/mute in screenshots) -->
+      <!-- Includes any group (no delete/mute) -->
       <ng-container *ngIf="selectionMeta.includesGroup && !selectionMeta.includesCommunity">
         <ion-button (click)="onPinSelected()">
           <ion-icon name="pin-outline"></ion-icon>
@@ -107,51 +107,77 @@
         </ion-button>
       </ion-buttons>
     </ion-toolbar>
-
-    <ion-toolbar>
-      <div class="main-header">
-        <div class="container">
-          <input type="text" id="searchInput" [(ngModel)]="searchText"
-            [placeholder]="'home.search.placeholder' | translate"
-            [attr.aria-label]="'home.search.placeholder' | translate" />
-        </div>
-      </div>
-
-      <div class="main-filters">
-        <div class="filters">
-          <button class="filter-link" [ngClass]="{ 'active-filter': selectedFilter === 'all' }"
-            (click)="setFilter('all')">
-            {{ 'home.filters.all' | translate }}
-          </button>
-          <button class="filter-link" [ngClass]="{ 'active-filter': selectedFilter === 'read' }"
-            (click)="setFilter('read')">
-            {{ 'home.filters.read' | translate }}
-          </button>
-          <button class="filter-link" [ngClass]="{ 'active-filter': selectedFilter === 'unread' }"
-            (click)="setFilter('unread')">
-            {{ 'home.filters.unread' | translate }}
-          </button>
-          <button class="filter-link" [ngClass]="{ 'active-filter': selectedFilter === 'groups' }"
-            (click)="setFilter('groups')">
-            {{ 'home.filters.groups' | translate }}
-          </button>
-        </div>
-      </div>
-
-      <div *ngIf="toggleGroupCreator" class="group-creator">
-        <ion-input [(ngModel)]="newGroupName" [placeholder]="'home.groupCreator.placeholder' | translate">
-        </ion-input>
-        <ion-list>
-          <ng-container *ngFor="let user of chatList">
-            <ion-item *ngIf="!user.group">
-              <ion-label>{{ user.name }}</ion-label>
-              <ion-checkbox [(ngModel)]="user.selected"></ion-checkbox>
-            </ion-item>
-          </ng-container>
-        </ion-list>
-      </div>
-    </ion-toolbar>
   </ng-template>
+
+  <!-- 🔎 Search + filters row
+       - normal mode: interactive
+       - selection mode: visible but disabled
+  -->
+  <ion-toolbar>
+    <div class="main-header" [class.disabled-ui]="isSelectionMode" [style.opacity]="isSelectionMode ? 0.55 : 1">
+      <div class="container">
+        <input
+          type="text"
+          id="searchInput"
+          [(ngModel)]="searchText"
+          [placeholder]="'home.search.placeholder' | translate"
+          [attr.aria-label]="'home.search.placeholder' | translate"
+          [readonly]="isSelectionMode"
+          [disabled]="isSelectionMode"
+        />
+      </div>
+    </div>
+
+    <div class="main-filters" [class.disabled-ui]="isSelectionMode" [style.opacity]="isSelectionMode ? 0.55 : 1">
+      <div class="filters">
+        <button
+          class="filter-link"
+          [ngClass]="{ 'active-filter': selectedFilter === 'all' }"
+          (click)="!isSelectionMode && setFilter('all')"
+          [disabled]="isSelectionMode">
+          {{ 'home.filters.all' | translate }}
+        </button>
+
+        <button
+          class="filter-link"
+          [ngClass]="{ 'active-filter': selectedFilter === 'read' }"
+          (click)="!isSelectionMode && setFilter('read')"
+          [disabled]="isSelectionMode">
+          {{ 'home.filters.read' | translate }}
+        </button>
+
+        <button
+          class="filter-link"
+          [ngClass]="{ 'active-filter': selectedFilter === 'unread' }"
+          (click)="!isSelectionMode && setFilter('unread')"
+          [disabled]="isSelectionMode">
+          {{ 'home.filters.unread' | translate }}
+        </button>
+
+        <button
+          class="filter-link"
+          [ngClass]="{ 'active-filter': selectedFilter === 'groups' }"
+          (click)="!isSelectionMode && setFilter('groups')"
+          [disabled]="isSelectionMode">
+          {{ 'home.filters.groups' | translate }}
+        </button>
+      </div>
+    </div>
+
+    <!-- (optional) you can keep your group-creator here unchanged -->
+    <div *ngIf="toggleGroupCreator" class="group-creator">
+      <ion-input [(ngModel)]="newGroupName" [placeholder]="'home.groupCreator.placeholder' | translate">
+      </ion-input>
+      <ion-list>
+        <ng-container *ngFor="let user of chatList">
+          <ion-item *ngIf="!user.group">
+            <ion-label>{{ user.name }}</ion-label>
+            <ion-checkbox [(ngModel)]="user.selected"></ion-checkbox>
+          </ion-item>
+        </ng-container>
+      </ion-list>
+    </div>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">

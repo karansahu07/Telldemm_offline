@@ -560,3 +560,6 @@ ion-item.selected { --background: #e7bebe; }
     ion-badge { border-radius: 10px; }
   }
 }
+.disabled-ui {
+  pointer-events: none;
+}

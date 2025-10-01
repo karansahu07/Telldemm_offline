@@ -868,6 +868,7 @@ openArchived() {
   }
 
   private openSelectedContactProfile(): void {
+    // console.log("selectedChats",this.selectedChats);
     const sel = this.selectedChats.filter(c => !c.group && !c.isCommunity);
     const chat = sel[0];
     if (!chat) return;
@@ -1818,7 +1819,9 @@ openArchived() {
   }
 }
 
-
+  get isSelectionMode(): boolean {
+    return this.selectedChats.length > 0;
+  }
 
   private trackRouteChanges() {
     this.versionService.checkVersion();
@@ -1849,62 +1852,6 @@ openArchived() {
       return date.toLocaleDateString();
     }
   }
-
-  // private async getPreviewFromMessages(messages: any[]): Promise<{ previewText: string; timestamp?: string }> {
-  //   if (!messages || messages.length === 0) return { previewText: '', timestamp: '' };
-
-  //   // iterate from last -> first
-  //   for (let i = messages.length - 1; i >= 0; i--) {
-  //     const m = messages[i];
-
-  //     // Skip if globally deleted or deletedForEveryone
-  //     if (m.isDeleted || m.deletedForEveryone) continue;
-
-  //     // Skip if deleted for current user
-  //     try {
-  //       if (m.deletedFor && this.senderUserId && m.deletedFor[String(this.senderUserId)]) {
-  //         continue;
-  //       }
-  //     } catch (e) {
-  //       // ignore and continue
-  //     }
-
-  //     if (m.attachment?.type && m.attachment.type !== 'text') {
-  //       let txt = this.translate.instant('home.preview.media.generic');
-  //       switch ((m.attachment.type || '').toString()) {
-  //         case 'image': txt = '📷 ' + this.translate.instant('home.preview.media.photo'); break;
-  //         case 'video': txt = '🎥 ' + this.translate.instant('home.preview.media.video'); break;
-  //         case 'audio': txt = '🎵 ' + this.translate.instant('home.preview.media.audio'); break;
-  //         case 'file': txt = '📎 ' + this.translate.instant('home.preview.media.file'); break;
-  //         default: txt = this.translate.instant('home.preview.media.generic');
-  //       }
-  //       return { previewText: txt, timestamp: m.timestamp };
-  //     }
-
-  //     // Otherwise attempt to decrypt text (fall back gracefully)
-  //     try {
-  //       const dec = await this.encryptionService.decrypt(m.text || '');
-  //       if (dec && String(dec).trim() !== '') {
-  //         return { previewText: dec, timestamp: m.timestamp };
-  //       } else if (m.text && String(m.text).trim() !== '') {
-  //         // fallback to raw text if decryption returned empty string
-  //         return { previewText: m.text, timestamp: m.timestamp };
-  //       } else {
-  //         // empty text -> skip to previous message
-  //         continue;
-  //       }
-  //     } catch (err) {
-  //       // can't decrypt -> show placeholder
-  //       // return { previewText: '[Encrypted]', timestamp: m.timestamp };
-  //       return { previewText: this.translate.instant('home.preview.encrypted'), timestamp: m.timestamp };
-  //     }
-  //   }
-
-  //   // If we reached here => no visible message found
-  //   const last = messages[messages.length - 1];
-  //   // return { previewText: 'This message was deleted', timestamp: last?.timestamp || '' };
-  //   return { previewText: this.translate.instant('home.preview.deleted'), timestamp: last?.timestamp || '' };
-  // }
 
   
 private async getPreviewFromMessages(

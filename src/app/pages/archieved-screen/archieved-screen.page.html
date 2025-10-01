@@ -10,11 +10,17 @@
     <ion-title>{{ selected.length }}</ion-title>
 
     <ion-buttons slot="end">
-      <!-- Unarchive selected -->
+      <!-- Delete only when ONLY privates are selected -->
+      <ion-button *ngIf="selectionMeta.onlyPrivates" (click)="deleteSelected()">
+        <ion-icon name="trash-outline"></ion-icon>
+      </ion-button>
+
+      <!-- Unarchive is always available -->
       <ion-button (click)="unarchiveSelected()">
         <ion-icon name="archive-outline"></ion-icon>
       </ion-button>
-      <ion-button>
+
+      <ion-button (click)="openArchiveMenu($event)">
         <ion-icon name="ellipsis-vertical"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -28,22 +34,23 @@
       </ion-buttons>
       <ion-title>Archived</ion-title>
       <ion-buttons slot="end">
-        <ion-button>
+        <ion-button (click)="openArchiveMenu($event)">
           <ion-icon name="ellipsis-vertical"></ion-icon>
         </ion-button>
       </ion-buttons>
     </ion-toolbar>
-
-    <!-- info banner -->
-    <ion-toolbar class="arch-banner">
-      <div class="banner-text">
-        These chats stay archived when new messages are received. Tap to change
-      </div>
-    </ion-toolbar>
   </ng-template>
+
+  <!-- 🔴 Always-visible banner (moved outside the conditional headers) -->
+  <ion-toolbar class="arch-banner">
+    <div class="banner-text">
+      These chats stay archived when new messages are received.
+    </div>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true" class="arch-content">
+  <!-- Loader -->
   <ion-list *ngIf="isLoading">
     <ion-item *ngFor="let i of [1,2,3]">
       <ion-avatar slot="start">
@@ -56,6 +63,7 @@
     </ion-item>
   </ion-list>
 
+  <!-- List -->
   <ion-list *ngIf="!isLoading">
     <ion-item
       *ngFor="let it of items"
@@ -70,8 +78,7 @@
         <ion-icon [name]="isSelected(it) ? 'checkmark-circle' : 'ellipse-outline'"></ion-icon>
       </div>
 
-      <ion-avatar slot="start"
-                  (click)="selected.length ? toggleSelection(it, $event) : null">
+      <ion-avatar slot="start" (click)="selected.length ? toggleSelection(it, $event) : null">
         <img *ngIf="it.avatar; else initials" [src]="it.avatar" alt="avatar" />
         <ng-template #initials>
           <div class="avatar-fallback">{{ (it.name||'?').slice(0,1) }}</div>
@@ -85,8 +92,8 @@
 
       <div slot="end" class="meta">
         <div class="time">{{ it.time }}</div>
-        <ion-badge *ngIf="it.unreadCount>0" color="danger">{{ it.unreadCount }}</ion-badge>
-        <!-- ✂️ removed per-row unarchive button -->
+        <ion-badge *ngIf="it.unreadCount > 0" color="danger">{{ it.unreadCount }}</ion-badge>
+        <!-- per-row unarchive removed -->
       </div>
     </ion-item>
 
