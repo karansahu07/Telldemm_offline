@@ -412,7 +412,7 @@
       "saveFailed": "فشل في تحديث رابط إنستجرام. حاول مرة أخرى."
     }
   },"home": {
-    "search": { "placeholder": "اسأل Meta AI أو ابحث" },
+    "search": { "placeholder": "اسأل  أو ابحث" },
     "filters": { "all": "الكل", "read": "مقروء", "unread": "غير مقروء", "groups": "المجموعات" },
     "groupCreator": { "placeholder": "أدخل اسم المجموعة" },
     "typing": "يكتب...",

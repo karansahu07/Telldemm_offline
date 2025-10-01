@@ -410,7 +410,7 @@
       "saveFailed": "인스타그램 링크를 업데이트하지 못했습니다. 다시 시도하세요."
     }
   },"home": {
-    "search": { "placeholder": "Meta AI에게 물어보기 또는 검색" },
+    "search": { "placeholder": "에게 물어보기 또는 검색" },
     "filters": { "all": "전체", "read": "읽음", "unread": "읽지 않음", "groups": "그룹" },
     "groupCreator": { "placeholder": "그룹 이름 입력" },
     "typing": "입력 중...",

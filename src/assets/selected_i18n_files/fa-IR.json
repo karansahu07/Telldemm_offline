@@ -357,7 +357,7 @@
       "saveFailed": "به‌روزرسانی لینک اینستاگرام ناموفق بود. دوباره تلاش کنید."
     }
   },"home": {
-    "search": { "placeholder": "از Meta AI بپرسید یا جستجو کنید" },
+    "search": { "placeholder": "از  بپرسید یا جستجو کنید" },
     "filters": { "all": "همه", "read": "خوانده‌شده", "unread": "خوانده‌نشده", "groups": "گروه‌ها" },
     "groupCreator": { "placeholder": "نام گروه را وارد کنید" },
     "typing": "در حال نوشتن...",

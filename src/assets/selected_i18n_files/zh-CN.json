@@ -411,7 +411,7 @@
       "saveFailed": "更新 Instagram 链接失败，请重试。"
     }
   },"home": {
-    "search": { "placeholder": "询问 Meta AI 或搜索" },
+    "search": { "placeholder": "询问  或搜索" },
     "filters": { "all": "全部", "read": "已读", "unread": "未读", "groups": "群组" },
     "groupCreator": { "placeholder": "输入群组名称" },
     "typing": "正在输入...",

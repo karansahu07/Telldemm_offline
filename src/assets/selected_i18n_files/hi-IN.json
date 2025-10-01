@@ -410,7 +410,7 @@
       "saveFailed": "इंस्टाग्राम लिंक अपडेट करने में विफल। फिर से प्रयास करें।"
     }
   },"home": {
-    "search": { "placeholder": "Meta AI से पूछें या खोजें" },
+    "search": { "placeholder": " से पूछें या खोजें" },
     "filters": { "all": "सभी", "read": "पढ़ा हुआ", "unread": "अपठित", "groups": "समूह" },
     "groupCreator": { "placeholder": "समूह का नाम दर्ज करें" },
     "typing": "टाइप कर रहा है...",

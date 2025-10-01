@@ -387,7 +387,7 @@
       "saveFailed": "Instagram bağlantısı güncellenemedi. Tekrar deneyin."
     }
   },"home": {
-    "search": { "placeholder": "Meta AI’ye Sor veya Ara" },
+    "search": { "placeholder": "’ye Sor veya Ara" },
     "filters": { "all": "TÜMÜ", "read": "Okundu", "unread": "Okunmadı", "groups": "Gruplar" },
     "groupCreator": { "placeholder": "Grup Adını Girin" },
     "typing": "yazıyor...",

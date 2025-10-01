@@ -410,7 +410,7 @@
       "saveFailed": "Impossibile aggiornare il link Instagram. Riprova."
     }
   }, "home": {
-    "search": { "placeholder": "Chiedi a Meta AI o Cerca" },
+    "search": { "placeholder": "Chiedi a  o Cerca" },
     "filters": { "all": "TUTTI", "read": "Letti", "unread": "Non letti", "groups": "Gruppi" },
     "groupCreator": { "placeholder": "Inserisci il nome del gruppo" },
     "typing": "sta scrivendo...",

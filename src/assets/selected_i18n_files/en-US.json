@@ -410,7 +410,7 @@
       "saveFailed": "Failed to update Instagram link. Try again."
     }
   },"home": {
-    "search": { "placeholder": "Ask Meta AI or Search" },
+    "search": { "placeholder": "Ask  or Search" },
     "filters": { "all": "ALL", "read": "Read", "unread": "Unread", "groups": "Groups" },
     "groupCreator": { "placeholder": "Enter Group Name" },
     "typing": "typing...",

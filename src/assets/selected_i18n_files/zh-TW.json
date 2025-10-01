@@ -412,7 +412,7 @@
       "saveFailed": "無法更新 Instagram 連結，請再試一次。"
     }
   }, "home": {
-    "search": { "placeholder": "詢問 Meta AI 或搜尋" },
+    "search": { "placeholder": "詢問  或搜尋" },
     "filters": { "all": "全部", "read": "已讀", "unread": "未讀", "groups": "群組" },
     "groupCreator": { "placeholder": "輸入群組名稱" },
     "typing": "正在輸入...",

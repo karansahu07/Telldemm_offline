@@ -412,7 +412,7 @@
       "saveFailed": "ইনস্টাগ্রাম লিঙ্ক আপডেট করতে ব্যর্থ। আবার চেষ্টা করুন।"
     }
   },"home": {
-    "search": { "placeholder": "Meta AI-কে জিজ্ঞাসা করুন অথবা খুঁজুন" },
+    "search": { "placeholder": "-কে জিজ্ঞাসা করুন অথবা খুঁজুন" },
     "filters": { "all": "সব", "read": "পড়া হয়েছে", "unread": "না পড়া", "groups": "গ্রুপ" },
     "groupCreator": { "placeholder": "গ্রুপের নাম লিখুন" },
     "typing": "টাইপ করছে...",

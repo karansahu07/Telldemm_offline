@@ -411,7 +411,7 @@
       "saveFailed": "ਇੰਸਟਾਗ੍ਰਾਮ ਲਿੰਕ ਅੱਪਡੇਟ ਕਰਨ ਵਿੱਚ ਅਸਫਲ। ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।"
     }
   },"home": {
-    "search": { "placeholder": "Meta AI ਨੂੰ ਪੁੱਛੋ ਜਾਂ ਖੋਜੋ" },
+    "search": { "placeholder": " ਨੂੰ ਪੁੱਛੋ ਜਾਂ ਖੋਜੋ" },
     "filters": { "all": "ਸਭ", "read": "ਪੜ੍ਹਿਆ", "unread": "ਨਾ ਪੜ੍ਹਿਆ", "groups": "ਗਰੁੱਪ" },
     "groupCreator": { "placeholder": "ਗਰੁੱਪ ਦਾ ਨਾਮ ਦਰਜ ਕਰੋ" },
     "typing": "ਲਿਖ ਰਿਹਾ ਹੈ...",

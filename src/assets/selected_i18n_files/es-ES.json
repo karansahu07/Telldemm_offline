@@ -411,7 +411,7 @@
       "saveFailed": "No se pudo actualizar el enlace de Instagram. Inténtalo de nuevo."
     }
   },"home": {
-    "search": { "placeholder": "Pregunta a Meta AI o Busca" },
+    "search": { "placeholder": "Pregunta a  o Busca" },
     "filters": { "all": "TODOS", "read": "Leído", "unread": "No leído", "groups": "Grupos" },
     "groupCreator": { "placeholder": "Introduce el nombre del grupo" },
     "typing": "escribiendo...",

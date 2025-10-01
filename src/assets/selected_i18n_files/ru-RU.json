@@ -410,7 +410,7 @@
       "saveFailed": "Не удалось обновить ссылку Instagram. Попробуйте снова."
     }
   }, "home": {
-    "search": { "placeholder": "Спросите Meta AI или выполните поиск" },
+    "search": { "placeholder": "Спросите  или выполните поиск" },
     "filters": { "all": "ВСЕ", "read": "Прочитанные", "unread": "Непрочитанные", "groups": "Группы" },
     "groupCreator": { "placeholder": "Введите название группы" },
     "typing": "печатает...",

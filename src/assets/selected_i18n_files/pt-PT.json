@@ -410,7 +410,7 @@
       "saveFailed": "Falha ao atualizar link do Instagram. Tente novamente."
     }
   },"home": {
-    "search": { "placeholder": "Pergunte ao Meta AI ou Pesquise" },
+    "search": { "placeholder": "Pergunte ao  ou Pesquise" },
     "filters": { "all": "TODOS", "read": "Lidos", "unread": "Não lidos", "groups": "Grupos" },
     "groupCreator": { "placeholder": "Introduza o nome do grupo" },
     "typing": "a escrever...",

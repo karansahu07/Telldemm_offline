@@ -410,7 +410,7 @@
       "saveFailed": "ไม่สามารถอัปเดตลิงก์ Instagram ได้ โปรดลองอีกครั้ง"
     }
   },"home": {
-    "search": { "placeholder": "ถาม Meta AI หรือ ค้นหา" },
+    "search": { "placeholder": "ถาม  หรือ ค้นหา" },
     "filters": { "all": "ทั้งหมด", "read": "อ่านแล้ว", "unread": "ยังไม่อ่าน", "groups": "กลุ่ม" },
     "groupCreator": { "placeholder": "ป้อนชื่อกลุ่ม" },
     "typing": "กำลังพิมพ์...",

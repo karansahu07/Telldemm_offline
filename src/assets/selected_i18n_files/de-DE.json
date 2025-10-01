@@ -411,7 +411,7 @@
       "saveFailed": "Instagram-Link konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut."
     }
   },"home": {
-    "search": { "placeholder": "Frag Meta AI oder Suche" },
+    "search": { "placeholder": "Frag  oder Suche" },
     "filters": { "all": "ALLE", "read": "Gelesen", "unread": "Ungelesen", "groups": "Gruppen" },
     "groupCreator": { "placeholder": "Gruppennamen eingeben" },
     "typing": "schreibt...",

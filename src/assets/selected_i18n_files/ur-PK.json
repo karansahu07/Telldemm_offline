@@ -386,7 +386,7 @@
       "saveFailed": "انسٹاگرام لنک اپ ڈیٹ کرنے میں ناکام۔ دوبارہ کوشش کریں۔"
     }
   },"home": {
-    "search": { "placeholder": "Meta AI سے پوچھیں یا تلاش کریں" },
+    "search": { "placeholder": " سے پوچھیں یا تلاش کریں" },
     "filters": { "all": "سب", "read": "پڑھا ہوا", "unread": "ناپڑھا", "groups": "گروپس" },
     "groupCreator": { "placeholder": "گروپ کا نام درج کریں" },
     "typing": "لکھ رہا ہے...",

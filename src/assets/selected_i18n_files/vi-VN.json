@@ -386,7 +386,7 @@
       "saveFailed": "Không thể cập nhật liên kết Instagram. Vui lòng thử lại."
     }
   },"home": {
-    "search": { "placeholder": "Hỏi Meta AI hoặc Tìm kiếm" },
+    "search": { "placeholder": "Hỏi  hoặc Tìm kiếm" },
     "filters": { "all": "TẤT CẢ", "read": "Đã đọc", "unread": "Chưa đọc", "groups": "Nhóm" },
     "groupCreator": { "placeholder": "Nhập tên nhóm" },
     "typing": "đang nhập...",

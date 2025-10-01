@@ -410,7 +410,7 @@
       "saveFailed": "इंस्टाग्राम लिंक अपडेट करण्यात अयशस्वी. पुन्हा प्रयत्न करा."
     }
   }, "home": {
-    "search": { "placeholder": "Meta AI ला विचारा किंवा शोधा" },
+    "search": { "placeholder": " ला विचारा किंवा शोधा" },
     "filters": { "all": "सर्व", "read": "वाचलेले", "unread": "न वाचलेले", "groups": "गट" },
     "groupCreator": { "placeholder": "गटाचे नाव प्रविष्ट करा" },
     "typing": "टाइप करत आहे...",
