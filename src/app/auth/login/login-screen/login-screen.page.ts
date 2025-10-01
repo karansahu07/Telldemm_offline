@@ -4,6 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule, ToastController, IonInputOtp } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/auth/auth.service';
+import { Device, DeviceInfo } from '@capacitor/device';
+import { VersionCheck } from 'src/app/services/version-check';
+
 
 
 @Component({
@@ -57,6 +60,7 @@ export class LoginScreenPage {
     private authService: AuthService,
     private router: Router,
     private toastController: ToastController,
+    private versionCheck: VersionCheck
     // private secureStorage: SecureStorageService
   ) { }
 
@@ -182,7 +186,39 @@ export class LoginScreenPage {
     this.otpValue = event.detail.value;
   }
 
-  async goToHome() {
+//   async goToHome() {
+//   if (!this.isOtpComplete()) {
+//     this.showToast('Please enter the complete 6-digit OTP.');
+//     return;
+//   }
+
+//   this.isVerifyingOtp = true;
+
+//   const payload = {
+//     country_code: '+91',
+//     phone_number: this.phoneNumber.trim(),
+//     otp_code: this.otpValue
+//   };
+
+//   try {
+//     console.log('📨 Verifying OTP payload:', payload);
+//     const result = await this.authService.verifyOtp(payload);
+//     this.isVerifyingOtp = false;
+
+//     if (result.success) {
+//       this.showToast('Login successful!', 'success');
+      
+//       this.router.navigateByUrl('/profile-setup', { replaceUrl: true });
+//     } else {
+//       this.showToast(result.message || 'Invalid OTP', 'danger');
+//     }
+//   } catch (err) {
+//     this.isVerifyingOtp = false;
+//     this.showToast('Verification failed. Please try again.', 'danger');
+//     console.error(err);
+//   }
+// }
+async goToHome() {
   if (!this.isOtpComplete()) {
     this.showToast('Please enter the complete 6-digit OTP.');
     return;
@@ -190,29 +226,59 @@ export class LoginScreenPage {
 
   this.isVerifyingOtp = true;
 
-  const payload = {
-    country_code: '+91',
-    phone_number: this.phoneNumber.trim(),
-    otp_code: this.otpValue
-  };
-
   try {
+    // 1️⃣ Get device info
+    const info = await Device.getInfo();
+    console.log('Device info:', info);
+
+    // 2️⃣ Get current app version from VersionCheck
+    const versionResult = await this.versionCheck.checkVersion();
+    const appVersion = versionResult.currentVersion || '00';
+    console.log('App version:', appVersion);
+
+    // 3️⃣ Use persistent UUID if uuid not available
+    let uuid = (info as any).uuid || localStorage.getItem('device_uuid');
+    if (!uuid) {
+      uuid = crypto.randomUUID();
+      localStorage.setItem('device_uuid', uuid);
+    }
+
+    // 4️⃣ Create device payload
+    const devicePayload = {
+      device_uuid: uuid,
+      device_model: info.model,
+      os_name: info.operatingSystem,
+      os_version: info.osVersion,
+      app_version: appVersion
+    };
+
+    // 5️⃣ Prepare OTP verification payload
+    const payload = {
+      country_code: this.countryCode,
+      phone_number: this.phoneNumber.trim(),
+      otp_code: this.otpValue,
+      device_details: [devicePayload]
+    };
+
     console.log('📨 Verifying OTP payload:', payload);
+
+    // 6️⃣ Call backend API
     const result = await this.authService.verifyOtp(payload);
     this.isVerifyingOtp = false;
 
     if (result.success) {
       this.showToast('Login successful!', 'success');
-      
       this.router.navigateByUrl('/profile-setup', { replaceUrl: true });
     } else {
       this.showToast(result.message || 'Invalid OTP', 'danger');
     }
   } catch (err) {
     this.isVerifyingOtp = false;
-    this.showToast('Verification failed. Please try again.', 'danger');
     console.error(err);
+    this.showToast('Verification failed. Please try again.', 'danger');
   }
 }
+
+
 
 }
