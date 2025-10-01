@@ -138,6 +138,12 @@ async verifyOtp(payload: {
 }
 
 
+/** Verify device API */
+async verifyDevice(payload: any): Promise<any> {
+    // Replace with your full backend URL if needed
+    return this.api.post('/api/auth/verify-device', payload).toPromise();
+  }
+
   /** Update user name in auth data */
   async updateUserName(name: string): Promise<void> {
     if (this._authData) {

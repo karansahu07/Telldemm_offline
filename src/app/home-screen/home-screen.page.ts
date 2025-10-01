@@ -21,6 +21,7 @@ import { Database } from '@angular/fire/database';
 import { ContactSyncService } from '../services/contact-sync.service';
 import { NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { Device, DeviceInfo } from '@capacitor/device';
 
 // Firebase modular imports
 import { getDatabase, ref as rtdbRef, onValue as rtdbOnValue, off as rtdbOff, get, update, remove, set } from 'firebase/database';
@@ -111,6 +112,10 @@ export class HomeScreenPage implements OnInit, OnDestroy {
       console.warn('checkForceLogout error (ignored):', err);
     }
 
+        // 1.2 Verify device
+  const verified = await this.verifyDeviceOnEnter();
+  if (!verified) return; // stop if mismatch
+
     // 2) Existing logic (kept as before)
     const shouldRefresh = localStorage.getItem('shouldRefreshHome');
 
@@ -123,6 +128,112 @@ export class HomeScreenPage implements OnInit, OnDestroy {
       this.sender_name = this.authService.authData?.name || '';
     }
   }
+
+  async verifyDeviceOnEnter(): Promise<boolean> {
+  if (!this.senderUserId) {
+    console.warn('Skipping device verification: senderUserId is missing');
+    return false;
+  }
+ 
+  try {
+    // 1️⃣ Get device info (with web fallback)
+    let info: any;
+    const platform = Capacitor.getPlatform();
+    if (platform === 'web') {
+      // Fallback for web platform
+      info = {
+        model: navigator.userAgent.includes('Mobile') ? 'Mobile Web' : 'Desktop Web',
+        operatingSystem: 'Web',
+        osVersion: 'N/A',
+        uuid: localStorage.getItem('device_uuid') || crypto.randomUUID()
+      };
+      // Persist UUID if new
+      if (!localStorage.getItem('device_uuid')) {
+        localStorage.setItem('device_uuid', info.uuid);
+      }
+    } else {
+      info = await Device.getInfo();
+    }
+    console.log('Device info retrieved:', info);
+ 
+    // 2️⃣ Get current app version (with web fallback)
+    let appVersion = '1.0.0'; // Default fallback
+    if (platform !== 'web') {
+      try {
+        const versionResult = await this.versionService.checkVersion();
+        appVersion = versionResult.currentVersion || '1.0.0';
+      } catch (versionErr) {
+        console.warn('Version check failed:', versionErr);
+        appVersion = '1.0.0';
+      }
+    } else {
+      // For web, use a placeholder or read from manifest.json if needed
+      appVersion = 'web.1.0.0';
+    }
+    console.log('App version retrieved:', appVersion);
+ 
+    // 3️⃣ Use persistent UUID
+    let uuid = localStorage.getItem('device_uuid') || info.uuid || crypto.randomUUID();
+    if (!localStorage.getItem('device_uuid')) {
+      localStorage.setItem('device_uuid', uuid);
+    }
+    console.log('UUID used:', uuid);
+ 
+    // 4️⃣ Create device payload
+    const devicePayload = {
+      device_uuid: uuid,
+      device_model: info.model,
+      os_name: info.operatingSystem,
+      os_version: info.osVersion,
+      app_version: appVersion
+    };
+ 
+    // 5️⃣ Prepare payload
+    const payload = {
+      user_id: this.senderUserId,
+      device_details: devicePayload  // Note: device_details expects an object, not array like in OTP
+    };
+    console.log('📨 Device verification payload:', payload);
+ 
+    // 6️⃣ Call backend API
+    console.log('🔄 Calling verifyDevice API...');
+    const res: any = await this.authService.verifyDevice(payload);
+    console.log('✅ API Response:', res);
+ 
+    if (res.device_mismatch) {
+      const backButtonHandler = (ev: any) => ev.detail.register(10000, () => { });
+      document.addEventListener('ionBackButton', backButtonHandler);
+ 
+      const alert = await this.alertCtrl.create({
+        header: 'Device Mismatch',
+        message: 'You are logged in on another device. Please login again.',
+        backdropDismiss: false,
+        keyboardClose: false,
+        buttons: [{
+          text: 'OK',
+          handler: () => {
+            this.resetapp.resetApp();
+          }
+        }]
+      });
+ 
+      await alert.present();
+ 
+      alert.onDidDismiss().then(() => {
+        document.removeEventListener('ionBackButton', backButtonHandler);
+      });
+ 
+      return false;
+    }
+ 
+    console.log('✅ Device verified:', res.message);
+    return true;
+ 
+  } catch (err) {
+    console.error('Verify Device API error:', err); // Changed to error for visibility
+    return false;
+  }
+}
 
 
   //this is for testing

@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { AuthService } from 'src/app/auth/auth.service';
 import { Device, DeviceInfo } from '@capacitor/device';
 import { VersionCheck } from 'src/app/services/version-check';
+import { Capacitor } from '@capacitor/core';
 
 
 
@@ -227,19 +228,46 @@ async goToHome() {
   this.isVerifyingOtp = true;
 
   try {
-    // 1️⃣ Get device info
-    const info = await Device.getInfo();
+    // 1️⃣ Get device info (with web fallback)
+    let info: any;
+    const platform = Capacitor.getPlatform();
+    if (platform === 'web') {
+      // Fallback for web platform
+      info = {
+        model: navigator.userAgent.includes('Mobile') ? 'Mobile Web' : 'Desktop Web',
+        operatingSystem: 'Web',
+        osVersion: 'N/A', // Or parse from navigator.userAgent if needed
+        uuid: localStorage.getItem('device_uuid') || crypto.randomUUID()
+      };
+      // Persist UUID if new
+      if (!localStorage.getItem('device_uuid')) {
+        localStorage.setItem('device_uuid', info.uuid);
+      }
+    } else {
+      info = await Device.getInfo();
+    }
     console.log('Device info:', info);
 
-    // 2️⃣ Get current app version from VersionCheck
-    const versionResult = await this.versionCheck.checkVersion();
-    const appVersion = versionResult.currentVersion || '00';
+    // 2️⃣ Get current app version from VersionCheck (with web fallback)
+    let appVersion = '00'; // Default fallback
+    if (platform !== 'web') {
+      try {
+        const versionResult = await this.versionCheck.checkVersion();
+        appVersion = versionResult.currentVersion || '00';
+      } catch (versionErr) {
+        console.warn('Version check failed:', versionErr);
+        appVersion = '00';
+      }
+    } else {
+      // For web, you could read from package.json or manifest.json
+      // Example: hardcode or use a service to get it
+      appVersion = 'web.1.0.0'; // Adjust as needed
+    }
     console.log('App version:', appVersion);
 
-    // 3️⃣ Use persistent UUID if uuid not available
-    let uuid = (info as any).uuid || localStorage.getItem('device_uuid');
-    if (!uuid) {
-      uuid = crypto.randomUUID();
+    // 3️⃣ Use persistent UUID
+    let uuid = localStorage.getItem('device_uuid') || info.uuid || crypto.randomUUID();
+    if (!localStorage.getItem('device_uuid')) {
       localStorage.setItem('device_uuid', uuid);
     }
 
@@ -274,11 +302,10 @@ async goToHome() {
     }
   } catch (err) {
     this.isVerifyingOtp = false;
-    console.error(err);
+    console.error('Error in goToHome:', err); // Enhanced logging
     this.showToast('Verification failed. Please try again.', 'danger');
   }
 }
-
 
 
 }
