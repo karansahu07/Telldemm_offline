@@ -5,8 +5,7 @@ import { IonicModule, PopoverController } from '@ionic/angular';
 export type HomeMenuAction =
   | 'addShortcut' | 'viewContact' | 'markUnread' | 'markRead' | 'selectAll'
   | 'lockChat' | 'lockChats' | 'favorite' | 'addToList' | 'block'
-  | 'exitGroup' | 'exitGroups' | 'groupInfo'
-  | 'exitCommunity' | 'communityInfo';
+  | 'exitGroup' | 'exitGroups' | 'groupInfo';
 
 @Component({
   selector: 'app-menu-home-popover',
@@ -21,18 +20,20 @@ export class MenuHomePopoverComponent {
   @Input() allSelected = false;
   @Input() isAllSelectedMode = false;
 
-  // selection buckets (exactly one of these should be true)
+  // selection buckets
   @Input() isSingleUser = false;
   @Input() isMultiUsers = false;
   @Input() isSingleGroup = false;
   @Input() isMultiGroups = false;
-  @Input() isSingleCommunity = false;
   @Input() isMixedChats = false;
 
-  constructor(private popover: PopoverController) {}
+  // 👇 NEW: unread visibility flags
+  @Input() canMarkReadSingle = false;   // single selection has unread>0
+  @Input() canMarkUnreadSingle = false; // single selection has unread==0
+  @Input() canMarkReadMulti = false;    // at least one selected has unread>0
+  @Input() canMarkUnreadMulti = false;  // all selected have unread==0  (optional)
 
-  choose(action: HomeMenuAction) {
-    this.popover.dismiss({ action });
-  }
+  constructor(private popover: PopoverController) {}
+  choose(action: HomeMenuAction) { this.popover.dismiss({ action }); }
   close() { this.popover.dismiss(); }
 }

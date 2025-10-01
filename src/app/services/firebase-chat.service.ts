@@ -831,6 +831,96 @@ async setPath(path: string, value: any) {
     update(messageRef, { read: true, readAt : Date.now() });
   }
 
+  /** this use in home screen mark as read feature
+   * Mark all messages addressed TO `userId` in a room as read.
+   * Returns how many messages were flipped.
+   */
+  async markRoomAsRead(roomId: string, userId: string): Promise<number> {
+    const db = getDatabase();
+    const snap = await get(rtdbRef(db, `chats/${roomId}`));
+    if (!snap.exists()) {
+      // still reset unread counter even if messages missing
+      try { await update(rtdbRef(db, `/unreadCounts/${roomId}`), { [userId]: 0 }); } catch {}
+      return 0;
+    }
+
+    const now = Date.now();
+    const msgs = snap.val() || {};
+    const multi: Record<string, any> = {};
+    let changed = 0;
+
+    Object.entries(msgs).forEach(([key, m]: any) => {
+      // only messages that were sent TO me
+      const isForMe = String(m?.receiver_id) === String(userId);
+      const alreadyRead = !!m?.read || (m?.readBy && m.readBy[userId]);
+
+      if (isForMe && !alreadyRead) {
+        multi[`chats/${roomId}/${key}/read`] = true;
+        multi[`chats/${roomId}/${key}/readAt`] = now;
+        // if you also track per-user read in groups, keep it in sync
+        multi[`chats/${roomId}/${key}/readBy/${userId}`] = now;
+        changed++;
+      }
+    });
+
+    // zero the unread counter for me in this room
+    multi[`unreadCounts/${roomId}/${userId}`] = 0;
+
+    if (Object.keys(multi).length) {
+      await update(rtdbRef(db, '/'), multi);
+    }
+    return changed;
+  }
+
+  /**
+   * Bulk for many rooms. Returns total number of messages flipped.
+   */
+  async markManyRoomsAsRead(roomIds: string[], userId: string): Promise<number> {
+    let total = 0;
+    for (const rid of roomIds) {
+      try { total += await this.markRoomAsRead(rid, userId); } catch {}
+    }
+    return total;
+  }
+
+  async markRoomAsUnread(roomId: string, userId: string, minCount: number = 1): Promise<void> {
+    const db = getDatabase();
+
+    // read current unread count
+    let current = 0;
+    try {
+      const snap = await get(rtdbRef(db, `unreadCounts/${roomId}/${userId}`));
+      current = snap.exists() ? Number(snap.val() || 0) : 0;
+    } catch { /* ignore */ }
+
+    const updates: Record<string, any> = {};
+    updates[`unreadChats/${userId}/${roomId}`] = true;
+    if (current < minCount) {
+      updates[`unreadCounts/${roomId}/${userId}`] = minCount;
+    }
+
+    await update(rtdbRef(db, '/'), updates);
+  }
+
+  /**
+   * Bulk: mark many rooms as unread for userId.
+   */
+  async markManyRoomsAsUnread(roomIds: string[], userId: string, minCount: number = 1): Promise<void> {
+    const db = getDatabase();
+
+    // optional: fetch counts first, but to keep it simple/fast we just upsert to minCount
+    // (safe because setting unreadCounts to minCount won't decrease if higher already)
+    const updates: Record<string, any> = {};
+    const nowMin = Math.max(1, minCount);
+
+    for (const roomId of roomIds) {
+      updates[`unreadChats/${userId}/${roomId}`] = true;
+      updates[`unreadCounts/${roomId}/${userId}`] = nowMin;
+    }
+
+    await update(rtdbRef(db, '/'), updates);
+  }
+
   //delete msg
   deleteMessage(roomId: string, messageKey: string) {
     const messageRef = ref(this.db, `chats/${roomId}/${messageKey}`);
