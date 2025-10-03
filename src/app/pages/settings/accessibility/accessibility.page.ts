@@ -18,6 +18,7 @@ export class AccessibilityPage implements OnInit {
   reduceMotion = true;
   largeText = false;
   simpleAnimations = true;
+  grayscale = false;   // 👈 new
 
   constructor(private translate: TranslateService) {}
 
@@ -36,7 +37,8 @@ export class AccessibilityPage implements OnInit {
       increaseContrast: this.increaseContrast,
       reduceMotion: this.reduceMotion,
       largeText: this.largeText,
-      simpleAnimations: this.simpleAnimations
+      simpleAnimations: this.simpleAnimations,
+      grayscale: this.grayscale   // 👈 added
     };
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
@@ -54,6 +56,7 @@ export class AccessibilityPage implements OnInit {
       if (typeof s.reduceMotion === 'boolean') this.reduceMotion = s.reduceMotion;
       if (typeof s.largeText === 'boolean') this.largeText = s.largeText;
       if (typeof s.simpleAnimations === 'boolean') this.simpleAnimations = s.simpleAnimations;
+      if (typeof s.grayscale === 'boolean') this.grayscale = s.grayscale;  // 👈 load grayscale
     } catch (e) {
       console.warn('Could not load accessibility settings', e);
     }
@@ -65,5 +68,7 @@ export class AccessibilityPage implements OnInit {
     body.classList.toggle('accessibility-reduced-motion', this.reduceMotion);
     body.classList.toggle('accessibility-large-text', this.largeText);
     body.classList.toggle('accessibility-simple-animations', this.simpleAnimations);
+    body.classList.toggle('accessibility-grayscale', this.grayscale);  // 👈 apply grayscale
   }
 }
+

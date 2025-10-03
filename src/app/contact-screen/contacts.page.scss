@@ -1,115 +1,112 @@
+/* ======================================
+   Contacts / Search Screen (tokenized)
+   ====================================== */
+
+/* App surfaces */
 ion-content {
-  --background: white;
-  color: black;
+  --background: var(--ion-background-color);
+  color: var(--ion-text-color);
+}
+ion-toolbar,
+.toolbar,
+.custom-search-toolbar {
+  --background: var(--ion-toolbar-background, var(--ion-background-color));
+  --color: var(--ion-toolbar-color, var(--ion-text-color));
+  color: var(--color);
+  border-bottom: 1px solid var(--ion-border-color);
+  box-shadow: none;
 }
 
-ion-toolbar {
-  --background: white;
+/* Header sizing without forcing fixed height */
+ion-header {
+  background: var(--ion-toolbar-background, var(--ion-background-color));
+  box-shadow: none;
+  border-bottom: 1px solid var(--ion-border-color);
 }
+.toolbar_screen { padding-top: 20px; }
 
-.toolbar {
-  --background: white;
-}
-
+/* Buttons / icons */
 .back-btn {
-  color: black;
+  color: var(--ion-toolbar-color, var(--ion-text-color));
   width: 8%;
   margin-top: 15px;
 }
-
-.btn-main-icon {
-  margin-top: 15px;
-}
+.btn-main-icon { margin-top: 15px; }
 
 .custom-search-icon {
-  --color: black;
+  --color: var(--ion-text-color);
   --background: transparent;
   padding: 2px;
   margin-right: 10px;
   font-size: 20px;
 }
+.all-icon-btn { color: var(--ion-text-color); }
+.call-dout-icon { font-size: 28px; }
 
-.all-icon-btn {
-  color: black;
-}
+ion-icon { font-size: 26px; color: var(--ion-text-color); }
 
-.call-dout-icon {
-  font-size: 28px;
-}
-
+/* Names / labels */
 .user-real-name {
   margin: 0;
   font-size: 18px;
+  color: var(--ion-text-color);
 }
-
 .user-name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: var(--ion-text-color);
 }
 
 ion-list-header,
 ion-label,
 h2,
-p {
-  color: black;
-}
+p { color: var(--ion-text-color); }
+h2 { font-size: 19px; text-align: left; }
 
-h2 {
-  font-size: 19px;
-  text-align: left;
-}
-
+/* Prominent circular action icon (brand-tinted) */
 .green-icon {
-  background-color: #ff1414;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: var(--ion-color-primary);
+  color: var(--ion-color-primary-contrast);
+  display: flex; align-items: center; justify-content: center;
   border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  color: white;
-}
-ion-icon {
-  font-size: 26px;
+  width: 50px; height: 50px;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--ion-color-primary) 25%, transparent);
 }
 
-ion-item {
-  --background: white;
-}
-
-ion-label {
-  color: black;
-}
+/* List surfaces */
+ion-item { --background: var(--ion-item-background); }
+ion-label { color: var(--ion-text-color); }
 
 .contact-count {
-  font-size: 0.9rem;
+  font-size: .9rem;
   padding-right: 10px;
-  color: #ccc;
+  color: color-mix(in srgb, var(--ion-text-color) 45%, transparent);
 }
-.list {
-  background: white;
+
+.list,
+.list2 {
+  background: var(--ion-card-background);
+  border: 1px solid var(--ion-border-color);
+  border-radius: 12px;
   margin-top: 20px;
 }
-.list2 {
-  background: white;
-  font-size: 20px;
-}
-.items {
-  color: black;
-}
-.group {
-  font-size: 19px;
-}
+.list2 { font-size: 20px; }
+
+.items, .group { color: var(--ion-text-color); }
+.group { font-size: 19px; }
+
+/* Search bar */
 .custom-search-container {
   display: flex;
   align-items: center;
-  background-color: white;
+  background: var(--ion-item-background);
   border-radius: 25px;
   margin: 8px 12px;
   padding: 0 12px;
-  height: 47px; 
-  border: 1px solid #e5e5e5;
+  height: 47px;
+  border: 1px solid var(--ion-border-color);
+  box-shadow: 0 1px 2px rgba(0,0,0,.04);
 }
 
 ion-input.custom-search-input {
@@ -119,13 +116,14 @@ ion-input.custom-search-input {
   --padding-top: 0;
   --padding-bottom: 0;
   --background: transparent;
-  --placeholder-color: #999;
+  --placeholder-color: color-mix(in srgb, var(--ion-text-color) 45%, transparent);
+  --highlight-color-focused: transparent;
+  --highlight-color: transparent;
   font-size: 14px;
   height: 100%;
-  display: flex;
-  align-items: center;
+  display: flex; align-items: center;
+  color: var(--ion-text-color);
 }
-
 ion-input.custom-search-input .native-input {
   border: none !important;
   box-shadow: none !important;
@@ -135,49 +133,40 @@ ion-input.custom-search-input .native-input {
   line-height: normal !important;
 }
 
-.custom-search-input {
-  --highlight-color-focused: transparent !important;
-  --highlight-color: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
+/* Pill toolbar that holds the search bar (optional) */
 .custom-search-toolbar {
   border-radius: 77px;
   height: auto;
-  --background: white;
   width: 97%;
-  margin: 4px;
+  margin: 4px 0 0 7px;
   padding-top: 41px;
-  margin-left: 7px;
 }
 
-ion-header {
-  background-color: white;
-  height: 11%;
-  box-shadow: none;
-  border-bottom: white;
-}
-
-.toolbar_screen {
-  padding-top: 20px;
-}
+/* Avatar */
 ion-avatar{
-display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #2c2a2a;
-    background-color: #f5afaf;
-    border-radius: 50%;
-    border-width: 0px;
-    overflow: hidden;
-    object-fit: contain;
+  display: flex; justify-content: center; align-items: center;
+  color: var(--ion-text-color);
+  background: color-mix(in srgb, var(--ion-color-primary) 14%, var(--ion-item-background));
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid var(--ion-border-color);
+}
+ion-avatar img{
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  object-fit: cover; /* fill circle properly */
 }
 
-ion-avatar img{
-  // max-width: 100%;
-    height: 100%;
-    width: 100%;
-    border-radius: 50%;
-    object-fit: contain;
+/* Utilities */
+.items { color: var(--ion-text-color); }
+
+/* Focus accessibility */
+:where(.custom-search-container, .green-icon, ion-avatar):focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* Dark-mode polish */
+@media (prefers-color-scheme: dark) {
+  .custom-search-container { box-shadow: 0 1px 2px rgba(0,0,0,.18); }
 }

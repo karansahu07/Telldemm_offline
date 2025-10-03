@@ -1,31 +1,107 @@
-.arch-toolbar {
-  --background: #f44336; /* red */
-  --color: #fff;
-}
-.arch-banner {
-  --background: #ffebee;
-  .banner-text {
-    padding: 10px 8px;
-    color: #c62828;
-    font-size: 14px;
-    text-align: center;
-  }
-}
-.arch-content {
-  .name { font-weight: 700; }
-  .preview { color:#666; margin-top:4px; }
-  .meta { display:flex; align-items:center; gap:8px; }
-  .time { font-size:12px; color:#888; text-align:right; }
-  .avatar-fallback {
-    width:40px;height:40px;border-radius:50%;
-    display:flex;align-items:center;justify-content:center;
-    background:#ffcdd2;color:#b71c1c;font-weight:700;
-  }
-  .empty { text-align:center; color:#999; padding:16px 0; }
+/* =========================
+   Arch Screen (tokenized)
+   ========================= */
+
+/* Page-scoped palette (falls back to global primary) */
+:root,
+.arch {
+  --arch-primary: var(--ion-color-primary, #f44336);
+  --arch-primary-rgb: var(--ion-color-primary-rgb, 244, 67, 54);
+  --arch-contrast: var(--ion-color-primary-contrast, #fff);
 }
 
+/* Toolbar */
+.arch-toolbar {
+  --background: var(--arch-primary);
+  --color: var(--arch-contrast);
+  color: var(--color);
+  border-bottom: 1px solid color-mix(in srgb, var(--arch-primary) 25%, transparent);
+  box-shadow: none;
+}
+
+/* Banner */
+.arch-banner {
+  --background: color-mix(in srgb, var(--arch-primary) 12%, var(--ion-item-background));
+  background: var(--background);
+  border-bottom: 1px solid color-mix(in srgb, var(--arch-primary) 22%, var(--ion-border-color));
+
+  .banner-text {
+    padding: 10px 8px;
+    color: color-mix(in srgb, var(--arch-primary) 80%, var(--ion-text-color));
+    font-size: 14px;
+    text-align: center;
+    font-weight: 600;
+  }
+}
+
+/* Content list rows */
+.arch-content {
+  .name {
+    font-weight: 700;
+    color: var(--ion-text-color);
+  }
+
+  .preview {
+    color: color-mix(in srgb, var(--ion-text-color) 65%, transparent);
+    margin-top: 4px;
+  }
+
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
+    font-size: 13px;
+  }
+
+  .time {
+    font-size: 12px;
+    color: color-mix(in srgb, var(--ion-text-color) 50%, transparent);
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .avatar-fallback {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background:
+      color-mix(in srgb, var(--arch-primary) 25%, var(--ion-card-background));
+    color: color-mix(in srgb, var(--arch-primary) 80%, var(--ion-text-color));
+    font-weight: 700;
+    border: 1px solid color-mix(in srgb, var(--arch-primary) 35%, var(--ion-border-color));
+  }
+
+  .empty {
+    text-align: center;
+    color: color-mix(in srgb, var(--ion-text-color) 45%, transparent);
+    padding: 16px 0;
+  }
+}
+
+/* Selection tick (leading icon) */
 .select-tick {
   margin-right: 8px;
   display: flex; align-items: center;
-  ion-icon { font-size: 22px; }
+
+  ion-icon {
+    font-size: 22px;
+    color: var(--arch-primary);
+  }
+}
+
+/* Focus & a11y */
+:where(.banner-text, .avatar-fallback, .select-tick):focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: 10px;
+}
+
+/* Dark-mode nudges */
+@media (prefers-color-scheme: dark) {
+  .arch-banner {
+    border-bottom-color: color-mix(in srgb, var(--arch-primary) 30%, var(--ion-border-color));
+  }
+  .arch-content .avatar-fallback {
+    background: color-mix(in srgb, var(--arch-primary) 30%, var(--ion-item-background));
+  }
 }

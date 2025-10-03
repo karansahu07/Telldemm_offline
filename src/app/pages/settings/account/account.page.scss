@@ -1,20 +1,26 @@
 page-account {
+  /* List surface */
   ion-list {
-    background: #ffffff;
-    --ion-item-background: #ffffff;
-    --ion-item-color: #000000;
+    background: var(--ion-background-color);
+    --ion-item-background: var(--ion-item-background, var(--ion-background-color));
+    --ion-item-color: var(--ion-text-color);
   }
+
+  /* Destructive action item */
   .delete-account {
-    --color: #b71c1c; /* Red text for destructive action */
+    --color: var(--ion-color-danger, #b71c1c);
+    font-weight: 600;
   }
-  @media (prefers-color-scheme: dark) {
-    ion-list {
-      background: #1a1a1a;
-      --ion-item-background: #1a1a1a;
-      --ion-item-color: #ffffff;
-    }
-    .delete-account {
-      --color: #b71c1c; /* Red text in dark mode */
-    }
+
+  /* Optional: subtle hover/focus for delete */
+  .delete-account:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+    border-radius: 6px;
+  }
+
+  /* Compact adjust for very small screens */
+  @media (max-width: 380px) {
+    ion-list { font-size: 14px; }
   }
 }

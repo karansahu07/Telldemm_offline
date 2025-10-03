@@ -11,11 +11,13 @@
 </ion-header>
 
 <ion-content class="ion-padding" style="--background: #ffffff;">
+  <!-- Display & Motion Group -->
   <ion-list lines="inset">
     <ion-list-header>
       <ion-label>{{ 'accessibility.groups.displayMotion' | translate }}</ion-label>
     </ion-list-header>
 
+    <!-- Increase Contrast -->
     <ion-item>
       <ion-icon slot="start" name="contrast-outline" aria-hidden="true"></ion-icon>
       <ion-label>
@@ -30,7 +32,8 @@
       </ion-toggle>
     </ion-item>
 
-    <ion-item>
+    <!-- Reduce Motion -->
+    <!-- <ion-item>
       <ion-icon slot="start" name="play-back-outline" aria-hidden="true"></ion-icon>
       <ion-label>
         <h2>{{ 'accessibility.reduceMotion.title' | translate }}</h2>
@@ -42,8 +45,9 @@
         (ionChange)="onToggle('reduceMotion', $event)"
         [attr.aria-label]="'accessibility.reduceMotion.title' | translate">
       </ion-toggle>
-    </ion-item>
+    </ion-item> -->
 
+    <!-- Large Text -->
     <ion-item>
       <ion-icon slot="start" name="text-outline" aria-hidden="true"></ion-icon>
       <ion-label>
@@ -57,14 +61,31 @@
         [attr.aria-label]="'accessibility.largeText.title' | translate">
       </ion-toggle>
     </ion-item>
+
+    <!-- Grayscale -->
+    <ion-item>
+      <ion-icon slot="start" name="color-filter-outline" aria-hidden="true"></ion-icon>
+      <ion-label>
+        <h2>{{ 'accessibility.grayscale.title' | translate }}</h2>
+        <p>{{ 'accessibility.grayscale.desc' | translate }}</p>
+      </ion-label>
+      <ion-toggle
+        slot="end"
+        [(ngModel)]="grayscale"
+        (ionChange)="onToggle('grayscale', $event)"
+        [attr.aria-label]="'accessibility.grayscale.title' | translate">
+      </ion-toggle>
+    </ion-item>
   </ion-list>
 
+  <!-- Interaction Group -->
   <ion-list lines="inset">
     <ion-list-header>
       <ion-label>{{ 'accessibility.groups.interaction' | translate }}</ion-label>
     </ion-list-header>
 
-    <ion-item>
+    <!-- Simple Animations -->
+    <!-- <ion-item>
       <ion-icon slot="start" name="hand-left-outline" aria-hidden="true"></ion-icon>
       <ion-label>
         <h2>{{ 'accessibility.simpleAnimations.title' | translate }}</h2>
@@ -76,6 +97,6 @@
         (ionChange)="onToggle('simpleAnimations', $event)"
         [attr.aria-label]="'accessibility.simpleAnimations.title' | translate">
       </ion-toggle>
-    </ion-item>
+    </ion-item> -->
   </ion-list>
 </ion-content>

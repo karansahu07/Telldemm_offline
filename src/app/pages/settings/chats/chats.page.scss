@@ -1,44 +1,71 @@
+/* =========================
+   Chats list (tokenized)
+   ========================= */
+
+/* Page surface */
 .chats-content {
-  --background: #ffffff;
-  color: #111;
+  --background: var(--ion-background-color);
+  color: var(--ion-text-color);
+  background: var(--background);
 }
 
-/* header tweaks */
+/* Header / toolbar */
 .chats-toolbar {
-  --background: #fff;
-  --color: #000;
+  --background: var(--ion-toolbar-background, var(--ion-background-color));
+  --color: var(--ion-toolbar-color, var(--ion-text-color));
   box-shadow: none;
+  border-bottom: 1px solid var(--ion-border-color);
 }
 
-/* icons and spacing */
+/* Icons & labels */
 .item-icon {
-  color: #2c3e50;
+  color: color-mix(in srgb, var(--ion-text-color) 75%, transparent);
   font-size: 22px;
 }
 
 .label-title {
   font-weight: 600;
   font-size: 14px;
+  color: var(--ion-text-color);
 }
 
 .label-sub {
   display: block;
   font-size: 12px;
-  color: #6b6b6b;
+  color: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
   margin-top: 4px;
 }
 
-/* list headers */
+/* List headers */
 ion-list-header {
   font-weight: 700;
   font-size: 12px;
-  color: #444;
+  color: color-mix(in srgb, var(--ion-text-color) 70%, transparent);
   padding-top: 18px;
   padding-bottom: 8px;
+  text-transform: uppercase; /* optional */
+  letter-spacing: .02em;     /* optional */
 }
 
-/* tighten item padding for a compact look */
+/* Compact item padding */
 ion-item {
-  --inner-padding-end: 12px;
   --inner-padding-start: 12px;
+  --inner-padding-end: 12px;
+  --background: var(--ion-item-background);
+  --color: var(--ion-text-color);
+  --inner-border-width: 0;
+}
+
+/* Focus accessibility */
+:where(ion-item, .item-icon):focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: 10px;
+}
+
+/* Subtle divider helper (optional) */
+.chats-divider {
+  height: 1px;
+  background: var(--ion-border-color);
+  margin: 8px 12px;
 }

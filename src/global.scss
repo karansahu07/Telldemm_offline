@@ -102,6 +102,106 @@
 // }
 
 
+/* ====================================
+   ACCESSIBILITY GLOBAL STYLES
+   ==================================== */
+
+/* High Contrast Mode */
+// body.accessibility-high-contrast {
+//   --ion-background-color: #000 !important;
+//   --ion-text-color: #fff !important;
+//   --ion-color-primary: #ffcc00 !important;
+//   --ion-toolbar-background: #111 !important;
+//   --ion-card-background: #000 !important;
+//   --ion-item-background: #111 !important;
+//   --ion-border-color: #666 !important;
+// }
+
+// /* High Contrast Mode via body class */
+// body.accessibility-high-contrast {
+//   --ion-background-color: #ffffff;   /* pure black */
+//   --ion-text-color: #000000;         /* pure white */
+
+//   --ion-toolbar-background: #ffffff;
+//   --ion-toolbar-color: #000000;
+
+//   --ion-item-background: #000000;
+//   --ion-card-background: #000000;
+//   --ion-border-color: #ffffff;       /* strong separators */
+
+//   --ion-color-primary: #ff1414;      /* brand red */
+//   --ion-color-primary-contrast: #000000;
+//   --ion-color-primary-shade: #d81212;
+//   --ion-color-primary-tint: #ff4a4a;
+
+//   /* Chat bubbles */
+//   --chat-bubble-sent: #a80606;       /* solid red bubble */
+//   --chat-bubble-received: #ffffff;   /* solid white bubble */
+//   --chat-bubble-text: #000000;       /* max readable */
+
+//   --chat-input-bg: #000000;
+//   --chat-input-text: #ffffff;
+//   --chat-input-icon: #a80606;
+
+//   /* Strong focus outline */
+//   --focus-ring: 0 0 0 3px #a80606, 0 0 0 5px #ffffff;
+// }
+
+
+/* Reduce Motion */
+// body.accessibility-reduced-motion * {
+//   animation: none !important;
+//   transition: none !important;
+//   scroll-behavior: auto !important;
+// }
+
+/* Accessibility: Large Text Mode */
+body.accessibility-large-text {
+  font-size: 1.2rem !important;
+  line-height: 1.6 !important;
+}
+
+/* Headings inside ion-labels */
+body.accessibility-large-text ion-label h2 {
+  font-size: 1.4rem !important;
+  font-weight: 600 !important;
+}
+
+/* Paragraphs inside ion-labels */
+body.accessibility-large-text ion-label p {
+  font-size: 1.1rem !important;
+}
+
+/* Optional: Increase tab text size for large text mode */
+body.accessibility-large-text p.tabtext {
+  font-size: 16px !important;
+}
+
+/* Optional: Increase chat message font size for large text mode */
+body.accessibility-large-text .chat-message {
+  font-size: 19px !important;
+}
+
+/* Optional: Increase search input font size */
+body.accessibility-large-text #searchInput {
+  font-size: 18px !important;
+}
+
+
+/* Simple Animations */
+// body.accessibility-simple-animations * {
+//   animation-duration: 0.3s !important;
+//   transition-duration: 0.2s !important;
+// }
+
+/* Grayscale Mode */
+body.accessibility-grayscale {
+  filter: grayscale(100%) !important;
+}
+
+
+
+
 .custom-toast {
   --background: #323232;               /* Neutral dark background */
   --color: #ffffff;                    /* Bright white text */

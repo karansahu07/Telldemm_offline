@@ -1,3 +1,7 @@
+/* =========================
+   Image Cropper (tokenized)
+   ========================= */
+
 .crop-content {
   --padding-top: 0;
   --padding-bottom: 0;
@@ -5,6 +9,7 @@
   --padding-end: 0;
 }
 
+/* Shell */
 .crop-container {
   padding: 16px;
   height: 100%;
@@ -12,9 +17,10 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: var(--ion-color-light);
+  background: var(--ion-item-background);
 }
 
+/* Stage */
 .image-container {
   position: relative;
   display: flex;
@@ -22,12 +28,14 @@
   align-items: center;
   max-width: 100%;
   max-height: 70vh;
-  background: #000;
-  border-radius: 8px;
+  background: color-mix(in srgb, var(--ion-text-color) 96%, #0000); /* deep neutral that adapts */
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--ion-border-color);
+  box-shadow: 0 4px 16px rgba(0,0,0,.12);
 }
 
+/* Image */
 .crop-image {
   max-width: 100%;
   max-height: 70vh;
@@ -40,141 +48,119 @@
   object-fit: contain;
 }
 
+/* Selection overlay */
 .crop-overlay {
   position: absolute;
   border: 2px solid var(--ion-color-primary);
-  background: rgba(var(--ion-color-primary-rgb), 0.1);
+  background: rgba(var(--ion-color-primary-rgb), .10);
   cursor: move;
   min-width: 50px;
   min-height: 50px;
   opacity: 0;
-  transition: opacity 0.3s ease;
-  
-  &.visible {
-    opacity: 1;
-  }
-  
+  transition: opacity .25s ease, box-shadow .15s ease;
+
+  &.visible { opacity: 1; }
+
   &::before {
     content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border: 2px dashed rgba(255, 255, 255, 0.8);
+    position: absolute; inset: 0;
+    border: 2px dashed rgba(255,255,255,.85);
+    mix-blend-mode: overlay; /* keeps dashes visible on dark bg */
     pointer-events: none;
+  }
+
+  /* Keyboard accessibility */
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
   }
 }
 
+/* Handles */
 .resize-handle {
   position: absolute;
   background: var(--ion-color-primary);
-  border: 2px solid #fff;
+  border: 2px solid var(--ion-color-primary-contrast, #fff);
   cursor: pointer;
   user-select: none;
   touch-action: none;
-  
+
   &.corner {
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
+  }
+
+  /* Larger invisible hit area for touch */
+  &::after {
+    content: '';
+    position: absolute; inset: -8px;
   }
 }
 
-.resize-handle.top-left {
-  top: -6px;
-  left: -6px;
-  cursor: nw-resize;
-}
+.resize-handle.top-left    { top: -7px; left: -7px; cursor: nw-resize; }
+.resize-handle.top-right   { top: -7px; right: -7px; cursor: ne-resize; }
+.resize-handle.bottom-left { bottom: -7px; left: -7px; cursor: sw-resize; }
+.resize-handle.bottom-right{ bottom: -7px; right: -7px; cursor: se-resize; }
 
-.resize-handle.top-right {
-  top: -6px;
-  right: -6px;
-  cursor: ne-resize;
-}
-
-.resize-handle.bottom-left {
-  bottom: -6px;
-  left: -6px;
-  cursor: sw-resize;
-}
-
-.resize-handle.bottom-right {
-  bottom: -6px;
-  right: -6px;
-  cursor: se-resize;
-}
-
+/* Drag hint */
 .drag-indicator {
-  position: absolute;
-  top: 50%;
-  left: 50%;
+  position: absolute; top: 50%; left: 50%;
   transform: translate(-50%, -50%);
   pointer-events: none;
-  color: rgba(255, 255, 255, 0.8);
+  color: color-mix(in srgb, #fff 85%, transparent);
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity .25s ease;
 }
-
-.crop-overlay:hover .drag-indicator {
-  opacity: 1;
-}
+.crop-overlay:hover .drag-indicator { opacity: 1; }
 
 .drag-icon {
   font-size: 20px;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,.3));
 }
 
+/* Loading mask */
 .loading-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background: rgba(0, 0, 0, 0.5);
-  color: white;
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  background: rgba(0,0,0,.5);
+  color: #fff;
   z-index: 10;
-  
+
   p {
     margin-top: 12px;
     font-size: 14px;
-    opacity: 0.8;
+    opacity: .9;
   }
 }
 
+/* Instructions */
 .instructions {
   margin-top: 16px;
   padding: 12px 16px;
-  background: rgba(var(--ion-color-primary-rgb), 0.1);
-  border-radius: 8px;
+  background: rgba(var(--ion-color-primary-rgb), .10);
+  border-radius: 10px;
   text-align: center;
+  border: 1px solid color-mix(in srgb, var(--ion-color-primary) 28%, var(--ion-border-color));
 }
-
 .instruction-text {
   margin: 0;
   font-size: 14px;
   color: var(--ion-color-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
 }
+.info-icon { font-size: 16px; }
 
-.info-icon {
-  font-size: 16px;
-}
-
+/* Footer bar */
 .footer-toolbar {
   --background: var(--ion-background-color);
   --border-style: solid;
   --border-width: 1px 0 0 0;
-  --border-color: var(--ion-color-light-shade);
+  --border-color: var(--ion-border-color);
+  padding-bottom: env(safe-area-inset-bottom, 0);
 }
 
+/* Footer buttons */
 .footer-buttons {
   display: flex;
   justify-content: space-between;
@@ -188,98 +174,56 @@
   --padding-start: 16px;
   --padding-end: 16px;
   height: 40px;
-  font-weight: 500;
+  font-weight: 600;
   min-width: 100px;
+  border-radius: 10px;
 }
 
 .cancel-btn {
-  --color: var(--ion-color-medium);
+  --background: transparent;
   --border-color: var(--ion-color-medium);
+  --color: var(--ion-color-medium);
+  border: 1px solid var(--ion-color-medium);
 }
-
 .ok-btn {
   --background: var(--ion-color-primary);
-  --color: white;
+  --background-hover: var(--ion-color-primary-shade);
+  --color: var(--ion-color-primary-contrast);
 }
 
-// Responsive design
+/* Responsive */
 @media (max-width: 768px) {
-  .crop-container {
-    padding: 12px;
-  }
-  
-  .image-container {
-    max-height: 60vh;
-  }
-  
-  .crop-image {
-    max-height: 60vh;
-  }
-  
-  .resize-handle.corner {
-    width: 16px;
-    height: 16px;
-  }
-  
-  .resize-handle.top-left {
-    top: -8px;
-    left: -8px;
-  }
-  
-  .resize-handle.top-right {
-    top: -8px;
-    right: -8px;
-  }
-  
-  .resize-handle.bottom-left {
-    bottom: -8px;
-    left: -8px;
-  }
-  
-  .resize-handle.bottom-right {
-    bottom: -8px;
-    right: -8px;
-  }
-  
-  .footer-buttons {
-    padding: 8px 12px;
-    gap: 8px;
-  }
-  
-  .cancel-btn,
-  .ok-btn {
-    min-width: 80px;
-    font-size: 14px;
-  }
+  .crop-container { padding: 12px; }
+  .image-container { max-height: 60vh; }
+  .crop-image { max-height: 60vh; }
+
+  .resize-handle.corner { width: 16px; height: 16px; }
+  .resize-handle.top-left     { top: -9px; left: -9px; }
+  .resize-handle.top-right    { top: -9px; right: -9px; }
+  .resize-handle.bottom-left  { bottom: -9px; left: -9px; }
+  .resize-handle.bottom-right { bottom: -9px; right: -9px; }
+
+  .footer-buttons { padding: 8px 12px; gap: 8px; }
+  .cancel-btn, .ok-btn { min-width: 84px; font-size: 14px; }
 }
 
-// Dark mode support
+/* High contrast preference */
+@media (prefers-contrast: more) {
+  .crop-overlay::before { border-color: #fff; }
+  .resize-handle { border-width: 3px; }
+}
+
+/* Dark mode */
 @media (prefers-color-scheme: dark) {
-  .crop-container {
-    background: var(--ion-color-dark);
-  }
-  
-  .instructions {
-    background: rgba(var(--ion-color-primary-rgb), 0.2);
-  }
-  
-  .loading-overlay {
-    background: rgba(0, 0, 0, 0.7);
-  }
+  .crop-container { background: var(--ion-color-dark, #121212); }
+  .image-container { box-shadow: 0 8px 24px rgba(0,0,0,.35); }
+  .instructions { background: rgba(var(--ion-color-primary-rgb), .18); }
+  .loading-overlay { background: rgba(0,0,0,.7); }
 }
 
-// Animation for crop overlay appearance
+/* Appear animation */
 @keyframes cropOverlayAppear {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  from { opacity: 0; transform: scale(.94); }
+  to   { opacity: 1; transform: scale(1); }
 }
-
-.crop-overlay.visible {
-  animation: cropOverlayAppear 0.3s ease;
-}
+.crop-overlay.visible { animation: cropOverlayAppear .25s ease; }

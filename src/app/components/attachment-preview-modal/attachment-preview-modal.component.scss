@@ -1,34 +1,65 @@
-// changes by homah start 
+/* =========================
+   Homah changes (refactored)
+   ========================= */
 
-.view-content{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    height: 100%;
+/* View container */
+.view-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
 }
 
-.smile{
-    box-shadow: 0px 0px 12px 0px rgba(0, 0, 0, 0.2);
-    border-radius: 40px;
+/* Smile button / chip */
+.smile {
+  border-radius: 40px;
+  background: var(--ion-item-background);
+  border: 1px solid var(--ion-border-color);
+  box-shadow: 0 0 12px 0 color-mix(in srgb, var(--ion-text-color) 18%, transparent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
 }
 
-.smile-icon{
-    height: 35px;
-    width: 28px;
+.smile-icon {
+  width: 28px;
+  height: 35px;
+  display: block;
 }
 
-.reply{
-    box-shadow: 0px 0px 12px 0px #cdcd;
-    border-radius: 15px;
+/* Reply bubble */
+.reply {
+  border-radius: 15px;
+  background: var(--ion-card-background);
+  border: 1px solid var(--ion-border-color);
+  box-shadow: 0 0 12px 0 color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+  padding: 6px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.reply-icon{
-        width: 26px;
-    height: 28px;
+.reply-icon {
+  width: 26px;
+  height: 28px;
+  display: block;
 }
 
-.user-head{
-    margin-left: 15px;
+/* User avatar/headline spacing */
+.user-head {
+  margin-left: 15px;
+  font-weight: 600;
+  color: var(--ion-text-color);
 }
 
-// changes by homah end 
+/* Accessibility focus ring */
+:where(.smile, .reply):focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* Small-screen tweaks */
+@media (max-width: 400px) {
+  .smile-icon, .reply-icon { width: 22px; height: 24px; }
+}
