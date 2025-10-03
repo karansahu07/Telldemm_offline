@@ -79,14 +79,14 @@
 
     <!-- 🔁 Default Chat Header -->
     <ng-template #defaultHeader>
-      <ion-buttons *ngIf="!showSearchBar" slot="start" style="color: black; width: 8%; margin-top: 15px;">
+      <ion-buttons *ngIf="!showSearchBar" slot="start" style="color: black; width: 8%; margin-top: 2px;">
         <ion-back-button defaultHref="/home-screen"></ion-back-button>
         <!-- <ion-icon name="arrow-back-outline" class="back-icon"></ion-icon> -->
       </ion-buttons>
 
       <ng-container *ngIf="!showSearchBar; else searchBar">
         <ion-buttons>
-          <ion-item lines="none" style="--padding-start: 0; --background: white; color: black; margin-top: 15px;"
+          <ion-item lines="none" style="--padding-start: 0; --background: white; color: black; margin-top: 2px;"
             detail="false">
             <!-- <ion-avatar slot="start">
               <img src="assets/images/user.jfif" alt="User Avatar"
@@ -163,7 +163,7 @@
         </ion-item>
       </ng-template>
 
-      <ion-buttons *ngIf="!showSearchBar" slot="end" style="margin-top: 15px;">
+      <ion-buttons *ngIf="!showSearchBar" slot="end" style="margin-top: 2px;">
         <ion-button style="color: black;">
           <ion-icon name="videocam-outline" style="font-size: 35px;"></ion-icon>
         </ion-button>
