@@ -184,6 +184,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
 
   // store unsubscribes for firebase onValue
   private onValueUnsubs: Array<() => void> = [];
+  private emojiTargetMsg: Message | null = null;
 
   constructor(
     private chatService: FirebaseChatService,

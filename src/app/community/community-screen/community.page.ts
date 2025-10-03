@@ -201,9 +201,15 @@ export class CommunityPage implements OnInit {
   await alert.present();
 }
 
-  goToGroupChat(groupId: string) {
-    this.router.navigate(['/chatting-screen', groupId]);
-  }
+goToGroupChat(groupId: string) {
+  this.router.navigate(['/chatting-screen'], {
+    queryParams: {
+      receiverId: groupId,
+      isGroup: true
+    }
+  });
+}
+
 
   goToAddGroupCommunity(community: any) {
   this.router.navigate(['/community-detail'], {
