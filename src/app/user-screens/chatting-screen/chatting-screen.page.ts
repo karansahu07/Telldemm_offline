@@ -1446,6 +1446,103 @@ async deleteSelectedMessages() {
     console.log('Share clicked for attachment:', this.lastPressedMessage);
   }
 
+  addReaction(msg: Message, emoji: string) {
+  const userId = this.senderId;
+  // toggle: same emoji -> remove, else set/update
+  const current = msg.reactions?.[userId] || null;
+  const newVal = current === emoji ? null : emoji;
+
+  // 1) optimistic UI
+  msg.reactions = { ...(msg.reactions || {}) };
+  if (newVal) msg.reactions[userId] = newVal;
+  else delete msg.reactions[userId];
+
+  // 2) persist (Firebase)
+  try {
+    const db = getDatabase();
+    const path = `chats/${this.roomId}/${msg.key}/reactions/${userId}`;
+    if (newVal) {
+      update(ref(db, path), newVal as any)    // if your node expects value directly, use set(ref(...), newVal)
+        .catch(() => {/* noop */});
+      // better:
+      // await set(ref(db, path), newVal);
+    } else {
+      remove(ref(db, path)).catch(() => {/* noop */});
+    }
+  } catch (e) {
+    console.warn('reaction update failed', e);
+  }
+}
+
+openEmojiKeyboard(msg: Message) {
+  this.emojiTargetMsg = msg;
+  // focus hidden input to pop OS emoji keyboard
+  const el = (document.querySelector('#chatting-screen') || document)  // adjust root if needed
+    .querySelector('ion-input[ng-reflect-name="emojiKeyboard"]') as any;
+
+  // better: use @ViewChild('emojiKeyboard') emojiInput!: IonInput;
+  // then: this.emojiInput.setFocus();
+  const inputEl = document.querySelector('ion-input + input') as HTMLInputElement; // Ionic renders native <input> after shadow
+  if (this.datePicker) {/* just to keep reference lint happy */}
+}
+
+onEmojiPicked(ev: CustomEvent) {
+  const val = (ev.detail as any)?.value || '';
+  const emoji = val?.trim();
+  if (!emoji || !this.emojiTargetMsg) return;
+  this.addReaction(this.emojiTargetMsg, emoji);
+
+  // clear input so next pick fires change again
+  const native = (ev.target as any)?.querySelector?.('input') as HTMLInputElement;
+  if (native) native.value = '';
+  this.emojiTargetMsg = null;
+}
+
+/** Build reaction summary for chips below a message */
+// getReactionSummary(msg: Message): Array<{ emoji: string; count: number; mine: boolean }> {
+//   const map = msg.reactions || {};
+//   const byEmoji: Record<string, number> = {};
+//   Object.values(map).forEach((e: any) => {
+//     const em = String(e || '');
+//     if (!em) return;
+//     byEmoji[em] = (byEmoji[em] || 0) + 1;
+//   });
+//   return Object.keys(byEmoji).map(emoji => ({
+//     emoji,
+//     count: byEmoji[emoji],
+//     mine: map[this.senderId] === emoji
+//   })).sort((a,b) => b.count - a.count);
+// }
+
+/** Summary already exists; re-use it to build compact badges */
+getReactionSummary(msg: Message): Array<{ emoji: string; count: number; mine: boolean }> {
+  const map = msg.reactions || {};
+  const byEmoji: Record<string, number> = {};
+  Object.values(map).forEach((e: any) => {
+    const em = String(e || '');
+    if (!em) return;
+    byEmoji[em] = (byEmoji[em] || 0) + 1;
+  });
+  return Object.keys(byEmoji).map(emoji => ({
+    emoji,
+    count: byEmoji[emoji],
+    mine: map[this.senderId] === emoji
+  })).sort((a,b) => b.count - a.count);
+}
+
+/** Return max 3 badges; prefer user's reaction first */
+getReactionBadges(msg: Message): Array<{ emoji: string; count: number; mine: boolean }> {
+  const list = this.getReactionSummary(msg);
+  // Put "mine" first if exists
+  const mineIdx = list.findIndex(x => x.mine);
+  if (mineIdx > 0) {
+    const mine = list.splice(mineIdx, 1)[0];
+    list.unshift(mine);
+  }
+  return list.slice(0, 3);
+}
+
+
   pinMessage() {
     const pin: PinnedMessage = {
       messageId: this.lastPressedMessage?.message_id as string,

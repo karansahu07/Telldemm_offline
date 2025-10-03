@@ -246,103 +246,143 @@
         <div class="text-bg-white date-label">{{ group.date }}</div>
       </div>
 
-      <div *ngFor="let msg of group.messages" [ngClass]="{
+      <div *ngFor="let msg of group.messages"
+     class="msg-row"
+     [ngClass]="{
        'align-end': msg.sender_id === senderId,
        'align-start': msg.sender_id !== senderId,
        'selected': isSelected(msg),
        'pinned-message-highlight': pinnedMessage && pinnedMessage.messageId === msg.message_id
-     }" style="display: flex; flex-direction: column; margin: 5px 0;" (touchstart)="startLongPress(msg)"
-        (touchend)="cancelLongPress()" (touchmove)="cancelLongPress()" (click)="onMessageClick(msg)">
+     }"
+     style="display: flex; flex-direction: column; margin: 5px 0;"
+     (touchstart)="startLongPress(msg)"
+     (touchend)="cancelLongPress()"
+     (touchmove)="cancelLongPress()"
+     (click)="onMessageClick(msg)">
 
-        <div class="message-bubble" (click)="openAttachmentModal(msg)" [attr.data-msg-key]="msg.key" [ngClass]="[
+  <!-- ===== MESSAGE BUBBLE ===== -->
+  <div class="message-bubble"
+       (click)="openAttachmentModal(msg)"
+       [attr.data-msg-key]="msg.key"
+       [ngClass]="[
          msg.sender_id === senderId ? 'sender-message' : 'receiver-message',
          msg.fadeOut ? 'fade-out' : 'fade-in'
        ]">
 
-          <!-- Forwarded Label -->
-          <div *ngIf="msg.isForwarded" class="forwarded-label">
-            <ion-icon name="arrow-undo-outline" class="forwarded-icon"></ion-icon>
-            Forwarded
-          </div>
+    <!-- Forwarded Label -->
+    <div *ngIf="msg.isForwarded" class="forwarded-label">
+      <ion-icon name="arrow-undo-outline" class="forwarded-icon"></ion-icon>
+      Forwarded
+    </div>
 
-          <!-- Group Sender Name -->
-          <span *ngIf="chatType === 'group' && msg.sender_id !== senderId"
-            style="font-size: 12px; color: #6c6c6c; margin-left: 5px;">
-            {{ msg.sender_name }}
-          </span>
+    <!-- Group Sender Name -->
+    <span *ngIf="chatType === 'group' && msg.sender_id !== senderId"
+          style="font-size: 12px; color: #6c6c6c; margin-left: 5px;">
+      {{ msg.sender_name }}
+    </span>
 
-          <!-- Replied Message -->
-          <div class="replied-message" *ngIf="msg.replyToMessageId"
-            (click)="scrollToRepliedMessage(msg.replyToMessageId)">
-            <ng-container *ngIf="msg.replyToMessageId && getRepliedMessage(msg.replyToMessageId) as repliedMsg">
-              <div class="replied-header">
-                <ion-icon name="arrow-undo-outline" class="reply-icon"></ion-icon>
-                <span class="replied-sender">{{ repliedMsg.sender_name }}</span>
-              </div>
-              <div class="replied-content">
-                <div class="replied-text" *ngIf="repliedMsg.text">
-                  {{ getReplyPreviewText(repliedMsg) }}
-                </div>
-                <div class="replied-attachment" *ngIf="repliedMsg.attachment">
-                  <ion-icon name="attach-outline"></ion-icon>
-                  {{ getReplyPreviewText(repliedMsg) }}
-                </div>
-              </div>
-            </ng-container>
-          </div>
-
-          <!-- Deleted Message -->
-          <ng-container *ngIf="msg.isDeleted">
-            <ion-text class="message-text" color="medium"><i>This message was deleted</i></ion-text>
-          </ng-container>
-
-          <!-- Normal Message -->
-          <ng-container *ngIf="!msg.isDeleted">
-            <ion-text class="message-text" *ngIf="!msg.attachment && msg.text">{{ msg.text }}</ion-text>
-
-            <!-- Attachments -->
-            <ng-container *ngIf="msg.attachment">
-              <img *ngIf="msg.attachment.type === 'image'" [src]="msg.attachment.previewUrl" alt="Image"
-                style="max-width: 200px; border-radius: 10px; margin: 5px 0;" />
-              <video *ngIf="msg.attachment.type === 'video'" controls
-                style="max-width: 200px; border-radius: 10px; margin: 5px 0;">
-                <source [src]="msg.attachment.previewUrl" [type]="msg.attachment.mimeType || 'video/mp4'" />
-              </video>
-              <audio *ngIf="msg.attachment.type === 'audio'" controls style="margin: 5px 0;">
-                <source [src]="msg.attachment.previewUrl" [type]="msg.attachment.mimeType || 'audio/mpeg'" />
-              </audio>
-              <div *ngIf="msg.attachment.type === 'file'" style="margin: 5px 0;">
-                <ion-icon name="document-outline" style="margin-right: 5px;"></ion-icon>
-                <a [href]="msg.attachment.previewUrl" [download]="msg.attachment.fileName || 'file'" target="_blank"
-                  rel="noopener">
-                  {{ msg.attachment.fileName || 'Download File' }}
-                </a>
-              </div>
-              <ion-text class="message-text" *ngIf="msg.text" style="margin-top: 5px;">
-                {{ msg.text }}
-              </ion-text>
-              <ion-text class="message-text" *ngIf="msg.attachment.caption">
-                {{ msg.attachment.caption }}
-              </ion-text>
-            </ng-container>
-          </ng-container>
-
-          <!-- Timestamp -->
-          <p class="time-stamp status-container">
-            <ion-icon *ngIf="pinnedMessage && pinnedMessage.messageId === msg.message_id" name="pin"
-              class="pin-indicator-timestamp"></ion-icon>
-            {{ msg.time }}
-            <span *ngIf="msg.isEdit" style="font-size: 11px; color: gray; margin-left: 4px;">(edited)</span>
-            <ng-container *ngIf="msg.sender_id === senderId">
-              <ion-icon *ngIf="!msg.delivered" name="checkmark-outline" class="status-icon sent"></ion-icon>
-              <ion-icon *ngIf="msg.delivered && !msg.read" name="checkmark-done-outline"
-                class="status-icon delivered"></ion-icon>
-              <ion-icon *ngIf="msg.delivered && msg.read" name="checkmark-done-outline"
-                class="status-icon read"></ion-icon>
-            </ng-container>
-          </p>
+    <!-- Replied Message -->
+    <div class="replied-message" *ngIf="msg.replyToMessageId"
+         (click)="scrollToRepliedMessage(msg.replyToMessageId)">
+      <ng-container *ngIf="msg.replyToMessageId && getRepliedMessage(msg.replyToMessageId) as repliedMsg">
+        <div class="replied-header">
+          <ion-icon name="arrow-undo-outline" class="reply-icon"></ion-icon>
+          <span class="replied-sender">{{ repliedMsg.sender_name }}</span>
         </div>
-      </div>
+        <div class="replied-content">
+          <div class="replied-text" *ngIf="repliedMsg.text">
+            {{ getReplyPreviewText(repliedMsg) }}
+          </div>
+          <div class="replied-attachment" *ngIf="repliedMsg.attachment">
+            <ion-icon name="attach-outline"></ion-icon>
+            {{ getReplyPreviewText(repliedMsg) }}
+          </div>
+        </div>
+      </ng-container>
+    </div>
+
+    <!-- Deleted Message -->
+    <ng-container *ngIf="msg.isDeleted">
+      <ion-text class="message-text" color="medium"><i>This message was deleted</i></ion-text>
+    </ng-container>
+
+    <!-- Normal Message -->
+    <ng-container *ngIf="!msg.isDeleted">
+      <ion-text class="message-text" *ngIf="!msg.attachment && msg.text">{{ msg.text }}</ion-text>
+
+      <!-- Attachments -->
+      <ng-container *ngIf="msg.attachment">
+        <img *ngIf="msg.attachment.type === 'image'" [src]="msg.attachment.previewUrl" alt="Image"
+             style="max-width: 200px; border-radius: 10px; margin: 5px 0;" />
+        <video *ngIf="msg.attachment.type === 'video'" controls
+               style="max-width: 200px; border-radius: 10px; margin: 5px 0;">
+          <source [src]="msg.attachment.previewUrl" [type]="msg.attachment.mimeType || 'video/mp4'" />
+        </video>
+        <audio *ngIf="msg.attachment.type === 'audio'" controls style="margin: 5px 0;">
+          <source [src]="msg.attachment.previewUrl" [type]="msg.attachment.mimeType || 'audio/mpeg'" />
+        </audio>
+        <div *ngIf="msg.attachment.type === 'file'" style="margin: 5px 0;">
+          <ion-icon name="document-outline" style="margin-right: 5px;"></ion-icon>
+          <a [href]="msg.attachment.previewUrl" [download]="msg.attachment.fileName || 'file'" target="_blank"
+             rel="noopener">
+            {{ msg.attachment.fileName || 'Download File' }}
+          </a>
+        </div>
+        <ion-text class="message-text" *ngIf="msg.text" style="margin-top: 5px;">
+          {{ msg.text }}
+        </ion-text>
+        <ion-text class="message-text" *ngIf="msg.attachment.caption">
+          {{ msg.attachment.caption }}
+        </ion-text>
+      </ng-container>
+    </ng-container>
+
+    <!-- Timestamp -->
+    <p class="time-stamp status-container">
+      <ion-icon *ngIf="pinnedMessage && pinnedMessage.messageId === msg.message_id" name="pin"
+                class="pin-indicator-timestamp"></ion-icon>
+      {{ msg.time }}
+      <span *ngIf="msg.isEdit" style="font-size: 11px; color: gray; margin-left: 4px;">(edited)</span>
+      <ng-container *ngIf="msg.sender_id === senderId">
+        <ion-icon *ngIf="!msg.delivered" name="checkmark-outline" class="status-icon sent"></ion-icon>
+        <ion-icon *ngIf="msg.delivered && !msg.read" name="checkmark-done-outline"
+                  class="status-icon delivered"></ion-icon>
+        <ion-icon *ngIf="msg.delivered && msg.read" name="checkmark-done-outline"
+                  class="status-icon read"></ion-icon>
+      </ng-container>
+    </p>
+  </div>
+
+  <!-- 🟢 FLOATING REACTION BAR -->
+  <div class="reaction-bar"
+       *ngIf="isSelected(msg)"
+       [class.right]="msg.sender_id === senderId"
+       [class.left]="msg.sender_id !== senderId">
+    <button class="react-btn" (click)="addReaction(msg, '👍')">👍</button>
+    <button class="react-btn" (click)="addReaction(msg, '❤️')">❤️</button>
+    <button class="react-btn" (click)="addReaction(msg, '😂')">😂</button>
+    <button class="react-btn" (click)="addReaction(msg, '😮')">😮</button>
+    <button class="react-btn" (click)="addReaction(msg, '😢')">😢</button>
+    <button class="react-btn" (click)="addReaction(msg, '🙏')">🙏</button>
+    <button class="react-btn more" (click)="openEmojiKeyboard(msg)">＋</button>
+  </div>
+
+  <!-- 🟡 COMPACT REACTION BADGE (WhatsApp style) -->
+  <div class="reaction-badges"
+       *ngIf="getReactionBadges(msg).length"
+       [class.right]="msg.sender_id === senderId"
+       [class.left]="msg.sender_id !== senderId">
+    <div class="badge"
+         *ngFor="let b of getReactionBadges(msg)"
+         [class.mine]="b.mine"
+         (click)="addReaction(msg, b.emoji)">
+      <span class="emoji">{{ b.emoji }}</span>
+      <!-- count optional: show only if you want -->
+      <!-- <span class="cnt" *ngIf="b.count > 1">{{ b.count }}</span> -->
+    </div>
+  </div>
+
+</div>
 
 
     </div>
