@@ -86,28 +86,33 @@
       "log": "Hesap silme penceresi açıldı"
     }
   },"accessibility": {
-    "title": "Erişilebilirlik",
-    "groups": {
-      "displayMotion": "Görüntü ve hareket",
-      "interaction": "Etkileşim"
-    },
-    "increaseContrast": {
-      "title": "Kontrastı artır",
-      "desc": "Açık modda okunabilirliği artırmak için ana renkleri koyulaştırın."
-    },
-    "reduceMotion": {
-      "title": "Hareketi azalt",
-      "desc": "Animasyonlu çıkartmaları, GIF’leri ve geçişleri en aza indirin."
-    },
-    "largeText": {
-      "title": "Büyük metin",
-      "desc": "Okumayı kolaylaştırmak için sistem yazı tipi boyutunu artırın."
-    },
-    "simpleAnimations": {
-      "title": "Basitleştirilmiş animasyonlar",
-      "desc": "Etkileşimi kolaylaştırmak için karmaşık animasyonları azaltın."
-    }
-  },"privacyPage": {
+  "title": "Erişilebilirlik",
+  "groups": {
+    "displayMotion": "Ekran ve hareket",
+    "interaction": "Etkileşim"
+  },
+  "increaseContrast": {
+    "title": "Karşıtlığı artır",
+    "desc": "Açık modda okunabilirliği artırmak için ana renkleri koyulaştırın."
+  },
+  "reduceMotion": {
+    "title": "Hareketi azalt",
+    "desc": "Animasyonlu çıkartmaları, GIF’leri ve geçişleri en aza indirin."
+  },
+  "largeText": {
+    "title": "Büyük metin",
+    "desc": "Okumayı kolaylaştırmak için sistem yazı tipi boyutunu artırın."
+  },
+  "simpleAnimations": {
+    "title": "Basitleştirilmiş animasyonlar",
+    "desc": "Daha kolay etkileşim için karmaşık animasyonları azaltın."
+  },
+  "grayscale": {
+    "title": "Gri tonlama modu",
+    "desc": "Göz yorgunluğunu azaltmak için tüm arayüz renklerini gri tonlarına dönüştürün."
+  }
+}
+,"privacyPage": {
     "title": "Gizlilik",
     "groups": {
       "whoCanSee": "Bilgilerimi kim görebilir",

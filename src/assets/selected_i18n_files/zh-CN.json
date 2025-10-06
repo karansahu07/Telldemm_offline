@@ -111,28 +111,33 @@
       "log": "删除账户弹窗已打开"
     }
   },"accessibility": {
-    "title": "辅助功能",
-    "groups": {
-      "displayMotion": "显示与动画",
-      "interaction": "交互"
-    },
-    "increaseContrast": {
-      "title": "增加对比度",
-      "desc": "加深关键颜色以提高在浅色模式下的可读性。"
-    },
-    "reduceMotion": {
-      "title": "减少动画",
-      "desc": "减少动态贴纸、GIF 和过渡效果。"
-    },
-    "largeText": {
-      "title": "大号文字",
-      "desc": "增加系统字体大小以便于阅读。"
-    },
-    "simpleAnimations": {
-      "title": "简化动画",
-      "desc": "减少复杂动画以便更容易交互。"
-    }
-  },"privacyPage": {
+  "title": "辅助功能",
+  "groups": {
+    "displayMotion": "显示与动画",
+    "interaction": "交互"
+  },
+  "increaseContrast": {
+    "title": "提高对比度",
+    "desc": "在浅色模式下加深主要颜色以改善可读性。"
+  },
+  "reduceMotion": {
+    "title": "减少动画",
+    "desc": "尽量减少动态贴纸、GIF 和过渡效果。"
+  },
+  "largeText": {
+    "title": "大字体",
+    "desc": "增大系统字体以便更轻松阅读。"
+  },
+  "simpleAnimations": {
+    "title": "简化动画",
+    "desc": "减少复杂动画以便更容易操作。"
+  },
+  "grayscale": {
+    "title": "灰度模式",
+    "desc": "将界面颜色转换为灰色调以减轻视觉疲劳。"
+  }
+}
+,"privacyPage": {
     "title": "隐私",
     "groups": {
       "whoCanSee": "谁可以查看我的信息",

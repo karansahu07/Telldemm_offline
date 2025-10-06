@@ -112,28 +112,33 @@
       "log": "刪除帳號視窗已開啟"
     }
   },"accessibility": {
-    "title": "無障礙",
-    "groups": {
-      "displayMotion": "顯示與動作",
-      "interaction": "互動"
-    },
-    "increaseContrast": {
-      "title": "增加對比",
-      "desc": "在淺色模式下加深主要顏色以提高可讀性。"
-    },
-    "reduceMotion": {
-      "title": "減少動作",
-      "desc": "減少動態貼圖、GIF 和轉場效果。"
-    },
-    "largeText": {
-      "title": "大字體",
-      "desc": "放大系統字體以便於閱讀。"
-    },
-    "simpleAnimations": {
-      "title": "簡化動畫",
-      "desc": "減少複雜動畫以便更容易操作。"
-    }
-  },"privacyPage": {
+  "title": "輔助功能",
+  "groups": {
+    "displayMotion": "顯示與動作",
+    "interaction": "互動"
+  },
+  "increaseContrast": {
+    "title": "提高對比",
+    "desc": "在亮色模式下加深主要顏色以改善可讀性。"
+  },
+  "reduceMotion": {
+    "title": "減少動作",
+    "desc": "盡量減少動態貼圖、GIF 與轉場效果。"
+  },
+  "largeText": {
+    "title": "大字體",
+    "desc": "放大系統字體大小以便更容易閱讀。"
+  },
+  "simpleAnimations": {
+    "title": "簡化動畫",
+    "desc": "減少複雜動畫以提升互動體驗。"
+  },
+  "grayscale": {
+    "title": "灰階模式",
+    "desc": "將所有介面顏色轉換為灰階以減輕視覺疲勞。"
+  }
+}
+,"privacyPage": {
     "title": "隱私",
     "groups": {
       "whoCanSee": "誰可以查看我的資訊",

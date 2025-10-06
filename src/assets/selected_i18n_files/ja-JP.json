@@ -110,28 +110,33 @@
       "log": "アカウント削除モーダルが開きました"
     }
   },"accessibility": {
-    "title": "アクセシビリティ",
-    "groups": {
-      "displayMotion": "表示と動作",
-      "interaction": "操作"
-    },
-    "increaseContrast": {
-      "title": "コントラストを高くする",
-      "desc": "ライトモードでの読みやすさを向上させるために主要な色を濃くします。"
-    },
-    "reduceMotion": {
-      "title": "動きを減らす",
-      "desc": "アニメーションスタンプ、GIF、トランジションを最小限に抑えます。"
-    },
-    "largeText": {
-      "title": "大きな文字",
-      "desc": "読みやすくするためにシステムフォントサイズを大きくします。"
-    },
-    "simpleAnimations": {
-      "title": "簡易アニメーション",
-      "desc": "複雑なアニメーションを減らして操作を簡単にします。"
-    }
-  }, "privacyPage": {
+  "title": "アクセシビリティ",
+  "groups": {
+    "displayMotion": "表示と動き",
+    "interaction": "操作"
+  },
+  "increaseContrast": {
+    "title": "コントラストを強調",
+    "desc": "ライトモードでの読みやすさを向上させるために、主要な色を濃くします。"
+  },
+  "reduceMotion": {
+    "title": "動きを減らす",
+    "desc": "アニメーションステッカー、GIF、トランジションを最小限にします。"
+  },
+  "largeText": {
+    "title": "大きな文字",
+    "desc": "読みやすくするためにシステムフォントサイズを大きくします。"
+  },
+  "simpleAnimations": {
+    "title": "簡易アニメーション",
+    "desc": "操作しやすくするために複雑なアニメーションを減らします。"
+  },
+  "grayscale": {
+    "title": "グレースケールモード",
+    "desc": "目の疲れを軽減するため、すべてのインターフェイスの色をグレーに変換します。"
+  }
+}
+, "privacyPage": {
     "title": "プライバシー",
     "groups": {
       "whoCanSee": "誰が自分の情報を見られるか",

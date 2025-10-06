@@ -110,28 +110,33 @@
       "log": "Se abrió la ventana de eliminación de cuenta"
     }
   },"accessibility": {
-    "title": "Accesibilidad",
-    "groups": {
-      "displayMotion": "Pantalla y movimiento",
-      "interaction": "Interacción"
-    },
-    "increaseContrast": {
-      "title": "Aumentar contraste",
-      "desc": "Oscurecer los colores principales para mejorar la legibilidad en modo claro."
-    },
-    "reduceMotion": {
-      "title": "Reducir movimiento",
-      "desc": "Minimizar stickers animados, GIFs y transiciones."
-    },
-    "largeText": {
-      "title": "Texto grande",
-      "desc": "Aumentar el tamaño de la fuente del sistema para facilitar la lectura."
-    },
-    "simpleAnimations": {
-      "title": "Animaciones simplificadas",
-      "desc": "Reducir animaciones complejas para facilitar la interacción."
-    }
-  },"privacyPage": {
+  "title": "Accesibilidad",
+  "groups": {
+    "displayMotion": "Pantalla y movimiento",
+    "interaction": "Interacción"
+  },
+  "increaseContrast": {
+    "title": "Aumentar contraste",
+    "desc": "Oscurecer colores clave para mejorar la legibilidad en modo claro."
+  },
+  "reduceMotion": {
+    "title": "Reducir movimiento",
+    "desc": "Minimizar stickers animados, GIFs y transiciones."
+  },
+  "largeText": {
+    "title": "Texto grande",
+    "desc": "Aumentar la escala del tipo de letra del sistema para una lectura más fácil."
+  },
+  "simpleAnimations": {
+    "title": "Animaciones simplificadas",
+    "desc": "Reducir animaciones complejas para una interacción más sencilla."
+  },
+  "grayscale": {
+    "title": "Modo escala de grises",
+    "desc": "Convertir todos los colores de la interfaz a tonos de gris para reducir la fatiga visual."
+  }
+}
+,"privacyPage": {
     "title": "Privacidad",
     "groups": {
       "whoCanSee": "Quién puede ver mi información",

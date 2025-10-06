@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
-import { AlertController, IonicModule, NavController } from '@ionic/angular';
+import { AlertController, IonicModule, NavController, Platform } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { TranslateModule, TranslateService, LangChangeEvent } from '@ngx-translate/core';
@@ -16,7 +16,7 @@ import { Resetapp } from '../services/resetapp';
   templateUrl: './setting-screen.page.html',
   styleUrls: ['./setting-screen.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, TranslateModule] // add TranslateModule
+  imports: [IonicModule, CommonModule, TranslateModule]
 })
 export class SettingScreenPage implements OnInit, OnDestroy {
   profileImageUrl: string = 'assets/images/user.jfif';
@@ -25,6 +25,7 @@ export class SettingScreenPage implements OnInit, OnDestroy {
   dpStatus = '';
 
   private langSub?: Subscription;
+  private backButtonSub?: Subscription;
 
   constructor(
     private service: ApiService,
@@ -34,9 +35,10 @@ export class SettingScreenPage implements OnInit, OnDestroy {
     private alertController: AlertController,
     private navCtrl: NavController,
     private resetapp: Resetapp,
-    private translate: TranslateService,   // << like HelpFeedbackPage
-    private cd: ChangeDetectorRef,         // << like HelpFeedbackPage
-    private zone: NgZone                   // << like HelpFeedbackPage
+    private translate: TranslateService,
+    private cd: ChangeDetectorRef,
+    private zone: NgZone,
+    private platform: Platform  // Add Platform
   ) {}
 
   ngOnInit() {
@@ -56,10 +58,24 @@ export class SettingScreenPage implements OnInit, OnDestroy {
   ionViewWillEnter() {
     this.loadUserProfile();
     this.sender_name = this.authService.authData?.name || '';
+
+    // Handle hardware back button
+    this.backButtonSub = this.platform.backButton.subscribeWithPriority(10, () => {
+      // Navigate to home-screen instead of default back behavior
+      this.navCtrl.navigateRoot('/home-screen', {
+        animationDirection: 'back'
+      });
+    });
+  }
+
+  ionViewWillLeave() {
+    // Unsubscribe when leaving the page
+    this.backButtonSub?.unsubscribe();
   }
 
   ngOnDestroy() {
     this.langSub?.unsubscribe();
+    this.backButtonSub?.unsubscribe();
   }
 
   goToProfile() { this.router.navigateByUrl('/setting-profile'); }

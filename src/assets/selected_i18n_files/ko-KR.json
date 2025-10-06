@@ -110,28 +110,33 @@
       "log": "계정 삭제 모달 열림"
     }
   },"accessibility": {
-    "title": "접근성",
-    "groups": {
-      "displayMotion": "디스플레이 및 동작",
-      "interaction": "상호작용"
-    },
-    "increaseContrast": {
-      "title": "대비 증가",
-      "desc": "라이트 모드에서 가독성을 높이기 위해 주요 색상을 어둡게 합니다."
-    },
-    "reduceMotion": {
-      "title": "동작 줄이기",
-      "desc": "애니메이션 스티커, GIF 및 전환 효과를 최소화합니다."
-    },
-    "largeText": {
-      "title": "큰 텍스트",
-      "desc": "읽기 쉽게 시스템 글꼴 크기를 키웁니다."
-    },
-    "simpleAnimations": {
-      "title": "단순화된 애니메이션",
-      "desc": "복잡한 애니메이션을 줄여 상호작용을 쉽게 합니다."
-    }
-  },"privacyPage": {
+  "title": "접근성",
+  "groups": {
+    "displayMotion": "화면 및 동작",
+    "interaction": "상호작용"
+  },
+  "increaseContrast": {
+    "title": "대비 향상",
+    "desc": "라이트 모드에서 가독성을 높이기 위해 주요 색상을 어둡게 합니다."
+  },
+  "reduceMotion": {
+    "title": "동작 줄이기",
+    "desc": "애니메이션 스티커, GIF 및 전환 효과를 최소화합니다."
+  },
+  "largeText": {
+    "title": "큰 텍스트",
+    "desc": "읽기 쉽게 시스템 글꼴 크기를 늘립니다."
+  },
+  "simpleAnimations": {
+    "title": "단순화된 애니메이션",
+    "desc": "복잡한 애니메이션을 줄여 상호작용을 쉽게 합니다."
+  },
+  "grayscale": {
+    "title": "그레이스케일 모드",
+    "desc": "시각적 피로를 줄이기 위해 모든 색상을 회색조로 변환합니다."
+  }
+}
+,"privacyPage": {
     "title": "개인정보",
     "groups": {
       "whoCanSee": "내 정보를 볼 수 있는 사람",

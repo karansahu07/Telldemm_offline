@@ -111,28 +111,32 @@
       "log": "Fenêtre de suppression du compte ouverte"
     }
   },"accessibility": {
-    "title": "Accessibilité",
-    "groups": {
-      "displayMotion": "Affichage et mouvement",
-      "interaction": "Interaction"
-    },
-    "increaseContrast": {
-      "title": "Augmenter le contraste",
-      "desc": "Assombrir les couleurs principales pour améliorer la lisibilité en mode clair."
-    },
-    "reduceMotion": {
-      "title": "Réduire les mouvements",
-      "desc": "Réduire les autocollants animés, GIFs et transitions."
-    },
-    "largeText": {
-      "title": "Texte large",
-      "desc": "Augmenter la taille de police du système pour une lecture plus facile."
-    },
-    "simpleAnimations": {
-      "title": "Animations simplifiées",
-      "desc": "Réduire les animations complexes pour une interaction plus facile."
-    }
-  },"privacyPage": {
+  "title": "Accessibilité",
+  "groups": {
+    "displayMotion": "Affichage et mouvement",
+    "interaction": "Interaction"
+  },
+  "increaseContrast": {
+    "title": "Augmenter le contraste",
+    "desc": "Assombrir les couleurs principales pour améliorer la lisibilité en mode clair."
+  },
+  "reduceMotion": {
+    "title": "Réduire les mouvements",
+    "desc": "Minimiser les autocollants animés, les GIFs et les transitions."
+  },
+  "largeText": {
+    "title": "Texte large",
+    "desc": "Augmenter la taille de la police système pour une lecture plus facile."
+  },
+  "simpleAnimations": {
+    "title": "Animations simplifiées",
+    "desc": "Réduire les animations complexes pour une interaction plus fluide."
+  },
+  "grayscale": {
+    "title": "Mode niveaux de gris",
+    "desc": "Convertir toutes les couleurs de l’interface en nuances de gris pour réduire la fatigue visuelle."
+  }
+},"privacyPage": {
     "title": "Confidentialité",
     "groups": {
       "whoCanSee": "Qui peut voir mes infos",

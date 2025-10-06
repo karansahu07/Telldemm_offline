@@ -110,28 +110,33 @@
       "log": "Finestra di eliminazione account aperta"
     }
   }, "accessibility": {
-    "title": "Accessibilità",
-    "groups": {
-      "displayMotion": "Schermo e movimento",
-      "interaction": "Interazione"
-    },
-    "increaseContrast": {
-      "title": "Aumenta il contrasto",
-      "desc": "Scurisci i colori principali per migliorare la leggibilità in modalità chiara."
-    },
-    "reduceMotion": {
-      "title": "Riduci movimento",
-      "desc": "Riduci adesivi animati, GIF e transizioni."
-    },
-    "largeText": {
-      "title": "Testo grande",
-      "desc": "Aumenta la dimensione del carattere di sistema per una lettura più semplice."
-    },
-    "simpleAnimations": {
-      "title": "Animazioni semplificate",
-      "desc": "Riduci le animazioni complesse per interazioni più facili."
-    }
-  },"privacyPage": {
+  "title": "Accessibilità",
+  "groups": {
+    "displayMotion": "Schermo e movimento",
+    "interaction": "Interazione"
+  },
+  "increaseContrast": {
+    "title": "Aumenta il contrasto",
+    "desc": "Scurisci i colori principali per migliorare la leggibilità in modalità chiara."
+  },
+  "reduceMotion": {
+    "title": "Riduci i movimenti",
+    "desc": "Riduci adesivi animati, GIF e transizioni."
+  },
+  "largeText": {
+    "title": "Testo grande",
+    "desc": "Aumenta la dimensione del carattere di sistema per una lettura più agevole."
+  },
+  "simpleAnimations": {
+    "title": "Animazioni semplificate",
+    "desc": "Riduci le animazioni complesse per un’interazione più fluida."
+  },
+  "grayscale": {
+    "title": "Modalità in scala di grigi",
+    "desc": "Converti tutti i colori dell’interfaccia in tonalità di grigio per ridurre l’affaticamento visivo."
+  }
+}
+,"privacyPage": {
     "title": "Privacy",
     "groups": {
       "whoCanSee": "Chi può vedere le mie info",
