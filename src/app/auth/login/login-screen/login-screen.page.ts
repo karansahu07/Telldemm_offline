@@ -29,9 +29,9 @@ export class LoginScreenPage {
 
   countries = [
   { name: 'India', code: '+91', disabled: false },
-  { name: 'Pakistan', code: '+92', disabled: true },
-  { name: 'UK', code: '+44', disabled: true },
-  { name: 'UAE', code: '+971', disabled: true },
+  { name: 'Pakistan', code: '+92', disabled: false },
+  { name: 'UK', code: '+44', disabled: false },
+  { name: 'UAE', code: '+971', disabled: false },
   // { name: 'USA', code: '+1', disabled: true },
   // { name: 'Canada', code: '+1', disabled: true },
   // { name: 'Germany', code: '+49', disabled: true },

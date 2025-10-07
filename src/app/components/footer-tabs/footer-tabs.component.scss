@@ -107,10 +107,10 @@ ion-item {
 /* Badge */
 ion-badge,
 .unread-badge {
-  font-size: 12px;
-  min-width: 20px;
-  height: 20px;
-  padding: 4px 8px;
+  font-size: 10px;
+  min-width: 18px;
+  height: 18px;
+  padding: 3px 6px;
   color: #fff;
   background: var(--ion-color-primary);
   border-radius: 50%;
@@ -118,8 +118,8 @@ ion-badge,
   justify-content: center;
   align-items: center;
   position: absolute;
-  top: 2px;
-  left: 45px;
+  top: 0;
+  left: 40px;
   box-sizing: border-box;
 }
 
@@ -135,13 +135,14 @@ ion-badge,
 }
 
 .icon-bg {
-  width: 60px;
-  height: 32px;
+  width: 50px;
+  height: 28px;
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 20px;
+  border-radius: 14px;
   background-color: transparent;
+  transition: background-color 0.2s;
 
   &.active {
     background-color: var(--ion-color-primary-tint);
@@ -149,8 +150,8 @@ ion-badge,
 }
 
 img.footericons {
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
 }
 
 /* Footer / Tab Bar */
@@ -161,15 +162,22 @@ ion-tab-bar {
   border-top: 1px solid var(--ion-border-color, #e0e0e0);
 }
 
+/* Compact Footer Style */
+.mineclass {
+  background: var(--ion-background-color);
+  padding: 4px 0 env(safe-area-inset-bottom, 4px) 0;
+  transition: padding-bottom 0.2s;
+}
+
 p.tabtext {
   color: var(--ion-text-color);
-  margin: 0;
-  font-size: 14px;
+  margin: 2px 0 0 0;
+  font-size: 12.5px;
   font-family: Montserrat-Medium;
 }
 
 button {
-  padding: 8px;
+  padding: 4px;
   background: none;
   border: none;
   outline: none;
@@ -177,18 +185,6 @@ button {
   flex-direction: column;
   align-items: center;
   flex-grow: 1;
-}
-
-:host {
-  display: block;
-  background: var(--ion-background-color);
-  padding-bottom: env(safe-area-inset-bottom, 6px);
-}
-
-.mineclass {
-  background: var(--ion-background-color);
-  padding: 6px 0 env(safe-area-inset-bottom, 6px) 0;
-  transition: padding-bottom 0.2s;
 }
 
 /* Avatars */
@@ -296,4 +292,11 @@ ion-item.selected {
 /* Disable UI */
 .disabled-ui {
   pointer-events: none;
+}
+
+/* Host background fix */
+:host {
+  display: block;
+  background: var(--ion-background-color);
+  padding-bottom: env(safe-area-inset-bottom, 6px);
 }
