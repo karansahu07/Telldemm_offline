@@ -403,13 +403,13 @@
       "updateFailed": "சுயவிவர படத்தை புதுப்பிக்க முடியவில்லை"
     }
   },"footerTabs": {
-    "chat": "அரட்டை",
-    "updates": "புதுப்பிப்புகள்",
-    "communities": "சமூகங்கள்",
-    "calls": "அழைப்புகள்",
+    "chat": "Tells (உரையாடல்)",
+    "updates": "Echoes (புதுப்பிப்புகள்)",
+    "communities": "DemmCircles (சமூகங்கள்)",
+    "calls": "Connects (அழைப்புகள்)",
     "badges": {
-      "unreadChats": "{{count}} படிக்காத அரட்டைகள்",
-      "unreadUpdates": "{{count}} புதுப்பிப்புகள்"
+      "unreadChats": "{{count}} படிக்கப்படாத Tells",
+      "unreadUpdates": "{{count}} Echoes"
     }
   }, "socialLinks": {
     "title": "இணைப்புகள்",

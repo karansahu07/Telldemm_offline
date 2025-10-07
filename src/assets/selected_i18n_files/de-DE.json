@@ -404,13 +404,13 @@
       "updateFailed": "Profilbild konnte nicht aktualisiert werden"
     }
   },"footerTabs": {
-    "chat": "Chats",
-    "updates": "Updates",
-    "communities": "Communities",
-    "calls": "Anrufe",
+    "chat": "Tells (Chats)",
+    "updates": "Echoes (Updates)",
+    "communities": "DemmCircles (Gemeinschaften)",
+    "calls": "Connects (Anrufe)",
     "badges": {
-      "unreadChats": "{{count}} ungelesene Chats",
-      "unreadUpdates": "{{count}} Updates"
+      "unreadChats": "{{count}} ungelesene Tells",
+      "unreadUpdates": "{{count}} Echoes"
     }
   },"socialLinks": {
     "title": "Links",

@@ -380,13 +380,13 @@
       "updateFailed": "Profil resmi güncellenemedi"
     }
   },"footerTabs": {
-    "chat": "Sohbet",
-    "updates": "Güncellemeler",
-    "communities": "Topluluklar",
-    "calls": "Aramalar",
+    "chat": "Tells (Sohbetler)",
+    "updates": "Echoes (Güncellemeler)",
+    "communities": "DemmCircles (Topluluklar)",
+    "calls": "Connects (Aramalar)",
     "badges": {
-      "unreadChats": "{{count}} okunmamış sohbet",
-      "unreadUpdates": "{{count}} güncelleme"
+      "unreadChats": "{{count}} okunmamış Tells",
+      "unreadUpdates": "{{count}} Echoes"
     }
   },"socialLinks": {
     "title": "Bağlantılar",

@@ -379,13 +379,13 @@
       "updateFailed": "پروفائل تصویر اپ ڈیٹ کرنے میں ناکام"
     }
   },"footerTabs": {
-    "chat": "چیٹ",
-    "updates": "اپ ڈیٹس",
-    "communities": "کمیونٹیز",
-    "calls": "کالز",
+    "chat": "Tells (چیٹس)",
+    "updates": "Echoes (اپ ڈیٹس)",
+    "communities": "DemmCircles (برادریاں)",
+    "calls": "Connects (کالز)",
     "badges": {
-      "unreadChats": "{{count}} نہ پڑھی گئی چیٹس",
-      "unreadUpdates": "{{count}} اپ ڈیٹس"
+      "unreadChats": "{{count}} نہ پڑھے Tells",
+      "unreadUpdates": "{{count}} Echoes"
     }
   },"socialLinks": {
     "title": "لنکس",

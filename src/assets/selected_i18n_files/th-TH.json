@@ -403,13 +403,13 @@
       "updateFailed": "ไม่สามารถอัปเดตรูปโปรไฟล์ได้"
     }
   },"footerTabs": {
-    "chat": "แชท",
-    "updates": "อัปเดต",
-    "communities": "ชุมชน",
-    "calls": "การโทร",
+    "chat": "Tells (แชท)",
+    "updates": "Echoes (อัปเดต)",
+    "communities": "DemmCircles (ชุมชน)",
+    "calls": "Connects (การโทร)",
     "badges": {
-      "unreadChats": "{{count}} แชทยังไม่ได้อ่าน",
-      "unreadUpdates": "{{count}} การอัปเดต"
+      "unreadChats": "{{count}} Tells ที่ยังไม่อ่าน",
+      "unreadUpdates": "{{count}} Echoes"
     }
   },"socialLinks": {
     "title": "ลิงก์",

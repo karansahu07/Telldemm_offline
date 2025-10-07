@@ -404,13 +404,13 @@
       "updateFailed": "更新头像失败"
     }
   },"footerTabs": {
-    "chat": "聊天",
-    "updates": "更新",
-    "communities": "社区",
-    "calls": "通话",
+    "chat": "Tells (聊天)",
+    "updates": "Echoes (更新)",
+    "communities": "DemmCircles (社区)",
+    "calls": "Connects (通话)",
     "badges": {
-      "unreadChats": "{{count}} 个未读聊天",
-      "unreadUpdates": "{{count}} 个更新"
+      "unreadChats": "{{count}} 未读 Tells",
+      "unreadUpdates": "{{count}} Echoes"
     }
   }, "socialLinks": {
     "title": "链接",

@@ -404,14 +404,14 @@
       "updated": "Profile picture updated successfully!",
       "updateFailed": "Failed to update profile picture"
     }
-  }, "footerTabs": {
-    "chat": "Chat",
-    "updates": "Updates",
-    "communities": "Communities",
-    "calls": "Calls",
+  },"footerTabs": {
+    "chat": "Tells (Chat)",
+    "updates": "Echoes (Updates)",
+    "communities": "DemmCircles (Communities)",
+    "calls": "Connects (Calls)",
     "badges": {
-      "unreadChats": "{{count}} unread chats",
-      "unreadUpdates": "{{count}} updates"
+      "unreadChats": "{{count}} unread Tells",
+      "unreadUpdates": "{{count}} Echoes"
     }
   },"socialLinks": {
     "title": "Links",

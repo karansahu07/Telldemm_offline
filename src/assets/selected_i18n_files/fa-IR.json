@@ -375,13 +375,13 @@
       "updateFailed": "به‌روزرسانی تصویر پروفایل ناموفق بود"
     }
   },"footerTabs": {
-    "chat": "گفتگو",
-    "updates": "به‌روزرسانی‌ها",
-    "communities": "انجمن‌ها",
-    "calls": "تماس‌ها",
+    "chat": "Tells (چت‌ها)",
+    "updates": "Echoes (به‌روزرسانی‌ها)",
+    "communities": "DemmCircles (جوامع)",
+    "calls": "Connects (تماس‌ها)",
     "badges": {
-      "unreadChats": "{{count}} گفتگوی خوانده‌نشده",
-      "unreadUpdates": "{{count}} به‌روزرسانی"
+      "unreadChats": "{{count}} Tells نخوانده",
+      "unreadUpdates": "{{count}} Echoes"
     }
   }, "socialLinks": {
     "title": "لینک‌ها",

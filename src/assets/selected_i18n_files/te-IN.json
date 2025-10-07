@@ -403,13 +403,13 @@
       "updateFailed": "ప్రొఫైల్ చిత్రం అప్‌డేట్ విఫలమైంది"
     }
   },"footerTabs": {
-    "chat": "చాట్",
-    "updates": "నవీకరణలు",
-    "communities": "కమ్యూనిటీలు",
-    "calls": "కాల్‌లు",
+    "chat": "Tells (చాట్)",
+    "updates": "Echoes (అప్‌డేట్స్)",
+    "communities": "DemmCircles (కమ్యూనిటీలు)",
+    "calls": "Connects (కాల్స్)",
     "badges": {
-      "unreadChats": "{{count}} చదవని చాట్లు",
-      "unreadUpdates": "{{count}} నవీకరణలు"
+      "unreadChats": "{{count}} చదవని Tells",
+      "unreadUpdates": "{{count}} Echoes"
     }
   },"socialLinks": {
     "title": "లింకులు",

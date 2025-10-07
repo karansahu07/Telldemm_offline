@@ -403,13 +403,13 @@
       "updateFailed": "프로필 이미지 업데이트 실패"
     }
   },"footerTabs": {
-    "chat": "채팅",
-    "updates": "업데이트",
-    "communities": "커뮤니티",
-    "calls": "통화",
+    "chat": "Tells (채팅)",
+    "updates": "Echoes (업데이트)",
+    "communities": "DemmCircles (커뮤니티)",
+    "calls": "Connects (통화)",
     "badges": {
-      "unreadChats": "{{count}}개의 안 읽은 채팅",
-      "unreadUpdates": "{{count}}개의 업데이트"
+      "unreadChats": "{{count}} 읽지 않은 Tells",
+      "unreadUpdates": "{{count}} Echoes"
     }
   },"socialLinks": {
     "title": "링크",

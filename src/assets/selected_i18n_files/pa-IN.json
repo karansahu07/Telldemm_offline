@@ -403,13 +403,13 @@
       "updateFailed": "ਪ੍ਰੋਫਾਈਲ ਚਿੱਤਰ ਅਪਡੇਟ ਕਰਨ ਵਿੱਚ ਅਸਫਲ"
     }
   },"footerTabs": {
-    "chat": "ਚੈਟ",
-    "updates": "ਅਪਡੇਟਸ",
-    "communities": "ਕਮਿਊਨਿਟੀਆਂ",
-    "calls": "ਕਾਲਾਂ",
+    "chat": "Tells (ਚੈਟ)",
+    "updates": "Echoes (ਅੱਪਡੇਟਸ)",
+    "communities": "DemmCircles (ਕਮਿਊਨਿਟੀਜ਼)",
+    "calls": "Connects (ਕਾਲਾਂ)",
     "badges": {
-      "unreadChats": "{{count}} ਨਾ ਪੜ੍ਹੀਆਂ ਚੈਟਾਂ",
-      "unreadUpdates": "{{count}} ਅਪਡੇਟਸ"
+      "unreadChats": "{{count}} ਅਪੜ੍ਹੇ Tells",
+      "unreadUpdates": "{{count}} Echoes"
     }
   },
   "socialLinks": {

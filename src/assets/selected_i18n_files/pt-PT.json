@@ -403,13 +403,13 @@
       "updateFailed": "Falha ao atualizar a foto de perfil"
     }
   },"footerTabs": {
-    "chat": "Conversas",
-    "updates": "Atualizações",
-    "communities": "Comunidades",
-    "calls": "Chamadas",
+    "chat": "Tells (Conversas)",
+    "updates": "Echoes (Atualizações)",
+    "communities": "DemmCircles (Comunidades)",
+    "calls": "Connects (Chamadas)",
     "badges": {
-      "unreadChats": "{{count}} conversas por ler",
-      "unreadUpdates": "{{count}} atualizações"
+      "unreadChats": "{{count}} Tells não lidos",
+      "unreadUpdates": "{{count}} Echoes"
     }
   },"socialLinks": {
     "title": "Links",

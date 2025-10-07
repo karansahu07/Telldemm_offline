@@ -405,13 +405,13 @@
       "updateFailed": "প্রোফাইল ছবি আপডেট ব্যর্থ হয়েছে"
     }
   },"footerTabs": {
-    "chat": "চ্যাট",
-    "updates": "আপডেট",
-    "communities": "কমিউনিটি",
-    "calls": "কল",
+    "chat": "Tells (চ্যাট)",
+    "updates": "Echoes (আপডেটস)",
+    "communities": "DemmCircles (কমিউনিটিস)",
+    "calls": "Connects (কলস)",
     "badges": {
-      "unreadChats": "{{count}}টি অপঠিত চ্যাট",
-      "unreadUpdates": "{{count}}টি আপডেট"
+      "unreadChats": "{{count}} অপঠিত Tells",
+      "unreadUpdates": "{{count}} Echoes"
     }
   }, "socialLinks": {
     "title": "লিঙ্কসমূহ",

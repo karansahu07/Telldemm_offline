@@ -404,13 +404,13 @@
       "updateFailed": "فشل تحديث صورة الملف الشخصي"
     }
   },"footerTabs": {
-    "chat": "الدردشة",
-    "updates": "التحديثات",
-    "communities": "المجتمعات",
-    "calls": "المكالمات",
+    "chat": "Tells (محادثات)",
+    "updates": "Echoes (تحديثات)",
+    "communities": "DemmCircles (مجتمعات)",
+    "calls": "Connects (مكالمات)",
     "badges": {
-      "unreadChats": "{{count}} دردشة غير مقروءة",
-      "unreadUpdates": "{{count}} تحديث"
+      "unreadChats": "{{count}} Tells غير مقروءة",
+      "unreadUpdates": "{{count}} Echoes"
     }
   }, "socialLinks": {
     "title": "الروابط",

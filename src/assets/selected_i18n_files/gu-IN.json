@@ -403,13 +403,13 @@
       "updateFailed": "પ્રોફાઇલ ચિત્ર અપડેટ કરવામાં નિષ્ફળ"
     }
   },"footerTabs": {
-    "chat": "ચેટ",
-    "updates": "અપડેટ્સ",
-    "communities": "સમુદાયો",
-    "calls": "કૉલ્સ",
+    "chat": "Tells (ચેટ)",
+    "updates": "Echoes (અપડેટ્સ)",
+    "communities": "DemmCircles (સમુદાયો)",
+    "calls": "Connects (કોલ્સ)",
     "badges": {
-      "unreadChats": "{{count}} ન વાંચેલ ચેટ્સ",
-      "unreadUpdates": "{{count}} અપડેટ્સ"
+      "unreadChats": "{{count}} અવાંચિત Tells",
+      "unreadUpdates": "{{count}} Echoes"
     }
   },"socialLinks": {
     "title": "લિંક્સ",

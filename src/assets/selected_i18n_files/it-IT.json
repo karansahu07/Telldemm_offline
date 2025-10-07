@@ -403,13 +403,13 @@
       "updateFailed": "Impossibile aggiornare l’immagine del profilo"
     }
   },"footerTabs": {
-    "chat": "Chat",
-    "updates": "Aggiornamenti",
-    "communities": "Comunità",
-    "calls": "Chiamate",
+    "chat": "Tells (Chat)",
+    "updates": "Echoes (Aggiornamenti)",
+    "communities": "DemmCircles (Comunità)",
+    "calls": "Connects (Chiamate)",
     "badges": {
-      "unreadChats": "{{count}} chat non lette",
-      "unreadUpdates": "{{count}} aggiornamenti"
+      "unreadChats": "{{count}} Tells non letti",
+      "unreadUpdates": "{{count}} Echoes"
     }
   },"socialLinks": {
     "title": "Link",

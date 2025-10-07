@@ -403,13 +403,13 @@
       "updateFailed": "Не удалось обновить фото профиля"
     }
   },"footerTabs": {
-    "chat": "Чаты",
-    "updates": "Обновления",
-    "communities": "Сообщества",
-    "calls": "Звонки",
+    "chat": "Tells (Чаты)",
+    "updates": "Echoes (Обновления)",
+    "communities": "DemmCircles (Сообщества)",
+    "calls": "Connects (Звонки)",
     "badges": {
-      "unreadChats": "{{count}} непрочитанных чатов",
-      "unreadUpdates": "{{count}} обновлений"
+      "unreadChats": "{{count}} непрочитанных Tells",
+      "unreadUpdates": "{{count}} Echoes"
     }
   },"socialLinks": {
     "title": "Ссылки",

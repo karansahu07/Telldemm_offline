@@ -379,13 +379,13 @@
       "updateFailed": "Không thể cập nhật ảnh hồ sơ"
     }
   },"footerTabs": {
-    "chat": "Trò chuyện",
-    "updates": "Cập nhật",
-    "communities": "Cộng đồng",
-    "calls": "Cuộc gọi",
+    "chat": "Tells (Trò chuyện)",
+    "updates": "Echoes (Cập nhật)",
+    "communities": "DemmCircles (Cộng đồng)",
+    "calls": "Connects (Cuộc gọi)",
     "badges": {
-      "unreadChats": "{{count}} cuộc trò chuyện chưa đọc",
-      "unreadUpdates": "{{count}} bản cập nhật"
+      "unreadChats": "{{count}} Tells chưa đọc",
+      "unreadUpdates": "{{count}} Echoes"
     }
   },"socialLinks": {
     "title": "Liên kết",

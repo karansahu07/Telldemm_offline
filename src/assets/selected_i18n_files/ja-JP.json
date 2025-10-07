@@ -403,13 +403,13 @@
       "updateFailed": "プロフィール画像の更新に失敗しました"
     }
   },"footerTabs": {
-    "chat": "チャット",
-    "updates": "アップデート",
-    "communities": "コミュニティ",
-    "calls": "通話",
+    "chat": "Tells (チャット)",
+    "updates": "Echoes (更新)",
+    "communities": "DemmCircles (コミュニティ)",
+    "calls": "Connects (通話)",
     "badges": {
-      "unreadChats": "{{count}} 件の未読チャット",
-      "unreadUpdates": "{{count}} 件のアップデート"
+      "unreadChats": "{{count}} 未読 Tells",
+      "unreadUpdates": "{{count}} Echoes"
     }
   },"socialLinks": {
     "title": "リンク",
