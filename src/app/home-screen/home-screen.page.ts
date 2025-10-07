@@ -30,6 +30,7 @@ import { Resetapp } from '../services/resetapp';
 import { VersionCheck } from '../services/version-check';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MenuHomePopoverComponent } from '../components/menu-home-popover/menu-home-popover.component';
+import { IChat, IUser } from 'src/types';
 
 @Component({
   selector: 'app-home-screen',
@@ -112,128 +113,128 @@ export class HomeScreenPage implements OnInit, OnDestroy {
       console.warn('checkForceLogout error (ignored):', err);
     }
 
-        // 1.2 Verify device
-  const verified = await this.verifyDeviceOnEnter();
-  if (!verified) return; // stop if mismatch
+    // 1.2 Verify device
+    const verified = await this.verifyDeviceOnEnter();
+    if (!verified) return; // stop if mismatch
 
     // 2) Existing logic (kept as before)
-    const shouldRefresh = localStorage.getItem('shouldRefreshHome');
+    // const shouldRefresh = localStorage.getItem('shouldRefreshHome');
 
-    if (shouldRefresh === 'true') {
-      // console.log('Refreshing home page after group creation...');
-      localStorage.removeItem('shouldRefreshHome');
-      this.clearChatData();
-      await this.refreshHomeData();
-      await this.loadData();
-      this.sender_name = this.authService.authData?.name || '';
-    }
+    // if (shouldRefresh === 'true') {
+    // console.log('Refreshing home page after group creation...');
+    // localStorage.removeItem('shouldRefreshHome');
+    this.clearChatData();
+    await this.refreshHomeData();
+    await this.loadData();
+    this.sender_name = this.authService.authData?.name || '';
+    // }
   }
 
   async verifyDeviceOnEnter(): Promise<boolean> {
-  if (!this.senderUserId) {
-    console.warn('Skipping device verification: senderUserId is missing');
-    return false;
-  }
- 
-  try {
-    // 1️⃣ Get device info (with web fallback)
-    let info: any;
-    const platform = Capacitor.getPlatform();
-    if (platform === 'web') {
-      // Fallback for web platform
-      info = {
-        model: navigator.userAgent.includes('Mobile') ? 'Mobile Web' : 'Desktop Web',
-        operatingSystem: 'Web',
-        osVersion: 'N/A',
-        uuid: localStorage.getItem('device_uuid') || crypto.randomUUID()
-      };
-      // Persist UUID if new
-      if (!localStorage.getItem('device_uuid')) {
-        localStorage.setItem('device_uuid', info.uuid);
-      }
-    } else {
-      info = await Device.getInfo();
-    }
-    console.log('Device info retrieved:', info);
- 
-    // 2️⃣ Get current app version (with web fallback)
-    let appVersion = '1.0.0'; // Default fallback
-    if (platform !== 'web') {
-      try {
-        const versionResult = await this.versionService.checkVersion();
-        appVersion = versionResult.currentVersion || '1.0.0';
-      } catch (versionErr) {
-        console.warn('Version check failed:', versionErr);
-        appVersion = '1.0.0';
-      }
-    } else {
-      // For web, use a placeholder or read from manifest.json if needed
-      appVersion = 'web.1.0.0';
-    }
-    console.log('App version retrieved:', appVersion);
- 
-    // 3️⃣ Use persistent UUID
-    let uuid = localStorage.getItem('device_uuid') || info.uuid || crypto.randomUUID();
-    if (!localStorage.getItem('device_uuid')) {
-      localStorage.setItem('device_uuid', uuid);
-    }
-    console.log('UUID used:', uuid);
- 
-    // 4️⃣ Create device payload
-    const devicePayload = {
-      device_uuid: uuid,
-      device_model: info.model,
-      os_name: info.operatingSystem,
-      os_version: info.osVersion,
-      app_version: appVersion
-    };
- 
-    // 5️⃣ Prepare payload
-    const payload = {
-      user_id: this.senderUserId,
-      device_details: devicePayload  // Note: device_details expects an object, not array like in OTP
-    };
-    console.log('📨 Device verification payload:', payload);
- 
-    // 6️⃣ Call backend API
-    console.log('🔄 Calling verifyDevice API...');
-    const res: any = await this.authService.verifyDevice(payload);
-    console.log('✅ API Response:', res);
- 
-    if (res.device_mismatch) {
-      const backButtonHandler = (ev: any) => ev.detail.register(10000, () => { });
-      document.addEventListener('ionBackButton', backButtonHandler);
- 
-            const alert = await this.alertCtrl.create({
-  header: 'Logged in on another device',
-  message: 'Your account is currently active on a different device. For security reasons, please log in again to continue.',
-  backdropDismiss: false,
-  keyboardClose: false,
-  buttons: [{
-    text: 'OK',
-    handler: () => {
-      this.resetapp.resetApp();
-    }
-  }]
-});
-  
-      await alert.present();
- 
-      alert.onDidDismiss().then(() => {
-        document.removeEventListener('ionBackButton', backButtonHandler);
-      });
- 
+    if (!this.senderUserId) {
+      console.warn('Skipping device verification: senderUserId is missing');
       return false;
     }
- 
-    console.log('✅ Device verified:', res.message);
-    return true;
- 
-  } catch (err) {
-    console.error('Verify Device API error:', err); // Changed to error for visibility
-    return false;
+
+    try {
+      // 1️⃣ Get device info (with web fallback)
+      let info: any;
+      const platform = Capacitor.getPlatform();
+      if (platform === 'web') {
+        // Fallback for web platform
+        info = {
+          model: navigator.userAgent.includes('Mobile') ? 'Mobile Web' : 'Desktop Web',
+          operatingSystem: 'Web',
+          osVersion: 'N/A',
+          uuid: localStorage.getItem('device_uuid') || crypto.randomUUID()
+        };
+        // Persist UUID if new
+        if (!localStorage.getItem('device_uuid')) {
+          localStorage.setItem('device_uuid', info.uuid);
+        }
+      } else {
+        info = await Device.getInfo();
+      }
+      console.log('Device info retrieved:', info);
+
+      // 2️⃣ Get current app version (with web fallback)
+      let appVersion = '1.0.0'; // Default fallback
+      if (platform !== 'web') {
+        try {
+          const versionResult = await this.versionService.checkVersion();
+          appVersion = versionResult.currentVersion || '1.0.0';
+        } catch (versionErr) {
+          console.warn('Version check failed:', versionErr);
+          appVersion = '1.0.0';
+        }
+      } else {
+        // For web, use a placeholder or read from manifest.json if needed
+        appVersion = 'web.1.0.0';
+      }
+      console.log('App version retrieved:', appVersion);
+
+      // 3️⃣ Use persistent UUID
+      let uuid = localStorage.getItem('device_uuid') || info.uuid || crypto.randomUUID();
+      if (!localStorage.getItem('device_uuid')) {
+        localStorage.setItem('device_uuid', uuid);
+      }
+      console.log('UUID used:', uuid);
+
+      // 4️⃣ Create device payload
+      const devicePayload = {
+        device_uuid: uuid,
+        device_model: info.model,
+        os_name: info.operatingSystem,
+        os_version: info.osVersion,
+        app_version: appVersion
+      };
+
+      // 5️⃣ Prepare payload
+      const payload = {
+        user_id: this.senderUserId,
+        device_details: devicePayload  // Note: device_details expects an object, not array like in OTP
+      };
+      console.log('📨 Device verification payload:', payload);
+
+      // 6️⃣ Call backend API
+      console.log('🔄 Calling verifyDevice API...');
+      const res: any = await this.authService.verifyDevice(payload);
+      console.log('✅ API Response:', res);
+
+      if (res.device_mismatch) {
+        const backButtonHandler = (ev: any) => ev.detail.register(10000, () => { });
+        document.addEventListener('ionBackButton', backButtonHandler);
+
+        const alert = await this.alertCtrl.create({
+          header: 'Logged in on another device',
+          message: 'Your account is currently active on a different device. For security reasons, please log in again to continue.',
+          backdropDismiss: false,
+          keyboardClose: false,
+          buttons: [{
+            text: 'OK',
+            handler: () => {
+              this.resetapp.resetApp();
+            }
+          }]
+        });
+
+        await alert.present();
+
+        alert.onDidDismiss().then(() => {
+          document.removeEventListener('ionBackButton', backButtonHandler);
+        });
+
+        return false;
+      }
+
+      console.log('✅ Device verified:', res.message);
+      return true;
+
+    } catch (err) {
+      console.error('Verify Device API error:', err); // Changed to error for visibility
+      return false;
+    }
   }
-}
 
 
   //this is for testing
@@ -319,8 +320,8 @@ export class HomeScreenPage implements OnInit, OnDestroy {
       this.isLoading = true;
       await Promise.all([
         this.getAllUsers(),
-        this.loadUserGroups(),
-        this.loadUserCommunitiesForHome()
+        // this.loadUserGroups(),
+        // this.loadUserCommunitiesForHome()
       ]);
       this.isLoading = false;
     } catch (err) {
@@ -841,7 +842,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
 
         // filter archived out from visible list
         this.chatList = this.chatList.filter(chat => {
-          const roomId = chat.group ? chat.receiver_Id : this.getRoomId(userId, chat.receiver_Id);
+          const roomId = chat.group ? chat.receiver_Id : this.getRoomId(userId, String(chat.receiver_Id));
           return !(this.archivedMap[roomId]?.isArchived);
         });
       });
@@ -1169,51 +1170,51 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     }
   }
 
- async markRoomAsRead(){
-  const me = this.senderUserId || this.authService.authData?.userId || '';
-  if (!me) return;
+  async markRoomAsRead() {
+    const me = this.senderUserId || this.authService.authData?.userId || '';
+    if (!me) return;
 
-  // build roomIds from current selection (ignore communities)
-  const roomIds = (this.selectedChats || [])
-    .filter(c => !c.isCommunity)
-    .map(c => c.group
-      ? String(c.receiver_Id)
-      : this.getRoomId(String(me), String(c.receiver_Id))
-    );
+    // build roomIds from current selection (ignore communities)
+    const roomIds = (this.selectedChats || [])
+      .filter(c => !c.isCommunity)
+      .map(c => c.group
+        ? String(c.receiver_Id)
+        : this.getRoomId(String(me), String(c.receiver_Id))
+      );
 
-  await this.firebaseChatService.markManyRoomsAsRead(roomIds, String(me));
+    await this.firebaseChatService.markManyRoomsAsRead(roomIds, String(me));
 
-  // optimistic UI
-  (this.selectedChats || []).forEach(c => { c.unreadCount = 0; c.unread = false; });
-  this.clearChatSelection();
-}
+    // optimistic UI
+    (this.selectedChats || []).forEach(c => { c.unreadCount = 0; c.unread = false; });
+    this.clearChatSelection();
+  }
 
-async markAsUnread() {
-  const me = this.senderUserId || this.authService.authData?.userId || '';
-  if (!me) return;
+  async markAsUnread() {
+    const me = this.senderUserId || this.authService.authData?.userId || '';
+    if (!me) return;
 
-  // Build roomIds for selected chats (ignore communities)
-  const roomIds = (this.selectedChats || [])
-    .filter(c => !c.isCommunity)
-    .map(c => c.group
-      ? String(c.receiver_Id)                   // group roomId is the groupId
-      : this.getRoomId(String(me), String(c.receiver_Id)) // private roomId a_b
-    );
+    // Build roomIds for selected chats (ignore communities)
+    const roomIds = (this.selectedChats || [])
+      .filter(c => !c.isCommunity)
+      .map(c => c.group
+        ? String(c.receiver_Id)                   // group roomId is the groupId
+        : this.getRoomId(String(me), String(c.receiver_Id)) // private roomId a_b
+      );
 
-  if (roomIds.length === 0) return;
+    if (roomIds.length === 0) return;
 
-  // Mark in RTDB (centralized)
-  await this.firebaseChatService.markManyRoomsAsUnread(roomIds, String(me), 1);
+    // Mark in RTDB (centralized)
+    await this.firebaseChatService.markManyRoomsAsUnread(roomIds, String(me), 1);
 
-  // Optimistic UI: show badge >= 1 on selected chats
-  (this.selectedChats || []).forEach(c => {
-    c.unread = true;
-    c.unreadCount = Math.max(Number(c.unreadCount || 0), 1);
-  });
+    // Optimistic UI: show badge >= 1 on selected chats
+    (this.selectedChats || []).forEach(c => {
+      c.unread = true;
+      c.unreadCount = Math.max(Number(c.unreadCount || 0), 1);
+    });
 
-  // optional: keep selection or clear it
-  this.clearChatSelection();
-}
+    // optional: keep selection or clear it
+    this.clearChatSelection();
+  }
 
 
   async prepareAndNavigateToChat(chat: any) {
@@ -1261,176 +1262,120 @@ async markAsUnread() {
   /**
    * ---------- Chat loading (users) ----------
    */
-  getAllUsers() {
+  async getAllUsers() {
     const currentSenderId = this.senderUserId;
     if (!currentSenderId) return;
-
+    // const matched = await this.contactSyncService.getMatchedUsers()
     this.contactSyncService.getMatchedUsers().then((matched) => {
       const deviceNameMap = new Map<string, string>();
-      (matched || []).forEach((m: any) => {
-        const key = this.normalizePhone(m.phone_number);
-        if (key && m.name) deviceNameMap.set(key, m.name);
-      });
+      // (matched || []).forEach((m: IUser) => {
+      //   const key = this.normalizePhone(m.phone_number);
+      //   if (key && m.name) deviceNameMap.set(key, m.name);
+      // });
+      this.userRooms().subscribe( (roomIds) => {
 
-      this.service.getAllUsers().subscribe((users: any[]) => {
-        users.forEach(async (user) => {  // ⭐ async add kiya
-          const receiverId = user.user_id?.toString();
-          if (!receiverId || receiverId === currentSenderId) return;
+        const myRoomIds = roomIds.filter(id => id.includes(currentSenderId))
+        // console.log({myRoomIds});
+        const receivers = matched.filter(c => myRoomIds.includes(this.getRoomId(currentSenderId, String(c.user_id))) && String(c.user_id) !== currentSenderId)
+        const availableRoomIds = receivers.map(r => this.getRoomId(currentSenderId, String(r.user_id)))
+        const missingReceiverIds = myRoomIds.filter(r => !availableRoomIds.includes(r)).map(r => r.split("_").find(id => id != currentSenderId))
+        for(const receiverId of missingReceiverIds){
+           const receiver = this.service.getUserProfilebyId(receiverId as string)
+           receivers.push({...receiver, user_id: Number(receiverId)} as any )
+        }
 
-          const phoneKey = this.normalizePhone(user.phone_number?.toString());
-          const deviceName = phoneKey ? deviceNameMap.get(phoneKey) : null;
-          const backendPhoneDisplay = phoneKey ? phoneKey.slice(-10) : null;
-          const displayName = deviceName || backendPhoneDisplay || user.name || 'Unknown';
+        // console.log({matched})
+        // const users = matched.map(m =>({}))
+        receivers.forEach(async receiver => {
+          const receiverId = String(receiver.user_id);
 
-          // this.checkUserInRooms(receiverId).subscribe(async (hasChat: boolean) => {  // ⭐ async add kiya
-          //   if (!hasChat) return;
+          const existingChat = this.chatList.find(
+            (c: IChat) => receiverId === String(c.receiver_Id) && !c.group);
+          if (existingChat) return;
 
-          //   const existingChat = this.chatList.find(
-          //     (c: any) => c.receiver_Id === receiverId && !c.group
-          //   );
-          //   if (existingChat) return;
+          const roomId = this.getRoomId(currentSenderId, receiverId);
+          const isArchived = await this.isRoomArchived(roomId);
+          if (isArchived) return;
 
-          //   const roomId = this.getRoomId(currentSenderId, receiverId);
-          //   const isArchived = await this.isRoomArchived(roomId);
+          // ⛔️ DO NOT push yet. Wait for first messages.
+          this.firebaseChatService.listenForMessages(roomId).subscribe(async (messages) => {
+            // compute preview (may be null)
+            const preview = await this.getPreviewFromMessages(messages);
 
-          //   if (isArchived) {
-          //     console.log('Skipping archived chat:', receiverId);
-          //     return;
-          //   }
+            // if no visible message for me → make sure row is removed/not added
+            if (!preview) {
+              // remove if somehow present
+              this.chatList = this.chatList.filter(
+                c => !(c.receiver_Id === receiverId && !c.group && !c.isCommunity)
+              );
+              return;
+            }
 
-          //   const chat: any = {
-          //     ...user,
-          //     name: displayName,
-          //     receiver_Id: receiverId,
-          //     profile_picture_url: user.profile_picture_url || null,
-          //     receiver_phone: phoneKey,
-          //     group: false,
-          //     message: '',
-          //     time: '',
-          //     unreadCount: 0,
-          //     unread: false,
-          //     isTyping: false,
-          //     typingText: null,
-          //     typingCount: 0
-          //   };
+            // ✅ ensure row exists (create once)
+            let chat : IChat = this.chatList.find((c: any) => c.receiver_Id === receiverId && !c.group) as IChat;
+            if (!chat) {
+              chat = {
+                ...receiver,
+                name: receiver.name || receiver.phone_number ||'Unknown',
+                receiver_Id: receiverId,
+                profile_picture_url: receiver.profile_picture_url || null,
+                receiver_phone: this.normalizePhone(receiver.phone_number),
+                group: false,
+                message: '',
+                time: '',
+                unreadCount: 0,
+                unread: false,
+                isTyping: false,
+                typingText: null,
+                typingCount: 0,
+                isCommunity : false,
+                dp : null,
+                pinned :null,
+                pinnedAt : null,
 
-          //   this.chatList.push(chat);
+              };
+              this.chatList.push(chat);
 
-          //   // Start typing listener for this chat
-          //   this.startTypingListenerForChat(chat);
+              // start typing + unread only when row exists
+              this.startTypingListenerForChat(chat);
+              const sub = this.firebaseChatService
+                .listenToUnreadCount(roomId, currentSenderId)
+                .subscribe((count: number) => {
+                  chat.unreadCount = count;
+                  chat.unread = count > 0;
+                });
+              this.unreadSubs.push(sub);
+            }
 
-          //   // Listen to last message
-          //   this.firebaseChatService.listenForMessages(roomId).subscribe(async (messages) => {
-          //     if (messages.length > 0) {
-          //       const lastRaw = messages[messages.length - 1];
-
-          //       // Keep delivered marking behavior on the actual last raw message
-          //       if (lastRaw.receiver_id === currentSenderId && !lastRaw.delivered) {
-          //         this.firebaseChatService.markDelivered(roomId, lastRaw.key);
-          //       }
-
-          //       // Use helper to find the last visible (non-deleted) message preview
-          //       try {
-          //         const { previewText, timestamp } = await this.getPreviewFromMessages(messages);
-          //         chat.message = previewText;
-          //         if (timestamp) {
-          //           chat.time = this.formatTimestamp(timestamp);
-          //           chat.timestamp = timestamp;
-          //         }
-          //       } catch (e) {
-          //         console.warn('preview extraction failed', e);
-          //         // Fallback to last raw behavior
-          //         if (lastRaw.isDeleted) chat.message = 'This message was deleted';
-          //         else {
-          //           try {
-          //             const dec = await this.encryptionService.decrypt(lastRaw.text);
-          //             chat.message = dec;
-          //           } catch {
-          //             chat.message = '[Encrypted]';
-          //           }
-          //         }
-          //         if (lastRaw.timestamp) chat.time = this.formatTimestamp(lastRaw.timestamp);
-          //       }
-          //     }
-          //   });
-
-          //   const sub = this.firebaseChatService
-          //     .listenToUnreadCount(roomId, currentSenderId)
-          //     .subscribe((count: number) => {
-          //       chat.unreadCount = count;
-          //       chat.unread = count > 0;
-          //     });
-          //   this.unreadSubs.push(sub);
-          // });
-
-          this.checkUserInRooms(receiverId).subscribe(async (hasChat: boolean) => {
-            if (!hasChat) return;
-
-            const existingChat = this.chatList.find(
-              (c: any) => c.receiver_Id === receiverId && !c.group
-            );
-            if (existingChat) return;
-
-            const roomId = this.getRoomId(currentSenderId, receiverId);
-            const isArchived = await this.isRoomArchived(roomId);
-            if (isArchived) return;
-
-            // ⛔️ DO NOT push yet. Wait for first messages.
-            this.firebaseChatService.listenForMessages(roomId).subscribe(async (messages) => {
-              // compute preview (may be null)
-              const preview = await this.getPreviewFromMessages(messages);
-
-              // if no visible message for me → make sure row is removed/not added
-              if (!preview) {
-                // remove if somehow present
-                this.chatList = this.chatList.filter(
-                  c => !(c.receiver_Id === receiverId && !c.group && !c.isCommunity)
-                );
-                return;
-              }
-
-              // ✅ ensure row exists (create once)
-              let chat = this.chatList.find((c: any) => c.receiver_Id === receiverId && !c.group);
-              if (!chat) {
-                chat = {
-                  ...user,
-                  name: displayName,
-                  receiver_Id: receiverId,
-                  profile_picture_url: user.profile_picture_url || null,
-                  receiver_phone: phoneKey,
-                  group: false,
-                  message: '',
-                  time: '',
-                  unreadCount: 0,
-                  unread: false,
-                  isTyping: false,
-                  typingText: null,
-                  typingCount: 0
-                };
-                this.chatList.push(chat);
-
-                // start typing + unread only when row exists
-                this.startTypingListenerForChat(chat);
-                const sub = this.firebaseChatService
-                  .listenToUnreadCount(roomId, currentSenderId)
-                  .subscribe((count: number) => {
-                    chat.unreadCount = count;
-                    chat.unread = count > 0;
-                  });
-                this.unreadSubs.push(sub);
-              }
-
-              // update preview/time
-              chat.message = preview.previewText || '';
-              if (preview.timestamp) {
-                chat.time = this.formatTimestamp(preview.timestamp);
-                (chat as any).timestamp = preview.timestamp;
-              }
-            });
+            // update preview/time
+            chat.message = preview.previewText || '';
+            if (preview.timestamp) {
+              chat.time = this.formatTimestamp(preview.timestamp);
+              (chat as any).timestamp = preview.timestamp;
+            }
           });
+        })
+      })
 
-        });
-      });
+      // this.service.getAllUsers().subscribe((users: any[]) => {
+      //   users.forEach(async (user) => {
+      //     const receiverId = user.user_id?.toString();
+      //     if (!receiverId || receiverId === currentSenderId) return;
+
+      //     const phoneKey = this.normalizePhone(user.phone_number?.toString());
+      //     const deviceName = phoneKey ? deviceNameMap.get(phoneKey) : null;
+      //     const backendPhoneDisplay = phoneKey ? phoneKey.slice(-10) : null;
+      //     const displayName = deviceName || backendPhoneDisplay || user.name || 'Unknown';
+
+
+      //     this.checkUserInRooms(receiverId).subscribe(async (hasChat: boolean) => {
+      //       if (!hasChat) return;
+
+
+      //     });
+
+      //   });
+      // });
     });
   }
 
@@ -1466,31 +1411,49 @@ async markAsUnread() {
     if (id) this.avatarErrorIds.add(String(id));
   }
 
-  checkUserInRooms(userId: string): Observable<boolean> {
+  // checkUserInRooms(userId: string): Observable<boolean> {
+  //   return new Observable(observer => {
+  //     const chatsRef = rtdbRef(getDatabase(), 'chats');
+
+  //     // Firebase listener
+  //     const unsub = rtdbOnValue(chatsRef, (snapshot: any) => {
+  //       const data = snapshot.val();
+  //       let userFound = false;
+  //       console.log("data", data);
+  //       if (data) {
+  //         Object.keys(data).some((roomId: string) => {
+  //           const userIds = roomId.split('_');
+  //           if (userIds.includes(this.senderUserId as string) && userIds.includes(userId)) {
+  //             userFound = true;
+  //             return true;
+  //           }
+  //           return false;
+  //         });
+  //       }
+
+  //       observer.next(userFound);
+  //     });
+
+  //     // cleanup for the onValue we created. onValue returns an unsubscribe function in modular firebase,
+  //     // but angularfire wrapper behaves differently; ensure we detach if needed.
+  //     return {
+  //       unsubscribe() {
+  //         try { unsub(); } catch (e) { }
+  //       }
+  //     };
+  //   });
+  // }
+
+  userRooms(): Observable<string[]> {
     return new Observable(observer => {
-      const chatsRef = rtdbRef(getDatabase(), 'chats');
+      const chatsRef = rtdbRef(getDatabase(), 'roomIds');
 
       // Firebase listener
       const unsub = rtdbOnValue(chatsRef, (snapshot: any) => {
         const data = snapshot.val();
-        let userFound = false;
-
-        if (data) {
-          Object.keys(data).some((roomId: string) => {
-            const userIds = roomId.split('_');
-            if (userIds.includes(this.senderUserId as string) && userIds.includes(userId)) {
-              userFound = true;
-              return true;
-            }
-            return false;
-          });
-        }
-
-        observer.next(userFound);
+        observer.next(!!data ? Object.keys(data) : []);
       });
 
-      // cleanup for the onValue we created. onValue returns an unsubscribe function in modular firebase,
-      // but angularfire wrapper behaves differently; ensure we detach if needed.
       return {
         unsubscribe() {
           try { unsub(); } catch (e) { }
@@ -1627,7 +1590,7 @@ async markAsUnread() {
         }
 
         // ensure row exists
-        let groupChat = this.chatList.find(c => c.group && c.receiver_Id === groupId);
+        let groupChat : any = this.chatList.find(c => c.group && c.receiver_Id === groupId);
         if (!groupChat) {
           groupChat = {
             name: groupName,
@@ -1643,7 +1606,7 @@ async markAsUnread() {
             typingCount: 0,
             members: groupInfo.members || {}
           };
-          this.chatList.push(groupChat);
+          this.chatList.push(groupChat as IChat);
 
           const sub = this.firebaseChatService
             .listenToUnreadCount(groupId, userid)
@@ -1839,46 +1802,46 @@ async markAsUnread() {
   }
 
   async openChat(chat: any) {
-  const receiverId   = chat.receiver_Id;
-  const receiverPhone = chat.receiver_phone;
-  const receiverName  = chat.name;
+    const receiverId = chat.receiver_Id;
+    const receiverPhone = chat.receiver_phone;
+    const receiverName = chat.name;
 
-  await this.secureStorage.setItem('receiver_name', receiverName);
+    await this.secureStorage.setItem('receiver_name', receiverName);
 
-  // 👉 before navigating, clear "marked as unread" (if present)
-  const me = this.senderUserId || this.authService.authData?.userId || '';
-  if (me) {
-    const roomId = chat.group
-      ? String(chat.receiver_Id)
-      : this.getRoomId(String(me), String(chat.receiver_Id));
+    // 👉 before navigating, clear "marked as unread" (if present)
+    const me = this.senderUserId || this.authService.authData?.userId || '';
+    if (me) {
+      const roomId = chat.group
+        ? String(chat.receiver_Id)
+        : this.getRoomId(String(me), String(chat.receiver_Id));
 
-    // If this row shows unread, clear the UI unread flag/badge in RTDB
-    if (chat.unread || (chat.unreadCount ?? 0) > 0) {
-      try {
-        await this.firebaseChatService.removeMarkAsUnread(roomId, String(me));
-        // optimistic UI
-        chat.unread = false;
-        chat.unreadCount = 0;
-      } catch (_) { /* ignore */ }
+      // If this row shows unread, clear the UI unread flag/badge in RTDB
+      if (chat.unread || (chat.unreadCount ?? 0) > 0) {
+        try {
+          await this.firebaseChatService.removeMarkAsUnread(roomId, String(me));
+          // optimistic UI
+          chat.unread = false;
+          chat.unreadCount = 0;
+        } catch (_) { /* ignore */ }
+      }
+    }
+
+    // community routes as before
+    if (chat.isCommunity) {
+      this.router.navigate(['/community-detail'], { queryParams: { communityId: receiverId } });
+      return;
+    }
+
+    // existing behavior for group or private
+    if (chat.group) {
+      this.router.navigate(['/chatting-screen'], { queryParams: { receiverId, isGroup: true } });
+    } else {
+      await this.secureStorage.setItem('receiver_phone', receiverPhone);
+      this.router.navigate(['/chatting-screen'], {
+        queryParams: { receiverId: receiverId, receiver_phone: receiverPhone }
+      });
     }
   }
-
-  // community routes as before
-  if (chat.isCommunity) {
-    this.router.navigate(['/community-detail'], { queryParams: { communityId: receiverId } });
-    return;
-  }
-
-  // existing behavior for group or private
-  if (chat.group) {
-    this.router.navigate(['/chatting-screen'], { queryParams: { receiverId, isGroup: true } });
-  } else {
-    await this.secureStorage.setItem('receiver_phone', receiverPhone);
-    this.router.navigate(['/chatting-screen'], {
-      queryParams: { receiverId: receiverId, receiver_phone: receiverPhone }
-    });
-  }
-}
 
 
   async loadUserCommunitiesForHome() {

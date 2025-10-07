@@ -62,7 +62,7 @@ export class AddMembersPage implements OnInit {
     const existingIds = Object.keys(existingMembers);
 
     const matchedUsers = await this.contactSyncService.getMatchedUsers();
-    matchedUsers.forEach((user) => {
+    matchedUsers.forEach((user : any) => {
       if (user.phone_number !== currentUserPhone) {
         const isAlreadyAdded = existingIds.includes(user.user_id);
         this.allUsers.push({

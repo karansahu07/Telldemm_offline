@@ -1213,3 +1213,136 @@ ion-datetime {
     }
   }
 }
+
+/* Message row container - allow overflow for reactions */
+.msg-row {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+  overflow: visible;
+  
+  &.align-end {
+    align-items: flex-end;
+  }
+  
+  &.align-start {
+    align-items: flex-start;
+  }
+}
+
+/* Reaction badges - positioned below message bubble */
+.reaction-badges {
+  display: flex;
+  gap: 4px;
+  margin-top: 2px;
+  flex-wrap: wrap;
+  max-width: 200px;
+  position: relative;
+  z-index: 5;
+  
+  &.right {
+    justify-content: flex-end;
+    align-self: flex-end;
+  }
+  
+  &.left {
+    justify-content: flex-start;
+    align-self: flex-start;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 4px 9px;
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid #e0e0e0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    min-height: 24px;
+    
+    &:active {
+      transform: scale(0.95);
+    }
+    
+    &.mine {
+      background: transparent;
+      border-color: transparent;
+    }
+
+    .emoji {
+      font-size: 15px;
+      line-height: 1;
+      margin-bottom: -20px;
+    }
+
+    .cnt {
+      font-size: 11px;
+      color: #555;
+      font-weight: 600;
+      min-width: 10px;
+      text-align: center;
+      margin-left: 2px;
+    }
+  }
+}
+
+/* Floating reaction picker bar (appears on long press) */
+.reaction-bar {
+  position: absolute;
+  display: flex;
+  gap: 4px;
+  background: white;
+  border-radius: 25px;
+  padding: 8px 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+  top: -50px;
+  animation: slideIn 0.2s ease-out;
+  
+  &.right {
+    right: 0;
+    align-self: flex-end;
+  }
+  
+  &.left {
+    left: 0;
+    align-self: flex-start;
+  }
+
+  .react-btn {
+    background: transparent;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 50%;
+    transition: all 0.15s ease;
+    line-height: 1;
+    
+    &:active {
+      background: #f0f0f0;
+      transform: scale(1.15);
+    }
+    
+    &.more {
+      font-size: 18px;
+      font-weight: bold;
+      color: #666;
+    }
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

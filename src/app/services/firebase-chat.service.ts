@@ -364,19 +364,59 @@ export class FirebaseChatService {
     throw new Error('Method not implemented.');
   }
 
-  async sendMessage(roomId: string, message: Message, chatType: string, senderId: string) {
-    console.log("message from chat screen",message);
+  // async sendMessage(roomId: string, message: Message, chatType: string, senderId: string) {
+  //   console.log("message from chat screen",message);
+  //   const messagesRef = ref(this.db, `chats/${roomId}`);
+  //   await push(messagesRef, message);
+  //   console.log("messages is forwards id ", message);
+  //   if (chatType === 'private') {
+  //     // Increment unread for receiver only
+  //     const receiverId = message.receiver_id;
+  //     if (receiverId && receiverId !== senderId) {
+  //       this.incrementUnreadCount(roomId, receiverId);
+  //     }
+  //   } else if (chatType === 'group') {
+  //     // Increment unread for all members except sender
+  //     const groupSnapshot = await get(ref(this.db, `groups/${roomId}/members`));
+  //     const members = groupSnapshot.val();
+  //     if (members) {
+  //       Object.keys(members).forEach(memberId => {
+  //         if (memberId !== senderId) {
+  //           this.incrementUnreadCount(roomId, memberId);
+  //         }
+  //       });
+  //     }
+  //   }
+  // }
+
+ async sendMessage(roomId: string, message: Message, chatType: string, senderId: string) {
+  try {
+    const db = getDatabase();
+
+    try {
+      const idxSnap = await rtdbGet(rtdbRef(db, `roomIds/${roomId}`));
+      if (!idxSnap.exists()) {
+        // create a small metadata object; you can use `true` if you prefer
+        await rtdbSet(rtdbRef(db, `roomIds/${roomId}`), { createdAt: Date.now() });
+        console.log('✅ roomId registered in roomIds:', roomId);
+      }
+    } catch (err) {
+      // non-fatal: continue to push the message even if index write/check fails
+      console.warn('Could not verify/write roomIds entry (continuing):', err);
+    }
+
+    // --- Push the message (this will create chats/{roomId} if required) ---
     const messagesRef = ref(this.db, `chats/${roomId}`);
     await push(messagesRef, message);
-    console.log("messages is forwards id ", message);
+    console.log('✅ Message pushed to', roomId, message);
+
+    // --- Existing unread logic ---
     if (chatType === 'private') {
-      // Increment unread for receiver only
       const receiverId = message.receiver_id;
       if (receiverId && receiverId !== senderId) {
         this.incrementUnreadCount(roomId, receiverId);
       }
     } else if (chatType === 'group') {
-      // Increment unread for all members except sender
       const groupSnapshot = await get(ref(this.db, `groups/${roomId}/members`));
       const members = groupSnapshot.val();
       if (members) {
@@ -387,7 +427,13 @@ export class FirebaseChatService {
         });
       }
     }
+  } catch (err) {
+    console.error('sendMessage error:', err);
+    throw err;
   }
+}
+
+
 
   listenForMessages(roomId: string): Observable<any[]> {
     return new Observable(observer => {

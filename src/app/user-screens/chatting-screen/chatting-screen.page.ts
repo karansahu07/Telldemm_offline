@@ -423,212 +423,212 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
- async handleOption(option: string) {
-  if (option === 'Search') {
-    this.showSearchBar = true;
-    setTimeout(() => {
-      const input = document.querySelector('ion-input');
-      (input as HTMLIonInputElement)?.setFocus();
-    }, 100);
-    return;
-  }
-
-  if (option === 'View Contact') {
-    const queryParams: any = {
-      receiverId: this.receiverId,
-      receiver_phone: this.receiver_phone,
-      receiver_name: this.receiver_name,
-      isGroup: false
-    };
-    this.router.navigate(['/profile-screen'], { queryParams });
-    return;
-  }
-
-  // ✅ NEW: Clear Chat Option
-  if (option === 'clear chat') {
-    console.log("clear chat calls");
-    await this.handleClearChat();
-    return;
-  }
-
-  const groupId = this.receiverId;
-  const userId = await this.secureStorage.getItem('userId');
-
-  if (option === 'Group Info') {
-    const queryParams: any = {
-      receiverId: this.chatType === 'group' ? this.roomId : this.receiverId,
-      receiver_phone: this.receiver_phone,
-      receiver_name: this.receiver_name,
-      isGroup: this.chatType === 'group'
-    };
-    this.router.navigate(['/profile-screen'], { queryParams });
-
-  } else if (option === 'Add Members') {
-    const memberPhones = this.groupMembers.map(member => member.phone);
-    this.router.navigate(['/add-members'], {
-      queryParams: {
-        groupId: groupId,
-        members: JSON.stringify(memberPhones)
-      }
-    });
-
-  } else if (option === 'Exit Group') {
-  if (!this.roomId || !this.senderId) {
-    console.error('Missing groupId or userId');
-    return;
-  }
-
-  const db = getDatabase();
-  const groupId = this.roomId;
-  const userId = this.senderId;
-
-  // 🟢 Confirmation Alert
-  const alert = await this.alertCtrl.create({
-    header: 'Exit Group',
-    message: 'Are you sure you want to exit this group?',
-    buttons: [
-      { text: 'Cancel', role: 'cancel' },
-      {
-        text: 'Exit',
-        handler: async () => {
-          try {
-            const memberPath = `groups/${groupId}/members/${userId}`;
-            const pastMemberPath = `groups/${groupId}/pastmembers/${userId}`;
-
-            const memberSnap = await get(ref(db, memberPath));
-            if (!memberSnap.exists()) {
-              console.error('Member data not found');
-              return;
-            }
-
-            const memberData = memberSnap.val();
-            const wasAdmin = memberData.role === 'admin';
-
-            // ✅ Step 1: Move user to pastmembers
-            const updatedMemberData = {
-              ...memberData,
-              status: 'inactive',
-              removedAt: new Date().toISOString()
-            };
-
-            await set(ref(db, pastMemberPath), updatedMemberData);
-            await remove(ref(db, memberPath));
-
-            // ✅ Step 2: If user was admin, assign a new random admin
-            if (wasAdmin) {
-              const membersSnap = await get(ref(db, `groups/${groupId}/members`));
-              if (membersSnap.exists()) {
-                const members = membersSnap.val();
-                const memberIds = Object.keys(members);
-
-                if (memberIds.length > 0) {
-                  const randomId = memberIds[Math.floor(Math.random() * memberIds.length)];
-                  await update(ref(db, `groups/${groupId}/members/${randomId}`), {
-                    role: 'admin'
-                  });
-                  console.log(`👑 New admin assigned: ${randomId}`);
-                }
-              }
-            }
-
-            // ✅ Toast + navigate
-            const toast = await this.toastCtrl.create({
-              message: 'You exited the group',
-              duration: 2000,
-              color: 'medium'
-            });
-            toast.present();
-
-            this.router.navigate(['/home-screen']);
-
-          } catch (error) {
-            console.error('Error exiting group:', error);
-            const toast = await this.toastCtrl.create({
-              message: 'Failed to exit group',
-              duration: 2000,
-              color: 'danger'
-            });
-            toast.present();
-          }
-        }
-      }
-    ]
-  });
-
-  await alert.present();
-}
-
-}
-
-private async handleClearChat() {
-  try {
-    const userId = await this.authService.authData?.userId;
-    console.log("userID sdsdfgsdgsdfgertgryrtytr", userId); 
-    if (!userId) return;
-
-    // Show confirmation alert
-    const alert = await this.alertCtrl.create({
-      header: 'Clear Chat',
-      message: 'Are you sure you want to clear all messages? This cannot be undone.',
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel'
-        },
-        {
-          text: 'Clear',
-          handler: async () => {
-            await this.clearChatMessages(userId);
-          }
-        }
-      ]
-    });
-
-    await alert.present();
-
-  } catch (error) {
-    console.error('Error in handleClearChat:', error);
-  }
-}
-
-// ✅ Clear Chat Implementation (Soft Delete)
-private async clearChatMessages(userId: string) {
-  try {
-    const roomId = this.chatType === 'group' 
-      ? this.receiverId 
-      : this.getRoomId(userId, this.receiverId);
-
-    if (!roomId) {
-      console.error('Room ID not found');
+  async handleOption(option: string) {
+    if (option === 'Search') {
+      this.showSearchBar = true;
+      setTimeout(() => {
+        const input = document.querySelector('ion-input');
+        (input as HTMLIonInputElement)?.setFocus();
+      }, 100);
       return;
     }
 
-    await this.chatService.deleteChatForUser(roomId, userId);
+    if (option === 'View Contact') {
+      const queryParams: any = {
+        receiverId: this.receiverId,
+        receiver_phone: this.receiver_phone,
+        receiver_name: this.receiver_name,
+        isGroup: false
+      };
+      this.router.navigate(['/profile-screen'], { queryParams });
+      return;
+    }
 
-    // Clear local messages array (UI ko refresh karne ke liye)
-    this.messages = [];
+    // ✅ NEW: Clear Chat Option
+    if (option === 'clear chat') {
+      console.log("clear chat calls");
+      await this.handleClearChat();
+      return;
+    }
 
-    // Show success toast
-    const toast = await this.toastCtrl.create({
-      message: 'Chat cleared successfully',
-      duration: 2000,
-      color: 'success'
-    });
-    await toast.present();
+    const groupId = this.receiverId;
+    const userId = await this.secureStorage.getItem('userId');
 
-    console.log('✅ Chat cleared for user:', userId);
+    if (option === 'Group Info') {
+      const queryParams: any = {
+        receiverId: this.chatType === 'group' ? this.roomId : this.receiverId,
+        receiver_phone: this.receiver_phone,
+        receiver_name: this.receiver_name,
+        isGroup: this.chatType === 'group'
+      };
+      this.router.navigate(['/profile-screen'], { queryParams });
 
-  } catch (error) {
-    console.error('❌ Error clearing chat:', error);
-    
-    const toast = await this.toastCtrl.create({
-      message: 'Failed to clear chat',
-      duration: 2000,
-      color: 'danger'
-    });
-    await toast.present();
+    } else if (option === 'Add Members') {
+      const memberPhones = this.groupMembers.map(member => member.phone);
+      this.router.navigate(['/add-members'], {
+        queryParams: {
+          groupId: groupId,
+          members: JSON.stringify(memberPhones)
+        }
+      });
+
+    } else if (option === 'Exit Group') {
+      if (!this.roomId || !this.senderId) {
+        console.error('Missing groupId or userId');
+        return;
+      }
+
+      const db = getDatabase();
+      const groupId = this.roomId;
+      const userId = this.senderId;
+
+      // 🟢 Confirmation Alert
+      const alert = await this.alertCtrl.create({
+        header: 'Exit Group',
+        message: 'Are you sure you want to exit this group?',
+        buttons: [
+          { text: 'Cancel', role: 'cancel' },
+          {
+            text: 'Exit',
+            handler: async () => {
+              try {
+                const memberPath = `groups/${groupId}/members/${userId}`;
+                const pastMemberPath = `groups/${groupId}/pastmembers/${userId}`;
+
+                const memberSnap = await get(ref(db, memberPath));
+                if (!memberSnap.exists()) {
+                  console.error('Member data not found');
+                  return;
+                }
+
+                const memberData = memberSnap.val();
+                const wasAdmin = memberData.role === 'admin';
+
+                // ✅ Step 1: Move user to pastmembers
+                const updatedMemberData = {
+                  ...memberData,
+                  status: 'inactive',
+                  removedAt: new Date().toISOString()
+                };
+
+                await set(ref(db, pastMemberPath), updatedMemberData);
+                await remove(ref(db, memberPath));
+
+                // ✅ Step 2: If user was admin, assign a new random admin
+                if (wasAdmin) {
+                  const membersSnap = await get(ref(db, `groups/${groupId}/members`));
+                  if (membersSnap.exists()) {
+                    const members = membersSnap.val();
+                    const memberIds = Object.keys(members);
+
+                    if (memberIds.length > 0) {
+                      const randomId = memberIds[Math.floor(Math.random() * memberIds.length)];
+                      await update(ref(db, `groups/${groupId}/members/${randomId}`), {
+                        role: 'admin'
+                      });
+                      console.log(`👑 New admin assigned: ${randomId}`);
+                    }
+                  }
+                }
+
+                // ✅ Toast + navigate
+                const toast = await this.toastCtrl.create({
+                  message: 'You exited the group',
+                  duration: 2000,
+                  color: 'medium'
+                });
+                toast.present();
+
+                this.router.navigate(['/home-screen']);
+
+              } catch (error) {
+                console.error('Error exiting group:', error);
+                const toast = await this.toastCtrl.create({
+                  message: 'Failed to exit group',
+                  duration: 2000,
+                  color: 'danger'
+                });
+                toast.present();
+              }
+            }
+          }
+        ]
+      });
+
+      await alert.present();
+    }
+
   }
-}
+
+  private async handleClearChat() {
+    try {
+      const userId = await this.authService.authData?.userId;
+      console.log("userID sdsdfgsdgsdfgertgryrtytr", userId);
+      if (!userId) return;
+
+      // Show confirmation alert
+      const alert = await this.alertCtrl.create({
+        header: 'Clear Chat',
+        message: 'Are you sure you want to clear all messages? This cannot be undone.',
+        buttons: [
+          {
+            text: 'Cancel',
+            role: 'cancel'
+          },
+          {
+            text: 'Clear',
+            handler: async () => {
+              await this.clearChatMessages(userId);
+            }
+          }
+        ]
+      });
+
+      await alert.present();
+
+    } catch (error) {
+      console.error('Error in handleClearChat:', error);
+    }
+  }
+
+  // ✅ Clear Chat Implementation (Soft Delete)
+  private async clearChatMessages(userId: string) {
+    try {
+      const roomId = this.chatType === 'group'
+        ? this.receiverId
+        : this.getRoomId(userId, this.receiverId);
+
+      if (!roomId) {
+        console.error('Room ID not found');
+        return;
+      }
+
+      await this.chatService.deleteChatForUser(roomId, userId);
+
+      // Clear local messages array (UI ko refresh karne ke liye)
+      this.messages = [];
+
+      // Show success toast
+      const toast = await this.toastCtrl.create({
+        message: 'Chat cleared successfully',
+        duration: 2000,
+        color: 'success'
+      });
+      await toast.present();
+
+      console.log('✅ Chat cleared for user:', userId);
+
+    } catch (error) {
+      console.error('❌ Error clearing chat:', error);
+
+      const toast = await this.toastCtrl.create({
+        message: 'Failed to clear chat',
+        duration: 2000,
+        color: 'danger'
+      });
+      await toast.present();
+    }
+  }
 
   async checkIfBlocked() {
     this.senderId = this.authService.authData?.userId || this.senderId;
@@ -876,6 +876,10 @@ private async clearChatMessages(userId: string) {
     return this.selectedMessages.some((m) => m.message_id === msg.message_id);
   }
 
+isQuickReactionOpen(msg: any) {
+    return this.selectedMessages.some((m) => m.message_id === msg.message_id) && this.selectedMessages.length === 1;
+  }
+
   isOnlyOneTextMessage(): boolean {
     return this.selectedMessages.length === 1 && this.selectedMessages[0].type === 'text';
   }
@@ -984,308 +988,308 @@ private async clearChatMessages(userId: string) {
     }
   }
 
-//this is important
-// async deleteSelectedMessages() {
-//   if (!this.selectedMessages || this.selectedMessages.length === 0) {
-//     return;
-//   }
+  //this is important
+  // async deleteSelectedMessages() {
+  //   if (!this.selectedMessages || this.selectedMessages.length === 0) {
+  //     return;
+  //   }
 
-//   const currentUserId = this.senderId;
-//   const count = this.selectedMessages.length;
+  //   const currentUserId = this.senderId;
+  //   const count = this.selectedMessages.length;
 
-//   // Determine whether all selected messages were sent by current user
-//   const canDeleteForEveryone = this.selectedMessages.every(m => String(m.sender_id) === String(currentUserId));
+  //   // Determine whether all selected messages were sent by current user
+  //   const canDeleteForEveryone = this.selectedMessages.every(m => String(m.sender_id) === String(currentUserId));
 
-//   // Build preview text
-//   let preview = '';
-//   if (count === 1) {
-//     const m = this.selectedMessages[0];
-//     if (m.text && m.text.trim()) preview = m.text.length > 120 ? m.text.substring(0, 120) + '...' : m.text;
-//     else preview = this.getAttachmentPreview(m.attachment || {});
-//   } else {
-//     preview = `${count} messages`;
-//   }
+  //   // Build preview text
+  //   let preview = '';
+  //   if (count === 1) {
+  //     const m = this.selectedMessages[0];
+  //     if (m.text && m.text.trim()) preview = m.text.length > 120 ? m.text.substring(0, 120) + '...' : m.text;
+  //     else preview = this.getAttachmentPreview(m.attachment || {});
+  //   } else {
+  //     preview = `${count} messages`;
+  //   }
 
-//   // Build inputs for alert (Ionic radio buttons)
-//   const inputs: any[] = [
-//     { name: 'choice', type: 'radio', label: 'Delete for me', value: 'forMe', checked: true }
-//   ];
-//   if (canDeleteForEveryone) {
-//     inputs.push({ name: 'choice', type: 'radio', label: 'Delete for everyone', value: 'forEveryone', checked: false });
-//   }
+  //   // Build inputs for alert (Ionic radio buttons)
+  //   const inputs: any[] = [
+  //     { name: 'choice', type: 'radio', label: 'Delete for me', value: 'forMe', checked: true }
+  //   ];
+  //   if (canDeleteForEveryone) {
+  //     inputs.push({ name: 'choice', type: 'radio', label: 'Delete for everyone', value: 'forEveryone', checked: false });
+  //   }
 
-//   const alert = await this.alertCtrl.create({
-//     header: 'Delete messages?',
-//     cssClass: 'delete-confirm-alert',
-//     inputs,
-//     buttons: [
-//       { text: 'Cancel', role: 'cancel' },
-//       {
-//         text: 'OK',
-//         handler: async (selectedValue: any) => {
-//           let choice: string = '';
-//           if (typeof selectedValue === 'string') {
-//             choice = selectedValue;
-//           } else if (Array.isArray(selectedValue) && selectedValue.length > 0) {
-//             choice = selectedValue[0];
-//           } else if (selectedValue && typeof selectedValue === 'object') {
-//             const keys = Object.keys(selectedValue).filter(k => selectedValue[k]);
-//             choice = keys[0] || '';
-//           }
+  //   const alert = await this.alertCtrl.create({
+  //     header: 'Delete messages?',
+  //     cssClass: 'delete-confirm-alert',
+  //     inputs,
+  //     buttons: [
+  //       { text: 'Cancel', role: 'cancel' },
+  //       {
+  //         text: 'OK',
+  //         handler: async (selectedValue: any) => {
+  //           let choice: string = '';
+  //           if (typeof selectedValue === 'string') {
+  //             choice = selectedValue;
+  //           } else if (Array.isArray(selectedValue) && selectedValue.length > 0) {
+  //             choice = selectedValue[0];
+  //           } else if (selectedValue && typeof selectedValue === 'object') {
+  //             const keys = Object.keys(selectedValue).filter(k => selectedValue[k]);
+  //             choice = keys[0] || '';
+  //           }
 
-//           const doForMe = choice === 'forMe';
-//           const doForEveryone = choice === 'forEveryone';
+  //           const doForMe = choice === 'forMe';
+  //           const doForEveryone = choice === 'forEveryone';
 
-//           if (!doForMe && !doForEveryone) return;
+  //           if (!doForMe && !doForEveryone) return;
 
-//           try {
-//             const db = getDatabase();
+  //           try {
+  //             const db = getDatabase();
 
-//             for (const msg of [...this.selectedMessages]) {
-//               const key = msg.key;
-//               if (!key) continue;
+  //             for (const msg of [...this.selectedMessages]) {
+  //               const key = msg.key;
+  //               if (!key) continue;
 
-//                     this.selectedMessages.forEach(msg => msg.fadeOut = true);
+  //                     this.selectedMessages.forEach(msg => msg.fadeOut = true);
 
-//             // Wait for fade-out CSS transition (300ms) then update message arrays
-//             alert.dismiss({confirm : true})
-//              await new Promise((resolve)=>{
-//               setTimeout(async () => {
-//               this.allMessages = this.allMessages.filter(m => !m.fadeOut);
-//               this.displayedMessages = this.displayedMessages.filter(m => !m.fadeOut);
-//               this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
-//               this.saveToLocalStorage();
-//               resolve(null);
-//             }, 2100);
-//              })
+  //             // Wait for fade-out CSS transition (300ms) then update message arrays
+  //             alert.dismiss({confirm : true})
+  //              await new Promise((resolve)=>{
+  //               setTimeout(async () => {
+  //               this.allMessages = this.allMessages.filter(m => !m.fadeOut);
+  //               this.displayedMessages = this.displayedMessages.filter(m => !m.fadeOut);
+  //               this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
+  //               this.saveToLocalStorage();
+  //               resolve(null);
+  //             }, 2100);
+  //              })
 
-//               // DELETE FOR ME
-//               if (doForMe) {
-//                 try {
-//                   if (this.chatService.deleteMessageForMe) {
-//                     await this.chatService.deleteMessageForMe(this.roomId, key, currentUserId);
-//                   } else {
-//                     const updates: any = {};
-//                     updates[`/chats/${this.roomId}/${key}/deletedFor/${currentUserId}`] = true;
-//                     await update(ref(db), updates);
-//                   }
-//                 } catch (err) {
-//                   console.warn('deleteForMe failed for key', key, err);
-//                 }
-//               }
+  //               // DELETE FOR ME
+  //               if (doForMe) {
+  //                 try {
+  //                   if (this.chatService.deleteMessageForMe) {
+  //                     await this.chatService.deleteMessageForMe(this.roomId, key, currentUserId);
+  //                   } else {
+  //                     const updates: any = {};
+  //                     updates[`/chats/${this.roomId}/${key}/deletedFor/${currentUserId}`] = true;
+  //                     await update(ref(db), updates);
+  //                   }
+  //                 } catch (err) {
+  //                   console.warn('deleteForMe failed for key', key, err);
+  //                 }
+  //               }
 
-//               // DELETE FOR EVERYONE
-//               if (doForEveryone && String(msg.sender_id) === String(currentUserId)) {
-//                 try {
-//                   if (this.chatService.deleteMessageForEveryone) {
-//                     await this.chatService.deleteMessageForEveryone(
-//                       this.roomId,
-//                       key,
-//                       currentUserId,
-//                       this.chatType === 'group' ? this.groupMembers.map(g => String(g.user_id)) : [this.receiverId, this.senderId]
-//                     );
-//                   } else {
-//                     const updates: any = {};
-//                     updates[`/chats/${this.roomId}/${key}/deletedForEveryone`] = true;
-//                     updates[`/chats/${this.roomId}/${key}/deletedBy`] = currentUserId;
-//                     updates[`/chats/${this.roomId}/${key}/deletedAt`] = Date.now();
-//                     await update(ref(db), updates);
-//                   }
-//                 } catch (err) {
-//                   console.warn('deleteForEveryone failed for key', key, err);
-//                 }
-//               }
-//             }         
+  //               // DELETE FOR EVERYONE
+  //               if (doForEveryone && String(msg.sender_id) === String(currentUserId)) {
+  //                 try {
+  //                   if (this.chatService.deleteMessageForEveryone) {
+  //                     await this.chatService.deleteMessageForEveryone(
+  //                       this.roomId,
+  //                       key,
+  //                       currentUserId,
+  //                       this.chatType === 'group' ? this.groupMembers.map(g => String(g.user_id)) : [this.receiverId, this.senderId]
+  //                     );
+  //                   } else {
+  //                     const updates: any = {};
+  //                     updates[`/chats/${this.roomId}/${key}/deletedForEveryone`] = true;
+  //                     updates[`/chats/${this.roomId}/${key}/deletedBy`] = currentUserId;
+  //                     updates[`/chats/${this.roomId}/${key}/deletedAt`] = Date.now();
+  //                     await update(ref(db), updates);
+  //                   }
+  //                 } catch (err) {
+  //                   console.warn('deleteForEveryone failed for key', key, err);
+  //                 }
+  //               }
+  //             }         
 
-//             const toast = await this.toastCtrl.create({
-//               message: doForEveryone ? 'Deleted for everyone' : 'Deleted for you',
-//               duration: 1600,
-//               color: 'medium'
-//             });
-//             await toast.present();
+  //             const toast = await this.toastCtrl.create({
+  //               message: doForEveryone ? 'Deleted for everyone' : 'Deleted for you',
+  //               duration: 1600,
+  //               color: 'medium'
+  //             });
+  //             await toast.present();
 
-//             this.selectedMessages = [];
-//             this.lastPressedMessage = null;
+  //             this.selectedMessages = [];
+  //             this.lastPressedMessage = null;
 
-//           } catch (e) {
-//             console.error('deleteSelectedMessages handler err', e);
-//             const t = await this.toastCtrl.create({ message: 'Failed to delete messages', duration: 2000, color: 'danger' });
-//             t.present();
-//           }
-//         }
-//       }
-//     ]
-//   });
+  //           } catch (e) {
+  //             console.error('deleteSelectedMessages handler err', e);
+  //             const t = await this.toastCtrl.create({ message: 'Failed to delete messages', duration: 2000, color: 'danger' });
+  //             t.present();
+  //           }
+  //         }
+  //       }
+  //     ]
+  //   });
 
-//   await alert.present();
-// }
+  //   await alert.present();
+  // }
 
-async deleteSelectedMessages() {
-  if (!this.selectedMessages || this.selectedMessages.length === 0) {
-    return;
-  }
+  async deleteSelectedMessages() {
+    if (!this.selectedMessages || this.selectedMessages.length === 0) {
+      return;
+    }
 
-  const currentUserId = this.senderId;
-  const count = this.selectedMessages.length;
+    const currentUserId = this.senderId;
+    const count = this.selectedMessages.length;
 
-  // Build preview text
-  let preview = '';
-  if (count === 1) {
-    const m = this.selectedMessages[0];
-    if (m.text && m.text.trim()) preview = m.text.length > 120 ? m.text.substring(0, 120) + '...' : m.text;
-    else preview = this.getAttachmentPreview(m.attachment || {});
-  } else {
-    preview = `${count} messages`;
-  }
+    // Build preview text
+    let preview = '';
+    if (count === 1) {
+      const m = this.selectedMessages[0];
+      if (m.text && m.text.trim()) preview = m.text.length > 120 ? m.text.substring(0, 120) + '...' : m.text;
+      else preview = this.getAttachmentPreview(m.attachment || {});
+    } else {
+      preview = `${count} messages`;
+    }
 
-  // Always offer both options. Default to 'Delete for me'
-  const inputs: any[] = [
-    { name: 'choice', type: 'radio', label: 'Delete for me', value: 'forMe', checked: true },
-    { name: 'choice', type: 'radio', label: 'Delete for everyone', value: 'forEveryone', checked: false }
-  ];
+    // Always offer both options. Default to 'Delete for me'
+    const inputs: any[] = [
+      { name: 'choice', type: 'radio', label: 'Delete for me', value: 'forMe', checked: true },
+      { name: 'choice', type: 'radio', label: 'Delete for everyone', value: 'forEveryone', checked: false }
+    ];
 
-  const alert = await this.alertCtrl.create({
-    header: 'Delete messages?',
-    cssClass: 'delete-confirm-alert',
-    inputs,
-    buttons: [
-      { text: 'Cancel', role: 'cancel' },
-      {
-        text: 'OK',
-        handler: async (selectedValue: any) => {
-          let choice: string = '';
-          if (typeof selectedValue === 'string') {
-            choice = selectedValue;
-          } else if (Array.isArray(selectedValue) && selectedValue.length > 0) {
-            choice = selectedValue[0];
-          } else if (selectedValue && typeof selectedValue === 'object') {
-            const keys = Object.keys(selectedValue).filter(k => selectedValue[k]);
-            choice = keys[0] || '';
-          }
+    const alert = await this.alertCtrl.create({
+      header: 'Delete messages?',
+      cssClass: 'delete-confirm-alert',
+      inputs,
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        {
+          text: 'OK',
+          handler: async (selectedValue: any) => {
+            let choice: string = '';
+            if (typeof selectedValue === 'string') {
+              choice = selectedValue;
+            } else if (Array.isArray(selectedValue) && selectedValue.length > 0) {
+              choice = selectedValue[0];
+            } else if (selectedValue && typeof selectedValue === 'object') {
+              const keys = Object.keys(selectedValue).filter(k => selectedValue[k]);
+              choice = keys[0] || '';
+            }
 
-          const doForMe = choice === 'forMe';
-          const doForEveryone = choice === 'forEveryone';
+            const doForMe = choice === 'forMe';
+            const doForEveryone = choice === 'forEveryone';
 
-          if (!doForMe && !doForEveryone) return;
+            if (!doForMe && !doForEveryone) return;
 
-          try {
-            const db = getDatabase();
-
-            // trigger fade-out on UI messages
-            this.selectedMessages.forEach(msg => msg.fadeOut = true);
-
-            // dismiss the alert first, then wait for fade-out duration before removing from arrays
             try {
-              await alert.dismiss();
+              const db = getDatabase();
+
+              // trigger fade-out on UI messages
+              this.selectedMessages.forEach(msg => msg.fadeOut = true);
+
+              // dismiss the alert first, then wait for fade-out duration before removing from arrays
+              try {
+                await alert.dismiss();
+              } catch (e) {
+                // ignore
+              }
+
+              await new Promise<void>((resolve) => {
+                setTimeout(async () => {
+                  try {
+                    this.allMessages = this.allMessages.filter(m => !m.fadeOut);
+                    this.displayedMessages = this.displayedMessages.filter(m => !m.fadeOut);
+                    this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
+                    this.saveToLocalStorage();
+                  } catch (e) {
+                    console.error('fade-out removal failed', e);
+                  } finally {
+                    resolve();
+                  }
+                }, 1100); // match CSS transition duration
+              });
+
+              // Now apply deletions to server/db for each selected message
+              for (const msg of [...this.selectedMessages]) {
+                const key = msg.key;
+                if (!key) continue;
+
+                // DELETE FOR ME: mark deleted for this user
+                if (doForMe) {
+                  try {
+                    if (this.chatService.deleteMessageForMe) {
+                      await this.chatService.deleteMessageForMe(this.roomId, key, currentUserId);
+                    } else {
+                      const updates: any = {};
+                      updates[`/chats/${this.roomId}/${key}/deletedFor/${currentUserId}`] = true;
+                      await update(ref(db), updates);
+                    }
+                  } catch (err) {
+                    console.warn('deleteForMe failed for key', key, err);
+                  }
+                }
+
+                // DELETE FOR EVERYONE: attempt for all messages (not restricted to sender)
+                if (doForEveryone) {
+                  try {
+                    if (this.chatService.deleteMessageForEveryone) {
+                      // try service method (best)
+                      await this.chatService.deleteMessageForEveryone(
+                        this.roomId,
+                        key,
+                        currentUserId,
+                        this.chatType === 'group' ? this.groupMembers.map(g => String(g.user_id)) : [this.receiverId, this.senderId]
+                      );
+                    } else {
+                      // fallback: set convenience flags in DB so clients hide the message
+                      const updates: any = {};
+                      updates[`/chats/${this.roomId}/${key}/deletedForEveryone`] = true;
+                      updates[`/chats/${this.roomId}/${key}/deletedBy`] = currentUserId;
+                      updates[`/chats/${this.roomId}/${key}/deletedAt`] = Date.now();
+                      // optionally clear content:
+                      // updates[`/chats/${this.roomId}/${key}/text`] = '';
+                      // updates[`/chats/${this.roomId}/${key}/attachment`] = null;
+                      await update(ref(db), updates);
+                    }
+                  } catch (err) {
+                    console.warn('deleteForEveryone failed for key', key, err);
+                  }
+                }
+              }
+
+              const toast = await this.toastCtrl.create({
+                message: doForEveryone ? 'Deleted for everyone' : 'Deleted for you',
+                duration: 1600,
+                color: 'medium'
+              });
+              await toast.present();
+
+              this.selectedMessages = [];
+              this.lastPressedMessage = null;
             } catch (e) {
-              // ignore
+              console.error('deleteSelectedMessages handler err', e);
+              const t = await this.toastCtrl.create({ message: 'Failed to delete messages', duration: 2000, color: 'danger' });
+              t.present();
             }
-
-            await new Promise<void>((resolve) => {
-              setTimeout(async () => {
-                try {
-                  this.allMessages = this.allMessages.filter(m => !m.fadeOut);
-                  this.displayedMessages = this.displayedMessages.filter(m => !m.fadeOut);
-                  this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
-                  this.saveToLocalStorage();
-                } catch (e) {
-                  console.error('fade-out removal failed', e);
-                } finally {
-                  resolve();
-                }
-              }, 1100); // match CSS transition duration
-            });
-
-            // Now apply deletions to server/db for each selected message
-            for (const msg of [...this.selectedMessages]) {
-              const key = msg.key;
-              if (!key) continue;
-
-              // DELETE FOR ME: mark deleted for this user
-              if (doForMe) {
-                try {
-                  if (this.chatService.deleteMessageForMe) {
-                    await this.chatService.deleteMessageForMe(this.roomId, key, currentUserId);
-                  } else {
-                    const updates: any = {};
-                    updates[`/chats/${this.roomId}/${key}/deletedFor/${currentUserId}`] = true;
-                    await update(ref(db), updates);
-                  }
-                } catch (err) {
-                  console.warn('deleteForMe failed for key', key, err);
-                }
-              }
-
-              // DELETE FOR EVERYONE: attempt for all messages (not restricted to sender)
-              if (doForEveryone) {
-                try {
-                  if (this.chatService.deleteMessageForEveryone) {
-                    // try service method (best)
-                    await this.chatService.deleteMessageForEveryone(
-                      this.roomId,
-                      key,
-                      currentUserId,
-                      this.chatType === 'group' ? this.groupMembers.map(g => String(g.user_id)) : [this.receiverId, this.senderId]
-                    );
-                  } else {
-                    // fallback: set convenience flags in DB so clients hide the message
-                    const updates: any = {};
-                    updates[`/chats/${this.roomId}/${key}/deletedForEveryone`] = true;
-                    updates[`/chats/${this.roomId}/${key}/deletedBy`] = currentUserId;
-                    updates[`/chats/${this.roomId}/${key}/deletedAt`] = Date.now();
-                    // optionally clear content:
-                    // updates[`/chats/${this.roomId}/${key}/text`] = '';
-                    // updates[`/chats/${this.roomId}/${key}/attachment`] = null;
-                    await update(ref(db), updates);
-                  }
-                } catch (err) {
-                  console.warn('deleteForEveryone failed for key', key, err);
-                }
-              }
-            }
-
-            const toast = await this.toastCtrl.create({
-              message: doForEveryone ? 'Deleted for everyone' : 'Deleted for you',
-              duration: 1600,
-              color: 'medium'
-            });
-            await toast.present();
-
-            this.selectedMessages = [];
-            this.lastPressedMessage = null;
-          } catch (e) {
-            console.error('deleteSelectedMessages handler err', e);
-            const t = await this.toastCtrl.create({ message: 'Failed to delete messages', duration: 2000, color: 'danger' });
-            t.present();
           }
         }
-      }
-    ]
-  });
+      ]
+    });
 
-  await alert.present();
-}
+    await alert.present();
+  }
 
 
 
   private applyDeletionFilters(dm: Message): boolean {
-  try {
-    // deletedForEveryone shortcut
-    if (dm.deletedForEveryone) return true;
+    try {
+      // deletedForEveryone shortcut
+      if (dm.deletedForEveryone) return true;
 
-    // per-user deletion
-    if (dm.deletedFor && this.senderId && dm.deletedFor[String(this.senderId)]) {
-      return true;
+      // per-user deletion
+      if (dm.deletedFor && this.senderId && dm.deletedFor[String(this.senderId)]) {
+        return true;
+      }
+
+      // optional: if isDeleted flag you might want to show placeholder instead of hiding
+      // if you prefer placeholder, return false here and handle `isDeleted` in template.
+      return false;
+    } catch (e) {
+      console.warn('applyDeletionFilters error', e);
+      return false;
     }
-
-    // optional: if isDeleted flag you might want to show placeholder instead of hiding
-    // if you prefer placeholder, return false here and handle `isDeleted` in template.
-    return false;
-  } catch (e) {
-    console.warn('applyDeletionFilters error', e);
-    return false;
   }
-}
 
   onForward() {
     this.chatService.setForwardMessages(this.selectedMessages);
@@ -1445,103 +1449,6 @@ async deleteSelectedMessages() {
   shareMessage() {
     console.log('Share clicked for attachment:', this.lastPressedMessage);
   }
-
-  addReaction(msg: Message, emoji: string) {
-  const userId = this.senderId;
-  // toggle: same emoji -> remove, else set/update
-  const current = msg.reactions?.[userId] || null;
-  const newVal = current === emoji ? null : emoji;
-
-  // 1) optimistic UI
-  msg.reactions = { ...(msg.reactions || {}) };
-  if (newVal) msg.reactions[userId] = newVal;
-  else delete msg.reactions[userId];
-
-  // 2) persist (Firebase)
-  try {
-    const db = getDatabase();
-    const path = `chats/${this.roomId}/${msg.key}/reactions/${userId}`;
-    if (newVal) {
-      update(ref(db, path), newVal as any)    // if your node expects value directly, use set(ref(...), newVal)
-        .catch(() => {/* noop */});
-      // better:
-      // await set(ref(db, path), newVal);
-    } else {
-      remove(ref(db, path)).catch(() => {/* noop */});
-    }
-  } catch (e) {
-    console.warn('reaction update failed', e);
-  }
-}
-
-openEmojiKeyboard(msg: Message) {
-  this.emojiTargetMsg = msg;
-  // focus hidden input to pop OS emoji keyboard
-  const el = (document.querySelector('#chatting-screen') || document)  // adjust root if needed
-    .querySelector('ion-input[ng-reflect-name="emojiKeyboard"]') as any;
-
-  // better: use @ViewChild('emojiKeyboard') emojiInput!: IonInput;
-  // then: this.emojiInput.setFocus();
-  const inputEl = document.querySelector('ion-input + input') as HTMLInputElement; // Ionic renders native <input> after shadow
-  if (this.datePicker) {/* just to keep reference lint happy */}
-}
-
-onEmojiPicked(ev: CustomEvent) {
-  const val = (ev.detail as any)?.value || '';
-  const emoji = val?.trim();
-  if (!emoji || !this.emojiTargetMsg) return;
-  this.addReaction(this.emojiTargetMsg, emoji);
-
-  // clear input so next pick fires change again
-  const native = (ev.target as any)?.querySelector?.('input') as HTMLInputElement;
-  if (native) native.value = '';
-  this.emojiTargetMsg = null;
-}
-
-/** Build reaction summary for chips below a message */
-// getReactionSummary(msg: Message): Array<{ emoji: string; count: number; mine: boolean }> {
-//   const map = msg.reactions || {};
-//   const byEmoji: Record<string, number> = {};
-//   Object.values(map).forEach((e: any) => {
-//     const em = String(e || '');
-//     if (!em) return;
-//     byEmoji[em] = (byEmoji[em] || 0) + 1;
-//   });
-//   return Object.keys(byEmoji).map(emoji => ({
-//     emoji,
-//     count: byEmoji[emoji],
-//     mine: map[this.senderId] === emoji
-//   })).sort((a,b) => b.count - a.count);
-// }
-
-/** Summary already exists; re-use it to build compact badges */
-getReactionSummary(msg: Message): Array<{ emoji: string; count: number; mine: boolean }> {
-  const map = msg.reactions || {};
-  const byEmoji: Record<string, number> = {};
-  Object.values(map).forEach((e: any) => {
-    const em = String(e || '');
-    if (!em) return;
-    byEmoji[em] = (byEmoji[em] || 0) + 1;
-  });
-  return Object.keys(byEmoji).map(emoji => ({
-    emoji,
-    count: byEmoji[emoji],
-    mine: map[this.senderId] === emoji
-  })).sort((a,b) => b.count - a.count);
-}
-
-/** Return max 3 badges; prefer user's reaction first */
-getReactionBadges(msg: Message): Array<{ emoji: string; count: number; mine: boolean }> {
-  const list = this.getReactionSummary(msg);
-  // Put "mine" first if exists
-  const mineIdx = list.findIndex(x => x.mine);
-  if (mineIdx > 0) {
-    const mine = list.splice(mineIdx, 1)[0];
-    list.unshift(mine);
-  }
-  return list.slice(0, 3);
-}
-
 
   pinMessage() {
     const pin: PinnedMessage = {
@@ -1756,7 +1663,6 @@ getReactionBadges(msg: Message): Array<{ emoji: string; count: number; mine: boo
     return userA < userB ? `${userA}_${userB}` : `${userB}_${userA}`;
   }
 
-
   // async listenForMessages() {
   //   this.messageSub?.unsubscribe();
 
@@ -1803,6 +1709,18 @@ getReactionBadges(msg: Message): Array<{ emoji: string; count: number; mine: boo
   //         }
   //       }
 
+  //       // Apply deletion filters — skip messages hidden for current user
+  //       if (this.applyDeletionFilters(dm)) {
+  //         // If the message exists in our local cache and is now marked deletedForEveryone,
+  //         // we also remove it from allMessages so UI disappears.
+  //         if (existingById[String(messageId)] !== undefined) {
+  //           // remove from arrays
+  //           const idx = existingById[String(messageId)];
+  //           this.allMessages[idx] = { ...this.allMessages[idx], ...dm }; // keep metadata, but skip display below
+  //         }
+  //         continue; // skip adding to UI lists for this user
+  //       }
+
   //       // check if we already have message with same message_id
   //       const existingIndex = existingById[String(messageId)];
 
@@ -1838,29 +1756,31 @@ getReactionBadges(msg: Message): Array<{ emoji: string; count: number; mine: boo
   //       }
   //     }
 
-  //     // 4) After processing, remove any accidental duplicate message_id entries (safety)
+  //     // 4) After processing, remove duplicates (safety)
   //     const seenIds: Record<string, boolean> = {};
   //     this.allMessages = this.allMessages.filter(m => {
   //       const id = String(m.message_id || '');
   //       if (!id) return true;
   //       if (seenIds[id]) {
-  //         // duplicate -> skip
   //         return false;
   //       }
   //       seenIds[id] = true;
   //       return true;
   //     });
 
-  //     // 5) Sort and update displayed / grouped lists
+  //     // 5) Sort and update displayed / grouped lists (apply deletion filters again before exposing to UI)
   //     this.allMessages.sort((a, b) => {
   //       const ta = Number(a.timestamp) || new Date(a.timestamp || 0).getTime();
   //       const tb = Number(b.timestamp) || new Date(b.timestamp || 0).getTime();
   //       return ta - tb;
   //     });
 
+  //     // Filter out messages that should be hidden for this user
+  //     const visibleAllMessages = this.allMessages.filter(m => !this.applyDeletionFilters(m));
+
   //     const keepCount = Math.max(this.limit || 50, this.displayedMessages?.length || 0);
-  //     const startIdx = Math.max(0, this.allMessages.length - keepCount);
-  //     this.displayedMessages = this.allMessages.slice(startIdx);
+  //     const startIdx = Math.max(0, visibleAllMessages.length - keepCount);
+  //     this.displayedMessages = visibleAllMessages.slice(startIdx);
 
   //     this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
 
@@ -1882,7 +1802,6 @@ getReactionBadges(msg: Message): Array<{ emoji: string; count: number; mine: boo
   this.messageSub = this.chatService.listenForMessages(this.roomId).subscribe(async (newMessages) => {
     if (!Array.isArray(newMessages)) return;
 
-    // 1) decrypt all message.text in parallel (preserve order)
     const decryptPromises = newMessages.map(msg =>
       this.encryptionService.decrypt(msg.text || '')
         .then(dt => ({ msg, decryptedText: dt }))
@@ -1893,23 +1812,24 @@ getReactionBadges(msg: Message): Array<{ emoji: string; count: number; mine: boo
     );
 
     const decryptedPairs = await Promise.all(decryptPromises);
-
-    // 2) Build a lookup map by message_id for existing messages (fast dedupe)
     const existingById: Record<string, number> = {};
     this.allMessages.forEach((m, i) => {
       if (m.message_id) existingById[String(m.message_id)] = i;
     });
 
-    // 3) Process incoming messages
     for (const pair of decryptedPairs) {
       const msg = pair.msg;
       const serverKey = msg.key || null;
       const messageId = msg.message_id || uuidv4();
 
-      // Build dm with decrypted text
-      const dm: Message = { ...msg, key: serverKey, message_id: messageId, text: pair.decryptedText };
+      const dm: Message = { 
+        ...msg, 
+        key: serverKey, 
+        message_id: messageId, 
+        text: pair.decryptedText,
+        reactions: msg.reactions || {} // ✅ Ensure reactions are included
+      };
 
-      // decrypt attachment.caption if present (safe)
       if (dm.attachment && (dm.attachment as any).caption) {
         try {
           const encCap = (dm.attachment as any).caption;
@@ -1922,43 +1842,34 @@ getReactionBadges(msg: Message): Array<{ emoji: string; count: number; mine: boo
         }
       }
 
-      // Apply deletion filters — skip messages hidden for current user
       if (this.applyDeletionFilters(dm)) {
-        // If the message exists in our local cache and is now marked deletedForEveryone,
-        // we also remove it from allMessages so UI disappears.
         if (existingById[String(messageId)] !== undefined) {
-          // remove from arrays
           const idx = existingById[String(messageId)];
-          this.allMessages[idx] = { ...this.allMessages[idx], ...dm }; // keep metadata, but skip display below
+          this.allMessages[idx] = { ...this.allMessages[idx], ...dm };
         }
-        continue; // skip adding to UI lists for this user
+        continue;
       }
 
-      // check if we already have message with same message_id
       const existingIndex = existingById[String(messageId)];
 
       if (existingIndex !== undefined) {
-        // merge into existing entry (server wins but keep local-only flag if present)
         const old = this.allMessages[existingIndex];
         const merged: Message = {
           ...old,
           ...dm,
-          // prefer server key if present
-          key: dm.key || old.key
+          key: dm.key || old.key,
+          reactions: dm.reactions || old.reactions || {} // ✅ Merge reactions
         };
 
-        // preserve client-only flags
         if ((old as any).localOnly !== undefined) (merged as any).localOnly = (old as any).localOnly;
         if ((old as any).isLocallyEdited !== undefined) (merged as any).isLocallyEdited = (old as any).isLocallyEdited;
 
         this.allMessages[existingIndex] = merged;
       } else {
-        // brand new message — push
         this.allMessages.push(dm);
         existingById[String(messageId)] = this.allMessages.length - 1;
       }
 
-      // If message was sent to me and not read, mark read
       if (dm.receiver_id === this.senderId && !dm.read) {
         try {
           await this.chatService.markRead(this.roomId, dm.key);
@@ -1969,34 +1880,27 @@ getReactionBadges(msg: Message): Array<{ emoji: string; count: number; mine: boo
       }
     }
 
-    // 4) After processing, remove duplicates (safety)
     const seenIds: Record<string, boolean> = {};
     this.allMessages = this.allMessages.filter(m => {
       const id = String(m.message_id || '');
       if (!id) return true;
-      if (seenIds[id]) {
-        return false;
-      }
+      if (seenIds[id]) return false;
       seenIds[id] = true;
       return true;
     });
 
-    // 5) Sort and update displayed / grouped lists (apply deletion filters again before exposing to UI)
     this.allMessages.sort((a, b) => {
       const ta = Number(a.timestamp) || new Date(a.timestamp || 0).getTime();
       const tb = Number(b.timestamp) || new Date(b.timestamp || 0).getTime();
       return ta - tb;
     });
 
-    // Filter out messages that should be hidden for this user
     const visibleAllMessages = this.allMessages.filter(m => !this.applyDeletionFilters(m));
-
     const keepCount = Math.max(this.limit || 50, this.displayedMessages?.length || 0);
     const startIdx = Math.max(0, visibleAllMessages.length - keepCount);
     this.displayedMessages = visibleAllMessages.slice(startIdx);
 
     this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
-
     this.saveToLocalStorage();
 
     if (this.pinnedMessage) {
@@ -2201,49 +2105,49 @@ getReactionBadges(msg: Message): Array<{ emoji: string; count: number; mine: boo
   // }
 
   async loadFromLocalStorage() {
-  const cached = localStorage.getItem(this.roomId);
-  if (!cached) return;
+    const cached = localStorage.getItem(this.roomId);
+    if (!cached) return;
 
-  try {
-    const rawMessages = JSON.parse(cached);
-    const recentMessages = rawMessages.slice(-this.limit * 3);
+    try {
+      const rawMessages = JSON.parse(cached);
+      const recentMessages = rawMessages.slice(-this.limit * 3);
 
-    const decryptedMessages = await Promise.all(recentMessages.map(async (msg: any) => {
-      let decryptedText = '';
-      try {
-        decryptedText = await this.encryptionService.decrypt(msg.text || '');
-      } catch (e) {
-        console.warn('decrypt cached message.text failed', e);
-        decryptedText = '';
-      }
-
-      // decrypt cached attachment caption if present
-      if (msg.attachment && msg.attachment.caption) {
+      const decryptedMessages = await Promise.all(recentMessages.map(async (msg: any) => {
+        let decryptedText = '';
         try {
-          const captionPlain = await this.encryptionService.decrypt(msg.attachment.caption);
-          msg.attachment.caption = captionPlain; // overwrite with plaintext
+          decryptedText = await this.encryptionService.decrypt(msg.text || '');
         } catch (e) {
-          console.warn('decrypt cached attachment caption failed', e);
+          console.warn('decrypt cached message.text failed', e);
+          decryptedText = '';
         }
+
+        // decrypt cached attachment caption if present
+        if (msg.attachment && msg.attachment.caption) {
+          try {
+            const captionPlain = await this.encryptionService.decrypt(msg.attachment.caption);
+            msg.attachment.caption = captionPlain; // overwrite with plaintext
+          } catch (e) {
+            console.warn('decrypt cached attachment caption failed', e);
+          }
+        }
+
+        return { ...msg, text: decryptedText } as Message;
+      }));
+
+      // Filter out messages that are deleted for this user (or globally)
+      const visibleMessages = decryptedMessages.filter(m => !this.applyDeletionFilters(m));
+
+      this.allMessages = visibleMessages;
+      this.displayedMessages = visibleMessages.slice(-this.limit);
+      this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
+
+      if (visibleMessages.length > 0) {
+        this.lastMessageKey = visibleMessages[0].key;
       }
-
-      return { ...msg, text: decryptedText } as Message;
-    }));
-
-    // Filter out messages that are deleted for this user (or globally)
-    const visibleMessages = decryptedMessages.filter(m => !this.applyDeletionFilters(m));
-
-    this.allMessages = visibleMessages;
-    this.displayedMessages = visibleMessages.slice(-this.limit);
-    this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
-
-    if (visibleMessages.length > 0) {
-      this.lastMessageKey = visibleMessages[0].key;
+    } catch (error) {
+      console.error('Error loading from localStorage:', error);
     }
-  } catch (error) {
-    console.error('Error loading from localStorage:', error);
   }
-}
 
   blobToFile(blob: Blob, fileName: string, mimeType?: string): File {
     return new File([blob], fileName, {
@@ -2931,99 +2835,279 @@ getReactionBadges(msg: Message): Array<{ emoji: string; count: number; mine: boo
   // }
 
   async loadMessagesFromFirebase(loadMore = false) {
-  try {
-    const db = getDatabase();
-    const messagesRef = ref(db, `chats/${this.roomId}`);
+    try {
+      const db = getDatabase();
+      const messagesRef = ref(db, `chats/${this.roomId}`);
 
-    let qry;
-    if (loadMore && this.lastMessageKey) {
-      qry = query(messagesRef, orderByKey(), endBefore(this.lastMessageKey), limitToLast(this.limit));
-    } else {
-      qry = query(messagesRef, orderByKey(), limitToLast(this.limit));
-    }
-
-    const snapshot = await get(qry);
-
-    if (snapshot.exists()) {
-      const messagesData = snapshot.val();
-      const messageKeys = Object.keys(messagesData).sort();
-
-      const decryptTasks = messageKeys.map(async (key) => {
-        const msg = messagesData[key];
-
-        // decrypt text
-        let decryptedText = '';
-        try {
-          decryptedText = await this.encryptionService.decrypt(msg.text || '');
-        } catch (e) {
-          console.warn('decrypt text failed for key', key, e);
-          decryptedText = '';
-        }
-
-        // decrypt attachment.caption if present
-        if (msg.attachment && msg.attachment.caption) {
-          try {
-            const decryptedCaption = await this.encryptionService.decrypt(msg.attachment.caption);
-            msg.attachment.caption = decryptedCaption; // overwrite with plaintext
-            // OR: msg.attachment.captionPlain = decryptedCaption;
-          } catch (e) {
-            console.warn('decrypt attachment caption failed for key', key, e);
-          }
-        }
-
-        return {
-          ...msg,
-          key: key,
-          text: decryptedText
-        } as Message;
-      });
-
-      const results = await Promise.all(decryptTasks);
-
-      // -----------------------
-      // FILTER OUT MESSAGES HIDDEN FOR THIS USER (deletedFor / deletedForEveryone)
-      // -----------------------
-      const filteredResults = results.filter((msg: Message) => {
-        // if applyDeletionFilters returns true -> message should be hidden for current user
-        try {
-          return !this.applyDeletionFilters(msg);
-        } catch (e) {
-          // fail open (show message) if filter crashes
-          console.warn('applyDeletionFilters error while loading firebase messages', e);
-          return true;
-        }
-      });
-
-      // Merge into allMessages / displayedMessages keeping chronological order
-      if (loadMore) {
-        // older messages prepended (results are sorted ascending by key/name)
-        this.allMessages = [...filteredResults, ...this.allMessages];
-        this.displayedMessages = [...filteredResults, ...this.displayedMessages];
+      let qry;
+      if (loadMore && this.lastMessageKey) {
+        qry = query(messagesRef, orderByKey(), endBefore(this.lastMessageKey), limitToLast(this.limit));
       } else {
-        this.allMessages = filteredResults;
-        this.displayedMessages = filteredResults;
+        qry = query(messagesRef, orderByKey(), limitToLast(this.limit));
       }
 
-      // Keep lastMessageKey based on raw results (so pagination works even when some were filtered out)
-      if (results.length > 0 && results[0]?.key) {
-        this.lastMessageKey = results[0].key;
+      const snapshot = await get(qry);
+
+      if (snapshot.exists()) {
+        const messagesData = snapshot.val();
+        const messageKeys = Object.keys(messagesData).sort();
+
+        const decryptTasks = messageKeys.map(async (key) => {
+          const msg = messagesData[key];
+
+          // decrypt text
+          let decryptedText = '';
+          try {
+            decryptedText = await this.encryptionService.decrypt(msg.text || '');
+          } catch (e) {
+            console.warn('decrypt text failed for key', key, e);
+            decryptedText = '';
+          }
+
+          // decrypt attachment.caption if present
+          if (msg.attachment && msg.attachment.caption) {
+            try {
+              const decryptedCaption = await this.encryptionService.decrypt(msg.attachment.caption);
+              msg.attachment.caption = decryptedCaption; // overwrite with plaintext
+              // OR: msg.attachment.captionPlain = decryptedCaption;
+            } catch (e) {
+              console.warn('decrypt attachment caption failed for key', key, e);
+            }
+          }
+
+          return {
+            ...msg,
+            key: key,
+            text: decryptedText
+          } as Message;
+        });
+
+        const results = await Promise.all(decryptTasks);
+
+        // -----------------------
+        // FILTER OUT MESSAGES HIDDEN FOR THIS USER (deletedFor / deletedForEveryone)
+        // -----------------------
+        const filteredResults = results.filter((msg: Message) => {
+          // if applyDeletionFilters returns true -> message should be hidden for current user
+          try {
+            return !this.applyDeletionFilters(msg);
+          } catch (e) {
+            // fail open (show message) if filter crashes
+            console.warn('applyDeletionFilters error while loading firebase messages', e);
+            return true;
+          }
+        });
+
+        // Merge into allMessages / displayedMessages keeping chronological order
+        if (loadMore) {
+          // older messages prepended (results are sorted ascending by key/name)
+          this.allMessages = [...filteredResults, ...this.allMessages];
+          this.displayedMessages = [...filteredResults, ...this.displayedMessages];
+        } else {
+          this.allMessages = filteredResults;
+          this.displayedMessages = filteredResults;
+        }
+
+        // Keep lastMessageKey based on raw results (so pagination works even when some were filtered out)
+        if (results.length > 0 && results[0]?.key) {
+          this.lastMessageKey = results[0].key;
+        }
+
+        // hasMoreMessages should be true if the query returned 'limit' keys (raw)
+        this.hasMoreMessages = messageKeys.length === this.limit;
+
+        this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
+
+        this.saveToLocalStorage();
+
+        await this.markDisplayedMessagesAsRead();
+      } else {
+        this.hasMoreMessages = false;
       }
-
-      // hasMoreMessages should be true if the query returned 'limit' keys (raw)
-      this.hasMoreMessages = messageKeys.length === this.limit;
-
-      this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
-
-      this.saveToLocalStorage();
-
-      await this.markDisplayedMessagesAsRead();
-    } else {
-      this.hasMoreMessages = false;
+    } catch (error) {
+      console.error('Error loading messages from Firebase:', error);
     }
-  } catch (error) {
-    console.error('Error loading messages from Firebase:', error);
   }
-}
+
+  // addReaction(msg: Message, emoji: string) {
+  //   const userId = this.senderId;
+  //   const current = msg.reactions?.[userId] || null;
+  //   const newVal = current === emoji ? null : emoji;
+
+  //   // Update UI locally
+  //   msg.reactions = { ...(msg.reactions || {}) };
+  //   if (newVal) msg.reactions[userId] = newVal;
+  //   else delete msg.reactions[userId];
+
+  //   // Update Firebase
+  //   try {
+  //     const db = getDatabase();
+  //     const path = `chats/${this.roomId}/${msg.key}/reactions/${userId}`;
+
+  //     if (newVal) {
+  //       set(ref(db, path), newVal) // ✅ correctly writes value
+  //         .then(() => console.log('✅ Reaction saved:', newVal))
+  //         .catch(err => console.error('❌ Reaction save error:', err));
+  //     } else {
+  //       remove(ref(db, path))
+  //         .then(() => console.log('✅ Reaction removed'))
+  //         .catch(err => console.error('❌ Reaction remove error:', err));
+  //     }
+  //   } catch (e) {
+  //     console.warn('reaction update failed', e);
+  //   }
+  // }
+
+  async addReaction(msg: Message, emoji: string) {
+    const userId = this.senderId;
+    const current = msg.reactions?.[userId] || null;
+    const newVal = current === emoji ? null : emoji;
+
+    // 1) Optimistic UI update
+    msg.reactions = { ...(msg.reactions || {}) };
+    if (newVal) msg.reactions[userId] = newVal;
+    else delete msg.reactions[userId];
+
+    // If you maintain grouped/displayed arrays, ensure they reflect the change:
+    try {
+      // update the message inside displayed/all arrays if present
+      const idxAll = this.allMessages.findIndex(m => m.key === msg.key);
+      if (idxAll !== -1) {
+        this.allMessages[idxAll] = { ...this.allMessages[idxAll], ...msg };
+      }
+      const idxDisp = this.displayedMessages.findIndex(m => m.key === msg.key);
+      if (idxDisp !== -1) {
+        this.displayedMessages[idxDisp] = { ...this.displayedMessages[idxDisp], ...msg };
+      }
+      // refresh grouped view (optional, expensive if called very often)
+      this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
+      // persist a small cache
+      this.saveToLocalStorage();
+    } catch (e) {
+      console.warn('update local arrays failed', e);
+    }
+
+    // 2) Persist to Firebase
+    try {
+      const db = getDatabase();
+      const path = `chats/${this.roomId}/${msg.key}/reactions/${userId}`;
+
+      if (newVal) {
+        await set(ref(db, path), newVal);
+        console.log('✅ Reaction saved:', newVal);
+      } else {
+        await remove(ref(db, path));
+        console.log('✅ Reaction removed');
+      }
+
+      // 3) After successful write -> exit selection mode
+      this.selectedMessages = [];
+      this.lastPressedMessage = null;
+
+      // if you have UI flags for selection, reset them too:
+      // e.g. this.showSelectionToolbar = false; (replace with your actual flag)
+      // Also ensure any CSS 'selected' classes will update because selectedMessages empty
+
+    } catch (err) {
+      console.error('❌ Reaction save/remove error:', err);
+
+      // Optionally rollback optimistic UI on error:
+      try {
+        // revert local change by refetching msg from allMessages (if exists) or clear reaction
+        const idx = this.allMessages.findIndex(m => m.key === msg.key);
+        if (idx !== -1) {
+          // re-sync from stored version if you have one; fallback: remove current user's reaction
+          delete this.allMessages[idx].reactions?.[userId];
+          delete msg.reactions?.[userId];
+        }
+        // this.displayedMessages = this.displayedMessages.map(m => m.key === msg.key ? { ...this.displayedMessages.find(x => x.key === msg.key) } : m);
+        this.displayedMessages = this.displayedMessages.map(m =>
+          m.key === msg.key
+            ? { ...(this.displayedMessages.find(x => x.key === msg.key) || {} as Message) }
+            : m
+        );
+        this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
+        this.saveToLocalStorage();
+      } catch (e) { /* ignore rollback errors */ }
+
+      // keep UI selection cleared? you can choose to keep selection if error:
+      this.selectedMessages = [];
+      this.lastPressedMessage = null;
+
+      const t = await this.toastCtrl.create({ message: 'Failed to update reaction', duration: 1600, color: 'danger' });
+      await t.present();
+    }
+  }
+
+
+  openEmojiKeyboard(msg: Message) {
+    this.emojiTargetMsg = msg;
+    // focus hidden input to pop OS emoji keyboard
+    const el = (document.querySelector('#chatting-screen') || document)  // adjust root if needed
+      .querySelector('ion-input[ng-reflect-name="emojiKeyboard"]') as any;
+
+    // better: use @ViewChild('emojiKeyboard') emojiInput!: IonInput;
+    // then: this.emojiInput.setFocus();
+    const inputEl = document.querySelector('ion-input + input') as HTMLInputElement; // Ionic renders native <input> after shadow
+    if (this.datePicker) {/* just to keep reference lint happy */ }
+  }
+
+  onEmojiPicked(ev: CustomEvent) {
+    const val = (ev.detail as any)?.value || '';
+    const emoji = val?.trim();
+    if (!emoji || !this.emojiTargetMsg) return;
+    this.addReaction(this.emojiTargetMsg, emoji);
+
+    // clear input so next pick fires change again
+    const native = (ev.target as any)?.querySelector?.('input') as HTMLInputElement;
+    if (native) native.value = '';
+    this.emojiTargetMsg = null;
+  }
+
+  /** Build reaction summary for chips below a message */
+  // getReactionSummary(msg: Message): Array<{ emoji: string; count: number; mine: boolean }> {
+  //   const map = msg.reactions || {};
+  //   const byEmoji: Record<string, number> = {};
+  //   Object.values(map).forEach((e: any) => {
+  //     const em = String(e || '');
+  //     if (!em) return;
+  //     byEmoji[em] = (byEmoji[em] || 0) + 1;
+  //   });
+  //   return Object.keys(byEmoji).map(emoji => ({
+  //     emoji,
+  //     count: byEmoji[emoji],
+  //     mine: map[this.senderId] === emoji
+  //   })).sort((a,b) => b.count - a.count);
+  // }
+
+  /** Summary already exists; re-use it to build compact badges */
+  getReactionSummary(msg: Message): Array<{ emoji: string; count: number; mine: boolean }> {
+    const map = msg.reactions || {};
+    const byEmoji: Record<string, number> = {};
+    Object.values(map).forEach((e: any) => {
+      const em = String(e || '');
+      if (!em) return;
+      byEmoji[em] = (byEmoji[em] || 0) + 1;
+    });
+    return Object.keys(byEmoji).map(emoji => ({
+      emoji,
+      count: byEmoji[emoji],
+      mine: map[this.senderId] === emoji
+    })).sort((a, b) => b.count - a.count);
+  }
+
+  /** Return max 3 badges; prefer user's reaction first */
+  getReactionBadges(msg: Message): Array<{ emoji: string; count: number; mine: boolean }> {
+    const list = this.getReactionSummary(msg);
+    // Put "mine" first if exists
+    const mineIdx = list.findIndex(x => x.mine);
+    if (mineIdx > 0) {
+      const mine = list.splice(mineIdx, 1)[0];
+      list.unshift(mine);
+    }
+    return list.slice(0, 3);
+  }
+
 
   goToProfile() {
     const queryParams: any = {

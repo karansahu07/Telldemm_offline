@@ -79,14 +79,14 @@
 
     <!-- 🔁 Default Chat Header -->
     <ng-template #defaultHeader>
-      <ion-buttons *ngIf="!showSearchBar" slot="start" style="color: black; width: 8%; margin-top: 2px;">
+      <ion-buttons *ngIf="!showSearchBar" slot="start" style="color: black; width: 8%; margin-top: 15px;">
         <ion-back-button defaultHref="/home-screen"></ion-back-button>
         <!-- <ion-icon name="arrow-back-outline" class="back-icon"></ion-icon> -->
       </ion-buttons>
 
       <ng-container *ngIf="!showSearchBar; else searchBar">
         <ion-buttons>
-          <ion-item lines="none" style="--padding-start: 0; --background: white; color: black; margin-top: 2px;"
+          <ion-item lines="none" style="--padding-start: 0; --background: white; color: black; margin-top: 15px;"
             detail="false">
             <!-- <ion-avatar slot="start">
               <img src="assets/images/user.jfif" alt="User Avatar"
@@ -163,7 +163,7 @@
         </ion-item>
       </ng-template>
 
-      <ion-buttons *ngIf="!showSearchBar" slot="end" style="margin-top: 2px;">
+      <ion-buttons *ngIf="!showSearchBar" slot="end" style="margin-top: 15px;">
         <ion-button style="color: black;">
           <ion-icon name="videocam-outline" style="font-size: 35px;"></ion-icon>
         </ion-button>
@@ -351,38 +351,40 @@
                   class="status-icon read"></ion-icon>
       </ng-container>
     </p>
+
+     <!-- 🟡 COMPACT REACTION BADGE (WhatsApp style) -->
+    <div class="reaction-badges"
+         *ngIf="getReactionBadges(msg).length > 0"
+         [class.right]="msg.sender_id === senderId"
+         [class.left]="msg.sender_id !== senderId">
+      <div class="badge"
+           *ngFor="let b of getReactionBadges(msg)"
+           [class.mine]="b.mine"
+           (click)="addReaction(msg, b.emoji)">
+        <span class="emoji">{{ b.emoji }}</span>
+        <span class="cnt" *ngIf="b.count > 1">{{ b.count }}</span>
+      </div>
+    </div>
+
   </div>
 
   <!-- 🟢 FLOATING REACTION BAR -->
   <div class="reaction-bar"
-       *ngIf="isSelected(msg)"
-       [class.right]="msg.sender_id === senderId"
-       [class.left]="msg.sender_id !== senderId">
-    <button class="react-btn" (click)="addReaction(msg, '👍')">👍</button>
-    <button class="react-btn" (click)="addReaction(msg, '❤️')">❤️</button>
-    <button class="react-btn" (click)="addReaction(msg, '😂')">😂</button>
-    <button class="react-btn" (click)="addReaction(msg, '😮')">😮</button>
-    <button class="react-btn" (click)="addReaction(msg, '😢')">😢</button>
-    <button class="react-btn" (click)="addReaction(msg, '🙏')">🙏</button>
-    <button class="react-btn more" (click)="openEmojiKeyboard(msg)">＋</button>
-  </div>
-
-  <!-- 🟡 COMPACT REACTION BADGE (WhatsApp style) -->
-  <div class="reaction-badges"
-       *ngIf="getReactionBadges(msg).length"
-       [class.right]="msg.sender_id === senderId"
-       [class.left]="msg.sender_id !== senderId">
-    <div class="badge"
-         *ngFor="let b of getReactionBadges(msg)"
-         [class.mine]="b.mine"
-         (click)="addReaction(msg, b.emoji)">
-      <span class="emoji">{{ b.emoji }}</span>
-      <!-- count optional: show only if you want -->
-      <!-- <span class="cnt" *ngIf="b.count > 1">{{ b.count }}</span> -->
+         *ngIf="isQuickReactionOpen(msg)"
+         [class.right]="msg.sender_id === senderId"
+         [class.left]="msg.sender_id !== senderId">
+      <button class="react-btn" (click)="addReaction(msg, '👍')">👍</button>
+      <button class="react-btn" (click)="addReaction(msg, '❤️')">❤️</button>
+      <button class="react-btn" (click)="addReaction(msg, '😂')">😂</button>
+      <button class="react-btn" (click)="addReaction(msg, '😮')">😮</button>
+      <button class="react-btn" (click)="addReaction(msg, '😢')">😢</button>
+      <button class="react-btn" (click)="addReaction(msg, '🙏')">🙏</button>
+      <button class="react-btn more" (click)="openEmojiKeyboard(msg)">＋</button>
     </div>
-  </div>
 
+   
 </div>
+
 
 
     </div>

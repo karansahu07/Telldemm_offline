@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Contacts, GetContactsOptions } from '@capacitor-community/contacts';
 import { ApiService } from './api/api.service';
+import { IDeviceContact, IUser } from 'src/types';
  
 @Injectable({
   providedIn: 'root',
@@ -9,7 +10,7 @@ export class ContactSyncService {
   contacts: any;
   constructor(private apiService: ApiService) {}
 
-async getDevicePhoneNumbers(): Promise<any[]> {
+  async getDevicePhoneNumbers(): Promise<IDeviceContact[]> {
   try {
     const permission = await Contacts.requestPermissions();
 
@@ -18,15 +19,13 @@ async getDevicePhoneNumbers(): Promise<any[]> {
         projection: {
           name: true,
           phones: true,
-          emails: true,
         },
       };
 
       const result = await Contacts.getContacts(options);
       const rawContacts = result.contacts || [];
 
-      const formattedContacts: any[] = [];
-
+      const formattedContacts: IDeviceContact[] = [];
       const uniqueNumbers = new Set<string>();
 
       rawContacts.forEach((contact) => {
@@ -36,70 +35,68 @@ async getDevicePhoneNumbers(): Promise<any[]> {
           contact.name?.family || '',
         ]
           .join(' ')
-          .trim();
+          .trim() || 'Unknown';
 
-        const numbers = (contact.phones || [])
-          .map((p: any) => p.number.trim())
-          .filter((num: string) => {
-            // Remove duplicates based on cleaned 10-digit number
-            const digits = num.replace(/\D/g, '');
-            if (!digits || digits.length < 10 || uniqueNumbers.has(digits)) return false;
+        (contact.phones || []).forEach((p: any) => {
+          const number = (p.number || '').trim();
+          const digits = number.replace(/\D/g, '');
+
+          // ✅ Only keep valid 10+ digit numbers and avoid duplicates
+          if (digits.length >= 10 && !uniqueNumbers.has(digits)) {
             uniqueNumbers.add(digits);
-            return true;
-          });
-
-        const emails = (contact.emails || []).map((e: any) => e.address);
-
-        if (numbers.length > 0) {
-          formattedContacts.push({
-            name: fullName || 'Unknown',
-            phoneNumbers: numbers,
-            emails: emails,
-          });
-        }
+            formattedContacts.push({
+              name: fullName,
+              phoneNumber: number,
+            });
+          }
+        });
       });
 
-      this.contacts = formattedContacts;
-      console.log('Formatted Contacts:', this.contacts);
-      return formattedContacts; // ✅ RETURN here
+      console.log('Flattened Contacts:', formattedContacts);
+      return formattedContacts; // ✅ return flattened array
     } else {
       console.warn('Permission not granted for contacts');
-      return []; // ⛔️ return empty array if denied
+      return [];
     }
   } catch (error) {
     console.error('Error loading contacts', error);
-    return []; // ⛔️ also return empty array on failure
+    return [];
   }
 }
 
-async getMatchedUsers(): Promise<any[]> {
+async getMatchedUsers(): Promise<IUser[]> {
   const formattedContacts = await this.getDevicePhoneNumbers();
 
   const deviceNumbersMap = new Map<string, string>(); // phone => deviceName
-  formattedContacts.forEach(contact => {
-    (contact.phoneNumbers || []).forEach((number: string) => {
-      let cleaned = number.replace(/\D/g, '');
-      if (cleaned.length >= 10) {
-        const last10 = cleaned.slice(-10);
-        const formatted = '+91' + last10;
-        deviceNumbersMap.set(formatted, contact.name); // save device name
-      }
-    });
-  });
+  const nameNumberMap = formattedContacts.reduce((map, contact)=>{
+    map.set(contact.phoneNumber.slice(-10), contact.name)
+    return map; 
+  },new Map<string, string>())
+  // formattedContacts.forEach(contact => {
+  //   (contact.phoneNumbers || []).forEach((number: string) => {
+  //     let cleaned = number.replace(/\D/g, '');
+  //     if (cleaned.length >= 10) {
+  //       const last10 = cleaned.slice(-10);
+  //       const formatted = '+91' + last10;
+  //       deviceNumbersMap.set(formatted, contact.name); // save device name
+  //     }
+  //   });
+  // });
 
   return new Promise((resolve, reject) => {
     this.apiService.getAllUsers().subscribe({
       next: (users) => {
-        const matched = (users || []).map((user: any) => {
+        const matched = (users || []).map((user : IUser) => {
           const cleanedUserNumber = user.phone_number.replace(/\D/g, '');
           if (cleanedUserNumber.length >= 10) {
             const userLast10 = cleanedUserNumber.slice(-10);
             const formattedUser = '+91' + userLast10;
 
-            if (deviceNumbersMap.has(formattedUser)) {
+            if (nameNumberMap.has(userLast10)) {
               return {
                 ...user,
-                name: deviceNumbersMap.get(formattedUser), // ✅ override backend name
+                phone_number: formattedUser,
+                name: nameNumberMap.get(userLast10) as string, // ✅ override backend name
               };
             }
           }

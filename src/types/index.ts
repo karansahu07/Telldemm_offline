@@ -178,3 +178,44 @@ export type ArchItem = {
   timestamp?: string;
   unreadCount: number;
 };
+
+export interface IDeviceContact {
+  name : string;
+   phoneNumber: string;
+}
+
+export interface IUser {
+  user_id: number;
+  name: string;
+  phone_number: string;
+  email: string | null;
+  profile_picture_url: string | null;
+  status: 'verified' | 'unverified' | string; // you can narrow this union as needed
+  user_created_at: string | null;
+  otp_id: number | null;
+  otp_code: string | null;
+  is_verified: boolean | null;
+  otp_created_at: string | null;
+  expires_at: string | null;
+  bio? : any
+}
+
+export interface IChat extends IUser {
+  dp: any;
+  pinnedAt? : number | null;
+  pinned? : null | number | unknown;
+  name: string; // overrides IUser name if needed
+  receiver_Id: number | string;
+  profile_picture_url: string | null;
+  receiver_phone: string;
+  group: boolean;
+  message: string;
+  time: string;
+  unreadCount: number;
+  unread: boolean;
+  isTyping: boolean;
+  typingText: string | null;
+  typingCount: number;
+  isCommunity? : boolean;
+  members? : any;
+}
