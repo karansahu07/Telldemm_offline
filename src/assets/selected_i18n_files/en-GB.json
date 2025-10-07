@@ -450,27 +450,27 @@
       "saveFailed": "Failed to update Instagram link. Try again."
     }
   }, "home": {
-    "search": { "placeholder": "Ask  or Search" },
-    "filters": { "all": "ALL", "read": "Read", "unread": "Unread", "groups": "Groups" },
-    "groupCreator": { "placeholder": "Enter Group Name" },
+    "search": { "placeholder": "Ask or Search" },
+    "filters": { "all": "ALL", "read": "Read", "unread": "Unread", "groups": "DemmRooms (Groups)" },
+    "groupCreator": { "placeholder": "Enter DemmRoom (Group) Name" },
     "typing": "typing...",
     "time": { "yesterday": "Yesterday" },
     "preview": {
       "deleted": "This message was deleted",
       "encrypted": "[Encrypted]",
       "media": {
-        "photo": "Photo",
-        "video": "Video",
-        "audio": "Audio",
-        "file": "Attachment",
+        "photo": "PicTell (Photo)",
+        "video": "ClipTell (Video)",
+        "audio": "VoiceTell (Audio)",
+        "file": "FileTell (Attachment)",
         "generic": "[Media]"
       }
     },
     "actions": {
-      "scan": "Scan QR",
+      "scan": "Scan DemmCode (QR)",
       "camera": "Open camera",
       "menu": "Open menu",
-      "contacts": "Contacts"
+      "contacts": "DemmList (Contacts)"
     },
     "scan": {
       "onlyDevice": "Barcode scanning only works on a real device.",

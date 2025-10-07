@@ -448,37 +448,37 @@
       "saveFailed": "Falha ao atualizar link do Instagram. Tente novamente."
     }
   },"home": {
-    "search": { "placeholder": "Pergunte ao  ou Pesquise" },
-    "filters": { "all": "TODOS", "read": "Lidos", "unread": "Não lidos", "groups": "Grupos" },
-    "groupCreator": { "placeholder": "Introduza o nome do grupo" },
-    "typing": "a escrever...",
+    "search": { "placeholder": "Perguntar ou Pesquisar" },
+    "filters": { "all": "TUDO", "read": "Lido", "unread": "Não lido", "groups": "DemmRoom (Grupos)" },
+    "groupCreator": { "placeholder": "Introduzir Nome do DemmRoom" },
+    "typing": "a digitar...",
     "time": { "yesterday": "Ontem" },
     "preview": {
       "deleted": "Esta mensagem foi eliminada",
-      "encrypted": "[Encriptado]",
+      "encrypted": "[Criptografado]",
       "media": {
-        "photo": "Foto",
-        "video": "Vídeo",
-        "audio": "Áudio",
-        "file": "Anexo",
+        "photo": "PicTell (Foto)",
+        "video": "ClipTell (Vídeo)",
+        "audio": "VoiceTell (Áudio)",
+        "file": "FileTell (Anexo)",
         "generic": "[Média]"
       }
     },
     "actions": {
-      "scan": "Digitalizar QR",
+      "scan": "Escanear DemmCode",
       "camera": "Abrir câmara",
       "menu": "Abrir menu",
-      "contacts": "Contactos"
+      "contacts": "DemmList (Contactos)"
     },
     "scan": {
-      "onlyDevice": "A leitura de códigos de barras só funciona num dispositivo real.",
-      "permission": "A permissão da câmara é necessária para digitalizar códigos de barras.",
+      "onlyDevice": "O escaneamento de códigos de barras funciona apenas num dispositivo real.",
+      "permission": "É necessária autorização da câmara para escanear códigos de barras.",
       "notFound": "Nenhum código de barras encontrado.",
-      "error": "Ocorreu um erro durante a leitura."
+      "error": "Algo correu mal durante o escaneamento."
     },
     "logout": {
-      "header": "Terminar sessão",
-      "message": "Sessão expirada."
+      "header": "Sair",
+      "message": "Sessão expirada/terminada."
     },
     "alt": { "profile": "Perfil" }
   },"menu": {

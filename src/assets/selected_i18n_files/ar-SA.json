@@ -449,37 +449,37 @@
       "saveFailed": "فشل في تحديث رابط إنستجرام. حاول مرة أخرى."
     }
   },"home": {
-    "search": { "placeholder": "اسأل  أو ابحث" },
-    "filters": { "all": "الكل", "read": "مقروء", "unread": "غير مقروء", "groups": "المجموعات" },
-    "groupCreator": { "placeholder": "أدخل اسم المجموعة" },
+    "search": { "placeholder": "اسأل أو ابحث" },
+    "filters": { "all": "الكل", "read": "مقروء", "unread": "غير مقروء", "groups": "DemmRoom (غرف المجموعة)" },
+    "groupCreator": { "placeholder": "أدخل اسم DemmRoom (المجموعة)" },
     "typing": "يكتب...",
     "time": { "yesterday": "أمس" },
     "preview": {
       "deleted": "تم حذف هذه الرسالة",
-      "encrypted": "[مشفرة]",
+      "encrypted": "[مشفر]",
       "media": {
-        "photo": "صورة",
-        "video": "فيديو",
-        "audio": "صوت",
-        "file": "مرفق",
+        "photo": "PicTell (صورة)",
+        "video": "ClipTell (فيديو)",
+        "audio": "VoiceTell (صوت)",
+        "file": "FileTell (مرفق)",
         "generic": "[وسائط]"
       }
     },
     "actions": {
-      "scan": "مسح QR",
-      "camera": "افتح الكاميرا",
-      "menu": "افتح القائمة",
-      "contacts": "جهات الاتصال"
+      "scan": "مسح DemmCode (رمز QR)",
+      "camera": "فتح الكاميرا",
+      "menu": "فتح القائمة",
+      "contacts": "DemmList (جهات الاتصال)"
     },
     "scan": {
-      "onlyDevice": "مسح الباركود يعمل فقط على جهاز حقيقي.",
-      "permission": "إذن الكاميرا مطلوب لمسح الباركود.",
-      "notFound": "لم يتم العثور على باركود.",
+      "onlyDevice": "مسح الرموز الشريطية يعمل فقط على جهاز حقيقي.",
+      "permission": "يتطلب إذن الكاميرا لمسح الرموز الشريطية.",
+      "notFound": "لم يتم العثور على رمز شريطي.",
       "error": "حدث خطأ أثناء المسح."
     },
     "logout": {
       "header": "تسجيل الخروج",
-      "message": "انتهت الجلسة أو انتهت صلاحيتها."
+      "message": "انتهت صلاحية الجلسة/انتهت."
     },
     "alt": { "profile": "الملف الشخصي" }
   },"menu": {

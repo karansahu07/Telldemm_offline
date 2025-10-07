@@ -448,27 +448,27 @@
       "saveFailed": "इंस्टाग्राम लिंक अपडेट करने में विफल। फिर से प्रयास करें।"
     }
   },"home": {
-    "search": { "placeholder": " से पूछें या खोजें" },
-    "filters": { "all": "सभी", "read": "पढ़ा हुआ", "unread": "अपठित", "groups": "समूह" },
-    "groupCreator": { "placeholder": "समूह का नाम दर्ज करें" },
-    "typing": "टाइप कर रहा है...",
+    "search": { "placeholder": "पूछें या खोजें" },
+    "filters": { "all": "सभी", "read": "पढ़ा", "unread": "अपढ़", "groups": "DemmRoom (समूह)" },
+    "groupCreator": { "placeholder": "DemmRoom नाम दर्ज करें" },
+    "typing": "टाइप कर रहे हैं...",
     "time": { "yesterday": "कल" },
     "preview": {
       "deleted": "यह संदेश हटा दिया गया था",
       "encrypted": "[एन्क्रिप्टेड]",
       "media": {
-        "photo": "फोटो",
-        "video": "वीडियो",
-        "audio": "ऑडियो",
-        "file": "संलग्नक",
+        "photo": "PicTell (फोटो)",
+        "video": "ClipTell (वीडियो)",
+        "audio": "VoiceTell (ऑडियो)",
+        "file": "FileTell (संलग्नक)",
         "generic": "[मीडिया]"
       }
     },
     "actions": {
-      "scan": "QR स्कैन करें",
+      "scan": "DemmCode स्कैन करें",
       "camera": "कैमरा खोलें",
-      "menu": "मेन्यू खोलें",
-      "contacts": "संपर्क"
+      "menu": "मेनू खोलें",
+      "contacts": "DemmList (संपर्क)"
     },
     "scan": {
       "onlyDevice": "बारकोड स्कैनिंग केवल वास्तविक डिवाइस पर काम करती है।",
@@ -477,8 +477,8 @@
       "error": "स्कैनिंग के दौरान कुछ गलत हो गया।"
     },
     "logout": {
-      "header": "लॉगआउट",
-      "message": "सत्र का समय समाप्त/समाप्त हो गया।"
+      "header": "लॉग आउट",
+      "message": "सत्र समय समाप्त/समाप्त।"
     },
     "alt": { "profile": "प्रोफ़ाइल" }
   },"menu": {

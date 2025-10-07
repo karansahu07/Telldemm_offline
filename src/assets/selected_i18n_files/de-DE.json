@@ -449,37 +449,37 @@
       "saveFailed": "Instagram-Link konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut."
     }
   },"home": {
-    "search": { "placeholder": "Frag  oder Suche" },
-    "filters": { "all": "ALLE", "read": "Gelesen", "unread": "Ungelesen", "groups": "Gruppen" },
-    "groupCreator": { "placeholder": "Gruppennamen eingeben" },
-    "typing": "schreibt...",
+    "search": { "placeholder": "Fragen oder Suchen" },
+    "filters": { "all": "ALLE", "read": "Gelesen", "unread": "Ungelesen", "groups": "DemmRoom (Gruppen)" },
+    "groupCreator": { "placeholder": "DemmRoom-Name eingeben" },
+    "typing": "tippt...",
     "time": { "yesterday": "Gestern" },
     "preview": {
       "deleted": "Diese Nachricht wurde gelöscht",
       "encrypted": "[Verschlüsselt]",
       "media": {
-        "photo": "Foto",
-        "video": "Video",
-        "audio": "Audio",
-        "file": "Anhang",
+        "photo": "PicTell (Foto)",
+        "video": "ClipTell (Video)",
+        "audio": "VoiceTell (Audio)",
+        "file": "FileTell (Anhang)",
         "generic": "[Medien]"
       }
     },
     "actions": {
-      "scan": "QR scannen",
+      "scan": "DemmCode scannen",
       "camera": "Kamera öffnen",
       "menu": "Menü öffnen",
-      "contacts": "Kontakte"
+      "contacts": "DemmList (Kontakte)"
     },
     "scan": {
-      "onlyDevice": "Barcode-Scannen funktioniert nur auf einem echten Gerät.",
-      "permission": "Kamerazugriff ist erforderlich, um Barcodes zu scannen.",
+      "onlyDevice": "Barcode-Scanning funktioniert nur auf einem echten Gerät.",
+      "permission": "Kameraberechtigung ist erforderlich, um Barcodes zu scannen.",
       "notFound": "Kein Barcode gefunden.",
-      "error": "Beim Scannen ist ein Fehler aufgetreten."
+      "error": "Etwas ist während des Scans schiefgelaufen."
     },
     "logout": {
       "header": "Abmelden",
-      "message": "Sitzung abgelaufen."
+      "message": "Sitzung abgelaufen/zeitlich begrenzt."
     },
     "alt": { "profile": "Profil" }
   },"menu": {

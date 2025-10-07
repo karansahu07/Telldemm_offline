@@ -450,37 +450,37 @@
       "saveFailed": "ইনস্টাগ্রাম লিঙ্ক আপডেট করতে ব্যর্থ। আবার চেষ্টা করুন।"
     }
   },"home": {
-    "search": { "placeholder": "-কে জিজ্ঞাসা করুন অথবা খুঁজুন" },
-    "filters": { "all": "সব", "read": "পড়া হয়েছে", "unread": "না পড়া", "groups": "গ্রুপ" },
-    "groupCreator": { "placeholder": "গ্রুপের নাম লিখুন" },
-    "typing": "টাইপ করছে...",
+    "search": { "placeholder": "প্রশ্ন করুন বা অনুসন্ধান করুন" },
+    "filters": { "all": "সব", "read": "পড়া", "unread": "অপঠিত", "groups": "DemmRoom (গ্রুপ)" },
+    "groupCreator": { "placeholder": "DemmRoom নাম লিখুন" },
+    "typing": "টাইপিং করছে...",
     "time": { "yesterday": "গতকাল" },
     "preview": {
       "deleted": "এই বার্তাটি মুছে ফেলা হয়েছে",
       "encrypted": "[এনক্রিপ্টেড]",
       "media": {
-        "photo": "ছবি",
-        "video": "ভিডিও",
-        "audio": "অডিও",
-        "file": "সংযুক্তি",
+        "photo": "PicTell (ছবি)",
+        "video": "ClipTell (ভিডিও)",
+        "audio": "VoiceTell (অডিও)",
+        "file": "FileTell (ফাইল)",
         "generic": "[মিডিয়া]"
       }
     },
     "actions": {
-      "scan": "QR স্ক্যান করুন",
+      "scan": "DemmCode স্ক্যান করুন",
       "camera": "ক্যামেরা খুলুন",
       "menu": "মেনু খুলুন",
-      "contacts": "কনট্যাক্টস"
+      "contacts": "DemmList (যোগাযোগ)"
     },
     "scan": {
-      "onlyDevice": "বারকোড স্ক্যান শুধুমাত্র আসল ডিভাইসে কাজ করে।",
-      "permission": "বারকোড স্ক্যান করতে ক্যামেরা অনুমতি প্রয়োজন।",
-      "notFound": "কোনও বারকোড পাওয়া যায়নি।",
-      "error": "স্ক্যান করার সময় কিছু ভুল হয়েছে।"
+      "onlyDevice": "বারকোড স্ক্যানিং শুধুমাত্র একটি বাস্তব ডিভাইসে কাজ করে।",
+      "permission": "বারকোড স্ক্যান করার জন্য ক্যামেরা অনুমতি প্রয়োজন।",
+      "notFound": "কোনো বারকোড পাওয়া যায়নি।",
+      "error": "স্ক্যানিংয়ের সময় কিছু ভুল হয়েছে।"
     },
     "logout": {
       "header": "লগ আউট",
-      "message": "সেশন শেষ হয়েছে/মেয়াদোত্তীর্ণ।"
+      "message": "সেশন টাইম আউট/মেয়াদ শেষ।"
     },
     "alt": { "profile": "প্রোফাইল" }
   },"menu": {

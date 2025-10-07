@@ -448,37 +448,37 @@
       "saveFailed": "ઇન્સ્ટાગ્રામ લિંક અપડેટ કરવામાં નિષ્ફળ. ફરી પ્રયાસ કરો."
     }
   },"home": {
-    "search": { "placeholder": " ને પૂછો અથવા શોધો" },
-    "filters": { "all": "બધા", "read": "વાંચેલ", "unread": "ન વાંચેલ", "groups": "જૂથો" },
-    "groupCreator": { "placeholder": "જૂથનું નામ દાખલ કરો" },
-    "typing": "ટાઈપ કરી રહ્યા છે...",
-    "time": { "yesterday": "ગઇકાલે" },
+    "search": { "placeholder": "પૂછો અથવા શોધો" },
+    "filters": { "all": "બધું", "read": "વાંચેલું", "unread": "અવાંચેલું", "groups": "DemmRoom (ગ્રુપ્સ)" },
+    "groupCreator": { "placeholder": "DemmRoom નામ દાખલ કરો" },
+    "typing": "ટાઇપ કરી રહ્યા છે...",
+    "time": { "yesterday": "ગઈ કાલ" },
     "preview": {
       "deleted": "આ સંદેશ કાઢી નાખવામાં આવ્યો હતો",
       "encrypted": "[એન્ક્રિપ્ટેડ]",
       "media": {
-        "photo": "ફોટો",
-        "video": "વિડિઓ",
-        "audio": "ઑડિયો",
-        "file": "જોડાણ",
+        "photo": "PicTell (ફોટો)",
+        "video": "ClipTell (વિડિયો)",
+        "audio": "VoiceTell (ઓડિયો)",
+        "file": "FileTell (અનુબંધ)",
         "generic": "[મીડિયા]"
       }
     },
     "actions": {
-      "scan": "QR સ્કેન કરો",
+      "scan": "DemmCode સ્કેન કરો",
       "camera": "કેમેરા ખોલો",
       "menu": "મેનુ ખોલો",
-      "contacts": "સંપર્કો"
+      "contacts": "DemmList (સંપર્કો)"
     },
     "scan": {
-      "onlyDevice": "બારકોડ સ્કેનિંગ ફક્ત વાસ્તવિક ઉપકરણ પર જ કાર્ય કરે છે.",
-      "permission": "બારકોડ સ્કેન કરવા માટે કેમેરાની પરવાનગી જરૂરી છે.",
-      "notFound": "કોઈ બારકોડ મળ્યો નથી.",
+      "onlyDevice": "બારકોડ સ્કેનિંગ ફક્ત વાસ્તવિક ઉપકરણ પર કામ કરે છે.",
+      "permission": "બારકોડ સ્કેન કરવા માટે કેમેરા પરવાનગી જરૂરી છે.",
+      "notFound": "કોઈ બારકોડ મળ્યું નથી.",
       "error": "સ્કેનિંગ દરમિયાન કંઈક ખોટું થયું."
     },
     "logout": {
       "header": "લૉગ આઉટ",
-      "message": "સત્ર સમય સમાપ્ત/સમાપ્ત થયું."
+      "message": "સેશન સમયસીમા/સમાપ્ત."
     },
     "alt": { "profile": "પ્રોફાઇલ" }
   },"menu": {

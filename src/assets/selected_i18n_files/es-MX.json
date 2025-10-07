@@ -448,37 +448,37 @@
       "saveFailed": "Error al actualizar el enlace de Instagram. Inténtalo de nuevo."
     }
   },"home": {
-    "search": { "placeholder": "Pregunta a  o Busca" },
-    "filters": { "all": "TODOS", "read": "Leído", "unread": "No leído", "groups": "Grupos" },
-    "groupCreator": { "placeholder": "Ingresa el nombre del grupo" },
+    "search": { "placeholder": "Preguntar o Buscar" },
+    "filters": { "all": "TODO", "read": "Leído", "unread": "No leído", "groups": "DemmRoom (Grupos)" },
+    "groupCreator": { "placeholder": "Introducir Nombre de DemmRoom" },
     "typing": "escribiendo...",
     "time": { "yesterday": "Ayer" },
     "preview": {
       "deleted": "Este mensaje fue eliminado",
-      "encrypted": "[Encriptado]",
+      "encrypted": "[Cifrado]",
       "media": {
-        "photo": "Foto",
-        "video": "Video",
-        "audio": "Audio",
-        "file": "Archivo adjunto",
+        "photo": "PicTell (Foto)",
+        "video": "ClipTell (Vídeo)",
+        "audio": "VoiceTell (Audio)",
+        "file": "FileTell (Adjunto)",
         "generic": "[Medios]"
       }
     },
     "actions": {
-      "scan": "Escanear QR",
+      "scan": "Escanear DemmCode",
       "camera": "Abrir cámara",
       "menu": "Abrir menú",
-      "contacts": "Contactos"
+      "contacts": "DemmList (Contactos)"
     },
     "scan": {
       "onlyDevice": "El escaneo de códigos de barras solo funciona en un dispositivo real.",
-      "permission": "Se requiere permiso de la cámara para escanear códigos de barras.",
+      "permission": "Se requiere permiso de cámara para escanear códigos de barras.",
       "notFound": "No se encontró ningún código de barras.",
-      "error": "Ocurrió un error durante el escaneo."
+      "error": "Algo salió mal durante el escaneo."
     },
     "logout": {
       "header": "Cerrar sesión",
-      "message": "La sesión ha caducado."
+      "message": "Sesión caducada/expirada."
     },
     "alt": { "profile": "Perfil" }
   },"menu": {

@@ -449,39 +449,39 @@
       "saveFailed": "ਇੰਸਟਾਗ੍ਰਾਮ ਲਿੰਕ ਅੱਪਡੇਟ ਕਰਨ ਵਿੱਚ ਅਸਫਲ। ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।"
     }
   },"home": {
-    "search": { "placeholder": " ਨੂੰ ਪੁੱਛੋ ਜਾਂ ਖੋਜੋ" },
-    "filters": { "all": "ਸਭ", "read": "ਪੜ੍ਹਿਆ", "unread": "ਨਾ ਪੜ੍ਹਿਆ", "groups": "ਗਰੁੱਪ" },
-    "groupCreator": { "placeholder": "ਗਰੁੱਪ ਦਾ ਨਾਮ ਦਰਜ ਕਰੋ" },
+    "search": { "placeholder": "ਪੁੱਛੋ ਜਾਂ ਖੋਜੋ" },
+    "filters": { "all": "ਸਭ", "read": "ਪੜ੍ਹਿਆ", "unread": "ਅਪੜ੍ਹਿਆ", "groups": "DemmRoom (ਗਰੁੱਪ)" },
+    "groupCreator": { "placeholder": "DemmRoom ਨਾਮ ਦਾਖਲ ਕਰੋ" },
     "typing": "ਲਿਖ ਰਿਹਾ ਹੈ...",
-    "time": { "yesterday": "ਕੱਲ੍ਹ" },
+    "time": { "yesterday": "ਕਲ" },
     "preview": {
-      "deleted": "ਇਹ ਸੁਨੇਹਾ ਮਿਟਾ ਦਿੱਤਾ ਗਿਆ ਹੈ",
-      "encrypted": "[ਇੰਕ੍ਰਿਪਟਡ]",
+      "deleted": "ਇਹ ਸੁਨੇਹਾ ਮਿਟਾ ਦਿੱਤਾ ਗਿਆ ਸੀ",
+      "encrypted": "[ਐਨਕ੍ਰਿਪਟ ਕੀਤਾ]",
       "media": {
-        "photo": "ਫੋਟੋ",
-        "video": "ਵੀਡੀਓ",
-        "audio": "ਆਡੀਓ",
-        "file": "ਅਟੈਚਮੈਂਟ",
+        "photo": "PicTell (ਫੋਟੋ)",
+        "video": "ClipTell (ਵੀਡੀਓ)",
+        "audio": "VoiceTell (ਆਡੀਓ)",
+        "file": "FileTell (ਅਟੈਚਮੈਂਟ)",
         "generic": "[ਮੀਡੀਆ]"
       }
     },
     "actions": {
-      "scan": "QR ਸਕੈਨ ਕਰੋ",
+      "scan": "DemmCode ਸਕੈਨ ਕਰੋ",
       "camera": "ਕੈਮਰਾ ਖੋਲ੍ਹੋ",
-      "menu": "ਮੀਨੂ ਖੋਲ੍ਹੋ",
-      "contacts": "ਸੰਪਰਕ"
+      "menu": "ਮੇਨੂ ਖੋਲ੍ਹੋ",
+      "contacts": "DemmList (ਸੰਪਰਕ)"
     },
     "scan": {
-      "onlyDevice": "ਬਾਰਕੋਡ ਸਕੈਨ ਸਿਰਫ ਅਸਲੀ ਡਿਵਾਈਸ 'ਤੇ ਕੰਮ ਕਰਦਾ ਹੈ।",
-      "permission": "ਬਾਰਕੋਡ ਸਕੈਨ ਕਰਨ ਲਈ ਕੈਮਰਾ ਅਧਿਕਾਰ ਲੋੜੀਂਦੇ ਹਨ।",
+      "onlyDevice": "ਬਾਰਕੋਡ ਸਕੈਨਿੰਗ ਸਿਰਫ ਅਸਲ ਡਿਵਾਈਸ ਤੇ ਕੰਮ ਕਰਦਾ ਹੈ।",
+      "permission": "ਬਾਰਕੋਡ ਸਕੈਨ ਕਰਨ ਲਈ ਕੈਮਰਾ ਅਨੁਮਤੀ ਦੀ ਲੋੜ ਹੈ।",
       "notFound": "ਕੋਈ ਬਾਰਕੋਡ ਨਹੀਂ ਮਿਲਿਆ।",
-      "error": "ਸਕੈਨ ਕਰਨ ਦੌਰਾਨ ਕੁਝ ਗਲਤੀ ਹੋਈ।"
+      "error": "ਸਕੈਨਿੰਗ ਦੌਰਾਨ ਕੁਝ ਗਲਤ ਹੋ ਗਿਆ।"
     },
     "logout": {
-      "header": "ਲਾਗਆਉਟ",
-      "message": "ਸੈਸ਼ਨ ਸਮਾਪਤ/ਮਿਆਦ ਪੁੱਗ ਗਈ ਹੈ।"
+      "header": "ਲੌਗ ਆਊਟ",
+      "message": "ਸੈਸ਼ਨ ਸਮਾਂ ਸਿਰਫ/ਸਮਾਪਤ।"
     },
-    "alt": { "profile": "ਪ੍ਰੋਫ਼ਾਈਲ" }
+    "alt": { "profile": "ਪ੍ਰੋਫਾਈਲ" }
   },"menu": {
     "newGroup": "ਨਵਾਂ ਗਰੁੱਪ",
     "newCommunity": "ਨਵੀਂ ਕਮਿਊਨਿਟੀ",

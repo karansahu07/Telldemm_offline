@@ -448,37 +448,37 @@
       "saveFailed": "ไม่สามารถอัปเดตลิงก์ Instagram ได้ โปรดลองอีกครั้ง"
     }
   },"home": {
-    "search": { "placeholder": "ถาม  หรือ ค้นหา" },
-    "filters": { "all": "ทั้งหมด", "read": "อ่านแล้ว", "unread": "ยังไม่อ่าน", "groups": "กลุ่ม" },
-    "groupCreator": { "placeholder": "ป้อนชื่อกลุ่ม" },
+    "search": { "placeholder": "ถามหรือค้นหา" },
+    "filters": { "all": "ทั้งหมด", "read": "อ่านแล้ว", "unread": "ยังไม่อ่าน", "groups": "DemmRoom (กลุ่ม)" },
+    "groupCreator": { "placeholder": "ป้อนชื่อ DemmRoom" },
     "typing": "กำลังพิมพ์...",
     "time": { "yesterday": "เมื่อวาน" },
     "preview": {
       "deleted": "ข้อความนี้ถูกลบแล้ว",
       "encrypted": "[เข้ารหัส]",
       "media": {
-        "photo": "รูปภาพ",
-        "video": "วิดีโอ",
-        "audio": "เสียง",
-        "file": "ไฟล์แนบ",
+        "photo": "PicTell (รูปภาพ)",
+        "video": "ClipTell (วิดีโอ)",
+        "audio": "VoiceTell (เสียง)",
+        "file": "FileTell (ไฟล์แนบ)",
         "generic": "[สื่อ]"
       }
     },
     "actions": {
-      "scan": "สแกน QR",
+      "scan": "สแกน DemmCode",
       "camera": "เปิดกล้อง",
       "menu": "เปิดเมนู",
-      "contacts": "รายชื่อ"
+      "contacts": "DemmList (ผู้ติดต่อ)"
     },
     "scan": {
-      "onlyDevice": "การสแกนบาร์โค้ดใช้ได้เฉพาะบนอุปกรณ์จริงเท่านั้น",
-      "permission": "ต้องได้รับอนุญาตกล้องเพื่อสแกนบาร์โค้ด",
-      "notFound": "ไม่พบบาร์โค้ด",
+      "onlyDevice": "การสแกนบาร์โค้ดทำงานได้เฉพาะบนอุปกรณ์จริงเท่านั้น",
+      "permission": "ต้องมีสิทธิ์กล้องเพื่อสแกนบาร์โค้ด",
+      "notFound": "ไม่พบรหัสบาร์โค้ด",
       "error": "เกิดข้อผิดพลาดระหว่างการสแกน"
     },
     "logout": {
       "header": "ออกจากระบบ",
-      "message": "เซสชันหมดอายุแล้ว"
+      "message": "เซสชันหมดอายุ/หมดเวลา"
     },
     "alt": { "profile": "โปรไฟล์" }
   },"menu": {

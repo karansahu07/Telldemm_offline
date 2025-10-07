@@ -447,38 +447,38 @@
       "saved": "Instagram enregistré avec succès !",
       "saveFailed": "Échec de la mise à jour du lien Instagram. Réessayez."
     }
-  }, "home": {
-    "search": { "placeholder": "Demandez à  ou Recherchez" },
-    "filters": { "all": "TOUT", "read": "Lu", "unread": "Non lu", "groups": "Groupes" },
-    "groupCreator": { "placeholder": "Entrez le nom du groupe" },
-    "typing": "en train d’écrire...",
+  },"home": {
+    "search": { "placeholder": "Demander ou Rechercher" },
+    "filters": { "all": "TOUT", "read": "Lu", "unread": "Non lu", "groups": "DemmRoom (Groupes)" },
+    "groupCreator": { "placeholder": "Entrer Nom de DemmRoom" },
+    "typing": "tapote...",
     "time": { "yesterday": "Hier" },
     "preview": {
       "deleted": "Ce message a été supprimé",
       "encrypted": "[Chiffré]",
       "media": {
-        "photo": "Photo",
-        "video": "Vidéo",
-        "audio": "Audio",
-        "file": "Pièce jointe",
-        "generic": "[Média]"
+        "photo": "PicTell (Photo)",
+        "video": "ClipTell (Vidéo)",
+        "audio": "VoiceTell (Audio)",
+        "file": "FileTell (Pièce jointe)",
+        "generic": "[Médias]"
       }
     },
     "actions": {
-      "scan": "Scanner le QR",
-      "camera": "Ouvrir la caméra",
+      "scan": "Scanner DemmCode",
+      "camera": "Ouvrir l'appareil photo",
       "menu": "Ouvrir le menu",
-      "contacts": "Contacts"
+      "contacts": "DemmList (Contacts)"
     },
     "scan": {
-      "onlyDevice": "Le scan de code-barres fonctionne uniquement sur un appareil réel.",
-      "permission": "L’autorisation de la caméra est requise pour scanner les codes-barres.",
+      "onlyDevice": "Le scan de codes-barres ne fonctionne que sur un vrai appareil.",
+      "permission": "L'autorisation de l'appareil photo est requise pour scanner les codes-barres.",
       "notFound": "Aucun code-barres trouvé.",
-      "error": "Une erreur est survenue lors du scan."
+      "error": "Quelque chose s'est mal passé pendant le scan."
     },
     "logout": {
       "header": "Déconnexion",
-      "message": "Session expirée."
+      "message": "Session expirée/terminée."
     },
     "alt": { "profile": "Profil" }
   },"menu": {

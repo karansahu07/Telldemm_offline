@@ -420,37 +420,37 @@
       "saveFailed": "به‌روزرسانی لینک اینستاگرام ناموفق بود. دوباره تلاش کنید."
     }
   },"home": {
-    "search": { "placeholder": "از  بپرسید یا جستجو کنید" },
-    "filters": { "all": "همه", "read": "خوانده‌شده", "unread": "خوانده‌نشده", "groups": "گروه‌ها" },
-    "groupCreator": { "placeholder": "نام گروه را وارد کنید" },
-    "typing": "در حال نوشتن...",
+    "search": { "placeholder": "پرس و جو یا جستجو" },
+    "filters": { "all": "همه", "read": "خوانده شده", "unread": "خوانده نشده", "groups": "DemmRoom (گروه‌ها)" },
+    "groupCreator": { "placeholder": "نام DemmRoom را وارد کنید" },
+    "typing": "در حال تایپ...",
     "time": { "yesterday": "دیروز" },
     "preview": {
-      "deleted": "این پیام حذف شد",
-      "encrypted": "[رمزگذاری‌شده]",
+      "deleted": "این پیام حذف شده است",
+      "encrypted": "[رمزنگاری شده]",
       "media": {
-        "photo": "عکس",
-        "video": "ویدیو",
-        "audio": "صوت",
-        "file": "پیوست",
+        "photo": "PicTell (عکس)",
+        "video": "ClipTell (ویدیو)",
+        "audio": "VoiceTell (صوت)",
+        "file": "FileTell (پیوست)",
         "generic": "[رسانه]"
       }
     },
     "actions": {
-      "scan": "اسکن QR",
+      "scan": "اسکن DemmCode",
       "camera": "باز کردن دوربین",
       "menu": "باز کردن منو",
-      "contacts": "مخاطبین"
+      "contacts": "DemmList (مخاطبین)"
     },
     "scan": {
       "onlyDevice": "اسکن بارکد فقط روی دستگاه واقعی کار می‌کند.",
-      "permission": "اجازه دوربین برای اسکن بارکد لازم است.",
-      "notFound": "هیچ بارکدی یافت نشد.",
-      "error": "در طول اسکن مشکلی پیش آمد."
+      "permission": "برای اسکن بارکدها نیاز به مجوز دوربین است.",
+      "notFound": "هیچ بارکدی پیدا نشد.",
+      "error": "در حین اسکن چیزی اشتباه پیش رفت."
     },
     "logout": {
       "header": "خروج",
-      "message": "نشست منقضی شده است."
+      "message": "جلسه منقضی شد/به پایان رسید."
     },
     "alt": { "profile": "پروفایل" }
   }, "menu": {

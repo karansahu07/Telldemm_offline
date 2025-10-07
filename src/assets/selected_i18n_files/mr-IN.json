@@ -448,37 +448,37 @@
       "saveFailed": "इंस्टाग्राम लिंक अपडेट करण्यात अयशस्वी. पुन्हा प्रयत्न करा."
     }
   }, "home": {
-    "search": { "placeholder": " ला विचारा किंवा शोधा" },
-    "filters": { "all": "सर्व", "read": "वाचलेले", "unread": "न वाचलेले", "groups": "गट" },
-    "groupCreator": { "placeholder": "गटाचे नाव प्रविष्ट करा" },
-    "typing": "टाइप करत आहे...",
+    "search": { "placeholder": "विचारा किंवा शोधा" },
+    "filters": { "all": "सर्व", "read": "वाचले", "unread": "अवाचले", "groups": "DemmRoom (गट)" },
+    "groupCreator": { "placeholder": "DemmRoom नाव टाका" },
+    "typing": "टायप करत आहे...",
     "time": { "yesterday": "काल" },
     "preview": {
-      "deleted": "हा संदेश हटविण्यात आला आहे",
+      "deleted": "हे संदेश काढून टाकले गेले",
       "encrypted": "[एन्क्रिप्टेड]",
       "media": {
-        "photo": "फोटो",
-        "video": "व्हिडिओ",
-        "audio": "ऑडिओ",
-        "file": "जोडणी",
-        "generic": "[मीडिया]"
+        "photo": "PicTell (फोटो)",
+        "video": "ClipTell (व्हिडिओ)",
+        "audio": "VoiceTell (ऑडिओ)",
+        "file": "FileTell (संलग्नक)",
+        "generic": "[मीडियা]"
       }
     },
     "actions": {
-      "scan": "QR स्कॅन करा",
+      "scan": "DemmCode स्कॅन करा",
       "camera": "कॅमेरा उघडा",
       "menu": "मेनू उघडा",
-      "contacts": "संपर्क"
+      "contacts": "DemmList (संपर्क)"
     },
     "scan": {
-      "onlyDevice": "बारकोड स्कॅनिंग फक्त खऱ्या डिव्हाइसवर कार्य करते.",
+      "onlyDevice": "बारकोड स्कॅनिंग केवळ खऱ्या डिव्हाइसवर काम करते.",
       "permission": "बारकोड स्कॅन करण्यासाठी कॅमेरा परवानगी आवश्यक आहे.",
-      "notFound": "कोणताही बारकोड सापडला नाही.",
-      "error": "स्कॅनिंगदरम्यान काहीतरी चूक झाली."
+      "notFound": "कोणतेही बारकोड सापडले नाही.",
+      "error": "स्कॅनिंग दरम्यान काहीतरी चूक झाली."
     },
     "logout": {
-      "header": "लॉगआउट",
-      "message": "सत्राची वेळ संपली/कालबाह्य झाले."
+      "header": "लॉग आउट",
+      "message": "सत्र वेळ संपली/संपली."
     },
     "alt": { "profile": "प्रोफाइल" }
   }, "menu": {

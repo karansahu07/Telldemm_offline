@@ -447,38 +447,38 @@
       "saved": "Instagram успешно сохранен!",
       "saveFailed": "Не удалось обновить ссылку Instagram. Попробуйте снова."
     }
-  }, "home": {
-    "search": { "placeholder": "Спросите  или выполните поиск" },
-    "filters": { "all": "ВСЕ", "read": "Прочитанные", "unread": "Непрочитанные", "groups": "Группы" },
-    "groupCreator": { "placeholder": "Введите название группы" },
+  },"home": {
+    "search": { "placeholder": "Спросить или Поиск" },
+    "filters": { "all": "ВСЕ", "read": "Прочитано", "unread": "Непрочитано", "groups": "DemmRoom (Группы)" },
+    "groupCreator": { "placeholder": "Введите Название DemmRoom" },
     "typing": "печатает...",
     "time": { "yesterday": "Вчера" },
     "preview": {
       "deleted": "Это сообщение было удалено",
       "encrypted": "[Зашифровано]",
       "media": {
-        "photo": "Фото",
-        "video": "Видео",
-        "audio": "Аудио",
-        "file": "Вложение",
+        "photo": "PicTell (Фото)",
+        "video": "ClipTell (Видео)",
+        "audio": "VoiceTell (Аудио)",
+        "file": "FileTell (Вложение)",
         "generic": "[Медиа]"
       }
     },
     "actions": {
-      "scan": "Сканировать QR",
+      "scan": "Сканировать DemmCode",
       "camera": "Открыть камеру",
       "menu": "Открыть меню",
-      "contacts": "Контакты"
+      "contacts": "DemmList (Контакты)"
     },
     "scan": {
       "onlyDevice": "Сканирование штрих-кодов работает только на реальном устройстве.",
-      "permission": "Для сканирования штрих-кодов требуется доступ к камере.",
+      "permission": "Для сканирования штрих-кодов требуется разрешение на камеру.",
       "notFound": "Штрих-код не найден.",
-      "error": "Произошла ошибка во время сканирования."
+      "error": "Что-то пошло не так во время сканирования."
     },
     "logout": {
       "header": "Выйти",
-      "message": "Сеанс завершён/истёк."
+      "message": "Сессия истекла/завершилась."
     },
     "alt": { "profile": "Профиль" }
   },"menu": {

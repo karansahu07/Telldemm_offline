@@ -425,37 +425,37 @@
       "saveFailed": "Instagram bağlantısı güncellenemedi. Tekrar deneyin."
     }
   },"home": {
-    "search": { "placeholder": "’ye Sor veya Ara" },
-    "filters": { "all": "TÜMÜ", "read": "Okundu", "unread": "Okunmadı", "groups": "Gruplar" },
-    "groupCreator": { "placeholder": "Grup Adını Girin" },
+    "search": { "placeholder": "Sor veya Ara" },
+    "filters": { "all": "TÜM", "read": "Okundu", "unread": "Okunmadı", "groups": "DemmRoom (Gruplar)" },
+    "groupCreator": { "placeholder": "DemmRoom Adını Girin" },
     "typing": "yazıyor...",
     "time": { "yesterday": "Dün" },
     "preview": {
       "deleted": "Bu mesaj silindi",
-      "encrypted": "[Şifreli]",
+      "encrypted": "[Şifrelenmiş]",
       "media": {
-        "photo": "Fotoğraf",
-        "video": "Video",
-        "audio": "Ses",
-        "file": "Ek",
+        "photo": "PicTell (Fotoğraf)",
+        "video": "ClipTell (Video)",
+        "audio": "VoiceTell (Ses)",
+        "file": "FileTell (Ek)",
         "generic": "[Medya]"
       }
     },
     "actions": {
-      "scan": "QR Tara",
+      "scan": "DemmCode Tara",
       "camera": "Kamerayı aç",
       "menu": "Menüyü aç",
-      "contacts": "Kişiler"
+      "contacts": "DemmList (Kişiler)"
     },
     "scan": {
       "onlyDevice": "Barkod tarama yalnızca gerçek bir cihazda çalışır.",
       "permission": "Barkod taramak için kamera izni gereklidir.",
       "notFound": "Barkod bulunamadı.",
-      "error": "Taramada bir sorun oluştu."
+      "error": "Taramada bir şeyler ters gitti."
     },
     "logout": {
-      "header": "Çıkış",
-      "message": "Oturum zaman aşımına uğradı."
+      "header": "Çıkış Yap",
+      "message": "Oturum süresi doldu/bitti."
     },
     "alt": { "profile": "Profil" }
   },"menu": {

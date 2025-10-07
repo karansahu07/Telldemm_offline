@@ -424,37 +424,37 @@
       "saveFailed": "انسٹاگرام لنک اپ ڈیٹ کرنے میں ناکام۔ دوبارہ کوشش کریں۔"
     }
   },"home": {
-    "search": { "placeholder": " سے پوچھیں یا تلاش کریں" },
-    "filters": { "all": "سب", "read": "پڑھا ہوا", "unread": "ناپڑھا", "groups": "گروپس" },
-    "groupCreator": { "placeholder": "گروپ کا نام درج کریں" },
-    "typing": "لکھ رہا ہے...",
+    "search": { "placeholder": "پوچھیں یا تلاش کریں" },
+    "filters": { "all": "سب", "read": "پڑھا", "unread": "نہ پڑھا", "groups": "DemmRoom (گروپس)" },
+    "groupCreator": { "placeholder": "DemmRoom نام درج کریں" },
+    "typing": "ٹائپ کر رہا ہے...",
     "time": { "yesterday": "کل" },
     "preview": {
-      "deleted": "یہ پیغام حذف کر دیا گیا ہے",
+      "deleted": "یہ پیغام حذف کر دیا گیا تھا",
       "encrypted": "[انکرپٹڈ]",
       "media": {
-        "photo": "تصویر",
-        "video": "ویڈیو",
-        "audio": "آڈیو",
-        "file": "اٹیچمنٹ",
+        "photo": "PicTell (تصویر)",
+        "video": "ClipTell (ویڈیو)",
+        "audio": "VoiceTell (آڈیو)",
+        "file": "FileTell (منسلک)",
         "generic": "[میڈیا]"
       }
     },
     "actions": {
-      "scan": "QR اسکین کریں",
-      "camera": "کیمرا کھولیں",
+      "scan": "DemmCode اسکین کریں",
+      "camera": "کیمرہ کھولیں",
       "menu": "مینو کھولیں",
-      "contacts": "رابطے"
+      "contacts": "DemmList (رابطے)"
     },
     "scan": {
-      "onlyDevice": "بارکوڈ اسکیننگ صرف اصلی ڈیوائس پر کام کرتی ہے۔",
-      "permission": "بارکوڈ اسکین کرنے کے لیے کیمرا اجازت درکار ہے۔",
-      "notFound": "کوئی بارکوڈ نہیں ملا۔",
-      "error": "اسکیننگ کے دوران کچھ غلط ہوگیا۔"
+      "onlyDevice": "بار کوڈ اسکیننگ صرف اصلی ڈیوائس پر کام کرتی ہے۔",
+      "permission": "بار کوڈ اسکین کرنے کے لیے کیمرہ اجازت درکار ہے۔",
+      "notFound": "کوئی بار کوڈ نہیں ملا۔",
+      "error": "اسکیننگ کے دوران کچھ غلط ہو گیا۔"
     },
     "logout": {
       "header": "لاگ آؤٹ",
-      "message": "سیشن کا وقت ختم ہوگیا/میعاد ختم ہوگئی۔"
+      "message": "سیشن ٹائم آؤٹ/ختم۔"
     },
     "alt": { "profile": "پروفائل" }
   },"menu": {

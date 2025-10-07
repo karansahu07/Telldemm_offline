@@ -448,37 +448,37 @@
       "saveFailed": "Impossibile aggiornare il link Instagram. Riprova."
     }
   }, "home": {
-    "search": { "placeholder": "Chiedi a  o Cerca" },
-    "filters": { "all": "TUTTI", "read": "Letti", "unread": "Non letti", "groups": "Gruppi" },
-    "groupCreator": { "placeholder": "Inserisci il nome del gruppo" },
-    "typing": "sta scrivendo...",
+    "search": { "placeholder": "Chiedi o Cerca" },
+    "filters": { "all": "TUTTI", "read": "Letto", "unread": "Non letto", "groups": "DemmRoom (Gruppi)" },
+    "groupCreator": { "placeholder": "Inserisci Nome DemmRoom" },
+    "typing": "sta digitando...",
     "time": { "yesterday": "Ieri" },
     "preview": {
       "deleted": "Questo messaggio è stato eliminato",
-      "encrypted": "[Criptato]",
+      "encrypted": "[Crittografato]",
       "media": {
-        "photo": "Foto",
-        "video": "Video",
-        "audio": "Audio",
-        "file": "Allegato",
+        "photo": "PicTell (Foto)",
+        "video": "ClipTell (Video)",
+        "audio": "VoiceTell (Audio)",
+        "file": "FileTell (Allegato)",
         "generic": "[Media]"
       }
     },
     "actions": {
-      "scan": "Scansiona QR",
+      "scan": "Scansiona DemmCode",
       "camera": "Apri fotocamera",
       "menu": "Apri menu",
-      "contacts": "Contatti"
+      "contacts": "DemmList (Contatti)"
     },
     "scan": {
-      "onlyDevice": "La scansione dei codici a barre funziona solo su un dispositivo reale.",
+      "onlyDevice": "La scansione del codice a barre funziona solo su un dispositivo reale.",
       "permission": "È necessario il permesso della fotocamera per scansionare i codici a barre.",
       "notFound": "Nessun codice a barre trovato.",
-      "error": "Si è verificato un errore durante la scansione."
+      "error": "Qualcosa è andato storto durante la scansione."
     },
     "logout": {
       "header": "Disconnetti",
-      "message": "Sessione scaduta."
+      "message": "Sessione scaduta/scaduta."
     },
     "alt": { "profile": "Profilo" }
   },"menu": {
