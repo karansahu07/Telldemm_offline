@@ -44,27 +44,60 @@
     "cancel": "İptal",
     "logout": "Çıkış yap"
   },
-  "settingsPage": {
-    "title": "Ayarlar",
-    "account": { "title": "Hesap", "description": "Gizlilik, güvenlik, numara değiştir" },
-    "privacy": { "title": "Gizlilik", "description": "Gizlilik ayarlarını kontrol et" },
-    "avatar": { "title": "Avatar", "description": "Profil resmini değiştir" },
-    "chats": { "title": "Sohbetler", "description": "Tema, duvar kağıdı, yedekleme" },
-    "accessibility": { "title": "Erişilebilirlik", "description": "Yazı boyutu ve görüntüleme seçenekleri" },
-    "notifications": { "title": "Bildirimler", "description": "Mesaj, grup ve arama uyarıları" },
-    "storage": { "title": "Depolama ve Veri", "description": "Depolamayı ve ağ kullanımını yönet" },
-    "appLanguage": { "title": "Uygulama Dili", "description": "Uygulama dilini seç" },
-    "help": { "title": "Yardım ve Geri Bildirim", "description": "Yardım merkezi, bizimle iletişime geç, uygulama bilgisi" },
-    "updates": { "title": "Uygulama Güncellemeleri", "description": "Güncellemeleri kontrol et, otomatik güncelleme" },
-    "invite": { "title": "Bir Arkadaş Davet Et", "description": "Uygulamayı kişilerle paylaş" },
+ "settingsPage": {
+    "title": "DemmDesk (Ayarlar)",
+    "account": { 
+      "title": "MyTell (Hesap)", 
+      "description": "TellShield (Gizlilik), güvenlik, numara değiştir" 
+    },
+    "privacy": { 
+      "title": "TellShield (Gizlilik)", 
+      "description": "TellShield (Gizlilik) ayarlarınızı kontrol edin" 
+    },
+    "avatar": { 
+      "title": "TellFace (Profil resmi)", 
+      "description": "TellFace (Profil resminizi) değiştirin" 
+    },
+    "chats": { 
+      "title": "Tells (Sohbetler)", 
+      "description": "Tema, duvar kağıdı, SafeDemm (Yedekleme)" 
+    },
+    "accessibility": { 
+      "title": "Accessibility (Erişilebilirlik)", 
+      "description": "Metin boyutu ve ekran seçeneklerini ayarlayın" 
+    },
+    "notifications": { 
+      "title": "TellAlerts (Bildirimler)", 
+      "description": "Tell (Mesajlar), DemmRoom (Grup) ve Connect (Aramalar) uyarılarını yönetin" 
+    },
+    "storage": { 
+      "title": "SafeDemm (Depolama ve veri)", 
+      "description": "Depolama ve ağ kullanımını yönetin" 
+    },
+    "appLanguage": { 
+      "title": "App Language (Uygulama dili)", 
+      "description": "TellDemm uygulama dilini seçin" 
+    },
+    "help": { 
+      "title": "DemmHelp (Yardım)", 
+      "description": "Yardım merkezi, bize ulaşın, Uygulama bilgileri" 
+    },
+    "updates": { 
+      "title": "DemmUpdate (Uygulama güncellemeleri)", 
+      "description": "Güncellemeleri kontrol edin ve otomatik güncellemeyi etkinleştirin" 
+    },
+    "invite": { 
+      "title": "SpreadDemm (Arkadaş davet et)", 
+      "description": "TellDemm uygulamasını DemmList (Kişiler) ile paylaşın" 
+    },
     "logout": {
-      "title": "Çıkış yap",
+      "title": "Log Out (Çıkış yap)",
       "description": "Uygulama verilerini temizle ve çıkış yap",
-      "confirmHeader": "Çıkışı Onayla",
-      "confirmMessage": "Çıkış yapmak ve uygulama verilerini temizlemek istediğinizden emin misiniz?",
-      "loadingHeader": "Çıkış yapılıyor",
+      "confirmHeader": "Çıkış yapmayı onayla",
+      "confirmMessage": "Uygulama verilerini temizleyip çıkış yapmak istediğinizden emin misiniz?",
+      "loadingHeader": "Logging Out (Çıkış yapılıyor)",
       "loadingMessage": "Lütfen bekleyin...",
-      "successHeader": "Çıkış yapıldı",
+      "successHeader": "Logged Out (Çıkış yapıldı)",
       "successMessage": "Başarıyla çıkış yaptınız."
     },
     "defaultStatus": "Mevcut"

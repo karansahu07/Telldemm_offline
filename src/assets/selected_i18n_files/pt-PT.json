@@ -45,27 +45,60 @@
     "logout": "Terminar sessão"
   },
   "settingsPage": {
-    "title": "Definições",
-    "account": { "title": "Conta", "description": "Privacidade, segurança, alterar número" },
-    "privacy": { "title": "Privacidade", "description": "Controle as suas definições de privacidade" },
-    "avatar": { "title": "Avatar", "description": "Alterar foto de perfil" },
-    "chats": { "title": "Conversas", "description": "Tema, papel de parede, cópia de segurança" },
-    "accessibility": { "title": "Acessibilidade", "description": "Tamanho do texto e opções de visualização" },
-    "notifications": { "title": "Notificações", "description": "Alertas de mensagens, grupos e chamadas" },
-    "storage": { "title": "Armazenamento e dados", "description": "Gerir armazenamento e utilização da rede" },
-    "appLanguage": { "title": "Idioma da app", "description": "Escolher idioma da aplicação" },
-    "help": { "title": "Ajuda e feedback", "description": "Centro de ajuda, contacte-nos, informações da aplicação" },
-    "updates": { "title": "Atualizações da app", "description": "Verificar atualizações, atualização automática" },
-    "invite": { "title": "Convidar um amigo", "description": "Partilhe a app com os contactos" },
+    "title": "DemmDesk (Definições)",
+    "account": { 
+      "title": "MyTell (Conta)", 
+      "description": "TellShield (Privacidade), segurança, alterar número" 
+    },
+    "privacy": { 
+      "title": "TellShield (Privacidade)", 
+      "description": "Controle as suas definições de TellShield (Privacidade)" 
+    },
+    "avatar": { 
+      "title": "TellFace (Foto de perfil)", 
+      "description": "Altere a sua TellFace (Foto de perfil)" 
+    },
+    "chats": { 
+      "title": "Tells (Conversas)", 
+      "description": "Tema, papel de parede, SafeDemm (Cópia de segurança)" 
+    },
+    "accessibility": { 
+      "title": "Accessibility (Acessibilidade)", 
+      "description": "Ajuste o tamanho do texto e opções de ecrã" 
+    },
+    "notifications": { 
+      "title": "TellAlerts (Notificações)", 
+      "description": "Gerencie alertas de Tell (Mensagens), DemmRoom (Grupo) e Connect (Chamadas)" 
+    },
+    "storage": { 
+      "title": "SafeDemm (Armazenamento e dados)", 
+      "description": "Gerencie o armazenamento e uso de rede" 
+    },
+    "appLanguage": { 
+      "title": "App Language (Idioma da app)", 
+      "description": "Escolha o idioma da app TellDemm" 
+    },
+    "help": { 
+      "title": "DemmHelp (Ajuda)", 
+      "description": "Centro de ajuda, contacte-nos, Info da app" 
+    },
+    "updates": { 
+      "title": "DemmUpdate (Atualizações da app)", 
+      "description": "Verifique atualizações e ative auto-atualização" 
+    },
+    "invite": { 
+      "title": "SpreadDemm (Convidar um amigo)", 
+      "description": "Partilhe a app TellDemm com a sua DemmList (Contactos)" 
+    },
     "logout": {
-      "title": "Terminar sessão",
-      "description": "Limpar dados da app e terminar sessão",
-      "confirmHeader": "Confirmar término de sessão",
-      "confirmMessage": "Tem a certeza de que deseja terminar a sessão e limpar os dados da app?",
-      "loadingHeader": "A terminar sessão",
+      "title": "Log Out (Sair)",
+      "description": "Limpe dados da app e saia",
+      "confirmHeader": "Confirmar saída",
+      "confirmMessage": "Tem a certeza de que deseja sair e limpar os dados da app?",
+      "loadingHeader": "Logging Out (A sair)",
       "loadingMessage": "Por favor, aguarde...",
-      "successHeader": "Sessão terminada",
-      "successMessage": "Terminou a sessão com sucesso."
+      "successHeader": "Logged Out (Saiu)",
+      "successMessage": "Saiu com sucesso."
     },
     "defaultStatus": "Disponível"
   },

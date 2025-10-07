@@ -44,28 +44,61 @@
     "cancel": "రద్దు చేయి",
     "logout": "లాగ్ అవుట్"
   },
-  "settingsPage": {
-    "title": "సెట్టింగ్‌లు",
-    "account": { "title": "ఖాతా", "description": "గోప్యత, భద్రత, నంబర్ మార్చు" },
-    "privacy": { "title": "గోప్యత", "description": "మీ గోప్యతా సెట్టింగ్‌లను నియంత్రించండి" },
-    "avatar": { "title": "అవతార్", "description": "ప్రొఫైల్ ఫోటోను మార్చండి" },
-    "chats": { "title": "చాట్లు", "description": "థీమ్, వాల్‌పేపర్, బ్యాకప్" },
-    "accessibility": { "title": "ప్రాప్యత", "description": "పాఠ్యం పరిమాణం మరియు ప్రదర్శన ఎంపికలు" },
-    "notifications": { "title": "నోటిఫికేషన్లు", "description": "సందేశాలు, గ్రూపులు మరియు కాల్ అలర్ట్‌లు" },
-    "storage": { "title": "స్టోరేజ్ మరియు డేటా", "description": "స్టోరేజ్ మరియు నెట్‌వర్క్ వినియోగాన్ని నిర్వహించండి" },
-    "appLanguage": { "title": "యాప్ భాష", "description": "యాప్ భాషను ఎంచుకోండి" },
-    "help": { "title": "సహాయం మరియు అభిప్రాయం", "description": "సహాయం కేంద్రం, మమ్మల్ని సంప్రదించండి, యాప్ సమాచారం" },
-    "updates": { "title": "యాప్ నవీకరణలు", "description": "నవీకరణలను తనిఖీ చేయండి, ఆటో నవీకరణ" },
-    "invite": { "title": "మిత్రుడిని ఆహ్వానించండి", "description": "యాప్‌ను కాంటాక్ట్‌లతో పంచుకోండి" },
+ "settingsPage": {
+    "title": "DemmDesk (సెట్టింగ్స్)",
+    "account": { 
+      "title": "MyTell (ఖాతా)", 
+      "description": "TellShield (గోప్యత), భద్రత, సంఖ్య మార్చండి" 
+    },
+    "privacy": { 
+      "title": "TellShield (గోప్యత)", 
+      "description": "మీ TellShield (గోప్యత) సెట్టింగ్‌లను నియంత్రించండి" 
+    },
+    "avatar": { 
+      "title": "TellFace (ప్రొఫైల్ చిత్రం)", 
+      "description": "మీ TellFace (ప్రొఫైల్ చిత్రం) మార్చండి" 
+    },
+    "chats": { 
+      "title": "Tells (చాట్స్)", 
+      "description": "థీమ్, వాల్‌పేపర్, SafeDemm (బ్యాకప్)" 
+    },
+    "accessibility": { 
+      "title": "Accessibility (ప్రాప్తత)", 
+      "description": "పాఠ స్థూలత మరియు ప్రదర్శన ఎంపికలను సర్దుబాటు చేయండి" 
+    },
+    "notifications": { 
+      "title": "TellAlerts (సమాచారాలు)", 
+      "description": "Tell (సందేశం), DemmRoom (గ్రూప్) మరియు Connect (కాల్) హెచ్చరికలను నిర్వహించండి" 
+    },
+    "storage": { 
+      "title": "SafeDemm (స్టోరేజ్ మరియు డేటా)", 
+      "description": "స్టోరేజ్ మరియు నెట్‌వర్క్ ఉపయోగాన్ని నిర్వహించండి" 
+    },
+    "appLanguage": { 
+      "title": "App Language (అప్ భాష)", 
+      "description": "TellDemm అప్ భాషను ఎంచుకోండి" 
+    },
+    "help": { 
+      "title": "DemmHelp (సహాయం)", 
+      "description": "హెల్ప్ సెంటర్, సంప్రదించండి, అప్ సమాచారం" 
+    },
+    "updates": { 
+      "title": "DemmUpdate (అప్ అప్‌డేట్)", 
+      "description": "అప్‌డేట్‌లను తనిఖీ చేయండి మరియు ఆటో-అప్‌డేట్‌ను చేతన చేయండి" 
+    },
+    "invite": { 
+      "title": "SpreadDemm (స్నేహితుడిని ఆహ్వానించండి)", 
+      "description": "TellDemm అప్‌ను మీ DemmList (సంప్రదింపులు) తో పంచుకోండి" 
+    },
     "logout": {
-      "title": "లాగ్ అవుట్",
-      "description": "యాప్ డేటాను క్లియర్ చేసి సైన్ అవుట్ చేయండి",
+      "title": "Log Out (లాగ్ అవుట్)",
+      "description": "అప్ డేటాను క్లియర్ చేయండి మరియు సైన్ అవుట్ చేయండి",
       "confirmHeader": "లాగ్ అవుట్‌ను నిర్ధారించండి",
-      "confirmMessage": "మీరు ఖచ్చితంగా లాగ్ అవుట్ చేసి యాప్ డేటాను క్లియర్ చేయాలనుకుంటున్నారా?",
-      "loadingHeader": "లాగ్ అవుట్ అవుతోంది",
+      "confirmMessage": "మీరు నిజంగా లాగ్ అవుట్ చేయాలని మరియు అప్ డేటాను క్లియర్ చేయాలని కోరుకుంటున్నారా?",
+      "loadingHeader": "Logging Out (లాగ్ అవుట్ జరుగుతోంది)",
       "loadingMessage": "దయచేసి వేచి ఉండండి...",
-      "successHeader": "లాగ్ అవుట్ అయ్యింది",
-      "successMessage": "మీరు విజయవంతంగా లాగ్ అవుట్ అయ్యారు."
+      "successHeader": "Logged Out (లాగ్ అవుట్ చేయబడింది)",
+      "successMessage": "మీరు విజయవంతంగా లాగ్ అవుట్ చేయబడ్డారు."
     },
     "defaultStatus": "అందుబాటులో ఉంది"
   },

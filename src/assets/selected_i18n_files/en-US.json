@@ -45,18 +45,51 @@
     "logout": "Log Out"
   },
   "settingsPage": {
-    "title": "Settings",
-    "account": { "title": "Account", "description": "Privacy, security, change number" },
-    "privacy": { "title": "Privacy", "description": "Control your privacy settings" },
-    "avatar": { "title": "Avatar", "description": "Change profile picture" },
-    "chats": { "title": "Chats", "description": "Theme, wallpaper, backup" },
-    "accessibility": { "title": "Accessibility", "description": "Text size and display options" },
-    "notifications": { "title": "Notifications", "description": "Message, group, and call alerts" },
-    "storage": { "title": "Storage & Data", "description": "Manage storage and network usage" },
-    "appLanguage": { "title": "App Language", "description": "Choose app language" },
-    "help": { "title": "Help & Feedback", "description": "Help center, contact us, app info" },
-    "updates": { "title": "App Updates", "description": "Check for updates, auto-update" },
-    "invite": { "title": "Invite a Friend", "description": "Share the app with contacts" },
+    "title": "DemmDesk (Settings)",
+    "account": { 
+      "title": "MyTell (Account)", 
+      "description": "TellShield, security, change number" 
+    },
+    "privacy": { 
+      "title": "TellShield (Privacy)", 
+      "description": "Control your TellShield settings" 
+    },
+    "avatar": { 
+      "title": "TellFace (Avatar)", 
+      "description": "Change your TellFace" 
+    },
+    "chats": { 
+      "title": "Tells (Chats)", 
+      "description": "Theme, wallpaper, SafeDemm" 
+    },
+    "accessibility": { 
+      "title": "Accessibility", 
+      "description": "Adjust text size and display options" 
+    },
+    "notifications": { 
+      "title": "TellAlerts (Notifications)", 
+      "description": "Manage Tell, DemmRoom and Connect alerts" 
+    },
+    "storage": { 
+      "title": "SafeDemm (Storage & Data)", 
+      "description": "Manage storage and network usage" 
+    },
+    "appLanguage": { 
+      "title": "App Language", 
+      "description": "Choose TellDemm app language" 
+    },
+    "help": { 
+      "title": "DemmHelp (Help)", 
+      "description": "Help Centre, contact us, App Info" 
+    },
+    "updates": { 
+      "title": "DemmUpdate (App Updates)", 
+      "description": "Check for updates and enable auto-update" 
+    },
+    "invite": { 
+      "title": "SpreadDemm (Invite a Friend)", 
+      "description": "Share TellDemm app with your DemmList" 
+    },
     "logout": {
       "title": "Log Out",
       "description": "Clear app data and sign out",

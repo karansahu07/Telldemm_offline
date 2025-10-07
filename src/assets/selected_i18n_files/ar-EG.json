@@ -45,28 +45,61 @@
     "cancel": "إلغاء",
     "logout": "تسجيل الخروج"
   },
-  "settingsPage": {
-    "title": "الإعدادات",
-    "account": { "title": "الحساب", "description": "الخصوصية، الأمان، تغيير الرقم" },
-    "privacy": { "title": "الخصوصية", "description": "تحكم في إعدادات الخصوصية" },
-    "avatar": { "title": "الصورة الرمزية", "description": "تغيير صورة الملف الشخصي" },
-    "chats": { "title": "الدردشات", "description": "الثيم، الخلفية، النسخ الاحتياطي" },
-    "accessibility": { "title": "إمكانية الوصول", "description": "حجم النص وخيارات العرض" },
-    "notifications": { "title": "الإشعارات", "description": "تنبيهات الرسائل والمجموعات والمكالمات" },
-    "storage": { "title": "التخزين والبيانات", "description": "إدارة التخزين واستخدام الشبكة" },
-    "appLanguage": { "title": "لغة التطبيق", "description": "اختر لغة التطبيق" },
-    "help": { "title": "المساعدة والتعليقات", "description": "مركز المساعدة، تواصل معنا، معلومات التطبيق" },
-    "updates": { "title": "تحديثات التطبيق", "description": "تحقق من وجود تحديثات وتحديث تلقائي" },
-    "invite": { "title": "دعوة صديق", "description": "شارك التطبيق مع جهات الاتصال" },
+ "settingsPage": {
+    "title": "DemmDesk (إعدادات)",
+    "account": { 
+      "title": "MyTell (حسابي)", 
+      "description": "TellShield (الخصوصية)، الأمان، تغيير الرقم" 
+    },
+    "privacy": { 
+      "title": "TellShield (الخصوصية)", 
+      "description": "السيطرة على إعدادات TellShield (الخصوصية) الخاصة بك" 
+    },
+    "avatar": { 
+      "title": "TellFace (صورة الملف الشخصي)", 
+      "description": "غيّر TellFace (صورة الملف الشخصي) الخاصة بك" 
+    },
+    "chats": { 
+      "title": "Tells (محادثات)", 
+      "description": "الثيم، خلفية الشاشة، SafeDemm (النسخ الاحتياطي)" 
+    },
+    "accessibility": { 
+      "title": "Accessibility (إمكانية الوصول)", 
+      "description": "ضبط حجم النص وخيارات العرض" 
+    },
+    "notifications": { 
+      "title": "TellAlerts (إشعارات)", 
+      "description": "إدارة إشعارات Tell (الرسائل)، DemmRoom (المحادثات الجماعية) و Connect (المكالمات)" 
+    },
+    "storage": { 
+      "title": "SafeDemm (التخزين والبيانات)", 
+      "description": "إدارة التخزين واستخدام الشبكة" 
+    },
+    "appLanguage": { 
+      "title": "App Language (لغة التطبيق)", 
+      "description": "اختر لغة تطبيق TellDemm" 
+    },
+    "help": { 
+      "title": "DemmHelp (المساعدة)", 
+      "description": "مركز المساعدة، اتصل بنا، معلومات التطبيق" 
+    },
+    "updates": { 
+      "title": "DemmUpdate (تحديثات التطبيق)", 
+      "description": "تحقق من التحديثات وفعّل التحديث التلقائي" 
+    },
+    "invite": { 
+      "title": "SpreadDemm (دعوة صديق)", 
+      "description": "شارك تطبيق TellDemm مع قائمة DemmList (جهات الاتصال) الخاصة بك" 
+    },
     "logout": {
-      "title": "تسجيل الخروج",
-      "description": "مسح بيانات التطبيق وتسجيل الخروج",
+      "title": "Log Out (تسجيل الخروج)",
+      "description": "مسح بيانات التطبيق والخروج",
       "confirmHeader": "تأكيد تسجيل الخروج",
-      "confirmMessage": "هل تريد بالتأكيد تسجيل الخروج ومسح بيانات التطبيق؟",
-      "loadingHeader": "جاري تسجيل الخروج",
+      "confirmMessage": "هل أنت متأكد من رغبتك في تسجيل الخروج ومسح بيانات التطبيق؟",
+      "loadingHeader": "Logging Out (جاري تسجيل الخروج)",
       "loadingMessage": "يرجى الانتظار...",
-      "successHeader": "تم تسجيل الخروج",
-      "successMessage": "تم تسجيل الخروج بنجاح."
+      "successHeader": "Logged Out (تم تسجيل الخروج)",
+      "successMessage": "لقد تم تسجيل خروجك بنجاح."
     },
     "defaultStatus": "متاح"
   },

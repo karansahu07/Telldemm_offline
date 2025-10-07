@@ -46,27 +46,60 @@
     "logout": "Abmelden"
   },
   "settingsPage": {
-    "title": "Einstellungen",
-    "account": { "title": "Konto", "description": "Datenschutz, Sicherheit, Nummer ändern" },
-    "privacy": { "title": "Datenschutz", "description": "Verwalten Sie Ihre Datenschutzeinstellungen" },
-    "avatar": { "title": "Avatar", "description": "Profilbild ändern" },
-    "chats": { "title": "Chats", "description": "Thema, Hintergrund, Sicherung" },
-    "accessibility": { "title": "Barrierefreiheit", "description": "Textgröße und Anzeigeoptionen" },
-    "notifications": { "title": "Benachrichtigungen", "description": "Nachrichten-, Gruppen- und Anrufbenachrichtigungen" },
-    "storage": { "title": "Speicher & Daten", "description": "Speicher und Datennutzung verwalten" },
-    "appLanguage": { "title": "App-Sprache", "description": "App-Sprache auswählen" },
-    "help": { "title": "Hilfe & Feedback", "description": "Hilfe-Center, Kontakt, App-Infos" },
-    "updates": { "title": "App-Updates", "description": "Nach Updates suchen, Auto-Update" },
-    "invite": { "title": "Freund einladen", "description": "App mit Kontakten teilen" },
+    "title": "DemmDesk (Einstellungen)",
+    "account": { 
+      "title": "MyTell (Konto)", 
+      "description": "TellShield (Datenschutz), Sicherheit, Nummer ändern" 
+    },
+    "privacy": { 
+      "title": "TellShield (Datenschutz)", 
+      "description": "Steuern Sie Ihre TellShield (Datenschutz)-Einstellungen" 
+    },
+    "avatar": { 
+      "title": "TellFace (Profilbild)", 
+      "description": "Ändern Sie Ihr TellFace (Profilbild)" 
+    },
+    "chats": { 
+      "title": "Tells (Chats)", 
+      "description": "Thema, Hintergrundbild, SafeDemm (Backup)" 
+    },
+    "accessibility": { 
+      "title": "Accessibility (Barrierefreiheit)", 
+      "description": "Textgröße und Anzeigeoptionen anpassen" 
+    },
+    "notifications": { 
+      "title": "TellAlerts (Benachrichtigungen)", 
+      "description": "Tell (Nachrichten), DemmRoom (Gruppe) und Connect (Anrufe) Benachrichtigungen verwalten" 
+    },
+    "storage": { 
+      "title": "SafeDemm (Speicher & Daten)", 
+      "description": "Speicher und Netzwerkverbrauch verwalten" 
+    },
+    "appLanguage": { 
+      "title": "App Language (App-Sprache)", 
+      "description": "Wählen Sie die Sprache der TellDemm-App" 
+    },
+    "help": { 
+      "title": "DemmHelp (Hilfe)", 
+      "description": "Hilfe-Center, Kontaktieren Sie uns, App-Info" 
+    },
+    "updates": { 
+      "title": "DemmUpdate (App-Updates)", 
+      "description": "Auf Updates prüfen und Auto-Update aktivieren" 
+    },
+    "invite": { 
+      "title": "SpreadDemm (Freund einladen)", 
+      "description": "Teilen Sie die TellDemm-App mit Ihrer DemmList (Kontakte)" 
+    },
     "logout": {
-      "title": "Abmelden",
+      "title": "Log Out (Abmelden)",
       "description": "App-Daten löschen und abmelden",
       "confirmHeader": "Abmeldung bestätigen",
-      "confirmMessage": "Möchten Sie sich wirklich abmelden und die App-Daten löschen?",
-      "loadingHeader": "Abmeldung läuft",
+      "confirmMessage": "Sind Sie sicher, dass Sie sich abmelden und App-Daten löschen möchten?",
+      "loadingHeader": "Logging Out (Wird abgemeldet)",
       "loadingMessage": "Bitte warten...",
-      "successHeader": "Abgemeldet",
-      "successMessage": "Sie wurden erfolgreich abgemeldet."
+      "successHeader": "Logged Out (Abgemeldet)",
+      "successMessage": "Sie haben sich erfolgreich abgemeldet."
     },
     "defaultStatus": "Verfügbar"
   },

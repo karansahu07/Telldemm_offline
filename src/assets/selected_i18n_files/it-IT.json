@@ -45,27 +45,60 @@
     "logout": "Disconnetti"
   },
   "settingsPage": {
-    "title": "Impostazioni",
-    "account": { "title": "Account", "description": "Privacy, sicurezza, cambia numero" },
-    "privacy": { "title": "Privacy", "description": "Controlla le tue impostazioni sulla privacy" },
-    "avatar": { "title": "Avatar", "description": "Cambia foto profilo" },
-    "chats": { "title": "Chat", "description": "Tema, sfondo, backup" },
-    "accessibility": { "title": "Accessibilità", "description": "Dimensione del testo e opzioni di visualizzazione" },
-    "notifications": { "title": "Notifiche", "description": "Avvisi di messaggi, gruppi e chiamate" },
-    "storage": { "title": "Archiviazione e dati", "description": "Gestisci archiviazione e utilizzo della rete" },
-    "appLanguage": { "title": "Lingua dell'app", "description": "Scegli la lingua dell'app" },
-    "help": { "title": "Aiuto e feedback", "description": "Centro assistenza, contattaci, info sull'app" },
-    "updates": { "title": "Aggiornamenti app", "description": "Controlla aggiornamenti, aggiornamento automatico" },
-    "invite": { "title": "Invita un amico", "description": "Condividi l'app con i contatti" },
+    "title": "DemmDesk (Impostazioni)",
+    "account": { 
+      "title": "MyTell (Account)", 
+      "description": "TellShield (Privacy), sicurezza, cambia numero" 
+    },
+    "privacy": { 
+      "title": "TellShield (Privacy)", 
+      "description": "Controlla le tue impostazioni TellShield (Privacy)" 
+    },
+    "avatar": { 
+      "title": "TellFace (Foto del profilo)", 
+      "description": "Cambia la tua TellFace (Foto del profilo)" 
+    },
+    "chats": { 
+      "title": "Tells (Chat)", 
+      "description": "Tema, sfondo, SafeDemm (Backup)" 
+    },
+    "accessibility": { 
+      "title": "Accessibility (Accessibilità)", 
+      "description": "Regola dimensione testo e opzioni di visualizzazione" 
+    },
+    "notifications": { 
+      "title": "TellAlerts (Notifiche)", 
+      "description": "Gestisci avvisi Tell (Messaggi), DemmRoom (Gruppo) e Connect (Chiamate)" 
+    },
+    "storage": { 
+      "title": "SafeDemm (Archiviazione e dati)", 
+      "description": "Gestisci archiviazione e uso rete" 
+    },
+    "appLanguage": { 
+      "title": "App Language (Lingua app)", 
+      "description": "Scegli la lingua dell'app TellDemm" 
+    },
+    "help": { 
+      "title": "DemmHelp (Aiuto)", 
+      "description": "Centro assistenza, contattaci, Info app" 
+    },
+    "updates": { 
+      "title": "DemmUpdate (Aggiornamenti app)", 
+      "description": "Controlla aggiornamenti e abilita auto-aggiornamento" 
+    },
+    "invite": { 
+      "title": "SpreadDemm (Invita un amico)", 
+      "description": "Condividi l'app TellDemm con la tua DemmList (Contatti)" 
+    },
     "logout": {
-      "title": "Disconnetti",
-      "description": "Cancella i dati dell'app ed esci",
+      "title": "Log Out (Disconnetti)",
+      "description": "Cancella dati app e disconnettiti",
       "confirmHeader": "Conferma disconnessione",
-      "confirmMessage": "Sei sicuro di voler uscire e cancellare i dati dell'app?",
-      "loadingHeader": "Disconnessione in corso",
+      "confirmMessage": "Sei sicuro di voler disconnetterti e cancellare i dati dell'app?",
+      "loadingHeader": "Logging Out (Disconnessione in corso)",
       "loadingMessage": "Attendere prego...",
-      "successHeader": "Disconnesso",
-      "successMessage": "Disconnessione avvenuta con successo."
+      "successHeader": "Logged Out (Disconnesso)",
+      "successMessage": "Ti sei disconnesso con successo."
     },
     "defaultStatus": "Disponibile"
   },

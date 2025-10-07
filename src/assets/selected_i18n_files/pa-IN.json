@@ -45,27 +45,60 @@
     "logout": "ਲਾੱਗ ਆਉਟ"
   },
   "settingsPage": {
-    "title": "ਸੈਟਿੰਗਜ਼",
-    "account": { "title": "ਖਾਤਾ", "description": "ਪ੍ਰਾਈਵੇਸੀ, ਸੁਰੱਖਿਆ, ਨੰਬਰ ਬਦਲੋ" },
-    "privacy": { "title": "ਪ੍ਰਾਈਵੇਸੀ", "description": "ਆਪਣੀਆਂ ਪ੍ਰਾਈਵੇਸੀ ਸੈਟਿੰਗਜ਼ ਕੰਟਰੋਲ ਕਰੋ" },
-    "avatar": { "title": "ਅਵਤਾਰ", "description": "ਪ੍ਰੋਫਾਈਲ ਤਸਵੀਰ ਬਦਲੋ" },
-    "chats": { "title": "ਚੈਟਾਂ", "description": "ਥੀਮ, ਵਾਲਪੇਪਰ, ਬੈਕਅੱਪ" },
-    "accessibility": { "title": "ਪਹੁੰਚਯੋਗਤਾ", "description": "ਲਿਖਤ ਦਾ ਆਕਾਰ ਅਤੇ ਪ੍ਰਦਰਸ਼ਨ ਵਿਕਲਪ" },
-    "notifications": { "title": "ਨੋਟੀਫਿਕੇਸ਼ਨ", "description": "ਸੁਨੇਹੇ, ਸਮੂਹ ਅਤੇ ਕਾਲ ਅਲਰਟ" },
-    "storage": { "title": "ਸਟੋਰੇਜ ਅਤੇ ਡਾਟਾ", "description": "ਸਟੋਰੇਜ ਅਤੇ ਨੈੱਟਵਰਕ ਵਰਤੋਂ ਪ੍ਰਬੰਧਿਤ ਕਰੋ" },
-    "appLanguage": { "title": "ਐਪ ਭਾਸ਼ਾ", "description": "ਐਪ ਭਾਸ਼ਾ ਚੁਣੋ" },
-    "help": { "title": "ਮਦਦ ਅਤੇ ਫੀਡਬੈਕ", "description": "ਮਦਦ ਕੇਂਦਰ, ਸਾਡੇ ਨਾਲ ਸੰਪਰਕ ਕਰੋ, ਐਪ ਜਾਣਕਾਰੀ" },
-    "updates": { "title": "ਐਪ ਅੱਪਡੇਟ", "description": "ਅੱਪਡੇਟ ਚੈੱਕ ਕਰੋ, ਆਟੋਮੈਟਿਕ ਅੱਪਡੇਟ" },
-    "invite": { "title": "ਦੋਸਤ ਨੂੰ ਸੱਦਾ ਦਿਓ", "description": "ਐਪ ਸੰਪਰਕਾਂ ਨਾਲ ਸਾਂਝੀ ਕਰੋ" },
+    "title": "DemmDesk (ਸੈਟਿੰਗਜ਼)",
+    "account": { 
+      "title": "MyTell (ਖਾਤਾ)", 
+      "description": "TellShield (ਗੋਪਨੀਯਤਾ), ਸੁਰੱਖਿਆ, ਨੰਬਰ ਬਦਲੋ" 
+    },
+    "privacy": { 
+      "title": "TellShield (ਗੋਪਨੀਯਤਾ)", 
+      "description": "ਆਪਣੀਆਂ TellShield (ਗੋਪਨੀਯਤਾ) ਸੈਟਿੰਗਾਂ ਨੂੰ ਕੰਟਰੋਲ ਕਰੋ" 
+    },
+    "avatar": { 
+      "title": "TellFace (ਪ੍ਰੋਫਾਈਲ ਤਸਵੀਰ)", 
+      "description": "ਆਪਣੀ TellFace (ਪ੍ਰੋਫਾਈਲ ਤਸਵੀਰ) ਬਦਲੋ" 
+    },
+    "chats": { 
+      "title": "Tells (ਚੈਟਸ)", 
+      "description": "ਥੀਮ, ਵਾਲਪੇਪਰ, SafeDemm (ਬੈਕਅਪ)" 
+    },
+    "accessibility": { 
+      "title": "Accessibility ( ਪਹੁੰਚਯੋਗਤਾ)", 
+      "description": "ਲਿਖਤ ਦਾ ਅਕਾਰ ਅਤੇ ਵਿਖਾਪਣ ਵਿਕਲਪ ਸਮਾਯੋਜ਼ਨ ਕਰੋ" 
+    },
+    "notifications": { 
+      "title": "TellAlerts (ਸੂਚਨਾਵਾਂ)", 
+      "description": "Tell (ਸੰਦੇਸ਼), DemmRoom (ਗਰੁੱਪ) ਅਤੇ Connect (ਕਾਲ) ਅਲਰਟ ਪ੍ਰਬੰਧਨ ਕਰੋ" 
+    },
+    "storage": { 
+      "title": "SafeDemm (ਸਟੋਰੇਜ ਅਤੇ ਡੇਟਾ)", 
+      "description": "ਸਟੋਰੇਜ ਅਤੇ ਨੈੱਟਵਰਕ ਵਰਤੋਂ ਪ੍ਰਬੰਧਨ ਕਰੋ" 
+    },
+    "appLanguage": { 
+      "title": "App Language (ਐਪ ਭਾਸ਼ਾ)", 
+      "description": "TellDemm ਐਪ ਦੀ ਭਾਸ਼ਾ ਚੁਣੋ" 
+    },
+    "help": { 
+      "title": "DemmHelp (ਸਹਾਇਤਾ)", 
+      "description": "ਹੈਲਪ ਸੈਂਟਰ, ਸੰਪਰਕ ਕਰੋ, ਐਪ ਜਾਣਕਾਰੀ" 
+    },
+    "updates": { 
+      "title": "DemmUpdate (ਐਪ ਅੱਪਡੇਟ)", 
+      "description": "ਅੱਪਡੇਟ ਜਾਂਚੋ ਅਤੇ ਆਟੋ-ਅੱਪਡੇਟ ਸਮਰਥ ਕਰੋ" 
+    },
+    "invite": { 
+      "title": "SpreadDemm (ਮਿੱਤਰ ਨੂੰ ਆਮੰਤ੍ਰਿਤ ਕਰੋ)", 
+      "description": "TellDemm ਐਪ ਨੂੰ ਆਪਣੇ DemmList (ਸੰਪਰਕਾਂ) ਨਾਲ ਸਾਂਝਾ ਕਰੋ" 
+    },
     "logout": {
-      "title": "ਲਾੱਗ ਆਉਟ",
-      "description": "ਐਪ ਡਾਟਾ ਸਾਫ ਕਰੋ ਅਤੇ ਸਾਈਨ ਆਉਟ ਕਰੋ",
-      "confirmHeader": "ਲਾੱਗ ਆਉਟ ਦੀ ਪੁਸ਼ਟੀ ਕਰੋ",
-      "confirmMessage": "ਕੀ ਤੁਸੀਂ ਯਕੀਨੀ ਤੌਰ 'ਤੇ ਲਾੱਗ ਆਉਟ ਕਰਨਾ ਅਤੇ ਐਪ ਡਾਟਾ ਸਾਫ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?",
-      "loadingHeader": "ਲਾੱਗ ਆਉਟ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ",
-      "loadingMessage": "ਕਿਰਪਾ ਕਰਕੇ ਉਡੀਕ ਕਰੋ...",
-      "successHeader": "ਲਾੱਗ ਆਉਟ ਹੋ ਗਿਆ",
-      "successMessage": "ਤੁਸੀਂ ਸਫਲਤਾਪੂਰਵਕ ਲਾੱਗ ਆਉਟ ਕਰ ਦਿੱਤਾ ਹੈ।"
+      "title": "Log Out (ਲੌਗ ਆਊਟ)",
+      "description": "ਐਪ ਡੇਟਾ ਸਾਫ਼ ਕਰੋ ਅਤੇ ਸਾਈਨ ਆਊਟ ਕਰੋ",
+      "confirmHeader": "ਲੌਗ ਆਊਟ ਦੀ ਪੁਸ਼ਟੀ ਕਰੋ",
+      "confirmMessage": "ਕੀ ਤੁਸੀਂ ਸੱਚਮੁੱਚ ਲੌਗ ਆਊਟ ਕਰਨਾ ਅਤੇ ਐਪ ਡੇਟਾ ਸਾਫ਼ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?",
+      "loadingHeader": "Logging Out (ਲੌਗ ਆਊਟ ਹੋ ਰਿਹਾ ਹੈ)",
+      "loadingMessage": "ਕਿਰਪਾ ਕਰਕੇ ਰੁਕੋ...",
+      "successHeader": "Logged Out (ਲੌਗ ਆਊਟ ਕੀਤਾ ਗਿਆ)",
+      "successMessage": "ਤੁਸੀਂ ਸਫਲਤਾਪੂਰਵਕ ਲੌਗ ਆਊਟ ਹੋ ਗਏ ਹੋ।"
     },
     "defaultStatus": "ਉਪਲਬਧ"
   },

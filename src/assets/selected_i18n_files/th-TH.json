@@ -44,27 +44,60 @@
     "cancel": "ยกเลิก",
     "logout": "ออกจากระบบ"
   },
-  "settingsPage": {
-    "title": "การตั้งค่า",
-    "account": { "title": "บัญชี", "description": "ความเป็นส่วนตัว, ความปลอดภัย, เปลี่ยนหมายเลข" },
-    "privacy": { "title": "ความเป็นส่วนตัว", "description": "จัดการการตั้งค่าความเป็นส่วนตัวของคุณ" },
-    "avatar": { "title": "อวตาร", "description": "เปลี่ยนรูปโปรไฟล์" },
-    "chats": { "title": "แชท", "description": "ธีม, วอลเปเปอร์, การสำรองข้อมูล" },
-    "accessibility": { "title": "การช่วยการเข้าถึง", "description": "ขนาดตัวอักษรและตัวเลือกการแสดงผล" },
-    "notifications": { "title": "การแจ้งเตือน", "description": "การแจ้งเตือนข้อความ, กลุ่ม และการโทร" },
-    "storage": { "title": "ที่เก็บข้อมูลและข้อมูล", "description": "จัดการที่เก็บข้อมูลและการใช้งานเครือข่าย" },
-    "appLanguage": { "title": "ภาษาของแอป", "description": "เลือกภาษาของแอป" },
-    "help": { "title": "ความช่วยเหลือและข้อเสนอแนะ", "description": "ศูนย์ช่วยเหลือ, ติดต่อเรา, ข้อมูลแอป" },
-    "updates": { "title": "การอัปเดตแอป", "description": "ตรวจสอบการอัปเดต, อัปเดตอัตโนมัติ" },
-    "invite": { "title": "เชิญเพื่อน", "description": "แชร์แอปกับผู้ติดต่อ" },
+ "settingsPage": {
+    "title": "DemmDesk (การตั้งค่า)",
+    "account": { 
+      "title": "MyTell (บัญชี)", 
+      "description": "TellShield (ความเป็นส่วนตัว), ความปลอดภัย, เปลี่ยนหมายเลข" 
+    },
+    "privacy": { 
+      "title": "TellShield (ความเป็นส่วนตัว)", 
+      "description": "ควบคุมการตั้งค่า TellShield (ความเป็นส่วนตัว) ของคุณ" 
+    },
+    "avatar": { 
+      "title": "TellFace (รูปภาพโปรไฟล์)", 
+      "description": "เปลี่ยน TellFace (รูปภาพโปรไฟล์) ของคุณ" 
+    },
+    "chats": { 
+      "title": "Tells (แชท)", 
+      "description": "ธีม, วอลเปเปอร์, SafeDemm (สำรองข้อมูล)" 
+    },
+    "accessibility": { 
+      "title": "Accessibility (การเข้าถึง)", 
+      "description": "ปรับขนาดข้อความและตัวเลือกการแสดงผล" 
+    },
+    "notifications": { 
+      "title": "TellAlerts (การแจ้งเตือน)", 
+      "description": "จัดการการแจ้งเตือน Tell (ข้อความ), DemmRoom (กลุ่ม) และ Connect (การโทร)" 
+    },
+    "storage": { 
+      "title": "SafeDemm (ที่เก็บข้อมูลและข้อมูล)", 
+      "description": "จัดการที่เก็บข้อมูลและการใช้งานเครือข่าย" 
+    },
+    "appLanguage": { 
+      "title": "App Language (ภาษาแอป)", 
+      "description": "เลือกภาษาของแอป TellDemm" 
+    },
+    "help": { 
+      "title": "DemmHelp (ความช่วยเหลือ)", 
+      "description": "ศูนย์ช่วยเหลือ, ติดต่อเรา, ข้อมูลแอป" 
+    },
+    "updates": { 
+      "title": "DemmUpdate (การอัปเดตแอป)", 
+      "description": "ตรวจสอบการอัปเดตและเปิดใช้งานการอัปเดตอัตโนมัติ" 
+    },
+    "invite": { 
+      "title": "SpreadDemm (เชิญเพื่อน)", 
+      "description": "แชร์แอป TellDemm กับ DemmList (ผู้ติดต่อ) ของคุณ" 
+    },
     "logout": {
-      "title": "ออกจากระบบ",
+      "title": "Log Out (ออกจากระบบ)",
       "description": "ล้างข้อมูลแอปและออกจากระบบ",
       "confirmHeader": "ยืนยันการออกจากระบบ",
       "confirmMessage": "คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบและล้างข้อมูลแอป?",
-      "loadingHeader": "กำลังออกจากระบบ",
-      "loadingMessage": "โปรดรอสักครู่...",
-      "successHeader": "ออกจากระบบแล้ว",
+      "loadingHeader": "Logging Out (กำลังออกจากระบบ)",
+      "loadingMessage": "กรุณารอสักครู่...",
+      "successHeader": "Logged Out (ออกจากระบบแล้ว)",
       "successMessage": "คุณออกจากระบบเรียบร้อยแล้ว"
     },
     "defaultStatus": "พร้อมใช้งาน"
