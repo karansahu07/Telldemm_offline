@@ -1261,7 +1261,7 @@ ion-datetime {
     border: 1px solid #e0e0e0;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    // box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
     min-height: 24px;
     
     &:active {
@@ -1286,6 +1286,7 @@ ion-datetime {
       min-width: 10px;
       text-align: center;
       margin-left: 2px;
+       margin-bottom: -20px;
     }
   }
 }
@@ -1345,4 +1346,10 @@ ion-datetime {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
+}
+
+.reaction-info-button .action-sheet-button-inner {
+  pointer-events: none;
+  opacity: 0.95;
+  font-weight: 600;
 }

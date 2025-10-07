@@ -133,7 +133,7 @@ logoutUser(userId: number) {
   getUserProfilebyId(user_id: string): Observable<{
     phone_number: string;
     profile: null;
-    name: string; publicKeyHex: string 
+    name: string; publicKeyHex: string
 }> {
     return this.http.post<any>(
       `${this.baseUrl}/api/users/profile_by_userid`,

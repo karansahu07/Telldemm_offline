@@ -34,7 +34,8 @@ import {
   Platform,
   PopoverController,
   ToastController,
-  IonDatetime
+  IonDatetime,
+  ActionSheetController
 } from '@ionic/angular';
 import { firstValueFrom, Subscription, timer } from 'rxjs';
 import { Keyboard } from '@capacitor/keyboard';
@@ -209,7 +210,10 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     private renderer: Renderer2,
     private el: ElementRef,
     private zone: NgZone,
-    private presence: PresenceService
+    private presence: PresenceService,
+    private actionSheetCtrl: ActionSheetController,
+  // private toastCtrl: ToastController,
+  // private modalCtrl: ModalController,
   ) { }
 
   async ngOnInit() {
@@ -3064,22 +3068,6 @@ isQuickReactionOpen(msg: any) {
     this.emojiTargetMsg = null;
   }
 
-  /** Build reaction summary for chips below a message */
-  // getReactionSummary(msg: Message): Array<{ emoji: string; count: number; mine: boolean }> {
-  //   const map = msg.reactions || {};
-  //   const byEmoji: Record<string, number> = {};
-  //   Object.values(map).forEach((e: any) => {
-  //     const em = String(e || '');
-  //     if (!em) return;
-  //     byEmoji[em] = (byEmoji[em] || 0) + 1;
-  //   });
-  //   return Object.keys(byEmoji).map(emoji => ({
-  //     emoji,
-  //     count: byEmoji[emoji],
-  //     mine: map[this.senderId] === emoji
-  //   })).sort((a,b) => b.count - a.count);
-  // }
-
   /** Summary already exists; re-use it to build compact badges */
   getReactionSummary(msg: Message): Array<{ emoji: string; count: number; mine: boolean }> {
     const map = msg.reactions || {};
@@ -3107,6 +3095,57 @@ isQuickReactionOpen(msg: any) {
     }
     return list.slice(0, 3);
   }
+
+  async onReactionBadgeClick(ev: Event, msg: Message, badge: { emoji: string; count: number; mine: boolean }) {
+  ev.stopPropagation();
+
+  // Build header text: "1 reaction" / "3 reactions"
+  const header = badge.count === 1 ? '1 reaction' : `${badge.count} reactions`;
+
+  // If badge.mine === true, show the remove option; else show only view
+  const buttons: any[] = [];
+
+  // Show the emoji/count as a disabled info row
+  buttons.push({
+    text: `${badge.emoji}  ${badge.count}`,
+    icon: undefined,
+    role: undefined,
+    handler: () => { /* noop - disabled by setting css or no-op here */ },
+    cssClass: 'reaction-info-button'
+  });
+
+  // If the current user reacted with this emoji, show "Tap to remove"
+  if (badge.mine) {
+    buttons.push({
+      text: 'Tap to remove',
+      icon: 'trash',
+      handler: async () => {
+        // call existing addReaction which toggles/remove when same emoji present
+        await this.addReaction(msg, badge.emoji);
+      }
+    });
+  } else {
+    // Optionally allow user to react with this same emoji (i.e., add their reaction)
+    buttons.push({
+      text: `React with ${badge.emoji}`,
+      icon: undefined,
+      handler: async () => {
+        await this.addReaction(msg, badge.emoji);
+      }
+    });
+  }
+
+  // Cancel button
+  buttons.push({ text: 'Cancel', role: 'cancel' });
+
+  const sheet = await this.actionSheetCtrl.create({
+    header,
+    buttons,
+    cssClass: 'reaction-action-sheet'
+  });
+
+  await sheet.present();
+}
 
 
   goToProfile() {

@@ -118,6 +118,26 @@ export interface GetSocialMediaResponse {
   data: SocialMediaEntry[];
 }
 
+export interface GroupChat {
+  name: string;
+  receiver_Id: string;        // groupId
+  group: true;
+  isCommunity?: boolean;
+  group_name?: string;
+  message: string;
+  time: string;
+  unread: boolean;
+  unreadCount: number;
+  dp: string | null;
+  isTyping: boolean;
+  typingText: string | null;
+  typingCount: number;
+  members: Record<string, any>;
+  pinned?: boolean | null;
+  pinnedAt?: number | null;
+  timestamp?: string | number | null;
+}
+
 export interface GroupMember {
 user_id: string;
 name?: string;
@@ -167,6 +187,24 @@ export interface CreateCommunityResponse {
   data?: any;
 }
 
+// Community row type for Home chat list
+export interface CommunityChat {
+  name: string;
+  receiver_Id: string;      // community id
+  group: true;              // visually treated like a group
+  isCommunity: true;        // special flag for UI/navigation
+  group_name?: string;      // preview group name (announcement/general/first)
+  message: string;          // preview text
+  time: string;             // preview time (formatted)
+  unread: boolean;
+  unreadCount: number;
+  dp: string | null;        // community icon
+  pinned?: boolean | null;
+  pinnedAt?: number | null;
+  timestamp?: string | number | null;
+}
+
+
 export type ArchItem = {
   roomId: string;
   isGroup: boolean;
@@ -190,7 +228,7 @@ export interface IUser {
   phone_number: string;
   email: string | null;
   profile_picture_url: string | null;
-  status: 'verified' | 'unverified' | string; // you can narrow this union as needed
+  status: 'verified' | 'unverified' | string;
   user_created_at: string | null;
   otp_id: number | null;
   otp_code: string | null;

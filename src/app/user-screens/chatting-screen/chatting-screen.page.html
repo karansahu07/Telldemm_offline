@@ -357,13 +357,20 @@
          *ngIf="getReactionBadges(msg).length > 0"
          [class.right]="msg.sender_id === senderId"
          [class.left]="msg.sender_id !== senderId">
-      <div class="badge"
+      <!-- <div class="badge"
            *ngFor="let b of getReactionBadges(msg)"
            [class.mine]="b.mine"
            (click)="addReaction(msg, b.emoji)">
         <span class="emoji">{{ b.emoji }}</span>
         <span class="cnt" *ngIf="b.count > 1">{{ b.count }}</span>
-      </div>
+      </div> -->
+      <div class="badge"
+     *ngFor="let b of getReactionBadges(msg)"
+     [class.mine]="b.mine"
+     (click)="onReactionBadgeClick($event, msg, b)">
+  <span class="emoji">{{ b.emoji }}</span>
+  <span class="cnt" *ngIf="b.count > 1">{{ b.count }}</span>
+</div>
     </div>
 
   </div>
