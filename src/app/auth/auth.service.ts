@@ -84,7 +84,60 @@ export class AuthService {
   // }
 
 
-  /** Verify OTP & store in secure storage */
+//   /** Verify OTP & store in secure storage */
+// async verifyOtp(payload: { 
+//   country_code: string; 
+//   phone_number: string; 
+//   otp_code: string;
+//   device_details?: Array<{
+//     device_uuid: string;
+//     device_model: string;
+//     os_name: string;
+//     os_version: string;
+//     app_version: string;
+//   }>;
+// }): Promise<{ success: boolean; userId?: number; message?: string }> {
+//   try {
+//     // ✅ Log the payload to debug device info
+//     console.log('📨 Sending Verify OTP Payload:', payload);
+
+//     // Send to backend
+//     const res: any = await this.api.post('/api/auth/verify-otp_mb', payload).toPromise();
+
+//     if (res.status) {
+//       const senderPhone = `${payload.country_code}${payload.phone_number}`;
+//       const authData: AuthData = {
+//         loggedIn: true,
+//         phone_number: senderPhone,
+//         userId: res.user_id.toString(),
+//         name: res.name || undefined
+//       };
+
+//       // Store in secure storage
+//       await this.secureStorage.setItem('AUTH', JSON.stringify(authData));
+
+//       // Update in-memory auth state
+//       this._authData = authData;
+//       this._isAuthenticated = true;
+
+//       // Generate and upload public key
+//       const publicKeyHex = await this.encryptionService.generateAndStoreECCKeys();
+//       await this.api.post('/api/users/update-public-key', {
+//         user_id: res.user_id,
+//         public_key: publicKeyHex
+//       }).toPromise();
+
+//       return { success: true, userId: res.user_id };
+//     } else {
+//       return { success: false, message: res.message || 'Invalid OTP' };
+//     }
+//   } catch (error) {
+//     console.error('OTP verification failed:', error);
+//     return { success: false, message: 'OTP verification failed' };
+//   }
+// }
+
+/** Verify OTP & store in secure storage */
 async verifyOtp(payload: { 
   country_code: string; 
   phone_number: string; 
@@ -98,45 +151,53 @@ async verifyOtp(payload: {
   }>;
 }): Promise<{ success: boolean; userId?: number; message?: string }> {
   try {
-    // ✅ Log the payload to debug device info
     console.log('📨 Sending Verify OTP Payload:', payload);
 
-    // Send to backend
     const res: any = await this.api.post('/api/auth/verify-otp_mb', payload).toPromise();
 
-    if (res.status) {
-      const senderPhone = `${payload.country_code}${payload.phone_number}`;
-      const authData: AuthData = {
-        loggedIn: true,
-        phone_number: senderPhone,
-        userId: res.user_id.toString(),
-        name: res.name || undefined
+    // ✅ If API explicitly returns status: false
+    if (!res.status) {
+      return {
+        success: false,
+        message: res.message || 'Invalid or expired OTP'
       };
-
-      // Store in secure storage
-      await this.secureStorage.setItem('AUTH', JSON.stringify(authData));
-
-      // Update in-memory auth state
-      this._authData = authData;
-      this._isAuthenticated = true;
-
-      // Generate and upload public key
-      const publicKeyHex = await this.encryptionService.generateAndStoreECCKeys();
-      await this.api.post('/api/users/update-public-key', {
-        user_id: res.user_id,
-        public_key: publicKeyHex
-      }).toPromise();
-
-      return { success: true, userId: res.user_id };
-    } else {
-      return { success: false, message: res.message || 'Invalid OTP' };
     }
-  } catch (error) {
+
+    // ✅ On success, store auth data securely
+    const senderPhone = `${payload.country_code}${payload.phone_number}`;
+    const authData: AuthData = {
+      loggedIn: true,
+      phone_number: senderPhone,
+      userId: res.user_id.toString(),
+      name: res.name || undefined
+    };
+
+    await this.secureStorage.setItem('AUTH', JSON.stringify(authData));
+
+    this._authData = authData;
+    this._isAuthenticated = true;
+
+    // ✅ Generate and upload ECC public key
+    const publicKeyHex = await this.encryptionService.generateAndStoreECCKeys();
+    await this.api.post('/api/users/update-public-key', {
+      user_id: res.user_id,
+      public_key: publicKeyHex
+    }).toPromise();
+
+    return {
+      success: true,
+      userId: res.user_id,
+      message: res.message || 'OTP verified successfully'
+    };
+
+  } catch (error: any) {
     console.error('OTP verification failed:', error);
-    return { success: false, message: 'OTP verification failed' };
+
+    // ✅ Return backend error message if available
+    const apiMessage = error?.error?.message || error?.message || 'OTP verification failed';
+    return { success: false, message: apiMessage };
   }
 }
-
 
 /** Verify device API */
 async verifyDevice(payload: any): Promise<any> {
