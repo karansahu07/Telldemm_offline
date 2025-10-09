@@ -1291,10 +1291,10 @@ export class HomeScreenPage implements OnInit, OnDestroy {
           receivers.push({
             // ...receiver,
             user_id: Number(receiverId),
-            name: (receiver as any)?.name ?? '',
+            name: (receiver as any)?.phone_number ?? '',
             phone_number: (receiver as any)?.phone_number ?? '',
             email: (receiver as any)?.email ?? null,
-            profile_picture_url: (receiver as any)?.profile_picture_url ?? null,
+            profile_picture_url: (receiver as any)?.profile ?? null,
             status: (receiver as any)?.status ?? 'unverified',
             user_created_at: (receiver as any)?.user_created_at ?? null,
             otp_id: (receiver as any)?.otp_id ?? null,
