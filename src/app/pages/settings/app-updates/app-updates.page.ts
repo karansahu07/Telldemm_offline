@@ -71,6 +71,8 @@ export class AppUpdatesPage implements OnInit {
     try {
       const result = await this.versionCheck.checkAndNotify();
 
+      console.log("result",result);
+
       // Update UI
       this.version = result.currentVersion || this.version;
       this.latestVersion = result.latestVersion;

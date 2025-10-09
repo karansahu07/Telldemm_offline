@@ -1630,7 +1630,8 @@ async loadUserGroups() {
   }
 
   private trackRouteChanges() {
-    this.versionService.checkVersion();
+    // this.versionService.checkVersion();
+    this.versionService.checkAndNotify();
   }
 
   formatTimestamp(timestamp: string): string {

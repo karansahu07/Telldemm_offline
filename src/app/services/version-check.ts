@@ -50,6 +50,7 @@ export class VersionCheck {
     if (latestVersion) {
       const cleaned = this.cleanVersion(latestVersion);
       latestVersion = cleaned;
+      console.log("cleaned",cleaned);
       localStorage.setItem(LS_KEYS.latest, cleaned);
     }
 
@@ -89,6 +90,10 @@ export class VersionCheck {
       // Your backend should return something like { latestVersion: "8 (8.0)" } or "8.0"
       const url = `https://apps.ekarigar.com/backend/check-version?package=${packageName}`;
       const data: any = await this.http.get(url).toPromise();
+
+      console.log(data);
+      // {"packageName":"com.ekarigar.telldemm","latestVersion":"13 (12.1)"}
+
       // accept either raw string or { latestVersion: string }
       const raw = typeof data === 'string' ? data : data?.latestVersion;
       return raw ?? null;
@@ -98,11 +103,30 @@ export class VersionCheck {
     }
   }
 
-  private cleanVersion(v: string): string {
-    // e.g. "8 (8.0)" -> "8.0"
-    const match = v.match(/\d+(\.\d+)*/);
-    return match ? match[0] : v;
-    }
+  // private cleanVersion(v: string): string {
+  //   // e.g. "8 (8.0)" -> "8.0"
+  //   const match = v.match(/\d+(\.\d+)*/);
+  //   return match ? match[0] : v;
+  //   }
+ private cleanVersion(v: string): string {
+  // If version string looks like "13 (12.1)" → extract "12.1"
+  const match = v.match(/\(([^)]+)\)/);
+  if (match) {
+    return match[1]; // content inside parentheses
+  }
+
+  // Otherwise, extract the first decimal version number like "12.1"
+  const versionMatch = v.match(/\d+(\.\d+)+|\d+\.\d+/);
+  if (versionMatch) {
+    return versionMatch[0];
+  }
+
+  // Fallback: if version has only a single number, make it "x.0"
+  const numMatch = v.match(/\d+/);
+  return numMatch ? `${numMatch[0]}.0` : v;
+}
+
+
 
   private isUpdateAvailable(current: string, latest: string): boolean {
     const currParts = current.split('.').map(Number);
