@@ -343,23 +343,16 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
 
   async ionViewWillEnter() {
     Keyboard.setScroll({ isDisabled: false });
-
-    await this.chatService.loadMessages();
-    this.chatService.syncMessagesWithServer();
-
-    this.chatService.getMessages().subscribe(async (msgs) => {
-      this.groupedMessages = (await this.groupMessagesByDate(
-        msgs as any[]
-      )) as any[];
-    });
-
     this.senderId = this.authService.authData?.userId || '';
     this.sender_phone = this.authService.authData?.phone_number || '';
     this.sender_name = this.authService.authData?.name || '';
 
     const nameFromQuery =
       this.route.snapshot.queryParamMap.get('receiver_name');
-    this.receiver_name = nameFromQuery || (await this.secureStorage.getItem('receiver_name')) || '';
+    this.receiver_name =
+      nameFromQuery ||
+      (await this.secureStorage.getItem('receiver_name')) ||
+      '';
 
     const rawId = this.route.snapshot.queryParamMap.get('receiverId') || '';
     const chatTypeParam = this.route.snapshot.queryParamMap.get('isGroup');
@@ -406,6 +399,17 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     // }
 
     // this.loadReceiverProfile();
+  }
+
+  async ionViewDidEnter() {
+    await this.chatService.loadMessages();
+    this.chatService.syncMessagesWithServer();
+
+    this.chatService.getMessages().subscribe(async (msgs) => {
+      this.groupedMessages = (await this.groupMessagesByDate(
+        msgs as any[]
+      )) as any[];
+    });
   }
 
   async ionViewWillLeave() {
@@ -1673,15 +1677,23 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  //for minimal rerendering
+  trackByMessageId(index: number, message: any): string {
+    return message.msgId;
+  }
+
   async ngAfterViewInit() {
     if (this.ionContent) {
       this.ionContent.ionScroll.subscribe(async (event: any) => {
         if (
-          event.detail.scrollTop < 100 &&
-          this.hasMoreMessages &&
+          event.detail.scrollTop < 20 &&
+          this.chatService.hasMoreMessages &&
           !this.isLoadingMore
         ) {
-          await this.loadMoreMessages();
+          await this.chatService.loadMessages();
+          // await this.loadMoreMessages();
+        } else {
+          console.log('Not more messages');
         }
       });
     }

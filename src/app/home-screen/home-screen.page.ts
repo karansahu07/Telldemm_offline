@@ -1960,7 +1960,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
   }
 
   async openChat(chat: any) {
-    console.log({chat});
+    console.log({ chat });
     await this.firebaseChatService.openChat(chat);
     this.router.navigate(['/chatting-screen'], {
       queryParams: { receiverId: '', isGroup: true },

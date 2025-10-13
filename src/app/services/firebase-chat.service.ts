@@ -480,7 +480,7 @@ export class FirebaseChatService {
     }
   }
 
-  async syncMessagesWithServer(): Promise<void> {
+ async syncMessagesWithServer(): Promise<void> {
     try {
       console.count('syncserverwithmessages');
       const roomId = this.currentChat?.roomId;
@@ -491,7 +491,7 @@ export class FirebaseChatService {
       const baseRef = rtdbRef(this.db, `chats/${roomId}`);
       const currentMap = new Map(this._messages$.value); // clone map
       const currentArr = currentMap.get(roomId) ?? [];
-
+ 
       const snapToMsg = (s: DataSnapshot): IMessage => {
         const payload = s.val() ?? {};
         return {
@@ -500,12 +500,12 @@ export class FirebaseChatService {
           ...payload,
         };
       };
-
+ 
       if (!currentArr.length) {
         const pageSize = 50;
         const q = query(baseRef, orderByKey());
         const snap = await rtdbGet(q);
-
+ 
         const fetched: IMessage[] = [];
         snap.forEach((s) => {
           const m = snapToMsg(s);
@@ -517,18 +517,21 @@ export class FirebaseChatService {
           }
           return false;
         });
-
+ 
         fetched.sort((a, b) =>
           a.msgId! < b.msgId! ? -1 : a.msgId! > b.msgId! ? 1 : 0
         );
-
+ 
         currentMap.set(roomId, fetched);
         this._messages$.next(currentMap);
         console.log('Messages when no prev ->', fetched);
         return;
       }
-
-      const last = currentArr[currentArr.length - 1];
+ 
+      const last =
+        currentArr?.sort((a, b) =>
+          a.msgId! < b.msgId! ? -1 : a.msgId! > b.msgId! ? 1 : 0
+        )?.[currentArr.length - 1] || null;
       const lastKey = last.msgId ?? null;
       if (!lastKey) {
         console.warn(
@@ -556,25 +559,25 @@ export class FirebaseChatService {
         this._messages$.next(currentMap);
         return;
       }
-
+ 
       const qNew = query(baseRef, orderByKey(), startAt(lastKey as string));
       const snapNew = await rtdbGet(qNew);
-
+ 
       const newMessages: IMessage[] = [];
       snapNew.forEach((s) => {
         const m = snapToMsg(s);
         newMessages.push(m);
         return false;
       });
-
+ 
       if (newMessages.length && newMessages[0].msgId === lastKey) {
         newMessages.shift();
       }
-
+ 
       if (newMessages.length === 0) {
         return;
       }
-
+ 
       for (const m of newMessages) {
         try {
           this.sqliteService.saveMessage(m);
@@ -583,25 +586,30 @@ export class FirebaseChatService {
         }
         currentArr.push(m);
       }
-
+ 
       currentMap.set(roomId, [...currentArr]);
       this._messages$.next(currentMap);
-
+ 
       console.log('Current messages when some already exists->', currentArr);
     } catch (error) {
       console.error('syncMessagesWithServer error:', error);
     }
   }
+ 
 
   getMessages(): Observable<IMessage[] | undefined> {
-    return this._messages$
-      .asObservable()
-      .pipe(
-        map(
-          (messagesMap: Map<string, IMessage[]>) =>
-            messagesMap.get(this.currentChat?.roomId as string) || []
-        )
-      );
+    return this._messages$.asObservable().pipe(
+      map(
+        (messagesMap: Map<string, IMessage[]>) =>
+          messagesMap
+            .get(this.currentChat?.roomId as string)
+            ?.sort((a, b) => Number(a.timestamp) - Number(b.timestamp))
+            ?.map((msg) => ({
+              ...msg,
+              timestamp: new Date(msg.timestamp), // convert timestamp to Date object
+            })) || []
+      )
+    );
   }
 
   async getTotalMessages() {
@@ -625,6 +633,7 @@ export class FirebaseChatService {
       );
 
       if (!newMessages || newMessages.length === 0) {
+        console.log('Not more messages');
         return;
       }
 

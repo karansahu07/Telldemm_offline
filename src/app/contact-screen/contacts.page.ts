@@ -236,6 +236,7 @@ export class ContactsPage implements OnInit {
     name: string;
     phoneNumber: string;
     userId: string | null;
+    selected?: boolean;
   }[] = [];
   filteredContacts: {
     isOnPlatform: boolean;
@@ -243,6 +244,7 @@ export class ContactsPage implements OnInit {
     name: string;
     phoneNumber: string;
     userId: string | null;
+    selected?: boolean;
   }[] = [];
 
   showSearchBar = false;
@@ -286,6 +288,7 @@ export class ContactsPage implements OnInit {
 
     try {
       const pfUsers = this.firebaseChatService.currentUsers;
+      console.log({pfUsers})
       const deviceContacts = this.firebaseChatService.currentDeviceContacts;
 
       // Extract phone numbers of platform users
@@ -305,6 +308,7 @@ export class ContactsPage implements OnInit {
             phoneNumber: phoneNumber as string,
             name: username as string,
             isOnPlatform: !!isOnPlatform,
+            selected: false
           })
         ),
         // ...nonPfUsers.map((dc) => ({
@@ -329,19 +333,6 @@ export class ContactsPage implements OnInit {
 
   async openContactChat(receiverId: any) {
     try {
-      // const receiverId = contact.user_id?.toString() || contact.receiver_Id;
-      // let receiver_phone = contact.phone_number?.toString() || contact.receiver_Id;
-      // const receiver_name = contact.name;
-
-      // // Clean phone number (remove country codes)
-      // receiver_phone = receiver_phone.replace(/^(\+91|91)/, '');
-
-      // // Store receiver details in secure storage
-      // await this.secureStorage.setItem('receiver_name', receiver_name);
-      // await this.secureStorage.setItem('receiver_phone', receiver_phone);
-
-      // // Clean phone for navigation (last 10 digits)
-      // const cleanPhone = receiverId.replace(/\D/g, '').slice(-10);
       const receiver = this.allUsers.find(
         (u) => u.userId === receiverId && u.isOnPlatform
       );
@@ -377,127 +368,169 @@ export class ContactsPage implements OnInit {
 
   // async createGroup() {
   //   const selectedUsers = this.allUsers.filter(user => user.selected);
-
   //   const currentUserId = this.authService.authData?.userId || '';
   //   const currentUserPhone = this.authService.authData?.phone_number;
-  //   const currentUserName = await this.secureStorage.getItem('name');
-
-  //   const members = selectedUsers.map(u => ({
-  //     user_id: u.user_id,
-  //     name: u.name,
-  //     phone_number: u.phone_number
-  //   }));
-
-  //   // Add current user
-  //   if (currentUserId && currentUserPhone) {
-  //     members.push({
-  //       user_id: currentUserId,
-  //       name: currentUserName,
-  //       phone_number: currentUserPhone
-  //     });
+  //   const currentUserName = this.authService.authData?.name;
+  //   // Prepare members as IDs only
+  //   const memberIds = selectedUsers.map(u => u.user_id);
+  //   if (currentUserId) {
+  //       memberIds.push(Number(currentUserId));
   //   }
-
   //   const groupId = `group_${Date.now()}`;
-
   //   if (!this.newGroupName.trim()) {
-  //     alert('Group name is required');
-  //     return;
+  //       alert('Group name is required');
+  //       return;
   //   }
-
   //   try {
-  //     // Step 1: Create group in Firebase
-  //     await this.firebaseChatService.createGroup(groupId, this.newGroupName, members, currentUserId);
-
-  //     // Step 2: Sync to backend and get backendGroupId
-  //     this.api.createGroup(this.newGroupName, Number(currentUserId), groupId).subscribe({
-  //       next: async (res: any) => {
-  //         const backendGroupId = res?.group?.group_id;
-
-  //         if (backendGroupId) {
-  //           // Step 3: Save backendGroupId in Firebase
-  //           await this.firebaseChatService.updateBackendGroupId(groupId, backendGroupId);
-  //         }
-
-  //         // Reset form
-  //         this.creatingGroup = false;
-  //         this.newGroupName = '';
-  //         this.allUsers.forEach(u => (u.selected = false));
-
-  //         alert('Group created successfully');
-
-  //         // Refresh & navigate
-  //         localStorage.setItem('shouldRefreshHome', 'true');
-  //         this.router.navigate(['/home-screen']);
-  //       },
-  //       error: () => {
-  //         alert('Failed to sync group to backend');
+  //       const membersForFirebase = selectedUsers.map(u => ({
+  //           user_id: u.user_id,
+  //           name: u.name,
+  //           phone_number: u.phone_number
+  //       }));
+  //       if (currentUserId && currentUserPhone) {
+  //           membersForFirebase.push({
+  //               user_id: currentUserId,
+  //               name: currentUserName,
+  //               phone_number: currentUserPhone
+  //           });
   //       }
-  //     });
-
+  //       await this.firebaseChatService.createGroup(
+  //           groupId,
+  //           this.newGroupName,
+  //           membersForFirebase,
+  //           currentUserId
+  //       );
+  //       this.api.createGroup(this.newGroupName, Number(currentUserId), groupId, memberIds)
+  //           .subscribe({
+  //               next: async (res: any) => {
+  //                   const backendGroupId = res?.group?.group?.group_id;
+  //                   if (backendGroupId) {
+  //                       // Step 3: Save backendGroupId in Firebase
+  //                       await this.firebaseChatService.updateBackendGroupId(groupId, backendGroupId);
+  //                   }
+  //                   // Reset form
+  //                   this.creatingGroup = false;
+  //                   this.newGroupName = '';
+  //                   this.allUsers.forEach(u => (u.selected = false));
+  //                   alert('Group created successfully');
+  //                   // Refresh & navigate
+  //                   localStorage.setItem('shouldRefreshHome', 'true');
+  //                   this.router.navigate(['/home-screen']);
+  //               },
+  //               error: () => {
+  //                   alert('Failed to sync group to backend');
+  //               }
+  //           });
   //   } catch {
-  //     alert('Failed to create group');
+  //       alert('Failed to create group');
   //   }
   // }
 
-  async createGroup() {
-    // const selectedUsers = this.allUsers.filter(user => user.selected);
-    // const currentUserId = this.authService.authData?.userId || '';
-    // const currentUserPhone = this.authService.authData?.phone_number;
-    // const currentUserName = this.authService.authData?.name;
-    // // Prepare members as IDs only
-    // const memberIds = selectedUsers.map(u => u.user_id);
-    // if (currentUserId) {
-    //     memberIds.push(Number(currentUserId));
-    // }
-    // const groupId = `group_${Date.now()}`;
-    // if (!this.newGroupName.trim()) {
-    //     alert('Group name is required');
-    //     return;
-    // }
-    // try {
-    //     const membersForFirebase = selectedUsers.map(u => ({
-    //         user_id: u.user_id,
-    //         name: u.name,
-    //         phone_number: u.phone_number
-    //     }));
-    //     if (currentUserId && currentUserPhone) {
-    //         membersForFirebase.push({
-    //             user_id: currentUserId,
-    //             name: currentUserName,
-    //             phone_number: currentUserPhone
-    //         });
-    //     }
-    //     await this.firebaseChatService.createGroup(
-    //         groupId,
-    //         this.newGroupName,
-    //         membersForFirebase,
-    //         currentUserId
-    //     );
-    //     this.api.createGroup(this.newGroupName, Number(currentUserId), groupId, memberIds)
-    //         .subscribe({
-    //             next: async (res: any) => {
-    //                 const backendGroupId = res?.group?.group?.group_id;
-    //                 if (backendGroupId) {
-    //                     // Step 3: Save backendGroupId in Firebase
-    //                     await this.firebaseChatService.updateBackendGroupId(groupId, backendGroupId);
-    //                 }
-    //                 // Reset form
-    //                 this.creatingGroup = false;
-    //                 this.newGroupName = '';
-    //                 this.allUsers.forEach(u => (u.selected = false));
-    //                 alert('Group created successfully');
-    //                 // Refresh & navigate
-    //                 localStorage.setItem('shouldRefreshHome', 'true');
-    //                 this.router.navigate(['/home-screen']);
-    //             },
-    //             error: () => {
-    //                 alert('Failed to sync group to backend');
-    //             }
-    //         });
-    // } catch {
-    //     alert('Failed to create group');
-    // }
+async createGroup() {
+  // selectedUsers: treat truthy selected property (may be undefined if not initialized)
+  const selectedUsers = this.allUsers.filter(u => !!(u as any).selected);
+
+  // current user info from auth
+  const currentUserId = this.authService.authData?.userId ?? '';
+  const currentUserPhone = this.authService.authData?.phone_number ?? '';
+  const currentUserName = this.authService.authData?.name ?? '';
+
+  // require a group name
+  if (!this.newGroupName?.trim()) {
+    alert('Group name is required');
+    return;
   }
+
+  // build members for Firebase using the fields present in your allUsers objects
+  const membersForFirebase: Array<any> = selectedUsers.map(u => {
+    const userObj: any = u;
+    // prefer numeric userId when possible, fallback to userId string or phoneNumber
+    const uid = userObj.userId ?? userObj.user_id ?? null;
+    const parsedUid = typeof uid === 'number' ? uid : Number(uid);
+    return {
+      user_id: Number.isFinite(parsedUid) ? parsedUid : (uid ?? userObj.phoneNumber ?? null),
+      name: userObj.name ?? userObj.username ?? '',
+      phone_number: userObj.phoneNumber ?? userObj.phone_number ?? '',
+      profile: userObj.profile ?? userObj.avatar ?? '',
+      isOnPlatform: !!userObj.isOnPlatform
+    };
+  });
+
+  // include current user in members (if info available)
+  if (currentUserId || currentUserPhone) {
+    const parsedCurId = typeof currentUserId === 'number' ? currentUserId : Number(currentUserId);
+    membersForFirebase.push({
+      user_id: Number.isFinite(parsedCurId) ? parsedCurId : (currentUserId || currentUserPhone),
+      name: currentUserName ?? '',
+      phone_number: currentUserPhone ?? '',
+      profile: this.userProfile?.avatar ?? '',
+      isOnPlatform: true
+    });
+  }
+
+  // prepare memberIds for backend (prefer numeric IDs, otherwise string fallback)
+  const memberIds = membersForFirebase.map(m => {
+    const id = m.user_id;
+    const n = typeof id === 'number' ? id : Number(id);
+    return Number.isFinite(n) ? n : id;
+  });
+
+  const groupId = `group_${Date.now()}`;
+
+  try {
+    // 1) Create group in Firebase
+    await this.firebaseChatService.createGroup(
+      groupId,
+      this.newGroupName,
+      membersForFirebase,
+      currentUserId
+    );
+
+    // 2) Send to backend (pass memberIds so backend knows members)
+    // Note: using your existing api.createGroup signature; adapt if signature differs
+    this.api.createGroup(this.newGroupName, Number(currentUserId), groupId, memberIds)
+      .subscribe({
+        next: async (res: any) => {
+          // attempt to read backendGroupId from several common response shapes
+          const backendGroupId =
+            res?.group?.group_id ??
+            res?.group?.groupId ??
+            res?.group?.id ??
+            res?.group_id ??
+            res?.data?.group_id ??
+            res?.data?.id ??
+            res?.id;
+
+          if (backendGroupId) {
+            try {
+              await this.firebaseChatService.updateBackendGroupId(groupId, backendGroupId);
+            } catch (err) {
+              console.warn('Failed to update backendGroupId in Firebase:', err);
+            }
+          }
+
+          // reset UI & navigate
+          this.creatingGroup = false;
+          this.newGroupName = '';
+          this.allUsers.forEach((u: any) => (u.selected = false));
+
+          alert('Group created successfully');
+          localStorage.setItem('shouldRefreshHome', 'true');
+          this.router.navigate(['/home-screen']);
+        },
+        error: (err: any) => {
+          console.error('Failed to sync group to backend:', err);
+          alert('Failed to sync group to backend');
+        }
+      });
+
+  } catch (err) {
+    console.error('Failed to create group:', err);
+    alert('Failed to create group');
+  }
+}
+
+
 
   focusSearchBar() {
     this.showSearchBar = true;
