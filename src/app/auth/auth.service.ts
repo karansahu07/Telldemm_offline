@@ -17,6 +17,7 @@ interface AuthData {
 export class AuthService {
   private _isAuthenticated = false;
   private _authData: AuthData | null = null;
+  // private senderId : string | null = null;
 
   constructor(
     private api: ApiService,
@@ -33,6 +34,9 @@ export class AuthService {
   get authData(): AuthData | null {
     return this._authData;
   }
+  get senderId(): string | null {
+    return this._authData?.userId || null;
+  }
 
   /** Send OTP */
   sendOtp(payload: { phone_number: string; country_code: string }): Promise<any> {
@@ -44,6 +48,8 @@ export class AuthService {
   sendOtpDev(payload: { phone_number: string; country_code: string }): Promise<any> {
     return this.api.post('/api/auth/send-otp_mb_dev', payload).toPromise();
   }
+
+
 
   // /** Verify OTP & store in secure storage */
   // async verifyOtp(payload: { country_code: string; phone_number: string; otp_code: string }): Promise<{ success: boolean; userId?: number; message?: string }> {
@@ -99,7 +105,7 @@ export class AuthService {
 // }): Promise<{ success: boolean; userId?: number; message?: string }> {
 //   try {
 //     // ✅ Log the payload to debug device info
-//     console.log('📨 Sending Verify OTP Payload:', payload);
+//     //console.log('📨 Sending Verify OTP Payload:', payload);
 
 //     // Send to backend
 //     const res: any = await this.api.post('/api/auth/verify-otp_mb', payload).toPromise();
@@ -151,7 +157,7 @@ async verifyOtp(payload: {
   }>;
 }): Promise<{ success: boolean; userId?: number; message?: string }> {
   try {
-    console.log('📨 Sending Verify OTP Payload:', payload);
+    //console.log('📨 Sending Verify OTP Payload:', payload);
 
     const res: any = await this.api.post('/api/auth/verify-otp_mb', payload).toPromise();
 

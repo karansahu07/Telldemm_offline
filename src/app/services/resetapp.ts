@@ -248,7 +248,7 @@ export class Resetapp {
         console.warn('Failed to set user offline', err);
       }
     } else {
-      console.log('No userId found before reset; skipping FCM token delete');
+      //console.log('No userId found before reset; skipping FCM token delete');
     }
 
     this.clearLocalStorage();

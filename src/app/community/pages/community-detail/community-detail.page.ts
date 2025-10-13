@@ -303,7 +303,7 @@ import {
 } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FirebaseChatService } from '../../../services/firebase-chat.service';
-import { get, ref, getDatabase, update } from 'firebase/database';
+import { get, ref, getDatabase, update, Database } from 'firebase/database';
 import { AuthService } from 'src/app/auth/auth.service'; // adjust if your path is different
 
 // Popover component you already have
@@ -363,7 +363,7 @@ export class CommunityDetailPage implements OnInit {
     if (!this.communityId) return;
     this.loading = true;
     try {
-      const commSnap = await get(ref(this.firebaseService['db'], `communities/${this.communityId}`));
+      const commSnap = await get(ref(this.firebaseService['db'] as Database, `communities/${this.communityId}`));
       if (!commSnap.exists()) {
         this.community = null;
         this.memberCount = 0;

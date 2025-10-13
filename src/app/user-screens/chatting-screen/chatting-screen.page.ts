@@ -7,7 +7,7 @@ import {
   AfterViewInit,
   QueryList,
   Renderer2,
-  NgZone
+  NgZone,
 } from '@angular/core';
 import {
   query,
@@ -20,7 +20,7 @@ import {
   update,
   set,
   remove,
-  off
+  off,
 } from 'firebase/database';
 import { ref as dbRef, onValue, onDisconnect } from 'firebase/database';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -35,7 +35,7 @@ import {
   PopoverController,
   ToastController,
   IonDatetime,
-  ActionSheetController
+  ActionSheetController,
 } from '@ionic/angular';
 import { firstValueFrom, Subscription, timer } from 'rxjs';
 import { Keyboard } from '@capacitor/keyboard';
@@ -56,7 +56,11 @@ import { Clipboard } from '@capacitor/clipboard';
 import { Message, PinnedMessage } from 'src/types';
 import { AuthService } from 'src/app/auth/auth.service';
 import { ApiService } from 'src/app/services/api/api.service';
-import { SqliteService } from 'src/app/services/sqlite.service';
+import {
+  IAttachment,
+  IMessage,
+  SqliteService,
+} from 'src/app/services/sqlite.service';
 import { TypingService } from 'src/app/services/typing.service';
 import { Subject, Subscription as RxSub } from 'rxjs';
 import { throttleTime } from 'rxjs/operators';
@@ -64,24 +68,26 @@ import { PresenceService } from 'src/app/services/presence.service';
 import { switchMap } from 'rxjs/operators';
 import { resolve } from 'path';
 
-
-
 @Component({
   selector: 'app-chatting-screen',
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule],
   templateUrl: './chatting-screen.page.html',
-  styleUrls: ['./chatting-screen.page.scss']
+  styleUrls: ['./chatting-screen.page.scss'],
 })
 export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('scrollContainer', { static: false }) scrollContainer!: ElementRef;
   @ViewChild(IonContent, { static: false }) ionContent!: IonContent;
-  @ViewChild('fileInput', { static: false }) fileInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('fileInput', { static: false })
+  fileInput!: ElementRef<HTMLInputElement>;
   @ViewChild('datePicker', { static: false }) datePicker!: IonDatetime;
   @ViewChild('longPressEl') messageElements!: QueryList<ElementRef>;
 
   messages: Message[] = [];
-  groupedMessages: { date: string; messages: Message[] }[] = [];
+  groupedMessages: {
+    date: string;
+    messages: (Message & { isMe: boolean })[];
+  }[] = [];
 
   messageText = '';
   receiverId = '';
@@ -177,7 +183,11 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   typingFrom: string | null = null;
   private localTypingTimer: any = null;
   private typingUnsubscribe: (() => void) | null = null;
-  typingUsers: { userId: string; name: string | null; avatar: string | null }[] = [];
+  typingUsers: {
+    userId: string;
+    name: string | null;
+    avatar: string | null;
+  }[] = [];
 
   private statusPollSub?: Subscription;
   public receiverOnline = false;
@@ -211,10 +221,8 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     private el: ElementRef,
     private zone: NgZone,
     private presence: PresenceService,
-    private actionSheetCtrl: ActionSheetController,
-  // private toastCtrl: ToastController,
-  // private modalCtrl: ModalController,
-  ) { }
+    private actionSheetCtrl: ActionSheetController // private toastCtrl: ToastController, // private modalCtrl: ModalController,
+  ) {}
 
   async ngOnInit() {
     Keyboard.setScroll({ isDisabled: false });
@@ -223,67 +231,75 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     this.sender_phone = this.authService.authData?.phone_number || '';
     this.sender_name = this.authService.authData?.name || '';
 
-    const nameFromQuery = this.route.snapshot.queryParamMap.get('receiver_name');
-    this.receiver_name = nameFromQuery || await this.secureStorage.getItem('receiver_name') || '';
+    const nameFromQuery =
+      this.route.snapshot.queryParamMap.get('receiver_name');
+    this.receiver_name =
+      nameFromQuery ||
+      (await this.secureStorage.getItem('receiver_name')) ||
+      '';
 
     const rawId = this.route.snapshot.queryParamMap.get('receiverId') || '';
     const chatTypeParam = this.route.snapshot.queryParamMap.get('isGroup');
-    const phoneFromQuery = this.route.snapshot.queryParamMap.get('receiver_phone');
+    const phoneFromQuery =
+      this.route.snapshot.queryParamMap.get('receiver_phone');
 
     this.chatType = chatTypeParam === 'true' ? 'group' : 'private';
 
-    if (this.chatType === 'group') {
-      this.roomId = decodeURIComponent(rawId);
+    // if (this.chatType === 'group') {
+    //   this.roomId = decodeURIComponent(rawId);
 
-      try {
-        const { groupName, groupMembers } = await this.chatService.fetchGroupWithProfiles(this.roomId);
-        this.groupName = groupName;
-        this.groupMembers = groupMembers;
-      } catch (err) {
-        console.warn('Failed to fetch group with profiles', err);
-        this.groupName = 'Group';
-        this.groupMembers = [];
-      }
-    } else {
-      this.receiverId = decodeURIComponent(rawId);
-      this.roomId = this.getRoomId(this.senderId, this.receiverId);
-      this.receiver_phone = phoneFromQuery || localStorage.getItem('receiver_phone') || '';
-      localStorage.setItem('receiver_phone', this.receiver_phone);
-    }
+    //   try {
+    //     const res = await this.chatService.fetchGroupWithProfiles(this.roomId);
+    //     if (!res) return;
+    //     const { groupName, groupMembers } = res;
+    //     this.groupName = groupName;
+    //     this.groupMembers = groupMembers;
+    //   } catch (err) {
+    //     console.warn('Failed to fetch group with profiles', err);
+    //     this.groupName = 'Group';
+    //     this.groupMembers = [];
+    //   }
+    // } else {
+    //   this.receiverId = decodeURIComponent(rawId);
+    //   this.roomId = this.getRoomId(this.senderId, this.receiverId);
+    //   this.receiver_phone =
+    //     phoneFromQuery || localStorage.getItem('receiver_phone') || '';
+    //   localStorage.setItem('receiver_phone', this.receiver_phone);
+    // }
 
-    this.setupTypingListener();
+    // this.setupTypingListener();
 
-    await this.chatService.resetUnreadCount(this.roomId, this.senderId);
-    await this.markMessagesAsRead();
+    // await this.chatService.resetUnreadCount(this.roomId, this.senderId);
+    // await this.markMessagesAsRead();
 
-    try {
-      const db = getDatabase();
-      try {
-        const myTypingRef = dbRef(db, `typing/${this.roomId}/${this.senderId}`);
-        onDisconnect(myTypingRef).remove();
-      } catch (err) {
-        console.warn('onDisconnect setup failed', err);
-      }
+    // try {
+    //   const db = getDatabase();
+    //   try {
+    //     const myTypingRef = dbRef(db, `typing/${this.roomId}/${this.senderId}`);
+    //     onDisconnect(myTypingRef).remove();
+    //   } catch (err) {
+    //     console.warn('onDisconnect setup failed', err);
+    //   }
 
-      const tsub = this.typingInput$.pipe(
-        throttleTime(1200, undefined, { leading: true, trailing: true })
-      ).subscribe(() => {
-        this.sendTypingSignal();
-      });
-      this.typingRxSubs.push(tsub);
-    } catch (err) {
-      console.warn('Typing setup error', err);
-    }
+    //   const tsub = this.typingInput$
+    //     .pipe(throttleTime(1200, undefined, { leading: true, trailing: true }))
+    //     .subscribe(() => {
+    //       this.sendTypingSignal();
+    //     });
+    //   this.typingRxSubs.push(tsub);
+    // } catch (err) {
+    //   console.warn('Typing setup error', err);
+    // }
 
-    await this.loadFromLocalStorage();
-    this.listenForMessages();
-    this.setupPinnedMessageListener();
-    this.checkMobileView();
-    setTimeout(() => this.scrollToBottom(), 100);
-    await this.loadInitialMessages();
-    this.loadReceiverProfile();
-    await this.checkIfBlocked();
-    this.startReceiverStatusPoll();
+    // await this.loadFromLocalStorage();
+    // this.listenForMessages();
+    // this.setupPinnedMessageListener();
+    // this.checkMobileView();
+    // setTimeout(() => this.scrollToBottom(), 100);
+    // await this.loadInitialMessages();
+    // this.loadReceiverProfile();
+    // await this.checkIfBlocked();
+    // this.startReceiverStatusPoll();
   }
 
   onInputTyping() {
@@ -328,54 +344,77 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   async ionViewWillEnter() {
     Keyboard.setScroll({ isDisabled: false });
 
+    await this.chatService.loadMessages();
+    this.chatService.syncMessagesWithServer();
+
+    this.chatService.getMessages().subscribe(async (msgs) => {
+      this.groupedMessages = (await this.groupMessagesByDate(
+        msgs as any[]
+      )) as any[];
+    });
+
     this.senderId = this.authService.authData?.userId || '';
     this.sender_phone = this.authService.authData?.phone_number || '';
     this.sender_name = this.authService.authData?.name || '';
 
-    const nameFromQuery = this.route.snapshot.queryParamMap.get('receiver_name');
-    this.receiver_name = nameFromQuery || await this.secureStorage.getItem('receiver_name') || '';
+    const nameFromQuery =
+      this.route.snapshot.queryParamMap.get('receiver_name');
+    this.receiver_name = nameFromQuery || (await this.secureStorage.getItem('receiver_name')) || '';
 
     const rawId = this.route.snapshot.queryParamMap.get('receiverId') || '';
     const chatTypeParam = this.route.snapshot.queryParamMap.get('isGroup');
-    const phoneFromQuery = this.route.snapshot.queryParamMap.get('receiver_phone');
+    const phoneFromQuery =
+      this.route.snapshot.queryParamMap.get('receiver_phone');
 
-    this.chatType = chatTypeParam === 'true' ? 'group' : 'private';
+    // this.chatType = chatTypeParam === 'true' ? 'group' : 'private';
 
-    if (this.chatType === 'group') {
-      this.roomId = decodeURIComponent(rawId);
+    // if (this.chatType === 'group') {
+    //   this.roomId = decodeURIComponent(rawId);
 
-      try {
-        const { groupName, groupMembers } = await this.chatService.fetchGroupWithProfiles(this.roomId);
-        this.groupName = groupName;
-        this.groupMembers = groupMembers;
-      } catch (err) {
-        console.warn('Failed to fetch group with profiles', err);
-        this.groupName = 'Group';
-        this.groupMembers = [];
-      }
+    //   try {
+    //     const res = await this.chatService.fetchGroupWithProfiles(this.roomId);
+    //     if (!res) return;
+    //     const { groupName, groupMembers } = res;
+    //     this.groupName = groupName;
+    //     this.groupMembers = groupMembers;
+    //   } catch (err) {
+    //     console.warn('Failed to fetch group with profiles', err);
+    //     this.groupName = 'Group';
+    //     this.groupMembers = [];
+    //   }
 
-      this.setupTypingListener();
-    } else {
-      this.receiverId = decodeURIComponent(rawId);
-      this.roomId = this.getRoomId(this.senderId, this.receiverId);
-      this.receiver_phone = phoneFromQuery || localStorage.getItem('receiver_phone') || '';
-      localStorage.setItem('receiver_phone', this.receiver_phone);
+    //   this.setupTypingListener();
+    // } else {
+    //   this.receiverId = decodeURIComponent(rawId);
+    //   this.roomId = this.getRoomId(this.senderId, this.receiverId);
+    //   this.receiver_phone =
+    //     phoneFromQuery || localStorage.getItem('receiver_phone') || '';
+    //   localStorage.setItem('receiver_phone', this.receiver_phone);
+    // }
+
+    // await this.chatService.resetUnreadCount(this.roomId, this.senderId);
+    // await this.markMessagesAsRead();
+
+    // // await this.loadFromLocalStorage();
+    // // this.listenForMessages();
+
+    // const nav = this.router.getCurrentNavigation();
+    // const state = nav?.extras?.state;
+
+    // if (state && state['imageToSend']) {
+    //   this.attachmentPath = state['imageToSend'];
+    // }
+
+    // this.loadReceiverProfile();
+  }
+
+  async ionViewWillLeave() {
+    try {
+      this.chatService.closeChat();
+      console.log('Chat is closed');
+    } catch (error) {
+      console.error('error in closing chat', error);
     }
-
-    await this.chatService.resetUnreadCount(this.roomId, this.senderId);
-    await this.markMessagesAsRead();
-
-    await this.loadFromLocalStorage();
-    this.listenForMessages();
-
-    const nav = this.router.getCurrentNavigation();
-    const state = nav?.extras?.state;
-
-    if (state && state['imageToSend']) {
-      this.attachmentPath = state['imageToSend'];
-    }
-
-    this.loadReceiverProfile();
   }
 
   loadReceiverProfile() {
@@ -388,9 +427,9 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
           this.receiverProfile = res?.group_dp_url || null;
         },
         error: (err) => {
-          console.error("❌ Error loading group profile:", err);
+          console.error('❌ Error loading group profile:', err);
           this.receiverProfile = null;
-        }
+        },
       });
     } else {
       this.service.getUserProfilebyId(this.receiverId).subscribe({
@@ -398,9 +437,9 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
           this.receiverProfile = res?.profile || null;
         },
         error: (err) => {
-          console.error("❌ Error loading user profile:", err);
+          console.error('❌ Error loading user profile:', err);
           this.receiverProfile = null;
-        }
+        },
       });
     }
   }
@@ -442,7 +481,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
         receiverId: this.receiverId,
         receiver_phone: this.receiver_phone,
         receiver_name: this.receiver_name,
-        isGroup: false
+        isGroup: false,
       };
       this.router.navigate(['/profile-screen'], { queryParams });
       return;
@@ -450,7 +489,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
 
     // ✅ NEW: Clear Chat Option
     if (option === 'clear chat') {
-      console.log("clear chat calls");
+      //console.log("clear chat calls");
       await this.handleClearChat();
       return;
     }
@@ -463,19 +502,17 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
         receiverId: this.chatType === 'group' ? this.roomId : this.receiverId,
         receiver_phone: this.receiver_phone,
         receiver_name: this.receiver_name,
-        isGroup: this.chatType === 'group'
+        isGroup: this.chatType === 'group',
       };
       this.router.navigate(['/profile-screen'], { queryParams });
-
     } else if (option === 'Add Members') {
-      const memberPhones = this.groupMembers.map(member => member.phone);
+      const memberPhones = this.groupMembers.map((member) => member.phone);
       this.router.navigate(['/add-members'], {
         queryParams: {
           groupId: groupId,
-          members: JSON.stringify(memberPhones)
-        }
+          members: JSON.stringify(memberPhones),
+        },
       });
-
     } else if (option === 'Exit Group') {
       if (!this.roomId || !this.senderId) {
         console.error('Missing groupId or userId');
@@ -512,7 +549,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
                 const updatedMemberData = {
                   ...memberData,
                   status: 'inactive',
-                  removedAt: new Date().toISOString()
+                  removedAt: new Date().toISOString(),
                 };
 
                 await set(ref(db, pastMemberPath), updatedMemberData);
@@ -520,17 +557,23 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
 
                 // ✅ Step 2: If user was admin, assign a new random admin
                 if (wasAdmin) {
-                  const membersSnap = await get(ref(db, `groups/${groupId}/members`));
+                  const membersSnap = await get(
+                    ref(db, `groups/${groupId}/members`)
+                  );
                   if (membersSnap.exists()) {
                     const members = membersSnap.val();
                     const memberIds = Object.keys(members);
 
                     if (memberIds.length > 0) {
-                      const randomId = memberIds[Math.floor(Math.random() * memberIds.length)];
-                      await update(ref(db, `groups/${groupId}/members/${randomId}`), {
-                        role: 'admin'
-                      });
-                      console.log(`👑 New admin assigned: ${randomId}`);
+                      const randomId =
+                        memberIds[Math.floor(Math.random() * memberIds.length)];
+                      await update(
+                        ref(db, `groups/${groupId}/members/${randomId}`),
+                        {
+                          role: 'admin',
+                        }
+                      );
+                      //console.log(`👑 New admin assigned: ${randomId}`);
                     }
                   }
                 }
@@ -539,57 +582,55 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
                 const toast = await this.toastCtrl.create({
                   message: 'You exited the group',
                   duration: 2000,
-                  color: 'medium'
+                  color: 'medium',
                 });
                 toast.present();
 
                 this.router.navigate(['/home-screen']);
-
               } catch (error) {
                 console.error('Error exiting group:', error);
                 const toast = await this.toastCtrl.create({
                   message: 'Failed to exit group',
                   duration: 2000,
-                  color: 'danger'
+                  color: 'danger',
                 });
                 toast.present();
               }
-            }
-          }
-        ]
+            },
+          },
+        ],
       });
 
       await alert.present();
     }
-
   }
 
   private async handleClearChat() {
     try {
       const userId = await this.authService.authData?.userId;
-      console.log("userID sdsdfgsdgsdfgertgryrtytr", userId);
+      //console.log("userID sdsdfgsdgsdfgertgryrtytr", userId);
       if (!userId) return;
 
       // Show confirmation alert
       const alert = await this.alertCtrl.create({
         header: 'Clear Chat',
-        message: 'Are you sure you want to clear all messages? This cannot be undone.',
+        message:
+          'Are you sure you want to clear all messages? This cannot be undone.',
         buttons: [
           {
             text: 'Cancel',
-            role: 'cancel'
+            role: 'cancel',
           },
           {
             text: 'Clear',
             handler: async () => {
               await this.clearChatMessages(userId);
-            }
-          }
-        ]
+            },
+          },
+        ],
       });
 
       await alert.present();
-
     } catch (error) {
       console.error('Error in handleClearChat:', error);
     }
@@ -598,9 +639,10 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   // ✅ Clear Chat Implementation (Soft Delete)
   private async clearChatMessages(userId: string) {
     try {
-      const roomId = this.chatType === 'group'
-        ? this.receiverId
-        : this.getRoomId(userId, this.receiverId);
+      const roomId =
+        this.chatType === 'group'
+          ? this.receiverId
+          : this.getRoomId(userId, this.receiverId);
 
       if (!roomId) {
         console.error('Room ID not found');
@@ -616,19 +658,18 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       const toast = await this.toastCtrl.create({
         message: 'Chat cleared successfully',
         duration: 2000,
-        color: 'success'
+        color: 'success',
       });
       await toast.present();
 
-      console.log('✅ Chat cleared for user:', userId);
-
+      //console.log('✅ Chat cleared for user:', userId);
     } catch (error) {
       console.error('❌ Error clearing chat:', error);
 
       const toast = await this.toastCtrl.create({
         message: 'Failed to clear chat',
         duration: 2000,
-        color: 'danger'
+        color: 'danger',
       });
       await toast.present();
     }
@@ -643,10 +684,18 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     try {
       if (this.iBlockedRef) off(this.iBlockedRef);
       if (this.theyBlockedRef) off(this.theyBlockedRef);
-    } catch (e) { /* ignore */ }
+    } catch (e) {
+      /* ignore */
+    }
 
-    this.iBlockedRef = ref(db, `blockedContacts/${this.senderId}/${this.receiverId}`);
-    this.theyBlockedRef = ref(db, `blockedContacts/${this.receiverId}/${this.senderId}`);
+    this.iBlockedRef = ref(
+      db,
+      `blockedContacts/${this.senderId}/${this.receiverId}`
+    );
+    this.theyBlockedRef = ref(
+      db,
+      `blockedContacts/${this.receiverId}/${this.senderId}`
+    );
 
     const unsubA = onValue(this.iBlockedRef, (snap) => {
       const exists = snap.exists();
@@ -679,21 +728,37 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       });
     });
 
-    this.onValueUnsubs.push(() => { try { unsubA(); } catch (e) { } });
-    this.onValueUnsubs.push(() => { try { unsubB(); } catch (e) { } });
+    this.onValueUnsubs.push(() => {
+      try {
+        unsubA();
+      } catch (e) {}
+    });
+    this.onValueUnsubs.push(() => {
+      try {
+        unsubB();
+      } catch (e) {}
+    });
   }
 
   async unblockFromChat() {
     try {
       const db = getDatabase();
-      await remove(ref(db, `blockedContacts/${this.senderId}/${this.receiverId}`));
+      await remove(
+        ref(db, `blockedContacts/${this.senderId}/${this.receiverId}`)
+      );
       this.showBlockBubble = false;
       this.showUnblockBubble = true;
       clearTimeout(this.blockBubbleTimeout);
-      this.blockBubbleTimeout = setTimeout(() => { this.showUnblockBubble = false; }, 3000);
+      this.blockBubbleTimeout = setTimeout(() => {
+        this.showUnblockBubble = false;
+      }, 3000);
     } catch (err) {
       console.error('Unblock failed', err);
-      const t = await this.toastCtrl.create({ message: 'Failed to unblock', duration: 2000, color: 'danger' });
+      const t = await this.toastCtrl.create({
+        message: 'Failed to unblock',
+        duration: 2000,
+        color: 'danger',
+      });
       t.present();
     }
   }
@@ -703,20 +768,30 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       const db = getDatabase();
       await remove(ref(db, `chats/${this.roomId}`));
       localStorage.removeItem(this.roomId);
-      const t = await this.toastCtrl.create({ message: 'Chat deleted', duration: 1500, color: 'danger' });
+      const t = await this.toastCtrl.create({
+        message: 'Chat deleted',
+        duration: 1500,
+        color: 'danger',
+      });
       t.present();
       setTimeout(() => this.router.navigate(['/home-screen']), 800);
     } catch (err) {
       console.error('deleteChat failed', err);
-      const t = await this.toastCtrl.create({ message: 'Failed to delete chat', duration: 2000, color: 'danger' });
+      const t = await this.toastCtrl.create({
+        message: 'Failed to delete chat',
+        duration: 2000,
+        color: 'danger',
+      });
       t.present();
     }
   }
 
   onSearchInput() {
-    const elements = Array.from(document.querySelectorAll('.message-text')) as HTMLElement[];
+    const elements = Array.from(
+      document.querySelectorAll('.message-text')
+    ) as HTMLElement[];
 
-    elements.forEach(el => {
+    elements.forEach((el) => {
       el.innerHTML = el.textContent || '';
       el.style.backgroundColor = 'transparent';
     });
@@ -731,10 +806,13 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
 
     this.matchedMessages = [];
 
-    elements.forEach(el => {
+    elements.forEach((el) => {
       const originalText = el.textContent || '';
       if (regex.test(originalText)) {
-        const highlightedText = originalText.replace(regex, `<mark style="background: yellow;">$1</mark>`);
+        const highlightedText = originalText.replace(
+          regex,
+          `<mark style="background: yellow;">$1</mark>`
+        );
         el.innerHTML = highlightedText;
         this.matchedMessages.push(el);
       }
@@ -743,22 +821,28 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     this.currentSearchIndex = this.matchedMessages.length ? 0 : -1;
 
     if (this.currentSearchIndex >= 0) {
-      this.matchedMessages[this.currentSearchIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      this.matchedMessages[this.currentSearchIndex].scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
     }
   }
 
   navigateSearch(direction: 'up' | 'down') {
     if (!this.matchedMessages.length) return;
     if (direction === 'up') {
-      this.currentSearchIndex = (this.currentSearchIndex - 1 + this.matchedMessages.length) % this.matchedMessages.length;
+      this.currentSearchIndex =
+        (this.currentSearchIndex - 1 + this.matchedMessages.length) %
+        this.matchedMessages.length;
     } else {
-      this.currentSearchIndex = (this.currentSearchIndex + 1) % this.matchedMessages.length;
+      this.currentSearchIndex =
+        (this.currentSearchIndex + 1) % this.matchedMessages.length;
     }
     this.highlightMessage(this.currentSearchIndex);
   }
 
   highlightMessage(index: number) {
-    this.matchedMessages.forEach(el => {
+    this.matchedMessages.forEach((el) => {
       const originalText = el.textContent || '';
       el.innerHTML = originalText;
       el.style.backgroundColor = 'transparent';
@@ -770,7 +854,10 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
 
     this.matchedMessages.forEach((el) => {
       const originalText = el.textContent || '';
-      const highlightedText = originalText.replace(regex, `<mark style="background: yellow;">$1</mark>`);
+      const highlightedText = originalText.replace(
+        regex,
+        `<mark style="background: yellow;">$1</mark>`
+      );
       el.innerHTML = highlightedText;
     });
 
@@ -783,7 +870,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   cancelSearch() {
     this.searchText = '';
     this.showSearchBar = false;
-    this.matchedMessages.forEach(el => {
+    this.matchedMessages.forEach((el) => {
       el.innerHTML = el.textContent || '';
       el.style.backgroundColor = 'transparent';
     });
@@ -820,11 +907,11 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
 
   openDatePicker() {
     this.showDateModal = true;
-    console.log('Opening calendar modal...');
+    //console.log('Opening calendar modal...');
   }
 
   onMessagePress(message: any) {
-    const index = this.selectedMessages.findIndex(m => m.key === message.key);
+    const index = this.selectedMessages.findIndex((m) => m.key === message.key);
     if (index > -1) {
       this.selectedMessages.splice(index, 1);
     } else {
@@ -866,7 +953,9 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   toggleSelection(msg: any) {
-    const index = this.selectedMessages.findIndex((m) => m.message_id === msg.message_id);
+    const index = this.selectedMessages.findIndex(
+      (m) => m.message_id === msg.message_id
+    );
     if (index > -1) {
       this.selectedMessages.splice(index, 1);
     } else {
@@ -880,35 +969,50 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     return this.selectedMessages.some((m) => m.message_id === msg.message_id);
   }
 
-isQuickReactionOpen(msg: any) {
-    return this.selectedMessages.some((m) => m.message_id === msg.message_id) && this.selectedMessages.length === 1;
+  isQuickReactionOpen(msg: any) {
+    return (
+      this.selectedMessages.some((m) => m.message_id === msg.message_id) &&
+      this.selectedMessages.length === 1
+    );
   }
 
   isOnlyOneTextMessage(): boolean {
-    return this.selectedMessages.length === 1 && this.selectedMessages[0].type === 'text';
+    return (
+      this.selectedMessages.length === 1 &&
+      this.selectedMessages[0].type === 'text'
+    );
   }
 
   isMultipleTextMessages(): boolean {
-    return this.selectedMessages.length > 1 && this.selectedMessages.every(msg => msg.type === 'text');
+    return (
+      this.selectedMessages.length > 1 &&
+      this.selectedMessages.every((msg) => msg.type === 'text')
+    );
   }
 
   isOnlyOneAttachment(): boolean {
-    return this.selectedMessages.length === 1 && this.selectedMessages[0].type !== 'text';
+    return (
+      this.selectedMessages.length === 1 &&
+      this.selectedMessages[0].type !== 'text'
+    );
   }
 
   isMultipleAttachments(): boolean {
-    return this.selectedMessages.length > 1 && this.selectedMessages.every(msg => msg.type !== 'text');
+    return (
+      this.selectedMessages.length > 1 &&
+      this.selectedMessages.every((msg) => msg.type !== 'text')
+    );
   }
 
   isMixedSelection(): boolean {
-    const types = this.selectedMessages.map(msg => msg.type);
-    return types.includes('text') && types.some(t => t !== 'text');
+    const types = this.selectedMessages.map((msg) => msg.type);
+    return types.includes('text') && types.some((t) => t !== 'text');
   }
 
   async copySelectedMessages() {
     if (this.lastPressedMessage?.text) {
       await Clipboard.write({ string: this.lastPressedMessage.text });
-      console.log('Text copied to clipboard:', this.lastPressedMessage.text);
+      //console.log('Text copied to clipboard:', this.lastPressedMessage.text);
       this.selectedMessages = [];
       this.lastPressedMessage = null;
     }
@@ -927,7 +1031,9 @@ isQuickReactionOpen(msg: any) {
     this.lastPressedMessage = null;
 
     setTimeout(() => {
-      const inputElement = document.querySelector('ion-textarea') as HTMLIonTextareaElement;
+      const inputElement = document.querySelector(
+        'ion-textarea'
+      ) as HTMLIonTextareaElement;
       if (inputElement) {
         inputElement.setFocus();
       }
@@ -939,25 +1045,31 @@ isQuickReactionOpen(msg: any) {
   }
 
   getRepliedMessage(replyToMessageId: string): Message | null {
-    const msg = this.allMessages.find(msg => {
-      return msg.message_id == replyToMessageId;
-    }) || null;
+    const msg =
+      this.allMessages.find((msg) => {
+        return msg.message_id == replyToMessageId;
+      }) || null;
     return msg;
   }
 
   getReplyPreviewText(message: Message): string {
     if (message.text) {
-      return message.text.length > 50 ?
-        message.text.substring(0, 50) + '...' :
-        message.text;
+      return message.text.length > 50
+        ? message.text.substring(0, 50) + '...'
+        : message.text;
     } else if (message.attachment) {
       const type = (message.attachment as any).type;
       switch (type) {
-        case 'image': return '📷 Photo';
-        case 'video': return '🎥 Video';
-        case 'audio': return '🎵 Audio';
-        case 'file': return '📄 Document';
-        default: return '📎 Attachment';
+        case 'image':
+          return '📷 Photo';
+        case 'video':
+          return '🎥 Video';
+        case 'audio':
+          return '🎵 Audio';
+        case 'file':
+          return '📄 Document';
+        default:
+          return '📎 Attachment';
       }
     }
     return 'Message';
@@ -970,8 +1082,8 @@ isQuickReactionOpen(msg: any) {
 
     this.allMessages.forEach((msg) => {
       if (msg.message_id === replyToMessageId) {
-        const element = Array.from(messageElements).find(el =>
-          el.getAttribute('data-msg-key') === msg.key
+        const element = Array.from(messageElements).find(
+          (el) => el.getAttribute('data-msg-key') === msg.key
         );
         if (element && element instanceof HTMLElement) {
           targetElement = element;
@@ -982,7 +1094,7 @@ isQuickReactionOpen(msg: any) {
     if (targetElement) {
       targetElement.scrollIntoView({
         behavior: 'smooth',
-        block: 'center'
+        block: 'center',
       });
 
       targetElement.classList.add('highlight-message');
@@ -991,142 +1103,6 @@ isQuickReactionOpen(msg: any) {
       }, 2000);
     }
   }
-
-  //this is important
-  // async deleteSelectedMessages() {
-  //   if (!this.selectedMessages || this.selectedMessages.length === 0) {
-  //     return;
-  //   }
-
-  //   const currentUserId = this.senderId;
-  //   const count = this.selectedMessages.length;
-
-  //   // Determine whether all selected messages were sent by current user
-  //   const canDeleteForEveryone = this.selectedMessages.every(m => String(m.sender_id) === String(currentUserId));
-
-  //   // Build preview text
-  //   let preview = '';
-  //   if (count === 1) {
-  //     const m = this.selectedMessages[0];
-  //     if (m.text && m.text.trim()) preview = m.text.length > 120 ? m.text.substring(0, 120) + '...' : m.text;
-  //     else preview = this.getAttachmentPreview(m.attachment || {});
-  //   } else {
-  //     preview = `${count} messages`;
-  //   }
-
-  //   // Build inputs for alert (Ionic radio buttons)
-  //   const inputs: any[] = [
-  //     { name: 'choice', type: 'radio', label: 'Delete for me', value: 'forMe', checked: true }
-  //   ];
-  //   if (canDeleteForEveryone) {
-  //     inputs.push({ name: 'choice', type: 'radio', label: 'Delete for everyone', value: 'forEveryone', checked: false });
-  //   }
-
-  //   const alert = await this.alertCtrl.create({
-  //     header: 'Delete messages?',
-  //     cssClass: 'delete-confirm-alert',
-  //     inputs,
-  //     buttons: [
-  //       { text: 'Cancel', role: 'cancel' },
-  //       {
-  //         text: 'OK',
-  //         handler: async (selectedValue: any) => {
-  //           let choice: string = '';
-  //           if (typeof selectedValue === 'string') {
-  //             choice = selectedValue;
-  //           } else if (Array.isArray(selectedValue) && selectedValue.length > 0) {
-  //             choice = selectedValue[0];
-  //           } else if (selectedValue && typeof selectedValue === 'object') {
-  //             const keys = Object.keys(selectedValue).filter(k => selectedValue[k]);
-  //             choice = keys[0] || '';
-  //           }
-
-  //           const doForMe = choice === 'forMe';
-  //           const doForEveryone = choice === 'forEveryone';
-
-  //           if (!doForMe && !doForEveryone) return;
-
-  //           try {
-  //             const db = getDatabase();
-
-  //             for (const msg of [...this.selectedMessages]) {
-  //               const key = msg.key;
-  //               if (!key) continue;
-
-  //                     this.selectedMessages.forEach(msg => msg.fadeOut = true);
-
-  //             // Wait for fade-out CSS transition (300ms) then update message arrays
-  //             alert.dismiss({confirm : true})
-  //              await new Promise((resolve)=>{
-  //               setTimeout(async () => {
-  //               this.allMessages = this.allMessages.filter(m => !m.fadeOut);
-  //               this.displayedMessages = this.displayedMessages.filter(m => !m.fadeOut);
-  //               this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
-  //               this.saveToLocalStorage();
-  //               resolve(null);
-  //             }, 2100);
-  //              })
-
-  //               // DELETE FOR ME
-  //               if (doForMe) {
-  //                 try {
-  //                   if (this.chatService.deleteMessageForMe) {
-  //                     await this.chatService.deleteMessageForMe(this.roomId, key, currentUserId);
-  //                   } else {
-  //                     const updates: any = {};
-  //                     updates[`/chats/${this.roomId}/${key}/deletedFor/${currentUserId}`] = true;
-  //                     await update(ref(db), updates);
-  //                   }
-  //                 } catch (err) {
-  //                   console.warn('deleteForMe failed for key', key, err);
-  //                 }
-  //               }
-
-  //               // DELETE FOR EVERYONE
-  //               if (doForEveryone && String(msg.sender_id) === String(currentUserId)) {
-  //                 try {
-  //                   if (this.chatService.deleteMessageForEveryone) {
-  //                     await this.chatService.deleteMessageForEveryone(
-  //                       this.roomId,
-  //                       key,
-  //                       currentUserId,
-  //                       this.chatType === 'group' ? this.groupMembers.map(g => String(g.user_id)) : [this.receiverId, this.senderId]
-  //                     );
-  //                   } else {
-  //                     const updates: any = {};
-  //                     updates[`/chats/${this.roomId}/${key}/deletedForEveryone`] = true;
-  //                     updates[`/chats/${this.roomId}/${key}/deletedBy`] = currentUserId;
-  //                     updates[`/chats/${this.roomId}/${key}/deletedAt`] = Date.now();
-  //                     await update(ref(db), updates);
-  //                   }
-  //                 } catch (err) {
-  //                   console.warn('deleteForEveryone failed for key', key, err);
-  //                 }
-  //               }
-  //             }         
-
-  //             const toast = await this.toastCtrl.create({
-  //               message: doForEveryone ? 'Deleted for everyone' : 'Deleted for you',
-  //               duration: 1600,
-  //               color: 'medium'
-  //             });
-  //             await toast.present();
-
-  //             this.selectedMessages = [];
-  //             this.lastPressedMessage = null;
-
-  //           } catch (e) {
-  //             console.error('deleteSelectedMessages handler err', e);
-  //             const t = await this.toastCtrl.create({ message: 'Failed to delete messages', duration: 2000, color: 'danger' });
-  //             t.present();
-  //           }
-  //         }
-  //       }
-  //     ]
-  //   });
-
-  //   await alert.present();
-  // }
 
   async deleteSelectedMessages() {
     if (!this.selectedMessages || this.selectedMessages.length === 0) {
@@ -1140,7 +1116,9 @@ isQuickReactionOpen(msg: any) {
     let preview = '';
     if (count === 1) {
       const m = this.selectedMessages[0];
-      if (m.text && m.text.trim()) preview = m.text.length > 120 ? m.text.substring(0, 120) + '...' : m.text;
+      if (m.text && m.text.trim())
+        preview =
+          m.text.length > 120 ? m.text.substring(0, 120) + '...' : m.text;
       else preview = this.getAttachmentPreview(m.attachment || {});
     } else {
       preview = `${count} messages`;
@@ -1148,8 +1126,20 @@ isQuickReactionOpen(msg: any) {
 
     // Always offer both options. Default to 'Delete for me'
     const inputs: any[] = [
-      { name: 'choice', type: 'radio', label: 'Delete for me', value: 'forMe', checked: true },
-      { name: 'choice', type: 'radio', label: 'Delete for everyone', value: 'forEveryone', checked: false }
+      {
+        name: 'choice',
+        type: 'radio',
+        label: 'Delete for me',
+        value: 'forMe',
+        checked: true,
+      },
+      {
+        name: 'choice',
+        type: 'radio',
+        label: 'Delete for everyone',
+        value: 'forEveryone',
+        checked: false,
+      },
     ];
 
     const alert = await this.alertCtrl.create({
@@ -1164,10 +1154,15 @@ isQuickReactionOpen(msg: any) {
             let choice: string = '';
             if (typeof selectedValue === 'string') {
               choice = selectedValue;
-            } else if (Array.isArray(selectedValue) && selectedValue.length > 0) {
+            } else if (
+              Array.isArray(selectedValue) &&
+              selectedValue.length > 0
+            ) {
               choice = selectedValue[0];
             } else if (selectedValue && typeof selectedValue === 'object') {
-              const keys = Object.keys(selectedValue).filter(k => selectedValue[k]);
+              const keys = Object.keys(selectedValue).filter(
+                (k) => selectedValue[k]
+              );
               choice = keys[0] || '';
             }
 
@@ -1180,7 +1175,7 @@ isQuickReactionOpen(msg: any) {
               const db = getDatabase();
 
               // trigger fade-out on UI messages
-              this.selectedMessages.forEach(msg => msg.fadeOut = true);
+              this.selectedMessages.forEach((msg) => (msg.fadeOut = true));
 
               // dismiss the alert first, then wait for fade-out duration before removing from arrays
               try {
@@ -1192,9 +1187,15 @@ isQuickReactionOpen(msg: any) {
               await new Promise<void>((resolve) => {
                 setTimeout(async () => {
                   try {
-                    this.allMessages = this.allMessages.filter(m => !m.fadeOut);
-                    this.displayedMessages = this.displayedMessages.filter(m => !m.fadeOut);
-                    this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
+                    this.allMessages = this.allMessages.filter(
+                      (m) => !m.fadeOut
+                    );
+                    this.displayedMessages = this.displayedMessages.filter(
+                      (m) => !m.fadeOut
+                    );
+                    this.groupedMessages = await this.groupMessagesByDate(
+                      this.displayedMessages
+                    );
                     this.saveToLocalStorage();
                   } catch (e) {
                     console.error('fade-out removal failed', e);
@@ -1213,10 +1214,16 @@ isQuickReactionOpen(msg: any) {
                 if (doForMe) {
                   try {
                     if (this.chatService.deleteMessageForMe) {
-                      await this.chatService.deleteMessageForMe(this.roomId, key, currentUserId);
+                      await this.chatService.deleteMessageForMe(
+                        this.roomId,
+                        key,
+                        currentUserId
+                      );
                     } else {
                       const updates: any = {};
-                      updates[`/chats/${this.roomId}/${key}/deletedFor/${currentUserId}`] = true;
+                      updates[
+                        `/chats/${this.roomId}/${key}/deletedFor/${currentUserId}`
+                      ] = true;
                       await update(ref(db), updates);
                     }
                   } catch (err) {
@@ -1233,14 +1240,20 @@ isQuickReactionOpen(msg: any) {
                         this.roomId,
                         key,
                         currentUserId,
-                        this.chatType === 'group' ? this.groupMembers.map(g => String(g.user_id)) : [this.receiverId, this.senderId]
+                        this.chatType === 'group'
+                          ? this.groupMembers.map((g) => String(g.user_id))
+                          : [this.receiverId, this.senderId]
                       );
                     } else {
                       // fallback: set convenience flags in DB so clients hide the message
                       const updates: any = {};
-                      updates[`/chats/${this.roomId}/${key}/deletedForEveryone`] = true;
-                      updates[`/chats/${this.roomId}/${key}/deletedBy`] = currentUserId;
-                      updates[`/chats/${this.roomId}/${key}/deletedAt`] = Date.now();
+                      updates[
+                        `/chats/${this.roomId}/${key}/deletedForEveryone`
+                      ] = true;
+                      updates[`/chats/${this.roomId}/${key}/deletedBy`] =
+                        currentUserId;
+                      updates[`/chats/${this.roomId}/${key}/deletedAt`] =
+                        Date.now();
                       // optionally clear content:
                       // updates[`/chats/${this.roomId}/${key}/text`] = '';
                       // updates[`/chats/${this.roomId}/${key}/attachment`] = null;
@@ -1253,9 +1266,11 @@ isQuickReactionOpen(msg: any) {
               }
 
               const toast = await this.toastCtrl.create({
-                message: doForEveryone ? 'Deleted for everyone' : 'Deleted for you',
+                message: doForEveryone
+                  ? 'Deleted for everyone'
+                  : 'Deleted for you',
                 duration: 1600,
-                color: 'medium'
+                color: 'medium',
               });
               await toast.present();
 
@@ -1263,18 +1278,20 @@ isQuickReactionOpen(msg: any) {
               this.lastPressedMessage = null;
             } catch (e) {
               console.error('deleteSelectedMessages handler err', e);
-              const t = await this.toastCtrl.create({ message: 'Failed to delete messages', duration: 2000, color: 'danger' });
+              const t = await this.toastCtrl.create({
+                message: 'Failed to delete messages',
+                duration: 2000,
+                color: 'danger',
+              });
               t.present();
             }
-          }
-        }
-      ]
+          },
+        },
+      ],
     });
 
     await alert.present();
   }
-
-
 
   private applyDeletionFilters(dm: Message): boolean {
     try {
@@ -1282,7 +1299,11 @@ isQuickReactionOpen(msg: any) {
       if (dm.deletedForEveryone) return true;
 
       // per-user deletion
-      if (dm.deletedFor && this.senderId && dm.deletedFor[String(this.senderId)]) {
+      if (
+        dm.deletedFor &&
+        this.senderId &&
+        dm.deletedFor[String(this.senderId)]
+      ) {
         return true;
       }
 
@@ -1322,8 +1343,8 @@ isQuickReactionOpen(msg: any) {
         hasAttachment: hasAttachment,
         isPinned: isPinned,
         message: this.lastPressedMessage,
-        currentUserId: this.senderId
-      }
+        currentUserId: this.senderId,
+      },
     });
 
     await popover.present();
@@ -1359,12 +1380,14 @@ isQuickReactionOpen(msg: any) {
 
   async messageInfo() {
     // pick the message: prefer lastPressedMessage then fallback to first selectedMessages
-    const msg = this.lastPressedMessage || (this.selectedMessages && this.selectedMessages[0]);
+    const msg =
+      this.lastPressedMessage ||
+      (this.selectedMessages && this.selectedMessages[0]);
     if (!msg) {
       const t = await this.toastCtrl.create({
         message: 'No message selected',
         duration: 1500,
-        color: 'medium'
+        color: 'medium',
       });
       await t.present();
       return;
@@ -1385,20 +1408,19 @@ isQuickReactionOpen(msg: any) {
       this.router.navigate(['/message-info'], {
         queryParams: {
           // pass a small identifier; page can request the full object from chatService
-          messageKey: msg.key || msg.message_id || ''
-        }
+          messageKey: msg.key || msg.message_id || '',
+        },
       });
     } catch (err) {
       console.error('messageInfo error', err);
       const t = await this.toastCtrl.create({
         message: 'Failed to open message info',
         duration: 1500,
-        color: 'danger'
+        color: 'danger',
       });
       await t.present();
     }
   }
-
 
   async editMessage(message: Message) {
     const alert = await this.alertCtrl.create({
@@ -1408,25 +1430,27 @@ isQuickReactionOpen(msg: any) {
           name: 'text',
           type: 'text',
           value: message.text,
-        }
+        },
       ],
       buttons: [
         {
           text: 'Cancel',
-          role: 'cancel'
+          role: 'cancel',
         },
         {
           text: 'Save',
           handler: async (data: any) => {
             if (data.text && data.text.trim() !== '') {
-              const encryptedText = await this.encryptionService.encrypt(data.text.trim());
+              const encryptedText = await this.encryptionService.encrypt(
+                data.text.trim()
+              );
 
               const db = getDatabase();
               const msgRef = ref(db, `chats/${this.roomId}/${message.key}`);
 
               await update(msgRef, {
                 text: encryptedText,
-                isEdit: true
+                isEdit: true,
               });
 
               message.text = data.text.trim();
@@ -1434,9 +1458,9 @@ isQuickReactionOpen(msg: any) {
 
               this.lastPressedMessage = { ...message };
             }
-          }
-        }
-      ]
+          },
+        },
+      ],
     });
 
     await alert.present();
@@ -1451,7 +1475,7 @@ isQuickReactionOpen(msg: any) {
   }
 
   shareMessage() {
-    console.log('Share clicked for attachment:', this.lastPressedMessage);
+    //console.log('Share clicked for attachment:', this.lastPressedMessage);
   }
 
   pinMessage() {
@@ -1461,7 +1485,7 @@ isQuickReactionOpen(msg: any) {
       pinnedAt: Date.now(),
       pinnedBy: this.senderId,
       roomId: this.roomId,
-      scope: 'global'
+      scope: 'global',
     };
     this.chatService.pinMessage(pin);
     this.selectedMessages = [];
@@ -1484,7 +1508,9 @@ isQuickReactionOpen(msg: any) {
 
   findPinnedMessageDetails(messageId: string) {
     for (const group of this.groupedMessages) {
-      const foundMessage = group.messages.find(msg => msg.message_id === messageId);
+      const foundMessage = group.messages.find(
+        (msg) => msg.message_id === messageId
+      );
       if (foundMessage) {
         this.pinnedMessageDetails = foundMessage;
         break;
@@ -1502,7 +1528,9 @@ isQuickReactionOpen(msg: any) {
 
   scrollToPinnedMessage() {
     if (this.pinnedMessageDetails) {
-      const element = document.querySelector(`[data-msg-key="${this.pinnedMessageDetails.key}"]`);
+      const element = document.querySelector(
+        `[data-msg-key="${this.pinnedMessageDetails.key}"]`
+      );
       if (element) {
         element.scrollIntoView({ behavior: 'smooth', block: 'center' });
         element.classList.add('highlighted');
@@ -1516,7 +1544,7 @@ isQuickReactionOpen(msg: any) {
   }
 
   openChatInfo() {
-    console.log('Opening chat info');
+    //console.log('Opening chat info');
   }
 
   async loadInitialMessages() {
@@ -1533,11 +1561,16 @@ isQuickReactionOpen(msg: any) {
 
   getAttachmentIcon(type: string): string {
     switch (type) {
-      case 'image': return 'image-outline';
-      case 'video': return 'videocam-outline';
-      case 'audio': return 'musical-note-outline';
-      case 'file': return 'document-outline';
-      default: return 'attach-outline';
+      case 'image':
+        return 'image-outline';
+      case 'video':
+        return 'videocam-outline';
+      case 'audio':
+        return 'musical-note-outline';
+      case 'file':
+        return 'document-outline';
+      default:
+        return 'attach-outline';
     }
   }
 
@@ -1545,72 +1578,95 @@ isQuickReactionOpen(msg: any) {
     try {
       const db = getDatabase();
 
-      try { if (this.typingUnsubscribe) this.typingUnsubscribe(); } catch (e) { }
+      try {
+        if (this.typingUnsubscribe) this.typingUnsubscribe();
+      } catch (e) {}
 
-      const unsubscribe = onValue(dbRef(db, `typing/${this.roomId}`), (snap) => {
-        const val = snap.val() || {};
-        const now = Date.now();
+      const unsubscribe = onValue(
+        dbRef(db, `typing/${this.roomId}`),
+        (snap) => {
+          const val = snap.val() || {};
+          const now = Date.now();
 
-        const entries = Object.keys(val).map(k => ({
-          userId: k,
-          typing: val[k]?.typing ?? false,
-          lastUpdated: val[k]?.lastUpdated ?? 0,
-          name: val[k]?.name ?? null
-        }));
+          const entries = Object.keys(val).map((k) => ({
+            userId: k,
+            typing: val[k]?.typing ?? false,
+            lastUpdated: val[k]?.lastUpdated ?? 0,
+            name: val[k]?.name ?? null,
+          }));
 
-        const recent = entries.filter(e =>
-          e.userId !== this.senderId &&
-          e.typing &&
-          (now - (e.lastUpdated || 0)) < 10000
-        );
+          const recent = entries.filter(
+            (e) =>
+              e.userId !== this.senderId &&
+              e.typing &&
+              now - (e.lastUpdated || 0) < 10000
+          );
 
-        this.typingCount = recent.length;
+          this.typingCount = recent.length;
 
-        if (this.chatType === 'private') {
-          if (recent.length === 0) {
-            this.typingUsers = [];
-            this.typingFrom = null;
+          if (this.chatType === 'private') {
+            if (recent.length === 0) {
+              this.typingUsers = [];
+              this.typingFrom = null;
+              return;
+            }
+            const other = recent[0];
+            this.typingUsers = [
+              {
+                userId: other.userId,
+                name: other.name || `User ${other.userId}`,
+                avatar: 'assets/images/default-avatar.png',
+              },
+            ];
+            this.typingFrom = this.typingUsers[0].name || null;
             return;
           }
-          const other = recent[0];
-          this.typingUsers = [{
-            userId: other.userId,
-            name: other.name || `User ${other.userId}`,
-            avatar: 'assets/images/default-avatar.png'
-          }];
-          this.typingFrom = this.typingUsers[0].name || null;
-          return;
-        }
 
-        const usersForDisplay: { userId: string; name: string | null; avatar: string | null }[] = [];
+          const usersForDisplay: {
+            userId: string;
+            name: string | null;
+            avatar: string | null;
+          }[] = [];
 
-        recent.forEach(e => {
-          let member = this.groupMembers.find(m => String(m.user_id) === String(e.userId));
-          if (!member) {
-            member = this.groupMembers.find(m => m.phone_number && String(m.phone_number) === String(e.userId));
-          }
+          recent.forEach((e) => {
+            let member = this.groupMembers.find(
+              (m) => String(m.user_id) === String(e.userId)
+            );
+            if (!member) {
+              member = this.groupMembers.find(
+                (m) =>
+                  m.phone_number && String(m.phone_number) === String(e.userId)
+              );
+            }
 
-          const avatar = member?.avatar || null;
-          const displayName = member?.name || e.name || e.userId;
+            const avatar = member?.avatar || null;
+            const displayName = member?.name || e.name || e.userId;
 
-          usersForDisplay.push({
-            userId: e.userId,
-            name: displayName,
-            avatar: avatar || 'assets/images/default-avatar.png'
+            usersForDisplay.push({
+              userId: e.userId,
+              name: displayName,
+              avatar: avatar || 'assets/images/default-avatar.png',
+            });
           });
-        });
 
-        const uniq: { [k: string]: boolean } = {};
-        this.typingUsers = usersForDisplay.filter(u => {
-          if (uniq[u.userId]) return false;
-          uniq[u.userId] = true;
-          return true;
-        });
+          const uniq: { [k: string]: boolean } = {};
+          this.typingUsers = usersForDisplay.filter((u) => {
+            if (uniq[u.userId]) return false;
+            uniq[u.userId] = true;
+            return true;
+          });
 
-        this.typingFrom = this.typingUsers.length ? this.typingUsers[0].name : null;
-      });
+          this.typingFrom = this.typingUsers.length
+            ? this.typingUsers[0].name
+            : null;
+        }
+      );
 
-      this.typingUnsubscribe = () => { try { unsubscribe(); } catch (e) { } };
+      this.typingUnsubscribe = () => {
+        try {
+          unsubscribe();
+        } catch (e) {}
+      };
       this.onValueUnsubs.push(this.typingUnsubscribe);
     } catch (err) {
       console.warn('setupTypingListener error', err);
@@ -1620,7 +1676,11 @@ isQuickReactionOpen(msg: any) {
   async ngAfterViewInit() {
     if (this.ionContent) {
       this.ionContent.ionScroll.subscribe(async (event: any) => {
-        if (event.detail.scrollTop < 100 && this.hasMoreMessages && !this.isLoadingMore) {
+        if (
+          event.detail.scrollTop < 100 &&
+          this.hasMoreMessages &&
+          !this.isLoadingMore
+        ) {
           await this.loadMoreMessages();
         }
       });
@@ -1629,9 +1689,13 @@ isQuickReactionOpen(msg: any) {
     this.setDynamicPadding();
     window.addEventListener('resize', this.resizeHandler);
 
-    const footer = this.el.nativeElement.querySelector('.footer-fixed') as HTMLElement;
-    if (footer && ('ResizeObserver' in window)) {
-      const ro = new (window as any).ResizeObserver(() => this.setDynamicPadding());
+    const footer = this.el.nativeElement.querySelector(
+      '.footer-fixed'
+    ) as HTMLElement;
+    if (footer && 'ResizeObserver' in window) {
+      const ro = new (window as any).ResizeObserver(() =>
+        this.setDynamicPadding()
+      );
       ro.observe(footer);
       (this as any)._ro = ro;
     }
@@ -1643,19 +1707,20 @@ isQuickReactionOpen(msg: any) {
     }
 
     this.isLoadingMore = true;
-    const currentScrollHeight = this.scrollContainer?.nativeElement?.scrollHeight || 0;
+    const currentScrollHeight =
+      this.scrollContainer?.nativeElement?.scrollHeight || 0;
 
     try {
       await this.loadMessagesFromFirebase(true);
 
       setTimeout(() => {
         if (this.scrollContainer?.nativeElement) {
-          const newScrollHeight = this.scrollContainer.nativeElement.scrollHeight;
+          const newScrollHeight =
+            this.scrollContainer.nativeElement.scrollHeight;
           const scrollDiff = newScrollHeight - currentScrollHeight;
           this.scrollContainer.nativeElement.scrollTop = scrollDiff;
         }
       }, 100);
-
     } catch (error) {
       console.error('Error loading more messages:', error);
     } finally {
@@ -1667,260 +1732,149 @@ isQuickReactionOpen(msg: any) {
     return userA < userB ? `${userA}_${userB}` : `${userB}_${userA}`;
   }
 
-  // async listenForMessages() {
-  //   this.messageSub?.unsubscribe();
-
-  //   this.messageSub = this.chatService.listenForMessages(this.roomId).subscribe(async (newMessages) => {
-  //     if (!Array.isArray(newMessages)) return;
-
-  //     // 1) decrypt all message.text in parallel (preserve order)
-  //     const decryptPromises = newMessages.map(msg =>
-  //       this.encryptionService.decrypt(msg.text || '')
-  //         .then(dt => ({ msg, decryptedText: dt }))
-  //         .catch(err => {
-  //           console.warn('decrypt msg.text failed for key', msg.key, err);
-  //           return { msg, decryptedText: '' };
-  //         })
-  //     );
-
-  //     const decryptedPairs = await Promise.all(decryptPromises);
-
-  //     // 2) Build a lookup map by message_id for existing messages (fast dedupe)
-  //     const existingById: Record<string, number> = {};
-  //     this.allMessages.forEach((m, i) => {
-  //       if (m.message_id) existingById[String(m.message_id)] = i;
-  //     });
-
-  //     // 3) Process incoming messages
-  //     for (const pair of decryptedPairs) {
-  //       const msg = pair.msg;
-  //       const serverKey = msg.key || null;
-  //       const messageId = msg.message_id || uuidv4();
-
-  //       // Build dm with decrypted text
-  //       const dm: Message = { ...msg, key: serverKey, message_id: messageId, text: pair.decryptedText };
-
-  //       // decrypt attachment.caption if present (safe)
-  //       if (dm.attachment && (dm.attachment as any).caption) {
-  //         try {
-  //           const encCap = (dm.attachment as any).caption;
-  //           if (encCap && typeof encCap === 'string') {
-  //             const captionPlain = await this.encryptionService.decrypt(encCap);
-  //             (dm.attachment as any).caption = captionPlain;
-  //           }
-  //         } catch (err) {
-  //           console.warn('Failed to decrypt attachment.caption for message_id', messageId, err);
-  //         }
-  //       }
-
-  //       // Apply deletion filters — skip messages hidden for current user
-  //       if (this.applyDeletionFilters(dm)) {
-  //         // If the message exists in our local cache and is now marked deletedForEveryone,
-  //         // we also remove it from allMessages so UI disappears.
-  //         if (existingById[String(messageId)] !== undefined) {
-  //           // remove from arrays
-  //           const idx = existingById[String(messageId)];
-  //           this.allMessages[idx] = { ...this.allMessages[idx], ...dm }; // keep metadata, but skip display below
-  //         }
-  //         continue; // skip adding to UI lists for this user
-  //       }
-
-  //       // check if we already have message with same message_id
-  //       const existingIndex = existingById[String(messageId)];
-
-  //       if (existingIndex !== undefined) {
-  //         // merge into existing entry (server wins but keep local-only flag if present)
-  //         const old = this.allMessages[existingIndex];
-  //         const merged: Message = {
-  //           ...old,
-  //           ...dm,
-  //           // prefer server key if present
-  //           key: dm.key || old.key
-  //         };
-
-  //         // preserve client-only flags
-  //         if ((old as any).localOnly !== undefined) (merged as any).localOnly = (old as any).localOnly;
-  //         if ((old as any).isLocallyEdited !== undefined) (merged as any).isLocallyEdited = (old as any).isLocallyEdited;
-
-  //         this.allMessages[existingIndex] = merged;
-  //       } else {
-  //         // brand new message — push
-  //         this.allMessages.push(dm);
-  //         existingById[String(messageId)] = this.allMessages.length - 1;
-  //       }
-
-  //       // If message was sent to me and not read, mark read
-  //       if (dm.receiver_id === this.senderId && !dm.read) {
-  //         try {
-  //           await this.chatService.markRead(this.roomId, dm.key);
-  //           await this.chatService.resetUnreadCount(this.roomId, this.senderId);
-  //         } catch (err) {
-  //           console.warn('markRead/resetUnreadCount failed', err);
-  //         }
-  //       }
-  //     }
-
-  //     // 4) After processing, remove duplicates (safety)
-  //     const seenIds: Record<string, boolean> = {};
-  //     this.allMessages = this.allMessages.filter(m => {
-  //       const id = String(m.message_id || '');
-  //       if (!id) return true;
-  //       if (seenIds[id]) {
-  //         return false;
-  //       }
-  //       seenIds[id] = true;
-  //       return true;
-  //     });
-
-  //     // 5) Sort and update displayed / grouped lists (apply deletion filters again before exposing to UI)
-  //     this.allMessages.sort((a, b) => {
-  //       const ta = Number(a.timestamp) || new Date(a.timestamp || 0).getTime();
-  //       const tb = Number(b.timestamp) || new Date(b.timestamp || 0).getTime();
-  //       return ta - tb;
-  //     });
-
-  //     // Filter out messages that should be hidden for this user
-  //     const visibleAllMessages = this.allMessages.filter(m => !this.applyDeletionFilters(m));
-
-  //     const keepCount = Math.max(this.limit || 50, this.displayedMessages?.length || 0);
-  //     const startIdx = Math.max(0, visibleAllMessages.length - keepCount);
-  //     this.displayedMessages = visibleAllMessages.slice(startIdx);
-
-  //     this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
-
-  //     this.saveToLocalStorage();
-
-  //     if (this.pinnedMessage) {
-  //       this.findPinnedMessageDetails(this.pinnedMessage.key);
-  //     }
-
-  //     await Promise.resolve();
-  //     this.scrollToBottom();
-  //     this.observeVisibleMessages();
-  //   });
-  // }
-
   async listenForMessages() {
-  this.messageSub?.unsubscribe();
+    this.messageSub?.unsubscribe();
 
-  this.messageSub = this.chatService.listenForMessages(this.roomId).subscribe(async (newMessages) => {
-    if (!Array.isArray(newMessages)) return;
+    this.messageSub = this.chatService
+      .getMessages()
+      .subscribe(async (newMessages: any) => {
+        if (!Array.isArray(newMessages)) return;
 
-    const decryptPromises = newMessages.map(msg =>
-      this.encryptionService.decrypt(msg.text || '')
-        .then(dt => ({ msg, decryptedText: dt }))
-        .catch(err => {
-          console.warn('decrypt msg.text failed for key', msg.key, err);
-          return { msg, decryptedText: '' };
-        })
-    );
+        const decryptPromises = newMessages.map((msg) =>
+          this.encryptionService
+            .decrypt(msg.text || '')
+            .then((dt) => ({ msg, decryptedText: dt }))
+            .catch((err) => {
+              console.warn('decrypt msg.text failed for key', msg.key, err);
+              return { msg, decryptedText: '' };
+            })
+        );
 
-    const decryptedPairs = await Promise.all(decryptPromises);
-    const existingById: Record<string, number> = {};
-    this.allMessages.forEach((m, i) => {
-      if (m.message_id) existingById[String(m.message_id)] = i;
-    });
+        const decryptedPairs = await Promise.all(decryptPromises);
+        const existingById: Record<string, number> = {};
+        this.allMessages.forEach((m, i) => {
+          if (m.message_id) existingById[String(m.message_id)] = i;
+        });
 
-    for (const pair of decryptedPairs) {
-      const msg = pair.msg;
-      const serverKey = msg.key || null;
-      const messageId = msg.message_id || uuidv4();
+        for (const pair of decryptedPairs) {
+          const msg = pair.msg;
+          const serverKey = msg.key || null;
+          const messageId = msg.message_id || uuidv4();
 
-      const dm: Message = { 
-        ...msg, 
-        key: serverKey, 
-        message_id: messageId, 
-        text: pair.decryptedText,
-        reactions: msg.reactions || {} // ✅ Ensure reactions are included
-      };
+          const dm: Message = {
+            ...msg,
+            key: serverKey,
+            message_id: messageId,
+            text: pair.decryptedText,
+            reactions: msg.reactions || {}, // ✅ Ensure reactions are included
+          };
 
-      if (dm.attachment && (dm.attachment as any).caption) {
-        try {
-          const encCap = (dm.attachment as any).caption;
-          if (encCap && typeof encCap === 'string') {
-            const captionPlain = await this.encryptionService.decrypt(encCap);
-            (dm.attachment as any).caption = captionPlain;
+          if (dm.attachment && (dm.attachment as any).caption) {
+            try {
+              const encCap = (dm.attachment as any).caption;
+              if (encCap && typeof encCap === 'string') {
+                const captionPlain = await this.encryptionService.decrypt(
+                  encCap
+                );
+                (dm.attachment as any).caption = captionPlain;
+              }
+            } catch (err) {
+              console.warn(
+                'Failed to decrypt attachment.caption for message_id',
+                messageId,
+                err
+              );
+            }
           }
-        } catch (err) {
-          console.warn('Failed to decrypt attachment.caption for message_id', messageId, err);
+
+          if (this.applyDeletionFilters(dm)) {
+            if (existingById[String(messageId)] !== undefined) {
+              const idx = existingById[String(messageId)];
+              this.allMessages[idx] = { ...this.allMessages[idx], ...dm };
+            }
+            continue;
+          }
+
+          const existingIndex = existingById[String(messageId)];
+
+          if (existingIndex !== undefined) {
+            const old = this.allMessages[existingIndex];
+            const merged: Message = {
+              ...old,
+              ...dm,
+              key: dm.key || old.key,
+              reactions: dm.reactions || old.reactions || {}, // ✅ Merge reactions
+            };
+
+            if ((old as any).localOnly !== undefined)
+              (merged as any).localOnly = (old as any).localOnly;
+            if ((old as any).isLocallyEdited !== undefined)
+              (merged as any).isLocallyEdited = (old as any).isLocallyEdited;
+
+            this.allMessages[existingIndex] = merged;
+          } else {
+            this.allMessages.push(dm);
+            existingById[String(messageId)] = this.allMessages.length - 1;
+          }
+
+          if (dm.receiver_id === this.senderId && !dm.read) {
+            try {
+              await this.chatService.markRead(this.roomId, dm.key);
+              await this.chatService.resetUnreadCount(
+                this.roomId,
+                this.senderId
+              );
+            } catch (err) {
+              console.warn('markRead/resetUnreadCount failed', err);
+            }
+          }
         }
-      }
 
-      if (this.applyDeletionFilters(dm)) {
-        if (existingById[String(messageId)] !== undefined) {
-          const idx = existingById[String(messageId)];
-          this.allMessages[idx] = { ...this.allMessages[idx], ...dm };
+        const seenIds: Record<string, boolean> = {};
+        this.allMessages = this.allMessages.filter((m) => {
+          const id = String(m.message_id || '');
+          if (!id) return true;
+          if (seenIds[id]) return false;
+          seenIds[id] = true;
+          return true;
+        });
+
+        this.allMessages.sort((a, b) => {
+          const ta =
+            Number(a.timestamp) || new Date(a.timestamp || 0).getTime();
+          const tb =
+            Number(b.timestamp) || new Date(b.timestamp || 0).getTime();
+          return ta - tb;
+        });
+
+        const visibleAllMessages = this.allMessages.filter(
+          (m) => !this.applyDeletionFilters(m)
+        );
+        const keepCount = Math.max(
+          this.limit || 50,
+          this.displayedMessages?.length || 0
+        );
+        const startIdx = Math.max(0, visibleAllMessages.length - keepCount);
+        this.displayedMessages = visibleAllMessages.slice(startIdx);
+
+        this.groupedMessages = await this.groupMessagesByDate(
+          this.displayedMessages
+        );
+        this.saveToLocalStorage();
+
+        if (this.pinnedMessage) {
+          this.findPinnedMessageDetails(this.pinnedMessage.key);
         }
-        continue;
-      }
 
-      const existingIndex = existingById[String(messageId)];
-
-      if (existingIndex !== undefined) {
-        const old = this.allMessages[existingIndex];
-        const merged: Message = {
-          ...old,
-          ...dm,
-          key: dm.key || old.key,
-          reactions: dm.reactions || old.reactions || {} // ✅ Merge reactions
-        };
-
-        if ((old as any).localOnly !== undefined) (merged as any).localOnly = (old as any).localOnly;
-        if ((old as any).isLocallyEdited !== undefined) (merged as any).isLocallyEdited = (old as any).isLocallyEdited;
-
-        this.allMessages[existingIndex] = merged;
-      } else {
-        this.allMessages.push(dm);
-        existingById[String(messageId)] = this.allMessages.length - 1;
-      }
-
-      if (dm.receiver_id === this.senderId && !dm.read) {
-        try {
-          await this.chatService.markRead(this.roomId, dm.key);
-          await this.chatService.resetUnreadCount(this.roomId, this.senderId);
-        } catch (err) {
-          console.warn('markRead/resetUnreadCount failed', err);
-        }
-      }
-    }
-
-    const seenIds: Record<string, boolean> = {};
-    this.allMessages = this.allMessages.filter(m => {
-      const id = String(m.message_id || '');
-      if (!id) return true;
-      if (seenIds[id]) return false;
-      seenIds[id] = true;
-      return true;
-    });
-
-    this.allMessages.sort((a, b) => {
-      const ta = Number(a.timestamp) || new Date(a.timestamp || 0).getTime();
-      const tb = Number(b.timestamp) || new Date(b.timestamp || 0).getTime();
-      return ta - tb;
-    });
-
-    const visibleAllMessages = this.allMessages.filter(m => !this.applyDeletionFilters(m));
-    const keepCount = Math.max(this.limit || 50, this.displayedMessages?.length || 0);
-    const startIdx = Math.max(0, visibleAllMessages.length - keepCount);
-    this.displayedMessages = visibleAllMessages.slice(startIdx);
-
-    this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
-    this.saveToLocalStorage();
-
-    if (this.pinnedMessage) {
-      this.findPinnedMessageDetails(this.pinnedMessage.key);
-    }
-
-    await Promise.resolve();
-    this.scrollToBottom();
-    this.observeVisibleMessages();
-  });
-}
-
+        await Promise.resolve();
+        this.scrollToBottom();
+        this.observeVisibleMessages();
+      });
+  }
 
   private async markDisplayedMessagesAsRead() {
-    const unreadMessages = this.displayedMessages.filter(msg =>
-      !msg.read && msg.receiver_id === this.senderId
+    const unreadMessages = this.displayedMessages.filter(
+      (msg) => !msg.read && msg.receiver_id === this.senderId
     );
 
     for (const msg of unreadMessages) {
@@ -1933,22 +1887,27 @@ isQuickReactionOpen(msg: any) {
 
     allMessageElements.forEach((el: any) => {
       const msgKey = el.getAttribute('data-msg-key');
-      const msgIndex = this.displayedMessages.findIndex(m => m.key === msgKey);
+      const msgIndex = this.displayedMessages.findIndex(
+        (m) => m.key === msgKey
+      );
       if (msgIndex === -1) return;
 
       const msg = this.displayedMessages[msgIndex];
 
       if (!msg.read && msg.receiver_id === this.senderId) {
-        const observer = new IntersectionObserver(entries => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              this.chatService.markRead(this.roomId, msgKey);
-              observer.unobserve(entry.target);
-            }
-          });
-        }, {
-          threshold: 1.0
-        });
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                this.chatService.markRead(this.roomId, msgKey);
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          {
+            threshold: 1.0,
+          }
+        );
 
         observer.observe(el);
       }
@@ -1979,31 +1938,39 @@ isQuickReactionOpen(msg: any) {
           (async () => {
             try {
               const apiResponse = await firstValueFrom(
-                this.service.getDownloadUrl((msg.attachment as any).mediaId as string)
+                this.service.getDownloadUrl(
+                  (msg.attachment as any).mediaId as string
+                )
               );
 
               if (apiResponse.status && apiResponse.downloadUrl) {
                 const response = await fetch(apiResponse.downloadUrl);
                 const blob = await response.blob();
-                const extension = (msg.attachment as any).fileName?.split('.').pop() || 'dat';
-                const filename = `${(msg.attachment as any).mediaId}.${extension}`;
-                const file_Path = await this.FileService.saveFileToReceived(filename, blob);
-                await this.sqliteService.saveAttachment(
-                  this.roomId,
-                  (msg.attachment as any).type,
-                  file_Path,
-                  (msg.attachment as any).mediaId as string
+                const extension =
+                  (msg.attachment as any).fileName?.split('.').pop() || 'dat';
+                const filename = `${
+                  (msg.attachment as any).mediaId
+                }.${extension}`;
+                const file_Path = await this.FileService.saveFileToReceived(
+                  filename,
+                  blob
                 );
+                // await this.sqliteService.saveAttachment(
+                //   this.roomId,
+                //   (msg.attachment as any).type,
+                //   file_Path,
+                //   (msg.attachment as any).mediaId as string
+                // );
               }
             } catch (error) {
-              console.error("Error handling received attachment:", error);
+              console.error('Error handling received attachment:', error);
             }
           })();
         }
 
-        (msg.attachment as any).previewUrl = await this.sqliteService.getAttachmentPreview(
-          (msg.attachment as any).mediaId as string
-        );
+        // (msg.attachment as any).previewUrl = await this.sqliteService.getAttachmentPreview(
+        //   (msg.attachment as any).mediaId as string
+        // );
       }
 
       const isToday =
@@ -2034,9 +2001,9 @@ isQuickReactionOpen(msg: any) {
       grouped[label].push(msg);
     }
 
-    return Object.keys(grouped).map(date => ({
+    return Object.keys(grouped).map((date) => ({
       date,
-      messages: grouped[date]
+      messages: grouped[date],
     }));
   }
 
@@ -2065,49 +2032,6 @@ isQuickReactionOpen(msg: any) {
     }
   }
 
-  // async loadFromLocalStorage() {
-  //   const cached = localStorage.getItem(this.roomId);
-  //   if (!cached) return;
-
-  //   try {
-  //     const rawMessages = JSON.parse(cached);
-  //     const recentMessages = rawMessages.slice(-this.limit * 3);
-
-  //     const decryptedMessages = await Promise.all(recentMessages.map(async (msg: any) => {
-  //       let decryptedText = '';
-  //       try {
-  //         decryptedText = await this.encryptionService.decrypt(msg.text || '');
-  //       } catch (e) {
-  //         console.warn('decrypt cached message.text failed', e);
-  //         decryptedText = '';
-  //       }
-
-  //       // decrypt cached attachment caption if present
-  //       if (msg.attachment && msg.attachment.caption) {
-  //         try {
-  //           const captionPlain = await this.encryptionService.decrypt(msg.attachment.caption);
-  //           msg.attachment.caption = captionPlain; // overwrite with plaintext
-  //           // OR: msg.attachment.captionPlain = captionPlain;
-  //         } catch (e) {
-  //           console.warn('decrypt cached attachment caption failed', e);
-  //         }
-  //       }
-
-  //       return { ...msg, text: decryptedText };
-  //     }));
-
-  //     this.allMessages = decryptedMessages;
-  //     this.displayedMessages = decryptedMessages.slice(-this.limit);
-  //     this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
-
-  //     if (decryptedMessages.length > 0) {
-  //       this.lastMessageKey = decryptedMessages[0].key;
-  //     }
-  //   } catch (error) {
-  //     console.error('Error loading from localStorage:', error);
-  //   }
-  // }
-
   async loadFromLocalStorage() {
     const cached = localStorage.getItem(this.roomId);
     if (!cached) return;
@@ -2116,34 +2040,44 @@ isQuickReactionOpen(msg: any) {
       const rawMessages = JSON.parse(cached);
       const recentMessages = rawMessages.slice(-this.limit * 3);
 
-      const decryptedMessages = await Promise.all(recentMessages.map(async (msg: any) => {
-        let decryptedText = '';
-        try {
-          decryptedText = await this.encryptionService.decrypt(msg.text || '');
-        } catch (e) {
-          console.warn('decrypt cached message.text failed', e);
-          decryptedText = '';
-        }
-
-        // decrypt cached attachment caption if present
-        if (msg.attachment && msg.attachment.caption) {
+      const decryptedMessages = await Promise.all(
+        recentMessages.map(async (msg: any) => {
+          let decryptedText = '';
           try {
-            const captionPlain = await this.encryptionService.decrypt(msg.attachment.caption);
-            msg.attachment.caption = captionPlain; // overwrite with plaintext
+            decryptedText = await this.encryptionService.decrypt(
+              msg.text || ''
+            );
           } catch (e) {
-            console.warn('decrypt cached attachment caption failed', e);
+            console.warn('decrypt cached message.text failed', e);
+            decryptedText = '';
           }
-        }
 
-        return { ...msg, text: decryptedText } as Message;
-      }));
+          // decrypt cached attachment caption if present
+          if (msg.attachment && msg.attachment.caption) {
+            try {
+              const captionPlain = await this.encryptionService.decrypt(
+                msg.attachment.caption
+              );
+              msg.attachment.caption = captionPlain; // overwrite with plaintext
+            } catch (e) {
+              console.warn('decrypt cached attachment caption failed', e);
+            }
+          }
+
+          return { ...msg, text: decryptedText } as Message;
+        })
+      );
 
       // Filter out messages that are deleted for this user (or globally)
-      const visibleMessages = decryptedMessages.filter(m => !this.applyDeletionFilters(m));
+      const visibleMessages = decryptedMessages.filter(
+        (m) => !this.applyDeletionFilters(m)
+      );
 
       this.allMessages = visibleMessages;
       this.displayedMessages = visibleMessages.slice(-this.limit);
-      this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
+      this.groupedMessages = await this.groupMessagesByDate(
+        this.displayedMessages
+      );
 
       if (visibleMessages.length > 0) {
         this.lastMessageKey = visibleMessages[0].key;
@@ -2169,8 +2103,8 @@ isQuickReactionOpen(msg: any) {
       const type = mimeType?.startsWith('image')
         ? 'image'
         : mimeType?.startsWith('video')
-          ? 'video'
-          : 'file';
+        ? 'video'
+        : 'file';
 
       let blob = file.blob as Blob;
 
@@ -2230,312 +2164,56 @@ isQuickReactionOpen(msg: any) {
     this.replyToMessage = message;
   }
 
-  // async sendMessage() {
-  //   if (this.isSending) return;
-
-  //   if (this.iBlocked) {
-  //     const toast = await this.toastCtrl.create({ message: `Unblock ${this.receiver_name} to send messages.`, duration: 1800, color: 'medium' });
-  //     await toast.present();
-  //     return;
-  //   }
-
-  //   this.isSending = true;
-
-  //   try {
-  //     const plainText = this.messageText.trim();
-
-  //     const localKey = uuidv4();
-  //     const localMessage: any = {
-  //       sender_id: this.senderId,
-  //       text: plainText,
-  //       timestamp: new Date().toISOString(),
-  //       sender_phone: this.sender_phone,
-  //       sender_name: this.sender_name,
-  //       receiver_id: this.chatType === 'private' ? this.receiverId : '',
-  //       receiver_phone: this.receiver_phone,
-  //       delivered: false,
-  //       read: false,
-  //       message_id: uuidv4(),
-  //       isDeleted: false,
-  //       replyToMessageId: this.replyToMessage?.message_id || '',
-  //       isEdit: false,
-  //       localOnly: false,
-  //       key: localKey
-  //     };
-
-  //     if (this.theyBlocked) {
-  //       localMessage.localOnly = true;
-
-  //       if (this.selectedAttachment) {
-  //         try {
-  //           const filename = this.selectedAttachment.fileName || `${Date.now()}.${this.getFileExtension(this.selectedAttachment.fileName || 'dat')}`;
-  //           await this.FileService.saveFileToSent(filename, this.selectedAttachment.blob);
-
-  //           localMessage.attachment = {
-  //             type: this.selectedAttachment.type,
-  //             mediaId: '',
-  //             fileName: filename,
-  //             mimeType: this.selectedAttachment.mimeType,
-  //             fileSize: this.selectedAttachment.fileSize,
-  //             caption: plainText,
-  //             previewUrl: URL.createObjectURL(this.selectedAttachment.blob)
-  //           };
-
-  //           try {
-  //             await this.sqliteService.saveAttachment(this.roomId, this.selectedAttachment.type, `sent/${filename}`, '');
-  //           } catch (e) {
-  //             console.warn('sqlite saveAttachment (local) failed', e);
-  //           }
-  //         } catch (err) {
-  //           console.warn('Failed to save attachment locally:', err);
-  //         }
-  //       }
-
-  //       this.allMessages.push({ ...localMessage });
-  //       this.allMessages.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
-
-  //       const startIdx = Math.max(0, this.allMessages.length - Math.max(this.limit, this.displayedMessages.length || this.limit));
-  //       this.displayedMessages = this.allMessages.slice(startIdx);
-  //       this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
-
-  //       this.saveToLocalStorage();
-
-  //       this.messageText = '';
-  //       this.selectedAttachment = null;
-  //       this.showPreviewModal = false;
-  //       this.replyToMessage = null;
-  //       await this.stopTypingSignal();
-  //       this.scrollToBottom();
-  //       return;
-  //     }
-
-  //     const encryptedText = plainText ? await this.encryptionService.encrypt(plainText) : '';
-
-  //     const serverMessage: Message = {
-  //       sender_id: this.senderId,
-  //       text: encryptedText,
-  //       timestamp: new Date().toISOString(),
-  //       sender_phone: this.sender_phone,
-  //       sender_name: this.sender_name,
-  //       receiver_id: this.chatType === 'private' ? this.receiverId : '',
-  //       receiver_phone: this.receiver_phone,
-  //       delivered: false,
-  //       read: false,
-  //       message_id: uuidv4(),
-  //       isDeleted: false,
-  //       replyToMessageId: this.replyToMessage?.message_id || '',
-  //       isEdit: false
-  //     };
-
-  //     if (this.selectedAttachment) {
-  //       try {
-  //         const mediaId = await this.uploadAttachmentToS3(this.selectedAttachment);
-  //         serverMessage.attachment = {
-  //           type: this.selectedAttachment.type,
-  //           mediaId: mediaId,
-  //           fileName: this.selectedAttachment.fileName,
-  //           mimeType: this.selectedAttachment.mimeType,
-  //           fileSize: this.selectedAttachment.fileSize,
-  //           caption: plainText
-  //         };
-
-  //         const file_path = await this.FileService.saveFileToSent(this.selectedAttachment.fileName, this.selectedAttachment.blob);
-  //         await this.sqliteService.saveAttachment(this.roomId, this.selectedAttachment.type, file_path, mediaId);
-
-  //       } catch (error) {
-  //         console.error('Failed to upload attachment:', error);
-  //         const toast = await this.toastCtrl.create({
-  //           message: 'Failed to upload attachment. Please try again.',
-  //           duration: 3000,
-  //           color: 'danger'
-  //         });
-  //         await toast.present();
-  //         return;
-  //       }
-  //     }
-
-  //     await this.chatService.sendMessage(this.roomId, serverMessage, this.chatType, this.senderId);
-
-  //     this.messageText = '';
-  //     this.selectedAttachment = null;
-  //     this.showPreviewModal = false;
-  //     this.replyToMessage = null;
-  //     await this.stopTypingSignal();
-  //     this.scrollToBottom();
-
-  //   } catch (error) {
-  //     console.error('Error sending message:', error);
-  //     const toast = await this.toastCtrl.create({ message: 'Failed to send message. Please try again.', duration: 3000, color: 'danger' });
-  //     await toast.present();
-  //   } finally {
-  //     this.isSending = false;
-  //   }
-  // }
-
   async sendMessage() {
     if (this.isSending) return;
-
-    if (this.iBlocked) {
-      const toast = await this.toastCtrl.create({ message: `Unblock ${this.receiver_name} to send messages.`, duration: 1800, color: 'medium' });
-      await toast.present();
-      return;
-    }
 
     this.isSending = true;
 
     try {
       const plainText = this.messageText.trim();
-      const localKey = uuidv4();
-
-      // Prepare encrypted values depending on whether there is an attachment.
-      // If there is an attachment we encrypt caption; otherwise encrypt text.
-      let encryptedText = '';
-      let encryptedCaption = '';
-
-      if (this.selectedAttachment) {
-        // If there's an attachment, encrypt the caption (if provided).
-        if (plainText) {
-          try {
-            encryptedCaption = await this.encryptionService.encrypt(plainText);
-          } catch (err) {
-            console.warn('encrypt caption failed', err);
-            encryptedCaption = ''; // fallback - still send empty caption rather than plain
-          }
-        }
-      } else {
-        // No attachment -> encrypt normal text (for message.text)
-        if (plainText) {
-          try {
-            encryptedText = await this.encryptionService.encrypt(plainText);
-          } catch (err) {
-            console.warn('encrypt text failed', err);
-            encryptedText = '';
-          }
-        }
-      }
-
-      const localMessage: any = {
-        sender_id: this.senderId,
-        text: plainText, // keep human-readable in localMessage for UI; storage uses encrypted fields below
-        timestamp: new Date().toISOString(),
-        sender_phone: this.sender_phone,
-        sender_name: this.sender_name,
-        receiver_id: this.chatType === 'private' ? this.receiverId : '',
-        receiver_phone: this.receiver_phone,
-        delivered: false,
-        deliveredAt: null,   // <-- new
-        read: false,
-        readAt: null,        // <-- new
-        message_id: uuidv4(),
-        isDeleted: false,
-        replyToMessageId: this.replyToMessage?.message_id || '',
+      const localMessage: Partial<IMessage & { attachment?: IAttachment }> = {
+        sender: this.senderId,
+        text: plainText,
+        timestamp: Date.now(),
+        msgId: uuidv4(),
+        replyToMsgId: this.replyToMessage?.message_id || '',
         isEdit: false,
-        localOnly: false,
-        key: localKey
+        type: 'text',
+        reactions: [],
       };
-
-
-      // If THEY have blocked me -> save locally and DO NOT send to server
-      if (this.theyBlocked) {
-        localMessage.localOnly = true;
-
-        if (this.selectedAttachment) {
-          try {
-            const filename = this.selectedAttachment.fileName || `${Date.now()}.${this.getFileExtension(this.selectedAttachment.fileName || 'dat')}`;
-            await this.FileService.saveFileToSent(filename, this.selectedAttachment.blob);
-
-            // store encrypted caption (so DB/uploadable payload doesn't contain plain text)
-            localMessage.attachment = {
-              type: this.selectedAttachment.type,
-              mediaId: '',
-              fileName: filename,
-              mimeType: this.selectedAttachment.mimeType,
-              fileSize: this.selectedAttachment.fileSize,
-              caption: encryptedCaption,
-              previewUrl: URL.createObjectURL(this.selectedAttachment.blob)
-            };
-
-            try {
-              await this.sqliteService.saveAttachment(this.roomId, this.selectedAttachment.type, `sent/${filename}`, '');
-            } catch (e) {
-              console.warn('sqlite saveAttachment (local) failed', e);
-            }
-          } catch (err) {
-            console.warn('Failed to save attachment locally:', err);
-          }
-        }
-
-        // push local message for optimistic UI (note: localMessage.text is plain for UI)
-        this.allMessages.push({ ...localMessage });
-        this.allMessages.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
-
-        const startIdx = Math.max(0, this.allMessages.length - Math.max(this.limit, this.displayedMessages.length || this.limit));
-        this.displayedMessages = this.allMessages.slice(startIdx);
-        this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
-
-        this.saveToLocalStorage();
-
-        this.messageText = '';
-        this.selectedAttachment = null;
-        this.showPreviewModal = false;
-        this.replyToMessage = null;
-        await this.stopTypingSignal();
-        this.scrollToBottom();
-        return; // do not send to server
-      }
-
-      // Build server message. If there is an attachment, keep text empty and put encrypted caption inside attachment.
-      const serverMessage: Message = {
-        sender_id: this.senderId,
-        text: this.selectedAttachment ? '' : encryptedText,
-        timestamp: new Date().toISOString(),
-        sender_phone: this.sender_phone,
-        sender_name: this.sender_name,
-        receiver_id: this.chatType === 'private' ? this.receiverId : '',
-        receiver_phone: this.receiver_phone,
-        delivered: false,
-        deliveredAt: '',   // empty string instead of null
-        read: false,
-        readAt: '',        // empty string instead of null
-        message_id: uuidv4(),
-        isDeleted: false,
-        replyToMessageId: this.replyToMessage?.message_id || '',
-        isEdit: false
-      };
-
 
       if (this.selectedAttachment) {
         try {
-          const mediaId = await this.uploadAttachmentToS3(this.selectedAttachment);
+          const mediaId = await this.uploadAttachmentToS3(
+            this.selectedAttachment
+          );
 
-          serverMessage.attachment = {
+          localMessage.attachment = {
             type: this.selectedAttachment.type,
             mediaId: mediaId,
             fileName: this.selectedAttachment.fileName,
             mimeType: this.selectedAttachment.mimeType,
             fileSize: this.selectedAttachment.fileSize,
-            caption: encryptedCaption // send encrypted caption
+            caption: plainText, // send encrypted caption
           };
 
-          const file_path = await this.FileService.saveFileToSent(this.selectedAttachment.fileName, this.selectedAttachment.blob);
-          await this.sqliteService.saveAttachment(this.roomId, this.selectedAttachment.type, file_path, mediaId);
-
+          const file_path = await this.FileService.saveFileToSent(
+            this.selectedAttachment.fileName,
+            this.selectedAttachment.blob
+          );
         } catch (error) {
           console.error('Failed to upload attachment:', error);
           const toast = await this.toastCtrl.create({
             message: 'Failed to upload attachment. Please try again.',
             duration: 3000,
-            color: 'danger'
+            color: 'danger',
           });
           await toast.present();
           return;
         }
       }
 
-      console.log('>>> serverMessage to send:', serverMessage);
-      // finally send
-      await this.chatService.sendMessage(this.roomId, serverMessage, this.chatType, this.senderId);
-
+      await this.chatService.sendMessage(localMessage);
       // clear UI state
       this.messageText = '';
       this.selectedAttachment = null;
@@ -2543,10 +2221,13 @@ isQuickReactionOpen(msg: any) {
       this.replyToMessage = null;
       await this.stopTypingSignal();
       this.scrollToBottom();
-
     } catch (error) {
       console.error('Error sending message:', error);
-      const toast = await this.toastCtrl.create({ message: 'Failed to send message. Please try again.', duration: 3000, color: 'danger' });
+      const toast = await this.toastCtrl.create({
+        message: 'Failed to send message. Please try again.',
+        duration: 3000,
+        color: 'danger',
+      });
       await toast.present();
     } finally {
       this.isSending = false;
@@ -2558,11 +2239,13 @@ isQuickReactionOpen(msg: any) {
     if (!this.receiverId) return;
 
     // immediate fetch, then periodic
-    this.presence.getStatus(Number(this.receiverId)).subscribe(res => this.handleStatusResponse(res));
+    this.presence
+      .getStatus(Number(this.receiverId))
+      .subscribe((res) => this.handleStatusResponse(res));
     // Start polling while view is active:
-    this.statusPollSub = timer(pollIntervalMs, pollIntervalMs).pipe(
-      switchMap(() => this.presence.getStatus(Number(this.receiverId)))
-    ).subscribe(res => this.handleStatusResponse(res));
+    this.statusPollSub = timer(pollIntervalMs, pollIntervalMs)
+      .pipe(switchMap(() => this.presence.getStatus(Number(this.receiverId))))
+      .subscribe((res) => this.handleStatusResponse(res));
   }
 
   handleStatusResponse(res: any) {
@@ -2572,7 +2255,9 @@ isQuickReactionOpen(msg: any) {
       return;
     }
     this.receiverOnline = Number(res.data.is_online) === 1;
-    this.receiverLastSeen = res.data.last_seen ? this.formatLastSeen(res.data.last_seen) : null;
+    this.receiverLastSeen = res.data.last_seen
+      ? this.formatLastSeen(res.data.last_seen)
+      : null;
   }
 
   formatLastSeen(ts: string | null) {
@@ -2582,17 +2267,26 @@ isQuickReactionOpen(msg: any) {
     const now = new Date();
     const sameDay = d.toDateString() === now.toDateString();
     if (sameDay) {
-      return `Today at, ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+      return `Today at, ${d.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      })}`;
     }
     const yesterday = new Date();
     yesterday.setDate(now.getDate() - 1);
     if (d.toDateString() === yesterday.toDateString()) {
-      return `Yesterday, ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+      return `Yesterday, ${d.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      })}`;
     }
-    return d.toLocaleString([], { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+    return d.toLocaleString([], {
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   }
-
-
 
   private async uploadAttachmentToS3(attachment: any): Promise<string> {
     try {
@@ -2604,7 +2298,7 @@ isQuickReactionOpen(msg: any) {
           attachment.mimeType,
           {
             caption: this.messageText.trim(),
-            fileName: attachment.fileName
+            fileName: attachment.fileName,
           }
         )
       );
@@ -2614,11 +2308,17 @@ isQuickReactionOpen(msg: any) {
       }
 
       const uploadResult = await firstValueFrom(
-        this.service.uploadToS3(uploadResponse.upload_url, this.blobToFile(attachment.blob, attachment.fileName, attachment.mimeType))
+        this.service.uploadToS3(
+          uploadResponse.upload_url,
+          this.blobToFile(
+            attachment.blob,
+            attachment.fileName,
+            attachment.mimeType
+          )
+        )
       );
 
       return uploadResponse.media_id;
-
     } catch (error) {
       console.error('S3 upload error:', error);
       throw error;
@@ -2632,19 +2332,26 @@ isQuickReactionOpen(msg: any) {
 
     try {
       const localUrl = await this.FileService.getFilePreview(
-        `${msg.sender_id === this.senderId ? 'sent' : 'received'}/${msg.attachment.fileName}`
+        `${msg.sender_id === this.senderId ? 'sent' : 'received'}/${
+          msg.attachment.fileName
+        }`
       );
 
       if (localUrl) {
         attachmentUrl = localUrl;
       } else {
-        const downloadResponse = await firstValueFrom(this.service.getDownloadUrl(msg.attachment.mediaId));
+        const downloadResponse = await firstValueFrom(
+          this.service.getDownloadUrl(msg.attachment.mediaId)
+        );
 
         if (downloadResponse?.status && downloadResponse.downloadUrl) {
           attachmentUrl = downloadResponse.downloadUrl;
 
           if (msg.sender_id !== this.senderId) {
-            this.downloadAndSaveLocally(downloadResponse.downloadUrl, msg.attachment.fileName);
+            this.downloadAndSaveLocally(
+              downloadResponse.downloadUrl,
+              msg.attachment.fileName
+            );
           }
         }
       }
@@ -2654,11 +2361,11 @@ isQuickReactionOpen(msg: any) {
         componentProps: {
           attachment: {
             ...msg.attachment,
-            url: attachmentUrl
+            url: attachmentUrl,
           },
-          message: msg
+          message: msg,
         },
-        cssClass: 'attachment-modal'
+        cssClass: 'attachment-modal',
       });
 
       await modal.present();
@@ -2667,13 +2374,12 @@ isQuickReactionOpen(msg: any) {
       if (data && data.action === 'reply') {
         this.setReplyToMessage(data.message);
       }
-
     } catch (error) {
       console.error('Failed to load attachment:', error);
       const toast = await this.toastCtrl.create({
         message: 'Failed to load attachment',
         duration: 2000,
-        color: 'danger'
+        color: 'danger',
       });
       await toast.present();
     }
@@ -2691,17 +2397,22 @@ isQuickReactionOpen(msg: any) {
 
   getAttachmentPreview(attachment: any): string {
     if (attachment.caption) {
-      return attachment.caption.length > 30 ?
-        attachment.caption.substring(0, 30) + '...' :
-        attachment.caption;
+      return attachment.caption.length > 30
+        ? attachment.caption.substring(0, 30) + '...'
+        : attachment.caption;
     }
 
     switch (attachment.type) {
-      case 'image': return '📷 Photo';
-      case 'video': return '🎥 Video';
-      case 'audio': return '🎵 Audio';
-      case 'file': return attachment.fileName || '📄 File';
-      default: return '📎 Attachment';
+      case 'image':
+        return '📷 Photo';
+      case 'video':
+        return '🎥 Video';
+      case 'audio':
+        return '🎵 Audio';
+      case 'file':
+        return attachment.fileName || '📄 File';
+      default:
+        return '📎 Attachment';
     }
   }
 
@@ -2715,15 +2426,15 @@ isQuickReactionOpen(msg: any) {
           role: 'cancel',
           handler: () => {
             this.selectedAttachment = null;
-          }
+          },
         },
         {
           text: 'Send',
           handler: () => {
             this.sendMessage();
-          }
-        }
-      ]
+          },
+        },
+      ],
     });
 
     await alert.present();
@@ -2753,90 +2464,18 @@ isQuickReactionOpen(msg: any) {
     const ext = name.split('.').pop()?.toLowerCase();
     switch (ext) {
       case 'jpg':
-      case 'jpeg': return 'image/jpeg';
-      case 'png': return 'image/png';
-      case 'pdf': return 'application/pdf';
-      case 'docx': return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-      default: return '';
+      case 'jpeg':
+        return 'image/jpeg';
+      case 'png':
+        return 'image/png';
+      case 'pdf':
+        return 'application/pdf';
+      case 'docx':
+        return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      default:
+        return '';
     }
   }
-
-  // async loadMessagesFromFirebase(loadMore = false) {
-  //   try {
-  //     const db = getDatabase();
-  //     const messagesRef = ref(db, `chats/${this.roomId}`);
-
-  //     let qry;
-  //     if (loadMore && this.lastMessageKey) {
-  //       qry = query(messagesRef, orderByKey(), endBefore(this.lastMessageKey), limitToLast(this.limit));
-  //     } else {
-  //       qry = query(messagesRef, orderByKey(), limitToLast(this.limit));
-  //     }
-
-  //     const snapshot = await get(qry);
-
-  //     if (snapshot.exists()) {
-  //       const messagesData = snapshot.val();
-  //       const messageKeys = Object.keys(messagesData).sort();
-
-  //       const decryptTasks = messageKeys.map(async (key) => {
-  //         const msg = messagesData[key];
-
-  //         // decrypt text
-  //         let decryptedText = '';
-  //         try {
-  //           decryptedText = await this.encryptionService.decrypt(msg.text || '');
-  //         } catch (e) {
-  //           console.warn('decrypt text failed for key', key, e);
-  //           decryptedText = '';
-  //         }
-
-  //         // decrypt attachment.caption if present
-  //         if (msg.attachment && msg.attachment.caption) {
-  //           try {
-  //             const decryptedCaption = await this.encryptionService.decrypt(msg.attachment.caption);
-  //             msg.attachment.caption = decryptedCaption; // overwrite with plaintext
-  //             // OR: msg.attachment.captionPlain = decryptedCaption;
-  //           } catch (e) {
-  //             console.warn('decrypt attachment caption failed for key', key, e);
-  //           }
-  //         }
-
-  //         return {
-  //           ...msg,
-  //           key: key,
-  //           text: decryptedText
-  //         } as Message;
-  //       });
-
-  //       const results = await Promise.all(decryptTasks);
-
-  //       if (loadMore) {
-  //         this.allMessages = [...results, ...this.allMessages];
-  //         this.displayedMessages = [...results, ...this.displayedMessages];
-  //       } else {
-  //         this.allMessages = results;
-  //         this.displayedMessages = results;
-  //       }
-
-  //       if (results.length > 0) {
-  //         this.lastMessageKey = results[0].key;
-  //       }
-
-  //       this.hasMoreMessages = results.length === this.limit;
-
-  //       this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
-
-  //       this.saveToLocalStorage();
-
-  //       await this.markDisplayedMessagesAsRead();
-  //     } else {
-  //       this.hasMoreMessages = false;
-  //     }
-  //   } catch (error) {
-  //     console.error('Error loading messages from Firebase:', error);
-  //   }
-  // }
 
   async loadMessagesFromFirebase(loadMore = false) {
     try {
@@ -2845,7 +2484,12 @@ isQuickReactionOpen(msg: any) {
 
       let qry;
       if (loadMore && this.lastMessageKey) {
-        qry = query(messagesRef, orderByKey(), endBefore(this.lastMessageKey), limitToLast(this.limit));
+        qry = query(
+          messagesRef,
+          orderByKey(),
+          endBefore(this.lastMessageKey),
+          limitToLast(this.limit)
+        );
       } else {
         qry = query(messagesRef, orderByKey(), limitToLast(this.limit));
       }
@@ -2862,7 +2506,9 @@ isQuickReactionOpen(msg: any) {
           // decrypt text
           let decryptedText = '';
           try {
-            decryptedText = await this.encryptionService.decrypt(msg.text || '');
+            decryptedText = await this.encryptionService.decrypt(
+              msg.text || ''
+            );
           } catch (e) {
             console.warn('decrypt text failed for key', key, e);
             decryptedText = '';
@@ -2871,7 +2517,9 @@ isQuickReactionOpen(msg: any) {
           // decrypt attachment.caption if present
           if (msg.attachment && msg.attachment.caption) {
             try {
-              const decryptedCaption = await this.encryptionService.decrypt(msg.attachment.caption);
+              const decryptedCaption = await this.encryptionService.decrypt(
+                msg.attachment.caption
+              );
               msg.attachment.caption = decryptedCaption; // overwrite with plaintext
               // OR: msg.attachment.captionPlain = decryptedCaption;
             } catch (e) {
@@ -2882,7 +2530,7 @@ isQuickReactionOpen(msg: any) {
           return {
             ...msg,
             key: key,
-            text: decryptedText
+            text: decryptedText,
           } as Message;
         });
 
@@ -2897,7 +2545,10 @@ isQuickReactionOpen(msg: any) {
             return !this.applyDeletionFilters(msg);
           } catch (e) {
             // fail open (show message) if filter crashes
-            console.warn('applyDeletionFilters error while loading firebase messages', e);
+            console.warn(
+              'applyDeletionFilters error while loading firebase messages',
+              e
+            );
             return true;
           }
         });
@@ -2906,7 +2557,10 @@ isQuickReactionOpen(msg: any) {
         if (loadMore) {
           // older messages prepended (results are sorted ascending by key/name)
           this.allMessages = [...filteredResults, ...this.allMessages];
-          this.displayedMessages = [...filteredResults, ...this.displayedMessages];
+          this.displayedMessages = [
+            ...filteredResults,
+            ...this.displayedMessages,
+          ];
         } else {
           this.allMessages = filteredResults;
           this.displayedMessages = filteredResults;
@@ -2920,7 +2574,9 @@ isQuickReactionOpen(msg: any) {
         // hasMoreMessages should be true if the query returned 'limit' keys (raw)
         this.hasMoreMessages = messageKeys.length === this.limit;
 
-        this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
+        this.groupedMessages = await this.groupMessagesByDate(
+          this.displayedMessages
+        );
 
         this.saveToLocalStorage();
 
@@ -2931,36 +2587,11 @@ isQuickReactionOpen(msg: any) {
     } catch (error) {
       console.error('Error loading messages from Firebase:', error);
     }
+
+    this.chatService.getMessages().subscribe((messages) => {
+      console.log('message', messages);
+    });
   }
-
-  // addReaction(msg: Message, emoji: string) {
-  //   const userId = this.senderId;
-  //   const current = msg.reactions?.[userId] || null;
-  //   const newVal = current === emoji ? null : emoji;
-
-  //   // Update UI locally
-  //   msg.reactions = { ...(msg.reactions || {}) };
-  //   if (newVal) msg.reactions[userId] = newVal;
-  //   else delete msg.reactions[userId];
-
-  //   // Update Firebase
-  //   try {
-  //     const db = getDatabase();
-  //     const path = `chats/${this.roomId}/${msg.key}/reactions/${userId}`;
-
-  //     if (newVal) {
-  //       set(ref(db, path), newVal) // ✅ correctly writes value
-  //         .then(() => console.log('✅ Reaction saved:', newVal))
-  //         .catch(err => console.error('❌ Reaction save error:', err));
-  //     } else {
-  //       remove(ref(db, path))
-  //         .then(() => console.log('✅ Reaction removed'))
-  //         .catch(err => console.error('❌ Reaction remove error:', err));
-  //     }
-  //   } catch (e) {
-  //     console.warn('reaction update failed', e);
-  //   }
-  // }
 
   async addReaction(msg: Message, emoji: string) {
     const userId = this.senderId;
@@ -2975,16 +2606,23 @@ isQuickReactionOpen(msg: any) {
     // If you maintain grouped/displayed arrays, ensure they reflect the change:
     try {
       // update the message inside displayed/all arrays if present
-      const idxAll = this.allMessages.findIndex(m => m.key === msg.key);
+      const idxAll = this.allMessages.findIndex((m) => m.key === msg.key);
       if (idxAll !== -1) {
         this.allMessages[idxAll] = { ...this.allMessages[idxAll], ...msg };
       }
-      const idxDisp = this.displayedMessages.findIndex(m => m.key === msg.key);
+      const idxDisp = this.displayedMessages.findIndex(
+        (m) => m.key === msg.key
+      );
       if (idxDisp !== -1) {
-        this.displayedMessages[idxDisp] = { ...this.displayedMessages[idxDisp], ...msg };
+        this.displayedMessages[idxDisp] = {
+          ...this.displayedMessages[idxDisp],
+          ...msg,
+        };
       }
       // refresh grouped view (optional, expensive if called very often)
-      this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
+      this.groupedMessages = await this.groupMessagesByDate(
+        this.displayedMessages
+      );
       // persist a small cache
       this.saveToLocalStorage();
     } catch (e) {
@@ -2998,10 +2636,10 @@ isQuickReactionOpen(msg: any) {
 
       if (newVal) {
         await set(ref(db, path), newVal);
-        console.log('✅ Reaction saved:', newVal);
+        //console.log('✅ Reaction saved:', newVal);
       } else {
         await remove(ref(db, path));
-        console.log('✅ Reaction removed');
+        //console.log('✅ Reaction removed');
       }
 
       // 3) After successful write -> exit selection mode
@@ -3011,49 +2649,62 @@ isQuickReactionOpen(msg: any) {
       // if you have UI flags for selection, reset them too:
       // e.g. this.showSelectionToolbar = false; (replace with your actual flag)
       // Also ensure any CSS 'selected' classes will update because selectedMessages empty
-
     } catch (err) {
       console.error('❌ Reaction save/remove error:', err);
 
       // Optionally rollback optimistic UI on error:
       try {
         // revert local change by refetching msg from allMessages (if exists) or clear reaction
-        const idx = this.allMessages.findIndex(m => m.key === msg.key);
+        const idx = this.allMessages.findIndex((m) => m.key === msg.key);
         if (idx !== -1) {
           // re-sync from stored version if you have one; fallback: remove current user's reaction
           delete this.allMessages[idx].reactions?.[userId];
           delete msg.reactions?.[userId];
         }
         // this.displayedMessages = this.displayedMessages.map(m => m.key === msg.key ? { ...this.displayedMessages.find(x => x.key === msg.key) } : m);
-        this.displayedMessages = this.displayedMessages.map(m =>
+        this.displayedMessages = this.displayedMessages.map((m) =>
           m.key === msg.key
-            ? { ...(this.displayedMessages.find(x => x.key === msg.key) || {} as Message) }
+            ? {
+                ...(this.displayedMessages.find((x) => x.key === msg.key) ||
+                  ({} as Message)),
+              }
             : m
         );
-        this.groupedMessages = await this.groupMessagesByDate(this.displayedMessages);
+        this.groupedMessages = await this.groupMessagesByDate(
+          this.displayedMessages
+        );
         this.saveToLocalStorage();
-      } catch (e) { /* ignore rollback errors */ }
+      } catch (e) {
+        /* ignore rollback errors */
+      }
 
       // keep UI selection cleared? you can choose to keep selection if error:
       this.selectedMessages = [];
       this.lastPressedMessage = null;
 
-      const t = await this.toastCtrl.create({ message: 'Failed to update reaction', duration: 1600, color: 'danger' });
+      const t = await this.toastCtrl.create({
+        message: 'Failed to update reaction',
+        duration: 1600,
+        color: 'danger',
+      });
       await t.present();
     }
   }
 
-
   openEmojiKeyboard(msg: Message) {
     this.emojiTargetMsg = msg;
     // focus hidden input to pop OS emoji keyboard
-    const el = (document.querySelector('#chatting-screen') || document)  // adjust root if needed
+    const el = (document.querySelector('#chatting-screen') || document) // adjust root if needed
       .querySelector('ion-input[ng-reflect-name="emojiKeyboard"]') as any;
 
     // better: use @ViewChild('emojiKeyboard') emojiInput!: IonInput;
     // then: this.emojiInput.setFocus();
-    const inputEl = document.querySelector('ion-input + input') as HTMLInputElement; // Ionic renders native <input> after shadow
-    if (this.datePicker) {/* just to keep reference lint happy */ }
+    const inputEl = document.querySelector(
+      'ion-input + input'
+    ) as HTMLInputElement; // Ionic renders native <input> after shadow
+    if (this.datePicker) {
+      /* just to keep reference lint happy */
+    }
   }
 
   onEmojiPicked(ev: CustomEvent) {
@@ -3063,13 +2714,17 @@ isQuickReactionOpen(msg: any) {
     this.addReaction(this.emojiTargetMsg, emoji);
 
     // clear input so next pick fires change again
-    const native = (ev.target as any)?.querySelector?.('input') as HTMLInputElement;
+    const native = (ev.target as any)?.querySelector?.(
+      'input'
+    ) as HTMLInputElement;
     if (native) native.value = '';
     this.emojiTargetMsg = null;
   }
 
   /** Summary already exists; re-use it to build compact badges */
-  getReactionSummary(msg: Message): Array<{ emoji: string; count: number; mine: boolean }> {
+  getReactionSummary(
+    msg: Message
+  ): Array<{ emoji: string; count: number; mine: boolean }> {
     const map = msg.reactions || {};
     const byEmoji: Record<string, number> = {};
     Object.values(map).forEach((e: any) => {
@@ -3077,18 +2732,22 @@ isQuickReactionOpen(msg: any) {
       if (!em) return;
       byEmoji[em] = (byEmoji[em] || 0) + 1;
     });
-    return Object.keys(byEmoji).map(emoji => ({
-      emoji,
-      count: byEmoji[emoji],
-      mine: map[this.senderId] === emoji
-    })).sort((a, b) => b.count - a.count);
+    return Object.keys(byEmoji)
+      .map((emoji) => ({
+        emoji,
+        count: byEmoji[emoji],
+        mine: map[this.senderId] === emoji,
+      }))
+      .sort((a, b) => b.count - a.count);
   }
 
   /** Return max 3 badges; prefer user's reaction first */
-  getReactionBadges(msg: Message): Array<{ emoji: string; count: number; mine: boolean }> {
+  getReactionBadges(
+    msg: Message
+  ): Array<{ emoji: string; count: number; mine: boolean }> {
     const list = this.getReactionSummary(msg);
     // Put "mine" first if exists
-    const mineIdx = list.findIndex(x => x.mine);
+    const mineIdx = list.findIndex((x) => x.mine);
     if (mineIdx > 0) {
       const mine = list.splice(mineIdx, 1)[0];
       list.unshift(mine);
@@ -3096,64 +2755,70 @@ isQuickReactionOpen(msg: any) {
     return list.slice(0, 3);
   }
 
-  async onReactionBadgeClick(ev: Event, msg: Message, badge: { emoji: string; count: number; mine: boolean }) {
-  ev.stopPropagation();
+  async onReactionBadgeClick(
+    ev: Event,
+    msg: Message,
+    badge: { emoji: string; count: number; mine: boolean }
+  ) {
+    ev.stopPropagation();
 
-  // Build header text: "1 reaction" / "3 reactions"
-  const header = badge.count === 1 ? '1 reaction' : `${badge.count} reactions`;
+    // Build header text: "1 reaction" / "3 reactions"
+    const header =
+      badge.count === 1 ? '1 reaction' : `${badge.count} reactions`;
 
-  // If badge.mine === true, show the remove option; else show only view
-  const buttons: any[] = [];
+    // If badge.mine === true, show the remove option; else show only view
+    const buttons: any[] = [];
 
-  // Show the emoji/count as a disabled info row
-  buttons.push({
-    text: `${badge.emoji}  ${badge.count}`,
-    icon: undefined,
-    role: undefined,
-    handler: () => { /* noop - disabled by setting css or no-op here */ },
-    cssClass: 'reaction-info-button'
-  });
-
-  // If the current user reacted with this emoji, show "Tap to remove"
-  if (badge.mine) {
+    // Show the emoji/count as a disabled info row
     buttons.push({
-      text: 'Tap to remove',
-      icon: 'trash',
-      handler: async () => {
-        // call existing addReaction which toggles/remove when same emoji present
-        await this.addReaction(msg, badge.emoji);
-      }
-    });
-  } else {
-    // Optionally allow user to react with this same emoji (i.e., add their reaction)
-    buttons.push({
-      text: `React with ${badge.emoji}`,
+      text: `${badge.emoji}  ${badge.count}`,
       icon: undefined,
-      handler: async () => {
-        await this.addReaction(msg, badge.emoji);
-      }
+      role: undefined,
+      handler: () => {
+        /* noop - disabled by setting css or no-op here */
+      },
+      cssClass: 'reaction-info-button',
     });
+
+    // If the current user reacted with this emoji, show "Tap to remove"
+    if (badge.mine) {
+      buttons.push({
+        text: 'Tap to remove',
+        icon: 'trash',
+        handler: async () => {
+          // call existing addReaction which toggles/remove when same emoji present
+          await this.addReaction(msg, badge.emoji);
+        },
+      });
+    } else {
+      // Optionally allow user to react with this same emoji (i.e., add their reaction)
+      buttons.push({
+        text: `React with ${badge.emoji}`,
+        icon: undefined,
+        handler: async () => {
+          await this.addReaction(msg, badge.emoji);
+        },
+      });
+    }
+
+    // Cancel button
+    buttons.push({ text: 'Cancel', role: 'cancel' });
+
+    const sheet = await this.actionSheetCtrl.create({
+      header,
+      buttons,
+      cssClass: 'reaction-action-sheet',
+    });
+
+    await sheet.present();
   }
-
-  // Cancel button
-  buttons.push({ text: 'Cancel', role: 'cancel' });
-
-  const sheet = await this.actionSheetCtrl.create({
-    header,
-    buttons,
-    cssClass: 'reaction-action-sheet'
-  });
-
-  await sheet.present();
-}
-
 
   goToProfile() {
     const queryParams: any = {
       receiverId: this.chatType === 'group' ? this.roomId : this.receiverId,
       receiver_phone: this.receiver_phone,
       receiver_name: this.receiver_name,
-      isGroup: this.chatType === 'group'
+      isGroup: this.chatType === 'group',
     };
 
     this.router.navigate(['/profile-screen'], { queryParams });
@@ -3198,7 +2863,7 @@ isQuickReactionOpen(msg: any) {
       const image = await Camera.getPhoto({
         source: CameraSource.Camera,
         quality: 90,
-        resultType: CameraResultType.Uri
+        resultType: CameraResultType.Uri,
       });
       this.capturedImage = image.webPath!;
     } catch (error) {
@@ -3208,7 +2873,9 @@ isQuickReactionOpen(msg: any) {
 
   openKeyboard() {
     setTimeout(() => {
-      const textareaElement = document.querySelector('ion-textarea') as HTMLIonTextareaElement;
+      const textareaElement = document.querySelector(
+        'ion-textarea'
+      ) as HTMLIonTextareaElement;
       if (textareaElement) {
         textareaElement.setFocus();
       }
@@ -3216,15 +2883,17 @@ isQuickReactionOpen(msg: any) {
   }
 
   ngOnDestroy() {
-    this.keyboardListeners.forEach(listener => listener?.remove());
+    this.keyboardListeners.forEach((listener) => listener?.remove());
     this.messageSub?.unsubscribe();
     if (this.pinnedMessageSubscription) {
-      try { this.pinnedMessageSubscription(); } catch (e) { }
+      try {
+        this.pinnedMessageSubscription();
+      } catch (e) {}
     }
-    this.typingRxSubs.forEach(s => s.unsubscribe());
+    this.typingRxSubs.forEach((s) => s.unsubscribe());
     try {
       if (this.typingUnsubscribe) this.typingUnsubscribe();
-    } catch (e) { }
+    } catch (e) {}
     this.stopTypingSignal();
 
     window.removeEventListener('resize', this.resizeHandler);
@@ -3236,10 +2905,12 @@ isQuickReactionOpen(msg: any) {
       if (this.iBlockedRef) off(this.iBlockedRef);
       if (this.theyBlockedRef) off(this.theyBlockedRef);
       clearTimeout(this.blockBubbleTimeout);
-    } catch (e) { }
+    } catch (e) {}
 
-    this.onValueUnsubs.forEach(fn => {
-      try { fn(); } catch (e) { }
+    this.onValueUnsubs.forEach((fn) => {
+      try {
+        fn();
+      } catch (e) {}
     });
     this.onValueUnsubs = [];
     this.statusPollSub?.unsubscribe();
@@ -3260,13 +2931,18 @@ isQuickReactionOpen(msg: any) {
   }
 
   setDynamicPadding() {
-    const footerEl = this.el.nativeElement.querySelector('.footer-fixed') as HTMLElement;
+    const footerEl = this.el.nativeElement.querySelector(
+      '.footer-fixed'
+    ) as HTMLElement;
     if (!footerEl) return;
 
     if (this.platform.is('ios')) {
-      const safeAreaBottom = parseInt(
-        getComputedStyle(document.documentElement).getPropertyValue('--ion-safe-area-bottom')
-      ) || 0;
+      const safeAreaBottom =
+        parseInt(
+          getComputedStyle(document.documentElement).getPropertyValue(
+            '--ion-safe-area-bottom'
+          )
+        ) || 0;
 
       if (safeAreaBottom > 0) {
         this.renderer.setStyle(footerEl, 'padding-bottom', '16px');
@@ -3293,4 +2969,3 @@ isQuickReactionOpen(msg: any) {
     return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 }
-

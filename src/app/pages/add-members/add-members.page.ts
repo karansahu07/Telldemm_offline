@@ -35,7 +35,7 @@ export class AddMembersPage implements OnInit {
   ngOnInit() {
     this.loadDeviceMatchedContacts();
     this.groupId = this.route.snapshot.queryParamMap.get('groupId') || '';
-    // console.log("load device contacts",this.loadDeviceMatchedContacts);
+    // //console.log("load device contacts",this.loadDeviceMatchedContacts);
   }
 
   async showToast(message: string, color: 'success' | 'danger' = 'success') {

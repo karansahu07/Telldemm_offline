@@ -1,3 +1,5 @@
+import { IMessage } from 'src/app/services/sqlite.service';
+
 export interface Message {
   sender_id: string;
   key?: any;
@@ -15,7 +17,7 @@ export interface Message {
   read: boolean;
   readAt?: number | '';
 
-  isDeleted?: boolean;      // optional placeholder flag (true = message is replaced with "deleted" placeholder)
+  isDeleted?: boolean; // optional placeholder flag (true = message is replaced with "deleted" placeholder)
   message_id: string;
   isEdit?: boolean;
   time?: string;
@@ -64,25 +66,21 @@ export interface Message {
   // -------------------------------------------------------
 }
 
-
-
-
 export interface PinnedMessage {
-    roomId: string;
-    key: string;            // Chat room ID (1-to-1, group, community)
-    messageId?: string;     // ID of the pinned message
-    pinnedBy: string;       // User who pinned the message
-    pinnedAt: number;       // Timestamp when the message was pinned
-    scope: 'global';        // Always global
+  roomId: string;
+  key: string; // Chat room ID (1-to-1, group, community)
+  messageId?: string; // ID of the pinned message
+  pinnedBy: string; // User who pinned the message
+  pinnedAt: number; // Timestamp when the message was pinned
+  scope: 'global'; // Always global
 }
 
 export interface PinnedMessagesCollection {
-    [key: string]: PinnedMessage;
+  [key: string]: PinnedMessage;
 }
 export interface PinnedMessageWithContent extends PinnedMessage {
-    messageContent?: Message; // Assuming you have a ChatMessage interface
+  messageContent?: Message; // Assuming you have a ChatMessage interface
 }
-
 
 export interface Contact {
   userId: number;
@@ -120,7 +118,7 @@ export interface GetSocialMediaResponse {
 
 export interface GroupChat {
   name: string;
-  receiver_Id: string;        // groupId
+  receiver_Id: string; // groupId
   group: true;
   isCommunity?: boolean;
   group_name?: string;
@@ -139,33 +137,31 @@ export interface GroupChat {
 }
 
 export interface GroupMember {
-user_id: string;
-name?: string;
-phone_number?: string;
-avatar?: string;
-publicKeyHex?: string | null;
-status?: 'active' | 'left' | 'removed';
-role?: 'admin' | 'member';
-[k: string]: any;
+  user_id: string;
+  name?: string;
+  phone_number?: string;
+  avatar?: string;
+  publicKeyHex?: string | null;
+  status?: 'active' | 'left' | 'removed';
+  role?: 'admin' | 'member';
+  [k: string]: any;
 }
-
 
 export interface GroupData {
-name: string;
-groupId: string;
-description?: string;
-createdBy: string;
-createdByName?: string;
-createdAt?: string | number;
-members: Record<string, Partial<GroupMember>>;
+  name: string;
+  groupId: string;
+  description?: string;
+  createdBy: string;
+  createdByName?: string;
+  createdAt?: string | number;
+  members: Record<string, Partial<GroupMember>>;
 }
 
-
 export interface Community {
-name: string;
-description?: string;
-createdBy: string;
-groups?: Record<string, boolean> | {};
+  name: string;
+  description?: string;
+  createdBy: string;
+  groups?: Record<string, boolean> | {};
 }
 
 export interface CreateCommunityPayload {
@@ -190,20 +186,19 @@ export interface CreateCommunityResponse {
 // Community row type for Home chat list
 export interface CommunityChat {
   name: string;
-  receiver_Id: string;      // community id
-  group: true;              // visually treated like a group
-  isCommunity: true;        // special flag for UI/navigation
-  group_name?: string;      // preview group name (announcement/general/first)
-  message: string;          // preview text
-  time: string;             // preview time (formatted)
+  receiver_Id: string; // community id
+  group: true; // visually treated like a group
+  isCommunity: true; // special flag for UI/navigation
+  group_name?: string; // preview group name (announcement/general/first)
+  message: string; // preview text
+  time: string; // preview time (formatted)
   unread: boolean;
   unreadCount: number;
-  dp: string | null;        // community icon
+  dp: string | null; // community icon
   pinned?: boolean | null;
   pinnedAt?: number | null;
   timestamp?: string | number | null;
 }
-
 
 export type ArchItem = {
   roomId: string;
@@ -218,8 +213,8 @@ export type ArchItem = {
 };
 
 export interface IDeviceContact {
-  name : string;
-   phoneNumber: string;
+  name: string;
+  phoneNumber: string;
 }
 
 export interface IUser {
@@ -235,13 +230,13 @@ export interface IUser {
   is_verified: boolean | null;
   otp_created_at: string | null;
   expires_at: string | null;
-  bio? : any
+  bio?: any;
 }
 
 export interface IChat extends IUser {
   dp: any;
-  pinnedAt? : number | null;
-  pinned? : null | number | unknown;
+  pinnedAt?: number | null;
+  pinned?: null | number | unknown;
   name: string; // overrides IUser name if needed
   receiver_Id: number | string;
   profile_picture_url: string | null;
@@ -254,6 +249,19 @@ export interface IChat extends IUser {
   isTyping: boolean;
   typingText: string | null;
   typingCount: number;
-  isCommunity? : boolean;
-  members? : any;
+  isCommunity?: boolean;
+  members?: any;
+}
+
+
+
+export interface IChatMeta {
+  type: 'private' | 'group' | 'community';
+  lastmessageAt: number | string | Date;
+  lastmessageType: IMessage['type'];
+  lastmessage: string;
+  unreadCount: number | string;
+  isArchived : boolean;
+  isPinned : boolean;
+  isLocked : boolean;
 }

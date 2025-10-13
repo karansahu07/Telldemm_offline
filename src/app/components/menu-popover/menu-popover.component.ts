@@ -20,7 +20,7 @@ export class MenuPopoverComponent implements OnInit {
   constructor(
     private popoverCtrl: PopoverController,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.currentUrl = this.router.url;
@@ -54,6 +54,13 @@ export class MenuPopoverComponent implements OnInit {
   }
 
   selectOption(option: MenuOption) {
+
+    if (option.labelKey === 'menu.readAll') {
+      //console.log("read All clicked")
+      this.popoverCtrl.dismiss({ action: 'readAll' });
+      return;
+    }
+
     this.popoverCtrl.dismiss();
 
     if (option.route) {

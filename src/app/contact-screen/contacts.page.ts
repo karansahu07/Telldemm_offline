@@ -48,7 +48,7 @@
 //   ngOnInit() {
 //     this.loadDeviceMatchedContacts();
 //     const currentUserName = localStorage.getItem('name');
-//     console.log("username",currentUserName);
+//     //console.log("username",currentUserName);
 //   }
 
 //   /**
@@ -62,7 +62,7 @@
 
 //     try {
 //       const matchedUsers = await this.contactSyncService.getMatchedUsers();
-//       console.log("matched contacts", matchedUsers);
+//       //console.log("matched contacts", matchedUsers);
 
 //       matchedUsers.forEach((user) => {
 //         if (user.phone_number !== currentUserPhone) {
@@ -95,9 +95,9 @@
 //   const currentUserId = this.authService.authData?.userId || '';
 //   const currentUserPhone = this.authService.authData?.phone_number
 //   const currentUserName = await this.secureStorage.getItem('name');
-// console.log("Current User Name:", currentUserName);
+// //console.log("Current User Name:", currentUserName);
 
-//   console.log("username",currentUserName);
+//   //console.log("username",currentUserName);
 
 //   const members = selectedUsers.map(u => ({
 //     user_id: u.user_id,
@@ -127,7 +127,7 @@
 //     // Sync to backend
 //     this.api.createGroup(this.newGroupName, Number(currentUserId), groupId).subscribe({
 //       next: () => {
-//         console.log('Group synced to backend.');
+//         //console.log('Group synced to backend.');
 //       },
 //       error: (err: any) => {
 //         console.error('Failed to sync group to backend:', err);
@@ -192,7 +192,7 @@
 //     });
 //     await popover.present();
 //     const { data } = await popover.onDidDismiss();
-//     console.log('Selected Contact Menu Option:', data);
+//     //console.log('Selected Contact Menu Option:', data);
 //   }
 
 //   filterContacts() {
@@ -204,8 +204,6 @@
 //     );
 //   }
 // }
-
-
 
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
@@ -232,9 +230,20 @@ import { Contact } from 'src/types';
 export class ContactsPage implements OnInit {
   @ViewChild('searchInput', { static: false }) searchInput!: IonInput;
 
-  allUsers: any[] = [];
-filteredContacts: Contact[] = [];
-
+  allUsers: {
+    isOnPlatform: boolean;
+    profile: string;
+    name: string;
+    phoneNumber: string;
+    userId: string | null;
+  }[] = [];
+  filteredContacts: {
+    isOnPlatform: boolean;
+    profile: string;
+    name: string;
+    phoneNumber: string;
+    userId: string | null;
+  }[] = [];
 
   showSearchBar = false;
   searchTerm: string = '';
@@ -242,7 +251,7 @@ filteredContacts: Contact[] = [];
 
   creatingGroup = false;
   newGroupName: string = '';
-  userProfile:  any;
+  userProfile: any;
 
   isLoading = true;
 
@@ -255,91 +264,107 @@ filteredContacts: Contact[] = [];
     private secureStorage: SecureStorageService,
     private api: ApiService,
     private authService: AuthService
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.loadDeviceMatchedContacts();
     const currentUserName = this.authService.authData?.name;
-    console.log("username", currentUserName);
+    //console.log("username", currentUserName);
     const userId = this.authService.authData?.userId;
-  if (!userId) return;
-
-   this.api.getAllUsers().subscribe({
-    next: (users) => {
-     this.filteredContacts = users.map((u: any): Contact => ({
-  userId: u.user_id,
-  name: u.name,
-  profile: u.profile_picture_url || null,
-}));
-    },
-    error: (err) => {
-      console.error("Error fetching users:", err);
-    }
-  });
+    if (!userId) return;
   }
+  async loadDeviceMatchedContacts(): Promise<void> {
+    // current user phone from auth; fallback to localStorage if authService not ready
+    const currentUserPhone: string | undefined =
+      this.authService?.authData?.phone_number ??
+      localStorage.getItem('phone_number') ??
+      undefined;
 
-  async loadDeviceMatchedContacts() {
-    // const currentUserPhone = localStorage.getItem('phone_number');
-    const currentUserPhone = this.authService.authData?.phone_number;
     this.allUsers = [];
+
     this.isLoading = true;
 
     try {
-      const matchedUsers = await this.contactSyncService.getMatchedUsers();
-      console.log("matched contacts", matchedUsers);
+      const pfUsers = this.firebaseChatService.currentUsers;
+      const deviceContacts = this.firebaseChatService.currentDeviceContacts;
 
-      matchedUsers.forEach((user) => {
-        if (user.phone_number !== currentUserPhone) {
-          this.allUsers.push({
-            ...user,
-            name: user.name,
-            message: user.bio || '',
-            profile: user.profile_picture_url || null,
-            receiver_Id: user.phone_number,
-            selected: false,
-          });
-        }
-      });
+      // Extract phone numbers of platform users
+      const pfUserPhones = pfUsers.map((pu) => pu.phoneNumber);
 
+      // Filter device contacts that are NOT on the platform
+      const nonPfUsers = deviceContacts.filter(
+        (dc) => !pfUserPhones.includes(dc.phoneNumber)
+      );
+
+      // Build unified list of all users
+      this.allUsers = [
+        ...pfUsers.map(
+          ({ phoneNumber, username, userId, avatar, isOnPlatform }) => ({
+            userId: userId as string,
+            profile: avatar || '',
+            phoneNumber: phoneNumber as string,
+            name: username as string,
+            isOnPlatform: !!isOnPlatform,
+          })
+        ),
+        // ...nonPfUsers.map((dc) => ({
+        //   userId: dc.userId || '', // fallback if device contact has no userId
+        //   profile: dc.avatar || '',
+        //   phoneNumber: dc.phoneNumber as string,
+        //   name: dc.username || dc.phoneNumber,
+        //   isOnPlatform: false,
+        // })),
+      ];
+
+      // Initialize filtered contacts
       this.filteredContacts = [...this.allUsers];
-    } catch (err) {
-      console.error('Error loading matched contacts:', err);
+
+      //  ...nonPfUser.map(({ phoneNumber, username }) => ({ userId: null, name: username, phoneNumber, isOnPlatform: false, profile: "" }))]
+    } catch (error) {
+      console.error('Error loading contacts');
     } finally {
       this.isLoading = false;
     }
   }
 
-  // ✅ NEW METHOD: Open chat with selected contact
-  async openContactChat(contact: any) {
+  async openContactChat(receiverId: any) {
     try {
-      const receiverId = contact.user_id?.toString() || contact.receiver_Id;
-      let receiver_phone = contact.phone_number?.toString() || contact.receiver_Id;
-      const receiver_name = contact.name;
+      // const receiverId = contact.user_id?.toString() || contact.receiver_Id;
+      // let receiver_phone = contact.phone_number?.toString() || contact.receiver_Id;
+      // const receiver_name = contact.name;
 
-      // Clean phone number (remove country codes)
-      receiver_phone = receiver_phone.replace(/^(\+91|91)/, '');
+      // // Clean phone number (remove country codes)
+      // receiver_phone = receiver_phone.replace(/^(\+91|91)/, '');
 
-      // Store receiver details in secure storage
-      await this.secureStorage.setItem('receiver_name', receiver_name);
-      await this.secureStorage.setItem('receiver_phone', receiver_phone);
+      // // Store receiver details in secure storage
+      // await this.secureStorage.setItem('receiver_name', receiver_name);
+      // await this.secureStorage.setItem('receiver_phone', receiver_phone);
 
-      // Clean phone for navigation (last 10 digits)
-      const cleanPhone = receiverId.replace(/\D/g, '').slice(-10);
-
-      console.log('Navigating to chat with:', {
-        receiverId: cleanPhone,
-        receiver_phone,
-        receiver_name
-      });
-
-      // Navigate to chatting screen
+      // // Clean phone for navigation (last 10 digits)
+      // const cleanPhone = receiverId.replace(/\D/g, '').slice(-10);
+      const receiver = this.allUsers.find(
+        (u) => u.userId === receiverId && u.isOnPlatform
+      );
+      console.log('All users->', this.allUsers);
+      console.log('Filtered users->', this.filteredContacts);
+      console.log('ReceiverId->', receiverId);
+      console.log('Receiver->', receiver);
+      if (!receiver) {
+        console.error('Receiver not found!');
+        return;
+      }
+      await this.firebaseChatService.openChat(
+        {
+          receiver,
+        },
+        true
+      );
       this.router.navigate(['/chatting-screen'], {
         queryParams: {
-          receiverId: cleanPhone,
-          receiver_phone: receiver_phone
-        }
+          receiver_phone: receiver.phoneNumber.slice(-10),
+          receiverId: receiver.userId,
+        },
       });
-
     } catch (error) {
       console.error('Error opening chat:', error);
       alert('Failed to open chat. Please try again.');
@@ -414,82 +439,65 @@ filteredContacts: Contact[] = [];
   //   }
   // }
 
-
   async createGroup() {
-  const selectedUsers = this.allUsers.filter(user => user.selected);
-
-  const currentUserId = this.authService.authData?.userId || '';
-  const currentUserPhone = this.authService.authData?.phone_number;
-  const currentUserName = this.authService.authData?.name;
-
-  // Prepare members as IDs only
-  const memberIds = selectedUsers.map(u => u.user_id);
-
-  if (currentUserId) {
-    memberIds.push(Number(currentUserId));
+    // const selectedUsers = this.allUsers.filter(user => user.selected);
+    // const currentUserId = this.authService.authData?.userId || '';
+    // const currentUserPhone = this.authService.authData?.phone_number;
+    // const currentUserName = this.authService.authData?.name;
+    // // Prepare members as IDs only
+    // const memberIds = selectedUsers.map(u => u.user_id);
+    // if (currentUserId) {
+    //     memberIds.push(Number(currentUserId));
+    // }
+    // const groupId = `group_${Date.now()}`;
+    // if (!this.newGroupName.trim()) {
+    //     alert('Group name is required');
+    //     return;
+    // }
+    // try {
+    //     const membersForFirebase = selectedUsers.map(u => ({
+    //         user_id: u.user_id,
+    //         name: u.name,
+    //         phone_number: u.phone_number
+    //     }));
+    //     if (currentUserId && currentUserPhone) {
+    //         membersForFirebase.push({
+    //             user_id: currentUserId,
+    //             name: currentUserName,
+    //             phone_number: currentUserPhone
+    //         });
+    //     }
+    //     await this.firebaseChatService.createGroup(
+    //         groupId,
+    //         this.newGroupName,
+    //         membersForFirebase,
+    //         currentUserId
+    //     );
+    //     this.api.createGroup(this.newGroupName, Number(currentUserId), groupId, memberIds)
+    //         .subscribe({
+    //             next: async (res: any) => {
+    //                 const backendGroupId = res?.group?.group?.group_id;
+    //                 if (backendGroupId) {
+    //                     // Step 3: Save backendGroupId in Firebase
+    //                     await this.firebaseChatService.updateBackendGroupId(groupId, backendGroupId);
+    //                 }
+    //                 // Reset form
+    //                 this.creatingGroup = false;
+    //                 this.newGroupName = '';
+    //                 this.allUsers.forEach(u => (u.selected = false));
+    //                 alert('Group created successfully');
+    //                 // Refresh & navigate
+    //                 localStorage.setItem('shouldRefreshHome', 'true');
+    //                 this.router.navigate(['/home-screen']);
+    //             },
+    //             error: () => {
+    //                 alert('Failed to sync group to backend');
+    //             }
+    //         });
+    // } catch {
+    //     alert('Failed to create group');
+    // }
   }
-
-  const groupId = `group_${Date.now()}`;
-
-  if (!this.newGroupName.trim()) {
-    alert('Group name is required');
-    return;
-  }
-
-  try {
-    const membersForFirebase = selectedUsers.map(u => ({
-      user_id: u.user_id,
-      name: u.name,
-      phone_number: u.phone_number
-    }));
-
-    if (currentUserId && currentUserPhone) {
-      membersForFirebase.push({
-        user_id: currentUserId,
-        name: currentUserName,
-        phone_number: currentUserPhone
-      });
-    }
-
-    await this.firebaseChatService.createGroup(
-      groupId,
-      this.newGroupName,
-      membersForFirebase,
-      currentUserId
-    );
-
-    this.api.createGroup(this.newGroupName, Number(currentUserId), groupId, memberIds)
-      .subscribe({
-        next: async (res: any) => {
-          const backendGroupId = res?.group?.group?.group_id;
-
-          if (backendGroupId) {
-            // Step 3: Save backendGroupId in Firebase
-            await this.firebaseChatService.updateBackendGroupId(groupId, backendGroupId);
-          }
-
-          // Reset form
-          this.creatingGroup = false;
-          this.newGroupName = '';
-          this.allUsers.forEach(u => (u.selected = false));
-
-          alert('Group created successfully');
-
-          // Refresh & navigate
-          localStorage.setItem('shouldRefreshHome', 'true');
-          this.router.navigate(['/home-screen']);
-        },
-        error: () => {
-          alert('Failed to sync group to backend');
-        }
-      });
-
-  } catch {
-    alert('Failed to create group');
-  }
-}
-
-
 
   focusSearchBar() {
     this.showSearchBar = true;
@@ -531,22 +539,18 @@ filteredContacts: Contact[] = [];
     });
     await popover.present();
     const { data } = await popover.onDidDismiss();
-    console.log('Selected Contact Menu Option:', data);
+    //console.log('Selected Contact Menu Option:', data);
   }
 
   filterContacts() {
     const term = this.searchTerm.toLowerCase();
-    this.filteredContacts = this.allUsers.filter(
-      contact =>
-        contact.name?.toLowerCase().includes(term) ||
-        contact.message?.toLowerCase().includes(term)
-    );
+    // this.filteredContacts = this.allUsers.filter(
+    //     contact =>
+    //         contact.name?.toLowerCase().includes(term) ||
+    //         contact.message?.toLowerCase().includes(term)
+    // );
   }
 
-  // ✅ Helper method to get room ID (same as home screen)
-  getRoomId(a: string, b: string): string {
-    return a < b ? `${a}_${b}` : `${b}_${a}`;
-  }
   goToCommunity() {
     this.router.navigate(['/community-screen']);
   }

@@ -81,7 +81,7 @@ export class CommunityInfoPage implements OnInit {
   // button actions (wire to your logic / services)
   invite() {
     // navigate to invite page or call share link
-    console.log('invite');
+    //console.log('invite');
     // this.router.navigate(['/community-invite'], { queryParams: { communityId: this.communityId }});
   }
 
@@ -101,7 +101,7 @@ export class CommunityInfoPage implements OnInit {
 
   // menu actions for community options
   editCommunity() {
-    console.log('edit community');
+    //console.log('edit community');
     // navigate to edit page...
   }
   manageGroups() {
@@ -110,7 +110,7 @@ export class CommunityInfoPage implements OnInit {
     });
   }
   communitySettings() {
-    console.log('open community settings');
+    //console.log('open community settings');
   }
   viewGroups() {
     this.router.navigate(['/community-groups'], {
@@ -118,33 +118,33 @@ export class CommunityInfoPage implements OnInit {
     });
   }
   assignNewOwner() {
-    console.log('assign owner');
+    //console.log('assign owner');
   }
   exitCommunity() {
-    console.log('exit community');
+    //console.log('exit community');
   }
   reportCommunity() {
-    console.log('report community');
+    //console.log('report community');
   }
   deactivateCommunity() {
-    console.log('deactivate community');
+    //console.log('deactivate community');
   }
 
   // announcement-section actions
   notifications() {
-    console.log('notifications');
+    //console.log('notifications');
   }
   mediaVisibility() {
-    console.log('media visibility');
+    //console.log('media visibility');
   }
   disappearingMessages() {
-    console.log('disappearing messages');
+    //console.log('disappearing messages');
   }
   chatLock() {
-    console.log('chat lock');
+    //console.log('chat lock');
   }
   phoneNumberPrivacy() {
-    console.log('phone privacy');
+    //console.log('phone privacy');
   }
 
   // go back

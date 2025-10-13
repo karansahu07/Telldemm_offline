@@ -209,7 +209,7 @@ export class NewCommunityFormPage implements OnInit {
 
         // Add creator as member (auto-joins General)
         try {
-          await this.firebaseService.addUserToCommunity(String(creatorIdNum), firebaseCommunityId, true);
+          // await this.firebaseService.addUserToCommunity(String(creatorIdNum), firebaseCommunityId, true);
         } catch (addErr) {
           // don't block the flow if addUserToCommunity fails; warn and continue
           console.warn('addUserToCommunity failed (continuing):', addErr);
@@ -258,7 +258,7 @@ export class NewCommunityFormPage implements OnInit {
             // If server returns a different canonical id and you want to reconcile,
             // you could update Firebase with server id or call a backend endpoint
             // to link. For now we only log it.
-            console.log('Server created community with id:', serverId);
+            //console.log('Server created community with id:', serverId);
           }
         }
       } catch (apiErr) {

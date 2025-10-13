@@ -77,7 +77,7 @@
 //   /** Derive AES key from ECDH shared secret */
 //   async deriveAESKey(receiverPublicKeyHex: string): Promise<CryptoKey> {
 //     const privateKey = await this.getPrivateKey();
-//     console.log("private key",privateKey);
+//     //console.log("private key",privateKey);
 //     const publicKey = await this.importPublicKey(receiverPublicKeyHex);
 
 //     // Derive a 256-bit AES key from shared secret

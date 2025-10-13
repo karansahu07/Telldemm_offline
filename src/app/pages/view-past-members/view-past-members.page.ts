@@ -21,7 +21,7 @@ export class ViewPastMembersPage implements OnInit {
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
       this.groupId = params['groupId'];
-      console.log("pastmembers",this.groupId);
+      //console.log("pastmembers",this.groupId);
       if (this.groupId) {
         this.loadPastMembers();
       }
@@ -37,7 +37,7 @@ export class ViewPastMembersPage implements OnInit {
     if (snapshot.exists()) {
       const data = snapshot.val();
       this.pastMembers = Object.keys(data).map((user_id) => {
-        console.log("pastmembers",this.pastMembers);
+        //console.log("pastmembers",this.pastMembers);
         return {
           user_id,
           ...data[user_id]

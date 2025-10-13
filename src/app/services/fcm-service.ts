@@ -43,7 +43,7 @@
 
 //       // 📌 Token registration
 //       PushNotifications.addListener('registration', (token: Token) => {
-//         console.log('✅ FCM Token:', token.value);
+//         //console.log('✅ FCM Token:', token.value);
 //         this.fcmToken = token.value;
 //       });
 
@@ -54,33 +54,33 @@
 
 //       // 📩 Foreground push
 //       PushNotifications.addListener('pushNotificationReceived', async (notification: PushNotificationSchema) => {
-//         console.log('📩 Foreground push received:', notification);
+//         //console.log('📩 Foreground push received:', notification);
 //         await this.showLocalNotification(notification);
 //       });
 
 //       // 👉 CRITICAL: Background notification tapped
 //       PushNotifications.addListener('pushNotificationActionPerformed', (notification: ActionPerformed) => {
-//         console.log('👉 Background push action performed:', notification);
+//         //console.log('👉 Background push action performed:', notification);
 //         this.handleNotificationTap(notification.notification?.data || {});
 //       });
 
 //       // 👉 Local notification tapped (when shown in foreground)
 //       LocalNotifications.addListener('localNotificationActionPerformed', (evt: LocalNotificationActionPerformed) => {
-//         console.log('👉 Local notification tapped:', evt);
+//         //console.log('👉 Local notification tapped:', evt);
 //         this.handleNotificationTap(evt.notification?.extra || {});
 //       });
 
 //       // ✅ ADDITIONAL: Handle app state resume (for better reliability)
 //       App.addListener('appStateChange', ({ isActive }) => {
 //         if (isActive) {
-//           console.log('App became active, checking for pending notifications');
+//           //console.log('App became active, checking for pending notifications');
 //           this.checkForPendingNotifications();
 //         }
 //       });
 
 //       // ✅ ADDITIONAL: Custom event listener for MainActivity
 //       window.addEventListener('notificationTapped', (event: any) => {
-//         console.log('👉 Custom notification event from MainActivity:', event.detail);
+//         //console.log('👉 Custom notification event from MainActivity:', event.detail);
 //         try {
 //           const data = JSON.parse(event.detail);
 //           this.handleNotificationTap(data);
@@ -98,13 +98,13 @@
 
 //  // ✅ UNIFIED notification tap handler
 // private handleNotificationTap(data: any) {
-//   console.log('🎯 Handling notification tap with data:', data);
+//   //console.log('🎯 Handling notification tap with data:', data);
  
 //   const userid = this.authService.authData?.userId;
-//   console.log("userid", userid);
+//   //console.log("userid", userid);
  
 //   if (!data || Object.keys(data).length === 0) {
-//     console.log('No notification data available, navigating to home');
+//     //console.log('No notification data available, navigating to home');
 //     this.router.navigate(['/home-screen']);
 //     return;
 //   }
@@ -131,7 +131,7 @@
  
  
 //   } else {
-//     console.log('Could not resolve receiverId, navigating to home');
+//     //console.log('Could not resolve receiverId, navigating to home');
 //     this.router.navigate(['/home-screen']);
 //   }
 // }
@@ -141,7 +141,7 @@
 //     try {
 //       // Check for delivered notifications that might have been tapped
 //       const delivered = await PushNotifications.getDeliveredNotifications();
-//       console.log('📨 Delivered notifications:', delivered);
+//       //console.log('📨 Delivered notifications:', delivered);
 
 //       // You can process any pending notifications here if needed
 //     } catch (error) {
@@ -203,10 +203,10 @@
 
 //   // ✅ Save FCM token & user info to Firebase
 //   async saveFcmTokenToDatabase(userId: string, userName: string, userPhone: string) {
-//     // console.log("fcm service",userId, userName, userPhone );
+//     // //console.log("fcm service",userId, userName, userPhone );
 //     try {
 //       if (!this.fcmToken) {
-//         console.log('⚠️ FCM Token not available yet, retrying...');
+//         //console.log('⚠️ FCM Token not available yet, retrying...');
 //         setTimeout(() => this.saveFcmTokenToDatabase(userId, userName, userPhone), 2000);
 //         return;
 //       }
@@ -224,7 +224,7 @@
 //       };
 
 //       await set(userRef, userData);
-//       console.log('✅ User data + FCM token saved');
+//       //console.log('✅ User data + FCM token saved');
 //     } catch (error) {
 //       console.error('❌ Error saving FCM token:', error);
 //     }
@@ -237,7 +237,7 @@
 //         const db = getDatabase();
 //         const tokenRef = ref(db, `users/${userId}/fcmToken`);
 //         await set(tokenRef, this.fcmToken);
-//         console.log('✅ FCM Token updated successfully');
+//         //console.log('✅ FCM Token updated successfully');
 //       }
 //     } catch (error) {
 //       console.error('❌ Error updating FCM token:', error);
@@ -261,7 +261,7 @@
 
 //     await remove(userRef);
 
-//     console.log('🗑️ User deleted successfully:', userId);
+//     //console.log('🗑️ User deleted successfully:', userId);
 
 //   } catch (error) {
 //     console.error('❌ Error deleting user:', error);
@@ -389,7 +389,7 @@ export class FcmService {
           const token = await this.getFreshToken(8000).catch(() => '');
           if (token) {
             this.fcmToken = token;
-            console.log('Initial FCM token obtained during init:', token);
+            //console.log('Initial FCM token obtained during init:', token);
           }
         } catch (e) {
           console.warn('Could not get initial token via getFreshToken:', e);
@@ -404,7 +404,7 @@ export class FcmService {
 
       // 📌 Token registration (persistent listener for normal registration events)
       PushNotifications.addListener('registration', (token: Token) => {
-        console.log('✅ FCM Token (registration listener):', token.value);
+        //console.log('✅ FCM Token (registration listener):', token.value);
         this.fcmToken = token.value;
       });
 
@@ -415,33 +415,33 @@ export class FcmService {
 
       // 📩 Foreground push
       PushNotifications.addListener('pushNotificationReceived', async (notification: PushNotificationSchema) => {
-        console.log('📩 Foreground push received:', notification);
+        //console.log('📩 Foreground push received:', notification);
         await this.showLocalNotification(notification);
       });
 
       // 👉 CRITICAL: Background notification tapped
       PushNotifications.addListener('pushNotificationActionPerformed', (notification: ActionPerformed) => {
-        console.log('👉 Background push action performed:', notification);
+        //console.log('👉 Background push action performed:', notification);
         this.handleNotificationTap(notification.notification?.data || {});
       });
 
       // 👉 Local notification tapped (when shown in foreground)
       LocalNotifications.addListener('localNotificationActionPerformed', (evt: LocalNotificationActionPerformed) => {
-        console.log('👉 Local notification tapped:', evt);
+        //console.log('👉 Local notification tapped:', evt);
         this.handleNotificationTap(evt.notification?.extra || {});
       });
 
       // ✅ ADDITIONAL: Handle app state resume (for better reliability)
       App.addListener('appStateChange', ({ isActive }) => {
         if (isActive) {
-          console.log('App became active, checking for pending notifications');
+          //console.log('App became active, checking for pending notifications');
           this.checkForPendingNotifications();
         }
       });
 
       // ✅ ADDITIONAL: Custom event listener for MainActivity
       window.addEventListener('notificationTapped', (event: any) => {
-        console.log('👉 Custom notification event from MainActivity:', event.detail);
+        //console.log('👉 Custom notification event from MainActivity:', event.detail);
         try {
           const data = JSON.parse(event.detail);
           this.handleNotificationTap(data);
@@ -459,13 +459,13 @@ export class FcmService {
 
  // ✅ UNIFIED notification tap handler
  private handleNotificationTap(data: any) {
-   console.log('🎯 Handling notification tap with data:', data);
+   //console.log('🎯 Handling notification tap with data:', data);
 
    const userid = this.authService.authData?.userId;
-   console.log("userid", userid);
+   //console.log("userid", userid);
 
    if (!data || Object.keys(data).length === 0) {
-     console.log('No notification data available, navigating to home');
+     //console.log('No notification data available, navigating to home');
      this.router.navigate(['/home-screen']);
      return;
    }
@@ -481,7 +481,7 @@ export class FcmService {
      // Persist flag for later reloads
      localStorage.setItem('fromNotification', 'true');
    } else {
-     console.log('Could not resolve receiverId, navigating to home');
+     //console.log('Could not resolve receiverId, navigating to home');
      this.router.navigate(['/home-screen']);
    }
  }
@@ -494,7 +494,7 @@ export class FcmService {
       // but may not be available on all platforms; keep try/catch
       // @ts-ignore
       const delivered = await PushNotifications.getDeliveredNotifications?.();
-      console.log('📨 Delivered notifications:', delivered);
+      //console.log('📨 Delivered notifications:', delivered);
     } catch (error) {
       console.error('Error checking delivered notifications:', error);
     }
@@ -547,7 +547,7 @@ export class FcmService {
   async saveFcmTokenToDatabase(userId: string, userName: string, userPhone: string) {
     try {
       if (!this.fcmToken) {
-        console.log('⚠️ FCM Token not available yet, will retry in 2s...');
+        //console.log('⚠️ FCM Token not available yet, will retry in 2s...');
         setTimeout(() => this.saveFcmTokenToDatabase(userId, userName, userPhone), 2000);
         return;
       }
@@ -564,7 +564,7 @@ export class FcmService {
       };
 
       await set(userRef, userData);
-      console.log('✅ User data + FCM token saved');
+      //console.log('✅ User data + FCM token saved');
     } catch (error) {
       console.error('❌ Error saving FCM token:', error);
     }
@@ -588,7 +588,7 @@ export class FcmService {
           await set(tokenRef, this.fcmToken);
           // also update lastActive or whatever metadata you want
           await set(ref(db, `users/${userId}/lastActive`), new Date().toISOString());
-          console.log('✅ FCM Token refreshed and updated successfully:', this.fcmToken);
+          //console.log('✅ FCM Token refreshed and updated successfully:', this.fcmToken);
         } else {
           console.warn('⚠️ No fresh token received, skipping DB update');
         }
@@ -617,7 +617,7 @@ export class FcmService {
 
   //     await remove(userRef);
 
-  //     console.log('🗑️ User token deleted successfully:', userId);
+  //     //console.log('🗑️ User token deleted successfully:', userId);
 
   //   } catch (error) {
   //     console.error('❌ Error deleting user token:', error);
@@ -636,14 +636,14 @@ export class FcmService {
 
     // Remove token from Firebase
     await remove(userRef);
-    // console.log('🗑️ User token deleted successfully from Firebase:', userId);
+    // //console.log('🗑️ User token deleted successfully from Firebase:', userId);
 
     // Also call backend logout API
     const UserId = Number(userId);
     if (!Number.isNaN(UserId)) {
       this.service.logoutUser(UserId).subscribe({
         next: (res) => {
-          console.log('✅ Backend logout success:', res);
+          //console.log('✅ Backend logout success:', res);
         },
         error: (err) => {
           console.error('❌ Backend logout failed:', err);

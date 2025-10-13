@@ -84,11 +84,11 @@ export class AttachmentPreviewPage {
   // }
 
   send() {
-    console.log("image data: clicked here dgjndfgd");
+    //console.log("image data: clicked here dgjndfgd");
   this.navCtrl.navigateBack(`/chatting-screen?receiverId=${this.receiverId}&receiver_phone=${this.receiverPhone}`, {
     state: { imageToSend: this.imageData }
   });
-  console.log("image data:", this.imageData);
+  //console.log("image data:", this.imageData);
 }
 
 

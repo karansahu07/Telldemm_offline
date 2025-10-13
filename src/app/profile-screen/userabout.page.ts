@@ -93,8 +93,8 @@ socialMediaLinks: { platform: string; profile_url: string }[] = [];
       this.receiver_name = (await this.secureStorage.getItem('receiver_name')) || '';
       this.currentUserId = this.authService.authData?.userId || '';
       this.groupId = this.route.snapshot.queryParamMap.get('receiverId') || '';
-      console.log("group id checking:", this.groupId);
-      console.log("isGroup:", this.isGroup);
+      //console.log("group id checking:", this.groupId);
+      //console.log("isGroup:", this.isGroup);
 
       this.loadReceiverProfile();
 
@@ -130,7 +130,7 @@ socialMediaLinks: { platform: string; profile_url: string }[] = [];
       this.isGroup = params['isGroup'] === 'true';
       this.chatType = this.isGroup ? 'group' : 'private';
       this.receiver_name = params['receiver_name'] || '';
-      console.log("redirect name", this.receiver_name);
+      //console.log("redirect name", this.receiver_name);
       this.currentUserId = this.authService.authData?.userId || '';
       this.groupId = this.route.snapshot.queryParamMap.get('receiverId') || '';
 
@@ -513,7 +513,7 @@ async openActionSheet(member: any) {
     const memberPath = `groups/${groupId}/members/${member.user_id}`;
     const pastMemberPath = `groups/${groupId}/pastmembers/${member.user_id}`;
 
-    console.log('Deactivating and moving to pastmembers:', memberPath);
+    //console.log('Deactivating and moving to pastmembers:', memberPath);
 
     try {
       await update(ref(db, memberPath), {
@@ -534,7 +534,7 @@ async openActionSheet(member: any) {
       if (backendGroupId) {
         this.service.updateMemberStatus(backendGroupId, Number(member.user_id), false).subscribe({
           next: (res: any) => {
-            console.log('Member status updated in backend:', res);
+            //console.log('Member status updated in backend:', res);
           },
           error: (error: any) => {
             console.error('Error updating member status in backend:', error);
@@ -654,7 +654,7 @@ async openActionSheet(member: any) {
         });
 
         this.commonGroups = matchedGroups;
-        console.log('Common Groups:', this.commonGroups);
+        //console.log('Common Groups:', this.commonGroups);
       }
     } catch (error) {
       console.error('Error fetching common groups:', error);
@@ -790,14 +790,14 @@ async openActionSheet(member: any) {
     this.zone.run(() => {
       this.iBlocked = snapshot.exists();
       // keep boolean used by templates
-      // console.log('iBlocked ->', this.iBlocked);
+      // //console.log('iBlocked ->', this.iBlocked);
     });
   });
 
   onValue(this.theyBlockedRef, (snapshot) => {
     this.zone.run(() => {
       this.theyBlocked = snapshot.exists();
-      // console.log('theyBlocked ->', this.theyBlocked);
+      // //console.log('theyBlocked ->', this.theyBlocked);
     });
   });
 }

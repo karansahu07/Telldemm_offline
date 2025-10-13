@@ -61,7 +61,7 @@ export class UpdateUsernamePage implements OnInit {
     }
 
     try {
-      // console.log("trimmed", trimmed);
+      // //console.log("trimmed", trimmed);
       await firstValueFrom(this.service.updateUserName(this.userId as any, updatedName));
 
       // Update local auth data immediately so UI reflects the new name

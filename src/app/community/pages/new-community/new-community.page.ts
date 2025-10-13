@@ -22,7 +22,7 @@ export class NewCommunityPage implements OnInit {
   }
 
   getStarted() {
-    console.log('Get started clicked');
+    //console.log('Get started clicked');
     // Navigate to create community form
     this.navCtrl.navigateForward('/create-community-form');
   }

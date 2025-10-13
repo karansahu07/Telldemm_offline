@@ -1,220 +1,3 @@
-// import { Injectable } from '@angular/core';
-
-// @Injectable({
-//   providedIn: 'root'
-// })
-// export class SqliteService {
-
-// }// import { Injectable } from '@angular/core';
-// import {
-//   CapacitorSQLite,
-//   SQLiteDBConnection,
-// } from '@capacitor-community/sqlite';
-
-// @Injectable({
-//   providedIn: 'root', 
-// })
-// export class AttachmentService {
-//   pickAndSaveFile(chatId: string) {
-//     throw new Error('Method not implemented.');
-//   }
-//   private sqlite = CapacitorSQLite;
-//   private db!: SQLiteDBConnection;  //this is for attachment local db
-
-//   async init() {
-//     const dbName = 'chatDB';
-//     const res = await this.sqlite.createConnection({
-//       database: dbName,
-//       version: 1,
-//       encrypted: false,
-//       mode: 'no-encryption',
-//     });
-//     this.db = res;
-
-//     await this.db.open();
-//     await this.db.execute(`
-//       CREATE TABLE IF NOT EXISTS attachments (
-//         id INTEGER PRIMARY KEY AUTOINCREMENT,
-//         chatId TEXT,
-//         type TEXT,
-//         filePath TEXT,
-//         createdAt TEXT
-//       );
-//     `);
-//   }
-
-//   async saveAttachment(chatId: string, type: string, filePath: string) {
-//     const createdAt = new Date().toISOString();
-//     const sql = `INSERT INTO attachments (chatId, type, filePath, createdAt) VALUES (?, ?, ?, ?);`;
-//     const values = [chatId, type, filePath, createdAt];
-//     await this.db.run(sql, values);
-//   }
-
-//   async getAttachments(chatId: string) {
-//     const stmt = `SELECT * FROM attachments WHERE chatId = ? ORDER BY createdAt ASC`;
-//     const result = await this.db.query(stmt, [chatId]);
-//     return result.values || [];
-//   }
-// }
-
-
-
-
-// import { Injectable } from '@angular/core';
-// import {
-//   CapacitorSQLite,
-//   SQLiteDBConnection,
-// } from '@capacitor-community/sqlite';
-
-// @Injectable({
-//   providedIn: 'root',
-// })
-// export class AttachmentService {
-//   private sqlite = CapacitorSQLite;
-//   private db!: SQLiteDBConnection;
-
-//   async init() {
-//     const dbName = 'chatDB';
-//     const res = await this.sqlite.createConnection({
-//       database: dbName,
-//       version: 1,
-//       encrypted: false,
-//       mode: 'no-encryption',
-//     });
-
-//     this.db = res;
-//     await this.db.open();
-
-//     await this.db.execute(`
-//       CREATE TABLE IF NOT EXISTS attachments (
-//         id INTEGER PRIMARY KEY AUTOINCREMENT,
-//         roomId TEXT,
-//         type TEXT,
-//         filePath TEXT,
-//         createdAt TEXT
-//       );
-//     `);
-//   }
-
-//   async saveAttachment(roomId: string, type: string, filePath: string) {
-//     const createdAt = new Date().toISOString();
-//     const sql = `
-//       INSERT INTO attachments (roomId, type, filePath, createdAt)
-//       VALUES (?, ?, ?, ?);
-//     `;
-//     const values = [roomId, type, filePath, createdAt];
-//     await this.db.run(sql, values);
-//   }
-
-//   async getAttachments(roomId: string) {
-//     const stmt = `SELECT * FROM attachments WHERE roomId = ? ORDER BY createdAt ASC`;
-//     const result = await this.db.query(stmt, [roomId]);
-//     return result.values || [];
-//   }
-// }
-
-
-
-// import { Injectable } from '@angular/core';
-// import {
-//   CapacitorSQLite,
-//   SQLiteConnection,
-//   SQLiteDBConnection,
-// } from '@capacitor-community/sqlite';
-
-// @Injectable({
-//   providedIn: 'root',
-// })
-// export class AttachmentService {
-//   private sqliteConnection: SQLiteConnection;
-//   private db!: SQLiteDBConnection;
-//   private readonly dbName = 'chatDB';
-
-//   constructor() {
-//     this.sqliteConnection = new SQLiteConnection(CapacitorSQLite);
-//   }
-
-//   /**
-//    * Initialize SQLite DB and create attachments table if not exists
-//    */
-//   async init(): Promise<void> {
-//     try {
-//       // Create connection
-//       const db = await this.sqliteConnection.createConnection(
-
-//         this.dbName,       // database
-//         false,             // encrypted
-//         'no-encryption',   // mode
-//         1,                 // version
-//         false              // readonly
-//       );
-
-//       this.db = db;
-//       await this.db.open();
-
-//       // Create attachments table if it doesn't exist
-//       await this.db.execute(`
-//         CREATE TABLE IF NOT EXISTS attachments (
-//           id INTEGER PRIMARY KEY AUTOINCREMENT,
-//           roomId TEXT,
-//           type TEXT,
-//           filePath TEXT,
-//           createdAt TEXT
-//         );
-//       `);
-//       console.log("DB connected")
-//     } catch (error) {
-//       console.error('SQLite init error:', error);
-//     }
-//   }
-
-//   /**
-//    * Save a new attachment to the database
-//    */
-//   async saveAttachment(roomId: string, type: string, filePath: string): Promise<void> {
-//     try {
-//       const createdAt = new Date().toISOString();
-//       const sql = `
-//         INSERT INTO attachments (roomId, type, filePath, createdAt)
-//         VALUES (?, ?, ?, ?);
-//       `;
-//       const values = [roomId, type, filePath, createdAt];
-//       await this.db.run(sql, values);
-//     } catch (error) {
-//       console.error('Error saving attachment:', error);
-//     }
-//   }
-
-//   /**
-//    * Retrieve attachments for a specific room
-//    */
-//   async getAttachments(roomId: string): Promise<any[]> {
-//     try {
-//       const stmt = `SELECT * FROM attachments WHERE roomId = ? ORDER BY createdAt ASC`;
-//       const result = await this.db.query(stmt, [roomId]);
-//       return result.values || [];
-//     } catch (error) {
-//       console.error('Error retrieving attachments:', error);
-//       return [];
-//     }
-//   }
-
-//   /**
-//    * Close the database connection
-//    */
-//   async closeConnection(): Promise<void> {
-//   try {
-//     await this.sqliteConnection.closeConnection(this.dbName, false);
-//   } catch (error) {
-//     console.error('Error closing DB connection:', error);
-//   }                                                                                   
-// }
-
-// }
-
-
-
-
 import { Injectable } from '@angular/core';
 import {
   CapacitorSQLite,
@@ -223,25 +6,179 @@ import {
 } from '@capacitor-community/sqlite';
 import { Capacitor } from '@capacitor/core';
 import { defineCustomElements } from 'jeep-sqlite/loader';
-import { FilePicker } from '@capawesome/capacitor-file-picker';
 import { Directory, Filesystem } from '@capacitor/filesystem';
-import { ApiService } from './api/api.service';
-import { firstValueFrom } from 'rxjs';
+import { BehaviorSubject, firstValueFrom } from 'rxjs';
+import { AttachmentPreviewPage } from '../pages/attachment-preview/attachment-preview.page';
+
+/** ----------------- INTERFACES ----------------- **/
+export interface IUser {
+  userId: string;
+  username: string;
+  phoneNumber: string;
+  lastSeen?: Date;
+  avatar?: string;
+  status?: string;
+  isOnPlatform?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface IMessage {
+  msgId: string;
+  roomId: string;
+  sender: string;
+  type: 'text' | 'image' | 'audio' | 'video' | 'pdf' | 'other';
+  text?: string;
+  localUrl?: string;
+  cdnUrl?: string;
+  mediaId?: string;
+  isMe?: boolean;
+  status?: 'failed' | 'pending' | 'sent' | 'delivered' | 'read';
+  timestamp: string | Date | number;
+  deletedFor?: {
+    everyone: boolean;
+    users: [];
+  };
+  reactions: Record<string, string>[];
+  replyToMsgId: string;
+  isEdit: boolean;
+  receipts?: {
+    read: {
+      status: boolean;
+      readBy: {
+        userId: string;
+        timestamp: string | number | Date;
+      }[];
+    };
+    delivered: {
+      status: boolean;
+      deliveredTo: {
+        userId: string;
+        timestamp: string | number | Date;
+      }[];
+    };
+  };
+}
+
+export interface IAttachment {
+  type: 'audio' | 'video' | 'image' | 'pdf' | 'other';
+  mediaId?: string;
+  fileName?: string;
+  mimeType?: string;
+  fileSize?: number;
+  caption?: string;
+  localUrl?: string;
+  cdnUrl?: string;
+}
+
+export interface IConversation {
+  roomId: string;
+  title?: string;
+  phoneNumber?: string;
+  type: 'private' | 'group' | 'community';
+  isMyself?: boolean;
+  avatar?: string;
+  members?: string[];
+  adminIds?: string[];
+  createdAt?: Date;
+  updatedAt?: Date;
+  lastMessage?: string;
+  lastMessageType?: string;
+  lastMessageAt?: Date;
+  unreadCount?: number;
+  isArchived: boolean;
+  isPinned: boolean;
+  isLocked: boolean;
+}
+
+export interface IOpState {
+  id: string;
+  isLoading: boolean;
+  isError: string | null;
+  isSuccess: boolean | null;
+}
+
+export interface CreateConversationInput extends IConversation {}
+
+const DB_NAME = 'telldemm.db';
+
+/** ----------------- SCHEMAS ----------------- **/
+const TABLE_SCHEMAS = {
+  users: `
+    CREATE TABLE IF NOT EXISTS users (
+      userId TEXT PRIMARY KEY,
+      username TEXT NOT NULL,
+      phoneNumber TEXT UNIQUE NOT NULL,
+      lastSeen TEXT,
+      avatar TEXT,
+      status TEXT,
+      isOnPlatform INTEGER DEFAULT 0,
+      createdAt TEXT,
+      updatedAt TEXT 
+    );
+  `,
+  conversations: `
+    CREATE TABLE IF NOT EXISTS conversations (
+      roomId TEXT PRIMARY KEY,
+      title TEXT,
+      phoneNumber TEXT,
+      type TEXT,
+      isMyself INTEGER DEFAULT 0,
+      avatar TEXT,
+      members TEXT,
+      adminIds TEXT,
+      iaArchieved INTEGER DEFAULT 0,
+      isPinned INTEGER DEFAULT 0,
+      isLocked INTEGER DEFAULT 0,
+      createdAt TEXT NOT NULL,
+      updatedAt TEXT NOT NULL
+    );
+  `,
+  messages: `
+    CREATE TABLE IF NOT EXISTS messages (
+      msgId TEXT PRIMARY KEY,
+      roomId TEXT NOT NULL,
+      sender TEXT NOT NULL,
+      type TEXT DEFAULT 'text',
+      text TEXT,
+      isMe INTEGER DEFAULT 0,
+      status TEXT,
+      timestamp TEXT NOT NULL,
+      receipts TEXT,
+      replyToMsgId TEXT,
+      isEdit INTEGER DEFAULT 0,
+      reactions TEXT,
+      deletedFor TEXT,
+      mediaId TEXT
+      FOREIGN KEY (roomId) REFERENCES conversations(roomId),
+      FOREIGN KEY (mediaId) REFERENCES attachments(mediaId)
+    );
+  `,
+  attachments: `
+  CREATE TABLE IF NOT EXISTS attachments (
+    mediaId INTEGER AUTOINCREMENT PRIMARY KEY,
+    type TEXT,
+    fileName TEXT,
+    mimeType TEXT,
+    fileSize TEXT,
+    caption TEXT,
+    localUrl TEXT,
+    cdnUrl TEXT
+  )
+  `,
+};
 
 @Injectable({
   providedIn: 'root',
 })
 export class SqliteService {
+  private isInitialized: boolean = false;
   private sqliteConnection: SQLiteConnection;
   private db!: SQLiteDBConnection;
-  private readonly dbName = 'chatDB';
+  private operationStates = new Map<string, BehaviorSubject<IOpState>>();
 
-  constructor(
-    private service: ApiService
-  ) {
+  constructor() {
     this.sqliteConnection = new SQLiteConnection(CapacitorSQLite);
-
-    // ✅ For web platform, define the jeep-sqlite element
     if (Capacitor.getPlatform() === 'web') {
       defineCustomElements(window);
     }
@@ -249,160 +186,520 @@ export class SqliteService {
 
   async init(): Promise<void> {
     try {
-      // ✅ 1. Request file picker permissions before DB usage
-      // const permissionStatus = await FilePicker.checkPermissions();
-      const permissionStatus = await FilePicker.checkPermissions() as unknown as { publicStorage: 'granted' | 'denied' | 'prompt' };
-
-      if (permissionStatus.publicStorage !== 'granted') {
-        const requestStatus = await FilePicker.requestPermissions() as unknown as { publicStorage: 'granted' | 'denied' | 'prompt' };
-        if (requestStatus.publicStorage !== 'granted') {
-          console.warn('FilePicker permission not granted');
-        }
+      if (this.isInitialized) {
+        console.warn('DB Already initialized!');
+        return;
       }
 
-
-      // ✅ 2. Web store init if platform is web
       if (Capacitor.getPlatform() === 'web') {
         await this.sqliteConnection.initWebStore();
       }
-
-      // ✅ 3. Close existing connection if open
-      const isConn = (await this.sqliteConnection.isConnection(this.dbName, false)).result;
+      const isConn = (await this.sqliteConnection.isConnection(DB_NAME, false))
+        .result;
       if (isConn) {
-        await this.sqliteConnection.closeConnection(this.dbName, false);
+        await this.sqliteConnection.closeConnection(DB_NAME, false);
       }
-
-      // ✅ 4. Create new DB connection
       this.db = await this.sqliteConnection.createConnection(
-        this.dbName,
+        DB_NAME,
         false,
         'no-encryption',
         1,
         false
       );
-
       await this.db.open();
 
-      // ✅ 5. Create table if not exists
-      await this.db.execute(`
-      CREATE TABLE IF NOT EXISTS attachments (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        roomId TEXT,
-        type TEXT,
-        filePath TEXT,
-        createdAt TEXT,
-        mediaId TEXT
-      );
-    `);
-
-      console.log('✅ SQLite DB initialized');
+      await this.initDB();
+      this.isInitialized = true;
     } catch (error) {
       console.error('❌ SQLite init error:', error);
     }
-    finally{
-      setInterval(()=>{
-        this.loadAll()
-      },3000);
+  }
+
+  /** ----------------- DB INIT ----------------- **/
+  private async initDB() {
+    try {
+      for (const schema of Object.values(TABLE_SCHEMAS)) {
+        await this.db.execute(schema);
+      }
+      console.info('SQLite tables created! ✅');
+    } catch (err) {
+      console.error('DB init error:', err);
     }
   }
 
- async loadAll(){
-  const Data = await this.db.query(`select * from attachments`)
-  console.log("data is ", Data);
- }
-
-  /**
-   * Save a new attachment to the database
-   */
-  async saveAttachment(roomId: string, type: string, filePath: string, mediaId: string): Promise<void> {
-    try {
-      const createdAt = new Date().toISOString();
-      const sql = `
-        INSERT INTO attachments (roomId, type, filePath, createdAt, mediaId)
-        VALUES (?, ?, ?, ?, ?);
-      `;
-      const values = [roomId, type, filePath, createdAt, mediaId];
-      await this.db.run(sql, values);
-      console.log("values is this", values);
-    } catch (error) {
-      console.error('❌ Error saving attachment:', error);
+  /** ----------------- OP STATE ----------------- **/
+  private setOpState(id: string, partial: Partial<IOpState>) {
+    if (!this.operationStates.has(id)) {
+      this.operationStates.set(
+        id,
+        new BehaviorSubject<IOpState>({
+          id,
+          isLoading: false,
+          isError: null,
+          isSuccess: null,
+        })
+      );
     }
+    const current = this.operationStates.get(id)!.value;
+    this.operationStates.get(id)!.next({ ...current, ...partial });
   }
 
-  async getAttachmentPreview(mediaId: string) {
-    // try {
-    // const stmt = `SELECT * FROM attachments WHERE mediaId = ? ORDER BY createdAt ASC`;
-    // const result = await this.db.query(stmt, [mediaId]);
-    // return result.values || [];
-
-    let filePath = null;
+  private async withOpState<T>(
+    id: string,
+    action: () => Promise<T>,
+    defaultValue?: T
+  ): Promise<T> {
+    this.setOpState(id, { isLoading: true, isError: null, isSuccess: null });
     try {
-      if (this.db) {
-        const stmt = `SELECT * FROM attachments WHERE mediaId = ? ORDER BY createdAt ASC`;
-        const result = await this.db.query(stmt, [mediaId]);
-        const attachment = result.values?.[0];
-
-        if (attachment) {
-          // console.warn("⚠️ No attachment record found for mediaId:", mediaId);
-          // return null;
-        
-
-        filePath = attachment.filePath;
-
-        // ✅ 1. Check if file already exists at filePath
-        try {
-          const stat = await Filesystem.stat({ path: filePath });
-          if (stat) {
-            // Create preview URL from file path
-            const fileData = await Filesystem.readFile({ path: filePath });
-            const blob = this.base64ToBlob(fileData.data as string, attachment.type);
-            return URL.createObjectURL(blob);
-          }
-        } catch {
-          console.log("⚠️ File not found locally, downloading from API...");
-        }
-      }
-    }
-      // console.log("media id", mediaId)
-
-      // ❌ 2. File missing → get presigned download URL
-      const apiResponse = await firstValueFrom(this.service.getDownloadUrl(mediaId));
-      if (!apiResponse.status || !apiResponse.downloadUrl) {
-        console.error("❌ Failed to get download URL from API");
-        return null;
-      }
-
-      const downloadUrl = apiResponse.downloadUrl;
-
-      // 3. Download the file
-      const response = await fetch(downloadUrl);
-      const blob = await response.blob();
-
-      // 4. Save file locally
-      const base64Data = await this.blobToBase64(blob);
-      if(filePath && Capacitor.getPlatform() !== 'web'){
-        await Filesystem.writeFile({
-        path: filePath,
-        data: base64Data,
-        directory: Directory.Data,
+      if (!this.isInitialized) throw new Error('DB not initialized');
+      const result = await action();
+      this.setOpState(id, { isLoading: false, isSuccess: true });
+      return result;
+    } catch (err: any) {
+      console.error(`#SQLiteService.${id} Error:`, err);
+      this.setOpState(id, {
+        isLoading: false,
+        isError: err?.message || 'Unknown error',
       });
-      }
-
-      // 5. Create preview URL
-      const previewUrl = URL.createObjectURL(blob);
-
-      return previewUrl;
-
-
-    } catch (error) {
-      console.error('❌ Error retrieving attachments:', error);
-      return null;
+      return defaultValue as T;
     }
   }
 
+  getOpState$(id: string) {
+    if (!this.operationStates.has(id)) {
+      this.operationStates.set(
+        id,
+        new BehaviorSubject<IOpState>({
+          id,
+          isLoading: false,
+          isError: null,
+          isSuccess: null,
+        })
+      );
+    }
+    return this.operationStates.get(id)!.asObservable();
+  }
+
+  /** ----------------- HELPERS ----------------- **/
+  private toDate(value?: string | null): Date | undefined {
+    return value ? new Date(value) : undefined;
+  }
+
+  /** ----------------- CONTACTS ----------------- **/
+  async upsertContact(contact: IUser & { isOnPlatform?: boolean }) {
+    return this.withOpState('upsertContact', async () => {
+      const sql = `
+        INSERT INTO users (userId, phoneNumber, username, avatar, status, lastSeen, isOnPlatform, createdAt, updatedAt)
+        VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+        ON CONFLICT(userId) DO UPDATE SET
+        phoneNumber = excluded.phoneNumber,
+        username = excluded.username,
+        avatar = excluded.avatar,
+        status = excluded.status,
+        lastSeen = excluded.lastSeen,
+        isOnPlatform = excluded.isOnPlatform,
+        updatedAt = datetime('now')
+      `;
+      const params = [
+        contact.userId,
+        contact.phoneNumber,
+        contact.username || contact.phoneNumber,
+        contact.avatar || null,
+        contact.status || null,
+        contact.lastSeen?.toISOString() || null,
+        contact.isOnPlatform ? 1 : 0,
+      ];
+      await this.db.run(sql, params);
+    });
+  }
+
+  async upsertContacts(contacts: (IUser & { isOnPlatform?: boolean })[]) {
+    return this.withOpState('upsertContacts', async () => {
+      for (const c of contacts) {
+        await this.upsertContact(c);
+      }
+      console.info('Upserted contacts!');
+    });
+  }
+
+  async getContacts(onlyPlatformUsers = false): Promise<IUser[]> {
+    return this.withOpState(
+      'getContacts',
+      async () => {
+        const sql = onlyPlatformUsers
+          ? `SELECT * FROM users WHERE isOnPlatform = 1 ORDER BY username ASC`
+          : `SELECT * FROM users ORDER BY username ASC`;
+        const res = await this.db.query(sql);
+        return (
+          res.values?.map((c) => ({
+            ...c,
+            _id: c.userId,
+            isOnPlatform: !!c.isOnPlatform,
+            lastSeen: this.toDate(c.lastSeen),
+            createdAt: this.toDate(c.createdAt),
+            updatedAt: this.toDate(c.updatedAt),
+          })) ?? []
+        );
+      },
+      []
+    );
+  }
+
+  async getContactByPhone(phoneNumber: string): Promise<IUser | null> {
+    return this.withOpState(
+      'getContactByPhone',
+      async () => {
+        const res = await this.db.query(
+          `SELECT * FROM users WHERE phoneNumber = ?`,
+          [phoneNumber]
+        );
+        const c = res.values?.[0];
+        if (!c) return null;
+        return {
+          ...c,
+          // _id: c.userId,
+          isOnPlatform: !!c.isOnPlatform,
+          lastSeen: this.toDate(c.lastSeen),
+          createdAt: this.toDate(c.createdAt),
+          updatedAt: this.toDate(c.updatedAt),
+        };
+      },
+      null
+    );
+  }
+
+  async getContactById(id: string): Promise<IUser | null> {
+    return this.withOpState(
+      'getContactById',
+      async () => {
+        const res = await this.db.query(
+          `SELECT * FROM users WHERE userId = ?`,
+          [id]
+        );
+        const c = res.values?.[0];
+        if (!c) return null;
+        return {
+          ...c,
+          // _id: c.userId,
+          isOnPlatform: !!c.isOnPlatform,
+          lastSeen: this.toDate(c.lastSeen),
+          createdAt: this.toDate(c.createdAt),
+          updatedAt: this.toDate(c.updatedAt),
+        };
+      },
+      null
+    );
+  }
+
+  async updateContactMetadata(
+    id: string,
+    updates: Partial<Pick<IUser, 'avatar' | 'status' | 'username' | 'lastSeen'>>
+  ) {
+    return this.withOpState('updateContactMetadata', async () => {
+      const setClauses: string[] = [];
+      const params: any[] = [];
+      Object.entries(updates).forEach(([key, value]) => {
+        if (value !== undefined) {
+          setClauses.push(`${key} = ?`);
+          params.push(value instanceof Date ? value.toISOString() : value);
+        }
+      });
+      if (!setClauses.length) return;
+      params.push(id);
+      await this.db.run(
+        `UPDATE users SET ${setClauses.join(
+          ', '
+        )}, updatedAt = datetime('now') WHERE userId = ?`,
+        params
+      );
+    });
+  }
+
+  async deleteContact(phoneNumber: string) {
+    return this.withOpState('deleteContact', async () => {
+      await this.db.run(`DELETE FROM users WHERE phoneNumber = ?`, [
+        phoneNumber,
+      ]);
+    });
+  }
+
+  async deleteAllContacts() {
+    return this.withOpState('deleteAllContacts', async () => {
+      await this.db.execute('DELETE FROM users');
+    });
+  }
+
+  /** ----------------- CONVERSATIONS ----------------- **/
+  async createConversation(input: CreateConversationInput) {
+    return this.withOpState('createConversation', async () => {
+      const sql = `
+        INSERT INTO conversations
+        (roomId, title, type, isMyself, avatar, members, adminIds, phoneNumber,isArchived, isPinned, isLocked, createdAt, updatedAt)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?,?,?,?,  datetime('now'), datetime('now'))
+        ON CONFLICT(roomId) DO UPDATE SET
+        title = excluded.title,
+        type = excluded.type,
+        isMyself = excluded.isMyself,
+        avatar = excluded.avatar,
+        members = excluded.members,
+        adminIds = excluded.adminIds,
+        isArchived = excluded.isArchived,
+        isPinned = excluded.isPinned,
+        isLocked = excluded.isLocked,
+        updatedAt = datetime('now')
+      `;
+      await this.db.run(sql, [
+        input.roomId,
+        input.title,
+        input.type,
+        input.isMyself ? 1 : 0,
+        input.avatar || null,
+        JSON.stringify(input.members || []),
+        JSON.stringify(input.adminIds || []),
+        input.phoneNumber || null,
+        input.isArchived ? 1 : 0,
+        input.isPinned ? 1 : 0,
+        input.isLocked ? 1 : 0,
+      ]);
+    });
+  }
+
+  async getConversation(roomId: string): Promise<IConversation | null> {
+    return this.withOpState(
+      'getConversation',
+      async () => {
+        const res = await this.db.query(
+          `SELECT * FROM conversations WHERE roomId = ?`,
+          [roomId]
+        );
+        const row = res.values?.[0];
+        if (!row) return null;
+        return {
+          ...row,
+          members: row.members ? JSON.parse(row.members) : [],
+          adminIds: row.adminIds ? JSON.parse(row.adminIds) : [],
+          createdAt: this.toDate(row.createdAt),
+          updatedAt: this.toDate(row.updatedAt),
+        };
+      },
+      null
+    );
+  }
+
+  async getConversations(): Promise<IConversation[]> {
+    return this.withOpState(
+      'getConversations',
+      async () => {
+        const sql = `
+        SELECT c.*, 
+        m.text AS lastMessage,
+        m.type AS lastMessageType,
+        m.timestamp AS lastMessageAt,
+        (
+          SELECT COUNT(um.msgId) FROM messages um 
+          WHERE um.roomId = c.roomId AND um.isMe = 0 AND um.status = 'delivered'
+        ) AS unreadCount
+        FROM conversations c
+        LEFT JOIN messages m 
+        ON m.roomId = c.roomId
+        AND m.timestamp = (SELECT MAX(timestamp) FROM messages WHERE roomId = c.roomId)
+        ORDER BY c.updatedAt DESC
+      `;
+        const res = await this.db.query(sql);
+        return (
+          res.values?.map((c) => ({
+            ...c,
+            type: c.type,
+            isMyself: !!c.isMyself,
+            isArchived: !!c.isArchived,
+            isPinned: !!c.isPinned,
+            isLocked: !!c.isLocked,
+            members: c.members ? JSON.parse(c.members) : [],
+            adminIds: c.adminIds ? JSON.parse(c.adminIds) : [],
+            lastMessageAt: this.toDate(c.lastMessageAt),
+            createdAt: this.toDate(c.createdAt),
+            updatedAt: this.toDate(c.updatedAt),
+          })) ?? []
+        );
+      },
+      []
+    );
+  }
+
+  async deleteConversation(roomId: string) {
+    return this.withOpState('deleteConversation', async () => {
+      await this.db.run('DELETE FROM messages WHERE roomId = ?', [roomId]);
+      await this.db.run('DELETE FROM conversations WHERE roomId = ?', [roomId]);
+    });
+  }
+
+  async deleteConversations(roomIds: string[]) {
+    return this.withOpState('deleteConversations', async () => {
+      if (!roomIds.length) return;
+      const placeholders = roomIds.map(() => '?').join(', ');
+      await this.db.run(
+        `DELETE FROM messages WHERE roomId IN (${placeholders})`,
+        roomIds
+      );
+      await this.db.run(
+        `DELETE FROM conversations WHERE roomId IN (${placeholders})`,
+        roomIds
+      );
+    });
+  }
+
+  /** ----------------- MESSAGES ----------------- **/
+  async saveMessage(message: IMessage) {
+    return this.withOpState('saveMessage', async () => {
+      const sql = `
+        INSERT INTO messages 
+        (msgId, roomId, sender, type, text,mediaId, isMe, status, timestamp, receipts, deletedFor, replyToMsgId, reactions, isEdit )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
+      const params = [
+        message.msgId,
+        message.roomId,
+        message.sender,
+        message.type || 'text',
+        message.text || null,
+        message.mediaId || null,
+        message.isMe ? 1 : 0,
+        message.status,
+        String(message.timestamp),
+        JSON.stringify(message.receipts || {}),
+        JSON.stringify(message.deletedFor || {}),
+        message.replyToMsgId || '',
+        JSON.stringify(message.reactions || []),
+        !!message.isEdit ? 1 : 0,
+      ];
+      await this.db.run(sql, params);
+    });
+  }
+
+  saveAttachment(attachment: IAttachment) {
+    return this.withOpState('saveAttachment', async () => {
+      const query = `INSERT INTO attachments (mediaId, type, fileName, mimeType, fileSize, caption, localUrl, cdnUrl)
+      VALUES(?,?,?,?,?,?,?,?) `;
+      await this.db.run(query, [
+        attachment.mediaId || '',
+        attachment.type || '',
+        attachment.fileName || '',
+        attachment.mimeType || '',
+        attachment.fileSize || '',
+        attachment.caption || '',
+        attachment.localUrl || '',
+        attachment.cdnUrl || '',
+      ]);
+    });
+  }
+
+  async getMessages(
+    roomId: string,
+    limit = 20,
+    offset = 0
+  ): Promise<IMessage[]> {
+    return this.withOpState(
+      'getMessages',
+      async () => {
+        const sql = `SELECT * FROM messages WHERE roomId = ? ORDER BY timestamp DESC LIMIT ? OFFSET ?`;
+        const res = await this.db.query(sql, [roomId, limit, offset]);
+        return (
+          res.values?.reverse().map((msg) => ({
+            ...msg,
+            receipts: JSON.parse(msg.receipts || '{}'),
+            reactions: JSON.parse(msg.reactions || '[]'),
+            deletedFor: JSON.parse(msg.deletedFor || '{}'),
+            isMe: !!msg.isMe,
+            isEdit: !!msg.isEdit,
+            timestamp: this.toDate(msg.timestamp),
+          })) ?? []
+        );
+      },
+      []
+    );
+  }
+
+  async getMessage(msgId: string): Promise<IMessage | null> {
+    return this.withOpState(
+      'getMessage',
+      async () => {
+        const res = await this.db.query(
+          `SELECT * FROM messages WHERE msgId = ?`,
+          [msgId]
+        );
+        const m = res.values?.[0];
+        if (!m) return null;
+        return {
+          ...m,
+          receipts: JSON.parse(m.receipts || '{}'),
+          isMe: m.isMe === 1,
+          timestamp: this.toDate(m.timestamp),
+        };
+      },
+      null
+    );
+  }
+
+  async deleteMessages(msgIds: string[]) {
+    return this.withOpState('deleteMessages', async () => {
+      if (msgIds.length > 0) {
+        const placeholders = msgIds.map(() => '?').join(', ');
+        await this.db.run(
+          `DELETE FROM messages WHERE msgId IN (${placeholders})`,
+          msgIds
+        );
+      }
+    });
+  }
+
+  async updateMessageStatus(msgId: string, status: IMessage['status']) {
+    return this.withOpState('updateMessageStatus', async () => {
+      await this.db.run(`UPDATE messages SET status = ? WHERE msgId = ?`, [
+        status,
+        msgId,
+      ]);
+    });
+  }
+
+  async updateMessageReceipts(msgId: string, receipt: IMessage['receipts']) {
+    return this.withOpState('updateMessageReceipts', async () => {
+      await this.db.run(`UPDATE messages SET receipts = ? WHERE msgId = ?`, [
+        JSON.stringify(receipt),
+        msgId,
+      ]);
+    });
+  }
+
+  async getMessageCount(roomId: string): Promise<number> {
+    return this.withOpState(
+      'getMessageCount',
+      async () => {
+        const res = await this.db.query(
+          `SELECT COUNT(*) as count FROM messages WHERE roomId = ?`,
+          [roomId]
+        );
+        return res.values?.[0]?.count ?? 0;
+      },
+      0
+    );
+  }
+
+  /** ----------------- UTILITIES ----------------- **/
+  async resetDB() {
+    return this.withOpState('resetDB', async () => {
+      for (const table of ['users', 'conversations', 'messages']) {
+        await this.db.execute(`DROP TABLE IF EXISTS ${table}`);
+      }
+      for (const schema of Object.values(TABLE_SCHEMAS)) {
+        await this.db.execute(schema);
+      }
+      //console.log('DB reset complete ✅');
+    });
+  }
+
   /**
- * Helper: Convert Blob → Base64 string
- */
+   * Helper: Convert Blob → Base64 string
+   */
   private blobToBase64(blob: Blob): Promise<string> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -426,25 +723,11 @@ export class SqliteService {
   }
 
   /**
-   * Retrieve attachments for a specific room
-   */
-  async getAttachments(roomId: string): Promise<any[]> {
-    try {
-      const stmt = `SELECT * FROM attachments WHERE roomId = ? ORDER BY createdAt ASC`;
-      const result = await this.db.query(stmt, [roomId]);
-      return result.values || [];
-    } catch (error) {
-      console.error('❌ Error retrieving attachments:', error);
-      return [];
-    }
-  }
-
-  /**
    * Close the database connection
    */
   async closeConnection(): Promise<void> {
     try {
-      await this.sqliteConnection.closeConnection(this.dbName, false);
+      await this.sqliteConnection.closeConnection(DB_NAME, false);
     } catch (error) {
       console.error('❌ Error closing DB connection:', error);
     }

@@ -265,7 +265,7 @@
        (click)="openAttachmentModal(msg)"
        [attr.data-msg-key]="msg.key"
        [ngClass]="[
-         msg.sender_id === senderId ? 'sender-message' : 'receiver-message',
+        msg.isMe ? 'sender-message' : 'receiver-message',
          msg.fadeOut ? 'fade-out' : 'fade-in'
        ]">
 

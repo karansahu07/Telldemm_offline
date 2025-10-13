@@ -15,6 +15,7 @@ export class FileSystemService {
 
   private async createBaseFolder(): Promise<void> {
     try {
+    
       await Filesystem.mkdir({
         path: this.folderName,
         directory: Directory.Documents,
@@ -22,7 +23,7 @@ export class FileSystemService {
       });
     } catch (err: any) {
       if (!err.message?.includes('Directory exists')) {
-        console.error('Error creating base ChatMedia folder:', err);
+          // console.error('Error creating base ChatMedia folder:', err);
       }
     }
   }
@@ -37,7 +38,7 @@ export class FileSystemService {
         });
       } catch (err: any) {
         if (!err.message?.includes('Directory exists')) {
-          console.error(`Error creating ${sub} folder:`, err);
+          // console.error(`Error creating ${sub} folder:`, err);
         }
       }
     }
@@ -60,7 +61,7 @@ export class FileSystemService {
       useWebWorker: true,
     };
 
-    console.log("sgergsrg", typeof file);
+    //console.log("sgergsrg", typeof file);
     try {
       return await imageCompression(file as any, options);
     } catch (err) {
@@ -115,7 +116,7 @@ export class FileSystemService {
 
   private async saveFile(relativePath: string, file: Blob): Promise<string> {
     const compressedFile = await this.compressIfNeeded(file, relativePath);
-    console.log("type of ", typeof compressedFile);
+    //console.log("type of ", typeof compressedFile);
     const base64Data = await this.convertToBase64(compressedFile);
     const fullPath = `${this.folderName}/${relativePath}`;
 

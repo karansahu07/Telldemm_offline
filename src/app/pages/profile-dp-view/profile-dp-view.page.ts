@@ -30,9 +30,9 @@
 
 //   editProfileDp() {
 //     if (this.isGroup) {
-//       console.log('Edit Group Profile Picture clicked');
+//       //console.log('Edit Group Profile Picture clicked');
 //     } else {
-//       console.log('Edit User Profile Picture clicked');
+//       //console.log('Edit User Profile Picture clicked');
 //     }
 //   }
 
@@ -98,7 +98,7 @@
 //   }
 
 //  async pickOption(option: string) {
-//     console.log('Selected:', option);
+//     //console.log('Selected:', option);
 
 //     if (option === 'gallery') {
 //       const image = await Camera.getPhoto({
@@ -118,7 +118,7 @@
 //         .updateGroupDp(this.groupId, this.firebaseGroupId, file)
 //         .subscribe({
 //           next: (res : any) => {
-//             console.log('✅ Group DP updated:', res);
+//             //console.log('✅ Group DP updated:', res);
 
 //             this.imageUrl = this.profileImage || this.imageUrl;
 //           },
@@ -146,7 +146,7 @@
 //   }
 
 //   // closeEditModal() {
-//   //   console.log("Modal closed");
+//   //   //console.log("Modal closed");
 //   // }
 // }
 
@@ -224,7 +224,7 @@ export class ProfileDpViewPage implements OnInit, OnDestroy {
   //     if (gid) this.groupId = +gid;
   //     if (fid) this.firebaseGroupId = fid;
 
-  //     console.log('Page initialized with:', {
+  //     //console.log('Page initialized with:', {
   //       imageUrl: this.imageUrl,
   //       isGroup: this.isGroup,
   //       groupId: this.groupId,
@@ -253,12 +253,12 @@ export class ProfileDpViewPage implements OnInit, OnDestroy {
 
     this.firebaseGroupId = this.route.snapshot.queryParamMap.get('receiverId');
 
-    console.log('Page initialized with:', {
-      imageUrl: this.imageUrl,
-      isGroup: this.isGroup,
-      groupId: this.groupId,
-      firebaseGroupId: this.firebaseGroupId
-    });
+    //console.log('Page initialized with:', {
+      // imageUrl: this.imageUrl,
+      // isGroup: this.isGroup,
+      // groupId: this.groupId,
+      // firebaseGroupId: this.firebaseGroupId
+    // });
 
   } catch (error) {
     console.error('Error initializing page data:', error);
@@ -295,7 +295,7 @@ export class ProfileDpViewPage implements OnInit, OnDestroy {
    * Handle option selection from modal
    */
   async pickOption(option: string) {
-    console.log('Selected option:', option);
+    //console.log('Selected option:', option);
     
     // Close modal first
     this.closeEditModal();
@@ -479,8 +479,8 @@ export class ProfileDpViewPage implements OnInit, OnDestroy {
    * Update group image on server
    */
   private async updateGroupImage(croppedBlob: Blob, croppedImageUrl: string) {
-    console.log("group id is:",this.groupId);
-    console.log("group id is:",this.firebaseGroupId);
+    //console.log("group id is:",this.groupId);
+    //console.log("group id is:",this.firebaseGroupId);
     if (!this.firebaseGroupId) {
       await this.showToast('Group information missing', 'danger');
       return;
@@ -506,7 +506,7 @@ export class ProfileDpViewPage implements OnInit, OnDestroy {
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: async (response) => {
-            console.log('Group DP updated successfully:', response);
+            //console.log('Group DP updated successfully:', response);
             
             // Update local image immediately for better UX
             this.imageUrl = croppedImageUrl;

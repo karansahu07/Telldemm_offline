@@ -368,7 +368,7 @@
 // //       this.attachmentPath = state['imageToSend'];
 // //     }
 
-// //     console.log("this.attachmentPath", this.attachmentPath);
+// //     //console.log("this.attachmentPath", this.attachmentPath);
 
 // //     this.loadReceiverProfile();
 // //   }
@@ -423,7 +423,7 @@
 // //   }
 
 // //   async handleOption(option: string) {
-// //     console.log('Selected option:', option);
+// //     //console.log('Selected option:', option);
 
 // //     if (option === 'Search') {
 // //       this.showSearchBar = true;
@@ -625,7 +625,7 @@
 
 // //   openDatePicker() {
 // //     this.showDateModal = true;
-// //     console.log('Opening calendar modal...');
+// //     //console.log('Opening calendar modal...');
 // //   }
 
 // //   onMessagePress(message: any) {
@@ -709,7 +709,7 @@
 // //   async copySelectedMessages() {
 // //     if (this.lastPressedMessage?.text) {
 // //       await Clipboard.write({ string: this.lastPressedMessage.text });
-// //       console.log('Text copied to clipboard:', this.lastPressedMessage.text);
+// //       //console.log('Text copied to clipboard:', this.lastPressedMessage.text);
 // //       this.selectedMessages = [];
 // //       this.lastPressedMessage = null;
 // //     }
@@ -794,7 +794,7 @@
 // //   }
 
 // //   deleteSelectedMessages() {
-// //     console.log("selectedMessages", this.selectedMessages);
+// //     //console.log("selectedMessages", this.selectedMessages);
 // //     this.selectedMessages.forEach(msg => {
 // //       this.chatService.deleteMessage(this.roomId, msg.key);
 // //     });
@@ -802,7 +802,7 @@
 // //   }
 
 // //   onForward() {
-// //     console.log('Forwarding:', this.selectedMessages);
+// //     //console.log('Forwarding:', this.selectedMessages);
 
 // //     this.chatService.setForwardMessages(this.selectedMessages);
 
@@ -847,7 +847,7 @@
 // //   async handlePopoverAction(action: string) {
 // //     switch (action) {
 // //       case 'info':
-// //         console.log('Info clicked');
+// //         //console.log('Info clicked');
 // //         break;
 // //       case 'copy':
 // //         this.copyMessage();
@@ -912,14 +912,14 @@
 // //   async copyMessage() {
 // //     if (this.lastPressedMessage?.text) {
 // //       await Clipboard.write({ string: this.lastPressedMessage.text });
-// //       console.log('Text copied to clipboard:', this.lastPressedMessage.text);
+// //       //console.log('Text copied to clipboard:', this.lastPressedMessage.text);
 // //       this.selectedMessages = [];
 // //       this.lastPressedMessage = null;
 // //     }
 // //   }
 
 // //   shareMessage() {
-// //     console.log('Share clicked for attachment:', this.lastPressedMessage);
+// //     //console.log('Share clicked for attachment:', this.lastPressedMessage);
 // //   }
 
 // //   pinMessage() {
@@ -933,7 +933,7 @@
 // //     };
 // //     this.chatService.pinMessage(pin);
 
-// //     console.log("Message pinned", pin.messageId);
+// //     //console.log("Message pinned", pin.messageId);
 // //     this.selectedMessages = [];
 // //     this.lastPressedMessage = null;
 // //   }
@@ -986,7 +986,7 @@
 // //   }
 
 // //   openChatInfo() {
-// //     console.log('Opening chat info');
+// //     //console.log('Opening chat info');
 // //   }
 
 // //   async loadInitialMessages() {
@@ -1214,7 +1214,7 @@
 // //       if (msgIndex === -1) return;
 
 // //       const msg = this.messages[msgIndex];
-// //       console.log(msg);
+// //       //console.log(msg);
 
 // //       if (!msg.read && msg.receiver_id === this.senderId) {
 // //         const observer = new IntersectionObserver(entries => {
@@ -1379,7 +1379,7 @@
 // //   async pickAttachment() {
 // //     const result = await FilePicker.pickFiles({ readData: true });
 
-// //     console.log("files result of pick", result);
+// //     //console.log("files result of pick", result);
 // //     if (result?.files?.length) {
 // //       const file = result.files[0];
 // //       const mimeType = file.mimeType;
@@ -1398,7 +1398,7 @@
 // //         );
 // //       }
 
-// //       console.log("blob object is ::::", blob);
+// //       //console.log("blob object is ::::", blob);
 
 // //       const previewUrl = URL.createObjectURL(blob);
 
@@ -1480,7 +1480,7 @@
 // //       if (this.selectedAttachment) {
 // //         try {
 // //           const mediaId = await this.uploadAttachmentToS3(this.selectedAttachment);
-// //           console.log("media id is dfksdfgs", mediaId);
+// //           //console.log("media id is dfksdfgs", mediaId);
 
 // //           message.attachment = {
 // //             type: this.selectedAttachment.type,
@@ -1884,21 +1884,21 @@
 
 // //       if (safeAreaBottom > 0) {
 // //         this.renderer.setStyle(footerEl, 'padding-bottom', '16px');
-// //         console.log('chat: ✅ Gesture Navigation detected (iOS) — padding 16px');
+// //         //console.log('chat: ✅ Gesture Navigation detected (iOS) — padding 16px');
 // //       } else {
 // //         this.renderer.setStyle(footerEl, 'padding-bottom', '6px');
-// //         console.log('chat: 🔘 Buttons Navigation detected (iOS) — padding 6px');
+// //         //console.log('chat: 🔘 Buttons Navigation detected (iOS) — padding 6px');
 // //       }
 // //     } else {
 // //       if (this.isGestureNavigation()) {
 // //         this.renderer.setStyle(footerEl, 'padding-bottom', '35px');
-// //         console.log('chat: ✅ Gesture Navigation detected (Android) — padding 35px');
+// //         //console.log('chat: ✅ Gesture Navigation detected (Android) — padding 35px');
 // //       } else if (this.isTransparentButtonNav()) {
 // //         this.renderer.setStyle(footerEl, 'padding-bottom', '35px');
-// //         console.log('chat: ✨ Transparent Button Navigation detected (Android) — padding 35px');
+// //         //console.log('chat: ✨ Transparent Button Navigation detected (Android) — padding 35px');
 // //       } else {
 // //         this.renderer.setStyle(footerEl, 'padding-bottom', '6px');
-// //         console.log('chat: 🔘 Buttons Navigation detected (Android) — padding 6px');
+// //         //console.log('chat: 🔘 Buttons Navigation detected (Android) — padding 6px');
 // //       }
 // //     }
 // //   }
@@ -2299,7 +2299,7 @@
 //       this.attachmentPath = state['imageToSend'];
 //     }
 
-//     console.log("this.attachmentPath", this.attachmentPath);
+//     //console.log("this.attachmentPath", this.attachmentPath);
 
 //     this.loadReceiverProfile();
 //   }
@@ -2358,7 +2358,7 @@
 //   // }
 
 //   async handleOption(option: string) {
-//     console.log('Selected option:', option);
+//     //console.log('Selected option:', option);
 
 //     if (option === 'Search') {
 //       this.showSearchBar = true;
@@ -2649,7 +2649,7 @@
 
 //   openDatePicker() {
 //     this.showDateModal = true;
-//     console.log('Opening calendar modal...');
+//     //console.log('Opening calendar modal...');
 //   }
 
 //   onMessagePress(message: any) {
@@ -2733,7 +2733,7 @@
 //   async copySelectedMessages() {
 //     if (this.lastPressedMessage?.text) {
 //       await Clipboard.write({ string: this.lastPressedMessage.text });
-//       console.log('Text copied to clipboard:', this.lastPressedMessage.text);
+//       //console.log('Text copied to clipboard:', this.lastPressedMessage.text);
 //       this.selectedMessages = [];
 //       this.lastPressedMessage = null;
 //     }
@@ -2818,7 +2818,7 @@
 //   }
 
 //   deleteSelectedMessages() {
-//     console.log("selectedMessages", this.selectedMessages);
+//     //console.log("selectedMessages", this.selectedMessages);
 //     this.selectedMessages.forEach(msg => {
 //       this.chatService.deleteMessage(this.roomId, msg.key);
 //     });
@@ -2826,7 +2826,7 @@
 //   }
 
 //   onForward() {
-//     console.log('Forwarding:', this.selectedMessages);
+//     //console.log('Forwarding:', this.selectedMessages);
 
 //     this.chatService.setForwardMessages(this.selectedMessages);
 
@@ -2871,7 +2871,7 @@
 //   async handlePopoverAction(action: string) {
 //     switch (action) {
 //       case 'info':
-//         console.log('Info clicked');
+//         //console.log('Info clicked');
 //         break;
 //       case 'copy':
 //         this.copyMessage();
@@ -2936,14 +2936,14 @@
 //   async copyMessage() {
 //     if (this.lastPressedMessage?.text) {
 //       await Clipboard.write({ string: this.lastPressedMessage.text });
-//       console.log('Text copied to clipboard:', this.lastPressedMessage.text);
+//       //console.log('Text copied to clipboard:', this.lastPressedMessage.text);
 //       this.selectedMessages = [];
 //       this.lastPressedMessage = null;
 //     }
 //   }
 
 //   shareMessage() {
-//     console.log('Share clicked for attachment:', this.lastPressedMessage);
+//     //console.log('Share clicked for attachment:', this.lastPressedMessage);
 //   }
 
 //   pinMessage() {
@@ -2957,7 +2957,7 @@
 //     };
 //     this.chatService.pinMessage(pin);
 
-//     console.log("Message pinned", pin.messageId);
+//     //console.log("Message pinned", pin.messageId);
 //     this.selectedMessages = [];
 //     this.lastPressedMessage = null;
 //   }
@@ -3010,7 +3010,7 @@
 //   }
 
 //   openChatInfo() {
-//     console.log('Opening chat info');
+//     //console.log('Opening chat info');
 //   }
 
 //   async loadInitialMessages() {
@@ -3329,7 +3329,7 @@
 //       }
 
 //       // If message is to me and the chat is open, proactively mark read (await it)
-//       // console.log("dm.receiver_id , this.senderId && dm.read",dm.receiver_id,this.senderId, dm.read);
+//       // //console.log("dm.receiver_id , this.senderId && dm.read",dm.receiver_id,this.senderId, dm.read);
 //       if (dm.receiver_id === this.senderId && !dm.read) {
 //         try {
 //           await this.chatService.markRead(this.roomId, dm.key);
@@ -3555,7 +3555,7 @@
 //   async pickAttachment() {
 //     const result = await FilePicker.pickFiles({ readData: true });
 
-//     console.log("files result of pick", result);
+//     //console.log("files result of pick", result);
 //     if (result?.files?.length) {
 //       const file = result.files[0];
 //       const mimeType = file.mimeType;
@@ -3574,7 +3574,7 @@
 //         );
 //       }
 
-//       console.log("blob object is ::::", blob);
+//       //console.log("blob object is ::::", blob);
 
 //       const previewUrl = URL.createObjectURL(blob);
 
@@ -3667,7 +3667,7 @@
 // //       if (this.selectedAttachment) {
 // //         try {
 // //           const mediaId = await this.uploadAttachmentToS3(this.selectedAttachment);
-// //           console.log("media id is dfksdfgs", mediaId);
+// //           //console.log("media id is dfksdfgs", mediaId);
 
 // //           message.attachment = {
 // //             type: this.selectedAttachment.type,
@@ -4233,21 +4233,21 @@
 
 //       if (safeAreaBottom > 0) {
 //         this.renderer.setStyle(footerEl, 'padding-bottom', '16px');
-//         console.log('chat: ✅ Gesture Navigation detected (iOS) — padding 16px');
+//         //console.log('chat: ✅ Gesture Navigation detected (iOS) — padding 16px');
 //       } else {
 //         this.renderer.setStyle(footerEl, 'padding-bottom', '6px');
-//         console.log('chat: 🔘 Buttons Navigation detected (iOS) — padding 6px');
+//         //console.log('chat: 🔘 Buttons Navigation detected (iOS) — padding 6px');
 //       }
 //     } else {
 //       if (this.isGestureNavigation()) {
 //         this.renderer.setStyle(footerEl, 'padding-bottom', '35px');
-//         console.log('chat: ✅ Gesture Navigation detected (Android) — padding 35px');
+//         //console.log('chat: ✅ Gesture Navigation detected (Android) — padding 35px');
 //       } else if (this.isTransparentButtonNav()) {
 //         this.renderer.setStyle(footerEl, 'padding-bottom', '35px');
-//         console.log('chat: ✨ Transparent Button Navigation detected (Android) — padding 35px');
+//         //console.log('chat: ✨ Transparent Button Navigation detected (Android) — padding 35px');
 //       } else {
 //         this.renderer.setStyle(footerEl, 'padding-bottom', '6px');
-//         console.log('chat: 🔘 Buttons Navigation detected (Android) — padding 6px');
+//         //console.log('chat: 🔘 Buttons Navigation detected (Android) — padding 6px');
 //       }
 //     }
 //   }
@@ -4544,7 +4544,7 @@ export class CommunityChatPage implements OnInit, AfterViewInit, OnDestroy {
   await this.checkIfBlocked();
   this.startReceiverStatusPoll();
 
-  console.log('✅ Community ID:', this.communityId);
+  //console.log('✅ Community ID:', this.communityId);
 }
 
   onInputTyping() {
@@ -4967,7 +4967,7 @@ export class CommunityChatPage implements OnInit, AfterViewInit, OnDestroy {
 
   openDatePicker() {
     this.showDateModal = true;
-    console.log('Opening calendar modal...');
+    //console.log('Opening calendar modal...');
   }
 
   onMessagePress(message: any) {
@@ -5051,7 +5051,7 @@ export class CommunityChatPage implements OnInit, AfterViewInit, OnDestroy {
   async copySelectedMessages() {
     if (this.lastPressedMessage?.text) {
       await Clipboard.write({ string: this.lastPressedMessage.text });
-      console.log('Text copied to clipboard:', this.lastPressedMessage.text);
+      //console.log('Text copied to clipboard:', this.lastPressedMessage.text);
       this.selectedMessages = [];
       this.lastPressedMessage = null;
     }
@@ -5274,7 +5274,7 @@ export class CommunityChatPage implements OnInit, AfterViewInit, OnDestroy {
   async handlePopoverAction(action: string) {
     switch (action) {
       case 'info':
-        console.log('Info clicked');
+        //console.log('Info clicked');
         break;
       case 'copy':
         this.copyMessage();
@@ -5345,7 +5345,7 @@ export class CommunityChatPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   shareMessage() {
-    console.log('Share clicked for attachment:', this.lastPressedMessage);
+    //console.log('Share clicked for attachment:', this.lastPressedMessage);
   }
 
   pinMessage() {
@@ -5410,7 +5410,7 @@ export class CommunityChatPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   openChatInfo() {
-    console.log('Opening chat info');
+    //console.log('Opening chat info');
   }
 
   async loadInitialMessages() {
@@ -5851,12 +5851,12 @@ async listenForMessages() {
                 const extension = (msg.attachment as any).fileName?.split('.').pop() || 'dat';
                 const filename = `${(msg.attachment as any).mediaId}.${extension}`;
                 const file_Path = await this.FileService.saveFileToReceived(filename, blob);
-                await this.sqliteService.saveAttachment(
-                  this.roomId,
-                  (msg.attachment as any).type,
-                  file_Path,
-                  (msg.attachment as any).mediaId as string
-                );
+                // await this.sqliteService.saveAttachment(
+                //   this.roomId,
+                //   (msg.attachment as any).type,
+                //   file_Path,
+                //   (msg.attachment as any).mediaId as string
+                // );
               }
             } catch (error) {
               console.error("Error handling received attachment:", error);
@@ -5864,9 +5864,9 @@ async listenForMessages() {
           })();
         }
 
-        (msg.attachment as any).previewUrl = await this.sqliteService.getAttachmentPreview(
-          (msg.attachment as any).mediaId as string
-        );
+        // (msg.attachment as any).previewUrl = await this.sqliteService.getAttachmentPreview(
+        //   (msg.attachment as any).mediaId as string
+        // );
       }
 
       const isToday =
@@ -6298,7 +6298,7 @@ async listenForMessages() {
           };
 
           try {
-            await this.sqliteService.saveAttachment(this.roomId, this.selectedAttachment.type, `sent/${filename}`, '');
+            // await this.sqliteService.saveAttachment(this.roomId, this.selectedAttachment.type, `sent/${filename}`, '');
           } catch (e) {
             console.warn('sqlite saveAttachment (local) failed', e);
           }
@@ -6357,7 +6357,7 @@ async listenForMessages() {
         };
 
         const file_path = await this.FileService.saveFileToSent(this.selectedAttachment.fileName, this.selectedAttachment.blob);
-        await this.sqliteService.saveAttachment(this.roomId, this.selectedAttachment.type, file_path, mediaId);
+        // await this.sqliteService.saveAttachment(this.roomId, this.selectedAttachment.type, file_path, mediaId);
 
       } catch (error) {
         console.error('Failed to upload attachment:', error);
@@ -6372,7 +6372,7 @@ async listenForMessages() {
     }
 
     // finally send
-    await this.chatService.sendMessage(this.roomId, serverMessage, this.chatType, this.senderId);
+    // await this.chatService.sendMessage(this.roomId, serverMessage, this.chatType, this.senderId);
 
     // clear UI state
     this.messageText = '';

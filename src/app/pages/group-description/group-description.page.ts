@@ -27,21 +27,21 @@ export class GroupDescriptionPage {
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
       this.groupId = params['receiverId'];
-      console.log("this.groupId",this.groupId);
+      //console.log("this.groupId",this.groupId);
       this.description = params['currentDescription'] || '';
       this.receiverId = params['receiverId'] || '';
       this.receiver_phone = params['receiver_phone'] || '';
       this.receiver_name = params['receiver_name'] || '';
       // this.isGroup = params['isGroup'] === 'true';
       this.isGroup = params['isGroup'] === true;
-    // console.log("params['isGroup'] === true",params['isGroup']);
+    // //console.log("params['isGroup'] === true",params['isGroup']);
 
       this.chatType = this.isGroup ? 'group' : 'private';
     });
   }
 
 //   async saveDescription() {
-//     console.log("this button is clicked", this.groupId);
+//     //console.log("this button is clicked", this.groupId);
 //     if (!this.groupId) return;
 
 //     try {
@@ -64,7 +64,7 @@ export class GroupDescriptionPage {
 //   }
 
 async saveDescription() {
-  console.log("this button is clicked", this.groupId);
+  //console.log("this button is clicked", this.groupId);
   if (!this.groupId) return;
 
   try {
@@ -90,7 +90,7 @@ async saveDescription() {
 
 
   cancel() {
-    console.log(this.isGroup);
+    //console.log(this.isGroup);
     this.router.navigate(['/profile-screen'], {
         queryParams: {
       receiverId: this.receiverId,

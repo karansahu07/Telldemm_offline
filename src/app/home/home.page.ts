@@ -49,7 +49,7 @@ export class HomePage implements OnInit {
       const fromNotification = localStorage.getItem('fromNotification') === 'true';
 
       if (fromNotification) {
-        console.log("✅ Splash skipped → app opened from notification");
+        //console.log("✅ Splash skipped → app opened from notification");
         // clear the flag here (not in AppComponent)
         localStorage.removeItem('fromNotification');
         return; // 🚫 Don’t navigate, notification handler already routed

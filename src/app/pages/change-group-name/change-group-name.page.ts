@@ -24,7 +24,7 @@
 //     if (trimmedName.length === 0) return;
 
 //     // TODO: Save to Firebase or emit via socket
-//     console.log('Group name saved:', trimmedName);
+//     //console.log('Group name saved:', trimmedName);
 
 //     this.navCtrl.back(); // Navigate back after saving
 //   }

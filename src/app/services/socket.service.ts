@@ -28,7 +28,7 @@
 //       });
 
 //       this.socket.on('joined', msg => {
-//         console.log(msg);
+//         //console.log(msg);
 //       });
 //     });
 //   }
@@ -70,7 +70,7 @@
 //   onMessage(): Observable<any> {
 //     return new Observable(observer => {
 //       this.socket.on('privateMessageFromServer', (msg) => {
-//         console.log(msg);
+//         //console.log(msg);
 //         observer.next(msg);
 //       });
 //     });
@@ -162,7 +162,7 @@
 //   onMessage(): Observable<any> {
 //     return new Observable(observer => {
 //       this.socket.on('receive_message', (msg) => {
-//         console.log('Received message:', msg);
+//         //console.log('Received message:', msg);
 //         observer.next(msg);
 //       });
 //     }); 
@@ -205,7 +205,7 @@ export class SocketService {
   onMessage(): Observable<any> {
     return new Observable(observer => {
       this.socket.on('privateMessageFromServer', (msg) => {
-        console.log(msg);
+        //console.log(msg);
         observer.next(msg);
       });
     });

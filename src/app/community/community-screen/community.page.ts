@@ -12,7 +12,7 @@ import { MenuPopoverComponent } from '../../components/menu-popover/menu-popover
 import { FooterTabsComponent } from '../../components/footer-tabs/footer-tabs.component';
  import { FirebaseChatService } from '../../services/firebase-chat.service';
 import { AuthService } from '../../auth/auth.service';
-import { get, ref } from 'firebase/database';
+import { Database, get, ref } from 'firebase/database';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
@@ -72,7 +72,7 @@ export class CommunityPage implements OnInit {
   const communityIds = await this.firebaseService.getUserCommunities(this.userId);
 
   for (const cid of communityIds) {
-    const commSnap = await get(ref(this.firebaseService['db'], `communities/${cid}`));
+    const commSnap = await get(ref(this.firebaseService['db'] as Database, `communities/${cid}`));
     if (!commSnap.exists()) continue;
     const commData = commSnap.val();
 

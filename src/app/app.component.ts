@@ -20,6 +20,7 @@ import { Language } from './services/language';
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
 
 import { EdgeToEdge } from '@capawesome/capacitor-android-edge-to-edge-support';
+// import { LocalDb } from './services/local-db';
 
 const STORAGE_KEY = 'settings.accessibility';
 
@@ -32,6 +33,7 @@ register();
   styleUrls: ['app.component.scss'],
   standalone: false,
 })
+
 export class AppComponent implements OnInit {
   // Update this list if your home route path differs
   private homeRoutes = ['/home-screen', '/home'];
@@ -44,6 +46,7 @@ export class AppComponent implements OnInit {
   private langSvcSub?: Subscription;
 
   constructor(
+
     private networkService: NetworkService,
     private toastController: ToastController,
     private FirebasePushService: FirebasePushService,
@@ -60,12 +63,11 @@ export class AppComponent implements OnInit {
     private alertCtrl: AlertController,
     private presence: PresenceService, // <-- injected
     private langSvc: Language,
-    private translate: TranslateService,  
-     private zone: NgZone,
-       private cd: ChangeDetectorRef,   //// <-- injected
-  ) 
+    private translate: TranslateService,
+    private zone: NgZone,
+    private cd: ChangeDetectorRef,   //// <-- injected
 
-  {
+  ) {
     this.initializeApp();
     this.applyAccessibilityFromStorage();
     this.NavBar_initialize();
@@ -75,7 +77,7 @@ export class AppComponent implements OnInit {
       // 1) subscribe to ngx-translate onLangChange
       this.langSub = this.translate.onLangChange.subscribe((evt: LangChangeEvent) => {
         this.zone.run(() => {
-          console.log('[AppComponent] translate.onLangChange ->', evt.lang);
+          //console.log('[AppComponent] translate.onLangChange ->', evt.lang);
           this.applyLanguageChange(evt.lang);
         });
       });
@@ -85,7 +87,7 @@ export class AppComponent implements OnInit {
       if ((this.langSvc as any).langChanged$) {
         this.langSvcSub = (this.langSvc as any).langChanged$.subscribe((newLang: string) => {
           this.zone.run(() => {
-            console.log('[AppComponent] langSvc.langChanged$ ->', newLang);
+            //console.log('[AppComponent] langSvc.langChanged$ ->', newLang);
             this.applyLanguageChange(newLang);
           });
         });
@@ -93,38 +95,38 @@ export class AppComponent implements OnInit {
     });
   }
 
-private applyLanguageChange(newLang: string) {
-  // Call your Language service to set the language
-  if (typeof this.langSvc.useLanguage === 'function') {
-    this.langSvc.useLanguage(newLang);
+  private applyLanguageChange(newLang: string) {
+    // Call your Language service to set the language
+    if (typeof this.langSvc.useLanguage === 'function') {
+      this.langSvc.useLanguage(newLang);
+    }
+
+    // Set document direction (RTL/LTR)
+    const isRtl = /^(ar|he|fa|ur)/.test(newLang); // add more RTL langs if needed
+    document.documentElement.dir = isRtl ? 'rtl' : 'ltr';
+    document.documentElement.classList.toggle('rtl', isRtl);
+
+    // Force UI refresh
+    try { this.cd.detectChanges(); } catch (e) { console.warn('CD detect failed', e); }
   }
 
-  // Set document direction (RTL/LTR)
-  const isRtl = /^(ar|he|fa|ur)/.test(newLang); // add more RTL langs if needed
-  document.documentElement.dir = isRtl ? 'rtl' : 'ltr';
-  document.documentElement.classList.toggle('rtl', isRtl);
-
-  // Force UI refresh
-  try { this.cd.detectChanges(); } catch (e) { console.warn('CD detect failed', e); }
-}
 
 
 
 
-
-async NavBar_initialize() {
-  await EdgeToEdge.enable();  // enable edge-to-edge mode
-  await EdgeToEdge.setBackgroundColor({ color: "#ffffff" });
-  await StatusBar.setStyle({ style: Style.Light });  // choose text/icon style
-}
+  async NavBar_initialize() {
+    await EdgeToEdge.enable();  // enable edge-to-edge mode
+    await EdgeToEdge.setBackgroundColor({ color: "#ffffff" });
+    await StatusBar.setStyle({ style: Style.Light });  // choose text/icon style
+  }
 
 
   async ngOnInit() {
+
     await this.fcmService.initializePushNotifications();
     // await this.FirebasePushService.initPush();
     await this.sqliteService.init();
     await this.FileSystemService.init();
-
     await this.platform.ready();
 
     await this.authService.hydrateAuth();
@@ -140,14 +142,14 @@ async NavBar_initialize() {
       fromNotification = true;
     }
 
-    console.log('fromNotification (AppComponent):', fromNotification);
+    //console.log('fromNotification (AppComponent):', fromNotification);
 
     if (this.authService.isAuthenticated) {
       if (fromNotification) {
-        console.log('✅ Opened via notification, skipping welcome redirect');
+        //console.log('✅ Opened via notification, skipping welcome redirect');
         // still initialize presence even if opened via notification
       } else {
-        console.log('🟢 Normal launch → go home');
+        //console.log('🟢 Normal launch → go home');
         this.router.navigateByUrl('/home-screen', { replaceUrl: true });
       }
 
@@ -195,25 +197,25 @@ async NavBar_initialize() {
         window.addEventListener('beforeunload', this.beforeUnloadHandler);
       }
     } else {
-      console.log('🔒 Not authenticated → go welcome');
+      //console.log('🔒 Not authenticated → go welcome');
       this.router.navigateByUrl('/welcome-screen', { replaceUrl: true });
     }
     // ----------------------------
   }
 
-   private applyAccessibilityFromStorage() {
+  private applyAccessibilityFromStorage() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return;
       const s = JSON.parse(raw);
- 
+
       const body = document.body;
       body.classList.toggle('accessibility-high-contrast', !!s.increaseContrast);
       body.classList.toggle('accessibility-reduced-motion', !!s.reduceMotion);
       body.classList.toggle('accessibility-large-text', !!s.largeText);
       body.classList.toggle('accessibility-simple-animations', !!s.simpleAnimations);
       body.classList.toggle('accessibility-grayscale', !!s.grayscale);
- 
+
     } catch (e) {
       console.warn('Could not apply accessibility settings from storage', e);
     }
@@ -283,10 +285,10 @@ async NavBar_initialize() {
   //   this.router.events
   //     .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
   //     .subscribe((event: NavigationEnd) => {
-  //       console.log('➡️ Current route:', event.urlAfterRedirects);
+  //       //console.log('➡️ Current route:', event.urlAfterRedirects);
 
   //       if (event.urlAfterRedirects === '/home-screen') {
-  //         console.log('🔍 Running version check only on home-screen');
+  //         //console.log('🔍 Running version check only on home-screen');
   //         this.versionService.checkVersion();
   //       }
   //     });

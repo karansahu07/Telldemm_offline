@@ -128,7 +128,7 @@ export class LoginScreenPage {
     }, 100);
   }
   
-  console.log(`✅ UI Country Code: ${this.countryCode}, Payload will use: +91`);
+  //console.log(`✅ UI Country Code: ${this.countryCode}, Payload will use: +91`);
 }
 
   onAgreeClick() {
@@ -158,9 +158,9 @@ export class LoginScreenPage {
   };
 
   try {
-    console.log('📨 Sending OTP payload:', payload);
+    //console.log('📨 Sending OTP payload:', payload);
     const res = await this.authService.sendOtp(payload);
-    console.log('📬 OTP API Response:', res);
+    //console.log('📬 OTP API Response:', res);
 
     if (res.status) {
       this.showToast('OTP sent successfully.', 'success');
@@ -202,7 +202,7 @@ export class LoginScreenPage {
 //   };
 
 //   try {
-//     console.log('📨 Verifying OTP payload:', payload);
+//     //console.log('📨 Verifying OTP payload:', payload);
 //     const result = await this.authService.verifyOtp(payload);
 //     this.isVerifyingOtp = false;
 
@@ -246,7 +246,7 @@ async goToHome() {
     } else {
       info = await Device.getInfo();
     }
-    console.log('Device info:', info);
+    //console.log('Device info:', info);
 
     // 2️⃣ Get current app version from VersionCheck (with web fallback)
     let appVersion = '00'; // Default fallback
@@ -263,7 +263,7 @@ async goToHome() {
       // Example: hardcode or use a service to get it
       appVersion = 'web.1.0.0'; // Adjust as needed
     }
-    console.log('App version:', appVersion);
+    //console.log('App version:', appVersion);
 
     // 3️⃣ Use persistent UUID
     let uuid = localStorage.getItem('device_uuid') || info.uuid || crypto.randomUUID();
@@ -288,7 +288,7 @@ async goToHome() {
       device_details: [devicePayload]
     };
 
-    console.log('📨 Verifying OTP payload:', payload);
+    //console.log('📨 Verifying OTP payload:', payload);
 
     // 6️⃣ Call backend API
     const result = await this.authService.verifyOtp(payload);

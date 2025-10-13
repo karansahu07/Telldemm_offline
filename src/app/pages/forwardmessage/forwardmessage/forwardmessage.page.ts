@@ -170,7 +170,7 @@ export class ForwardmessagePage implements OnInit, OnDestroy {
       }));
 
       this.filteredContacts = [...this.matchedContacts];
-      console.log('Matched contacts loaded:', this.filteredContacts);
+      //console.log('Matched contacts loaded:', this.filteredContacts);
     } catch (error) {
       console.error('Error loading matched contacts', error);
     } finally {
@@ -257,7 +257,7 @@ export class ForwardmessagePage implements OnInit, OnDestroy {
       );
     }
 
-    console.log('Currently selected contacts:', this.selectedContacts);
+    //console.log('Currently selected contacts:', this.selectedContacts);
   }
 
   /**
@@ -278,7 +278,7 @@ export class ForwardmessagePage implements OnInit, OnDestroy {
         );
       }).filter(Boolean);
 
-      console.log('Fetched details for selected contacts:', this.selectedUserDetails);
+      //console.log('Fetched details for selected contacts:', this.selectedUserDetails);
     } catch (error) {
       console.error('Error fetching selected user details:', error);
     }
@@ -336,7 +336,7 @@ export class ForwardmessagePage implements OnInit, OnDestroy {
           message.text = textToSend;
         }
 
-        await this.firebaseChatService.sendMessage(roomId, message, 'private', this.senderUserId);
+        // await this.firebaseChatService.sendMessage(roomId, message, 'private', this.senderUserId);
       }
     }
 

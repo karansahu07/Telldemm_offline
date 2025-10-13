@@ -50,7 +50,7 @@ export class VersionCheck {
     if (latestVersion) {
       const cleaned = this.cleanVersion(latestVersion);
       latestVersion = cleaned;
-      console.log("cleaned",cleaned);
+      //console.log("cleaned",cleaned);
       localStorage.setItem(LS_KEYS.latest, cleaned);
     }
 
@@ -91,7 +91,7 @@ export class VersionCheck {
       const url = `https://apps.ekarigar.com/backend/check-version?package=${packageName}`;
       const data: any = await this.http.get(url).toPromise();
 
-      console.log(data);
+      //console.log(data);
       // {"packageName":"com.ekarigar.telldemm","latestVersion":"13 (12.1)"}
 
       // accept either raw string or { latestVersion: string }

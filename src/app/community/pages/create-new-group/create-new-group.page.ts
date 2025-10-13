@@ -172,7 +172,7 @@ async addMemberPrompt() {
 
       // Add user to community (counts etc). Passing false so it doesn't auto-join General (you already created mapping).
       try {
-        await this.firebaseService.addUserToCommunity(userId, this.communityId, false);
+        // await this.firebaseService.addUserToCommunity(userId, this.communityId, false);
       } catch (e) {
         // non-fatal; mapping already applied above
         console.warn('addUserToCommunity non-fatal error', e);

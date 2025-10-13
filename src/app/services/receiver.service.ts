@@ -25,7 +25,7 @@ export class ReceiverService {
   async setReceiver(receiver: ReceiverData): Promise<void> {
     this._receiverData = receiver;
 
-    console.log("receiver data safe",this._receiverData);
+    //console.log("receiver data safe",this._receiverData);
 
     // Store in SecureStorage
     await this.secureStorage.setItem('RECEIVER', JSON.stringify(receiver));

@@ -28,7 +28,7 @@ export class HelpFeedbackPage implements OnInit, OnDestroy {
       // run inside NgZone to ensure Angular change detection picks it up
       this.zone.run(() => {
         // optional: log new language
-        console.log('[HelpFeedbackPage] language changed ->', evt.lang);
+        //console.log('[HelpFeedbackPage] language changed ->', evt.lang);
 
         // if you use document.dir for RTL handling, update it here too
         const isRtl = /^(ar|he|fa|ur)/.test(evt.lang);

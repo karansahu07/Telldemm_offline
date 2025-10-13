@@ -44,7 +44,7 @@
 //   }
 
 //   get createdByText(): string {
-//     console.log("createdBy",this.group.createdBy, this.group.createdByName);
+//     //console.log("createdBy",this.group.createdBy, this.group.createdByName);
 //     const cb = (this.group?.createdBy || this.group?.created_by) ?? '';
 //     return cb ? `Created by ${cb}` : '';
 //   }

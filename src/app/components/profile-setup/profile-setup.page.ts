@@ -97,7 +97,7 @@ export class ProfileSetupPage implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
-          console.log("Profile API response:", res);
+          //console.log("Profile API response:", res);
           this.populateProfileData(res);
           this.isLoadingProfile = false;
         },
@@ -418,7 +418,7 @@ export class ProfileSetupPage implements OnInit, OnDestroy {
 
 //     if (!snapshot.exists()) {
 //       // user does not exist in DB yet -> use existing save flow for new users
-//       console.log('User not found in DB — saving as new user and storing FCM token');
+//       //console.log('User not found in DB — saving as new user and storing FCM token');
 //       await this.fcmService.saveFcmTokenToDatabase(
 //         this.userID,
 //         this.name,
@@ -428,11 +428,11 @@ export class ProfileSetupPage implements OnInit, OnDestroy {
 //       // user exists — check if fcmToken is present
 //       const userData: any = snapshot.val();
 //       if (!userData || !userData.fcmToken) {
-//         console.log('User exists but no fcmToken found — refreshing token');
+//         //console.log('User exists but no fcmToken found — refreshing token');
 //         // updateFcmToken will actively request a fresh token and write it to DB
 //         await this.fcmService.updateFcmToken(this.userID);
 //       } else {
-//         console.log('User exists and fcmToken is already present — skipping token update');
+//         //console.log('User exists and fcmToken is already present — skipping token update');
 //       }
 //     }
 
@@ -444,7 +444,7 @@ export class ProfileSetupPage implements OnInit, OnDestroy {
 //       await this.secureStorage.setItem('profile_url', this.imageData);
 //     }
 
-//     console.log('Additional data saved successfully');
+//     //console.log('Additional data saved successfully');
 //   } catch (error) {
 //     console.error('Error saving additional data:', error);
 //   }
@@ -462,7 +462,7 @@ private async saveAdditionalData(): Promise<void> {
 
     if (!snapshot.exists()) {
       // user does not exist in DB yet -> use existing save flow for new users
-      console.log('User not found in DB — saving as new user and storing FCM token');
+      //console.log('User not found in DB — saving as new user and storing FCM token');
       await this.fcmService.saveFcmTokenToDatabase(
         this.userID,
         this.name,
@@ -475,14 +475,14 @@ private async saveAdditionalData(): Promise<void> {
       // user exists — check if fcmToken is present
       const userData: any = snapshot.val();
       if (!userData || !userData.fcmToken) {
-        console.log('User exists but no fcmToken found — refreshing token');
+        //console.log('User exists but no fcmToken found — refreshing token');
         // updateFcmToken will actively request a fresh token and write it to DB
         await this.fcmService.updateFcmToken(this.userID);
 
         // fetch refreshed token from service
         finalFcmToken = this.fcmService.getFcmToken();
       } else {
-        console.log('User exists and fcmToken is already present — using existing token');
+        //console.log('User exists and fcmToken is already present — using existing token');
         finalFcmToken = userData.fcmToken || this.fcmService.getFcmToken();
       }
     }
@@ -494,7 +494,7 @@ private async saveAdditionalData(): Promise<void> {
       if (!Number.isNaN(UserId)) {
         this.service.pushFcmToAdmin(UserId, finalFcmToken).subscribe({
           next: (res) => {
-            console.log('✅ pushFcmToAdmin success', res);
+            //console.log('✅ pushFcmToAdmin success', res);
           },
           error: (err) => {
             console.error('❌ pushFcmToAdmin failed', err);
@@ -515,7 +515,7 @@ private async saveAdditionalData(): Promise<void> {
       await this.secureStorage.setItem('profile_url', this.imageData);
     }
 
-    console.log('Additional data saved successfully');
+    //console.log('Additional data saved successfully');
   } catch (error) {
     console.error('Error saving additional data:', error);
   }

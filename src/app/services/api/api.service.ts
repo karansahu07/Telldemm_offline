@@ -285,7 +285,7 @@ getGroupDp(firebase_group_id: string): Observable<{ status: boolean; group_dp: s
    * (use raw Blob, not base64)
    */
   uploadToS3(uploadUrl: string, file: File): Observable<any> {
-    // console.log("files issd",file);
+    // //console.log("files issd",file);
     return from(
       fetch(uploadUrl, {
         method: 'PUT',

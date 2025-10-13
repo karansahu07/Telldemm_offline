@@ -19,7 +19,7 @@
 //   }
 
 //   onOptionClick(option: string) {
-//     console.log('Selected:', option);
+//     //console.log('Selected:', option);
 //     this.popoverCtrl.dismiss({ action: option });
 //   }
 // }
@@ -54,7 +54,7 @@
 //   }
 
 //   async onOptionClick(option: string) {
-//     console.log('Selected:', option);
+//     //console.log('Selected:', option);
 
 //     if (option === 'addMembers') {
 //       await this.addMembersToGroup();
@@ -91,7 +91,7 @@
 
 //             try {
 //               await set(groupRef, true);
-//               console.log(`User ${userId} added successfully to group ${this.groupId}`);
+//               //console.log(`User ${userId} added successfully to group ${this.groupId}`);
 //               this.popoverCtrl.dismiss({ action: 'memberAdded' });
 //             } catch (err) {
 //               console.error('Error adding member:', err);
@@ -130,7 +130,7 @@
 
 //             try {
 //               await set(groupRef, newName);
-//               console.log('Group name updated to:', newName);
+//               //console.log('Group name updated to:', newName);
 //               this.popoverCtrl.dismiss({ action: 'nameChanged' });
 //             } catch (err) {
 //               console.error('Error changing group name:', err);
@@ -173,7 +173,7 @@ export class UseraboutMenuComponent {
   }
 
   async onOptionClick(option: string) {
-    console.log('Selected:', option);
+    //console.log('Selected:', option);
 
     if (option === 'addMembers') {
       await this.addMembersToGroup(); // Optional: can be kept as-is
@@ -193,7 +193,7 @@ export class UseraboutMenuComponent {
 
   //   try {
   //     await set(groupRef, true);
-  //     console.log(`User ${userId} added successfully to group ${this.groupId}`);
+  //     //console.log(`User ${userId} added successfully to group ${this.groupId}`);
   //     this.popoverCtrl.dismiss({ action: 'memberAdded' });
   //   } catch (err) {
   //     console.error('Error adding member:', err);

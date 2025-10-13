@@ -26,7 +26,7 @@ export class AccountPage implements OnInit {
 
   async openDeleteConfirmation() {
     // Replace with your modal/alert controller as needed
-    console.log(this.translate.instant('accountPage.confirmDelete.log'));
+    //console.log(this.translate.instant('accountPage.confirmDelete.log'));
   }
 
   goToEditEmail() {
