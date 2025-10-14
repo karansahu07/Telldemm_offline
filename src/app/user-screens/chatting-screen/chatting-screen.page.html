@@ -266,7 +266,6 @@
        [attr.data-msg-key]="msg.key"
        [ngClass]="[
         msg.isMe ? 'sender-message' : 'receiver-message',
-         msg.fadeOut ? 'fade-out' : 'fade-in'
        ]">
 
     <!-- Forwarded Label -->
@@ -287,7 +286,7 @@
       <ng-container *ngIf="msg.replyToMessageId && getRepliedMessage(msg.replyToMessageId) as repliedMsg">
         <div class="replied-header">
           <ion-icon name="arrow-undo-outline" class="reply-icon"></ion-icon>
-          <span class="replied-sender">{{ repliedMsg.sender_name }}</span>
+          <!-- <span class="replied-sender">{{ repliedMsg.sender_name }}</span> -->
         </div>
         <div class="replied-content">
           <div class="replied-text" *ngIf="repliedMsg.text">
@@ -331,9 +330,9 @@
         <ion-text class="message-text" *ngIf="msg.text" style="margin-top: 5px;">
           {{ msg.text }}
         </ion-text>
-        <ion-text class="message-text" *ngIf="msg.attachment.caption">
+        <!-- <ion-text class="message-text" *ngIf="msg.attachment.caption">
           {{ msg.attachment.caption }}
-        </ion-text>
+        </ion-text> -->
       </ng-container>
     </ng-container>
 
@@ -380,13 +379,13 @@
          *ngIf="isQuickReactionOpen(msg)"
          [class.right]="msg.sender_id === senderId"
          [class.left]="msg.sender_id !== senderId">
-      <button class="react-btn" (click)="addReaction(msg, '👍')">👍</button>
+      <!-- <button class="react-btn" (click)="addReaction(msg, '👍')">👍</button>
       <button class="react-btn" (click)="addReaction(msg, '❤️')">❤️</button>
       <button class="react-btn" (click)="addReaction(msg, '😂')">😂</button>
       <button class="react-btn" (click)="addReaction(msg, '😮')">😮</button>
       <button class="react-btn" (click)="addReaction(msg, '😢')">😢</button>
       <button class="react-btn" (click)="addReaction(msg, '🙏')">🙏</button>
-      <button class="react-btn more" (click)="openEmojiKeyboard(msg)">＋</button>
+      <button class="react-btn more" (click)="openEmojiKeyboard(msg)">＋</button> -->
     </div>
 
    

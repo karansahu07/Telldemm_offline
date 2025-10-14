@@ -155,7 +155,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   page = 0;
   isLoadingMore = false;
   hasMoreMessages = true;
-  allMessages: Message[] = []; // Store all messages
+  allMessages: (IMessage & { attachment? : IAttachment, fadeOut : boolean})[] = []; // Store all messages
   displayedMessages: Message[] = []; // Messages currently shown
   private lastMessageKey: string | null = null;
 
@@ -1048,15 +1048,15 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     this.replyToMessage = null;
   }
 
-  getRepliedMessage(replyToMessageId: string): Message | null {
+  getRepliedMessage(replyToMessageId: string): (IMessage & {attachment? : IAttachment, fadeOut : boolean}) | null {
     const msg =
       this.allMessages.find((msg) => {
-        return msg.message_id == replyToMessageId;
+        return msg.msgId == replyToMessageId;
       }) || null;
     return msg;
   }
 
-  getReplyPreviewText(message: Message): string {
+  getReplyPreviewText(message: any): string {
     if (message.text) {
       return message.text.length > 50
         ? message.text.substring(0, 50) + '...'
@@ -1085,9 +1085,9 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     const messageElements = document.querySelectorAll('[data-msg-key]');
 
     this.allMessages.forEach((msg) => {
-      if (msg.message_id === replyToMessageId) {
+      if (msg.msgId === replyToMessageId) {
         const element = Array.from(messageElements).find(
-          (el) => el.getAttribute('data-msg-key') === msg.key
+          (el) => el.getAttribute('data-msg-key') === msg.msgId
         );
         if (element && element instanceof HTMLElement) {
           targetElement = element;
@@ -1745,143 +1745,143 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   async listenForMessages() {
-    this.messageSub?.unsubscribe();
+    // this.messageSub?.unsubscribe();
 
-    this.messageSub = this.chatService
-      .getMessages()
-      .subscribe(async (newMessages: any) => {
-        if (!Array.isArray(newMessages)) return;
+    // this.messageSub = this.chatService
+    //   .getMessages()
+    //   .subscribe(async (newMessages: any) => {
+    //     if (!Array.isArray(newMessages)) return;
 
-        const decryptPromises = newMessages.map((msg) =>
-          this.encryptionService
-            .decrypt(msg.text || '')
-            .then((dt) => ({ msg, decryptedText: dt }))
-            .catch((err) => {
-              console.warn('decrypt msg.text failed for key', msg.key, err);
-              return { msg, decryptedText: '' };
-            })
-        );
+    //     const decryptPromises = newMessages.map((msg) =>
+    //       this.encryptionService
+    //         .decrypt(msg.text || '')
+    //         .then((dt) => ({ msg, decryptedText: dt }))
+    //         .catch((err) => {
+    //           console.warn('decrypt msg.text failed for key', msg.key, err);
+    //           return { msg, decryptedText: '' };
+    //         })
+    //     );
 
-        const decryptedPairs = await Promise.all(decryptPromises);
-        const existingById: Record<string, number> = {};
-        this.allMessages.forEach((m, i) => {
-          if (m.message_id) existingById[String(m.message_id)] = i;
-        });
+    //     const decryptedPairs = await Promise.all(decryptPromises);
+    //     const existingById: Record<string, number> = {};
+    //     this.allMessages.forEach((m, i) => {
+    //       if (m.msgId) existingById[String(m.msgId)] = i;
+    //     });
 
-        for (const pair of decryptedPairs) {
-          const msg = pair.msg;
-          const serverKey = msg.key || null;
-          const messageId = msg.message_id || uuidv4();
+    //     for (const pair of decryptedPairs) {
+    //       const msg = pair.msg;
+    //       const serverKey = msg.key || null;
+    //       const messageId = msg.message_id || uuidv4();
 
-          const dm: Message = {
-            ...msg,
-            key: serverKey,
-            message_id: messageId,
-            text: pair.decryptedText,
-            reactions: msg.reactions || {}, // ✅ Ensure reactions are included
-          };
+    //       const dm: Message = {
+    //         ...msg,
+    //         key: serverKey,
+    //         message_id: messageId,
+    //         text: pair.decryptedText,
+    //         reactions: msg.reactions || {}, // ✅ Ensure reactions are included
+    //       };
 
-          if (dm.attachment && (dm.attachment as any).caption) {
-            try {
-              const encCap = (dm.attachment as any).caption;
-              if (encCap && typeof encCap === 'string') {
-                const captionPlain = await this.encryptionService.decrypt(
-                  encCap
-                );
-                (dm.attachment as any).caption = captionPlain;
-              }
-            } catch (err) {
-              console.warn(
-                'Failed to decrypt attachment.caption for message_id',
-                messageId,
-                err
-              );
-            }
-          }
+    //       if (dm.attachment && (dm.attachment as any).caption) {
+    //         try {
+    //           const encCap = (dm.attachment as any).caption;
+    //           if (encCap && typeof encCap === 'string') {
+    //             const captionPlain = await this.encryptionService.decrypt(
+    //               encCap
+    //             );
+    //             (dm.attachment as any).caption = captionPlain;
+    //           }
+    //         } catch (err) {
+    //           console.warn(
+    //             'Failed to decrypt attachment.caption for message_id',
+    //             messageId,
+    //             err
+    //           );
+    //         }
+    //       }
 
-          if (this.applyDeletionFilters(dm)) {
-            if (existingById[String(messageId)] !== undefined) {
-              const idx = existingById[String(messageId)];
-              this.allMessages[idx] = { ...this.allMessages[idx], ...dm };
-            }
-            continue;
-          }
+    //       if (this.applyDeletionFilters(dm)) {
+    //         if (existingById[String(messageId)] !== undefined) {
+    //           const idx = existingById[String(messageId)];
+    //           this.allMessages[idx] = { ...this.allMessages[idx], ...dm };
+    //         }
+    //         continue;
+    //       }
 
-          const existingIndex = existingById[String(messageId)];
+    //       const existingIndex = existingById[String(messageId)];
 
-          if (existingIndex !== undefined) {
-            const old = this.allMessages[existingIndex];
-            const merged: Message = {
-              ...old,
-              ...dm,
-              key: dm.key || old.key,
-              reactions: dm.reactions || old.reactions || {}, // ✅ Merge reactions
-            };
+    //       if (existingIndex !== undefined) {
+    //         const old = this.allMessages[existingIndex];
+    //         const merged: Message = {
+    //           ...old,
+    //           ...dm,
+    //           key: dm.key || old.key,
+    //           reactions: dm.reactions || old.reactions || {}, // ✅ Merge reactions
+    //         };
 
-            if ((old as any).localOnly !== undefined)
-              (merged as any).localOnly = (old as any).localOnly;
-            if ((old as any).isLocallyEdited !== undefined)
-              (merged as any).isLocallyEdited = (old as any).isLocallyEdited;
+    //         if ((old as any).localOnly !== undefined)
+    //           (merged as any).localOnly = (old as any).localOnly;
+    //         if ((old as any).isLocallyEdited !== undefined)
+    //           (merged as any).isLocallyEdited = (old as any).isLocallyEdited;
 
-            this.allMessages[existingIndex] = merged;
-          } else {
-            this.allMessages.push(dm);
-            existingById[String(messageId)] = this.allMessages.length - 1;
-          }
+    //         this.allMessages[existingIndex] = merged;
+    //       } else {
+    //         this.allMessages.push(dm);
+    //         existingById[String(messageId)] = this.allMessages.length - 1;
+    //       }
 
-          if (dm.receiver_id === this.senderId && !dm.read) {
-            try {
-              await this.chatService.markRead(this.roomId, dm.key);
-              await this.chatService.resetUnreadCount(
-                this.roomId,
-                this.senderId
-              );
-            } catch (err) {
-              console.warn('markRead/resetUnreadCount failed', err);
-            }
-          }
-        }
+    //       if (dm.receiver_id === this.senderId && !dm.read) {
+    //         try {
+    //           await this.chatService.markRead(this.roomId, dm.key);
+    //           await this.chatService.resetUnreadCount(
+    //             this.roomId,
+    //             this.senderId
+    //           );
+    //         } catch (err) {
+    //           console.warn('markRead/resetUnreadCount failed', err);
+    //         }
+    //       }
+    //     }
 
-        const seenIds: Record<string, boolean> = {};
-        this.allMessages = this.allMessages.filter((m) => {
-          const id = String(m.message_id || '');
-          if (!id) return true;
-          if (seenIds[id]) return false;
-          seenIds[id] = true;
-          return true;
-        });
+    //     const seenIds: Record<string, boolean> = {};
+    //     this.allMessages = this.allMessages.filter((m) => {
+    //       const id = String(m.message_id || '');
+    //       if (!id) return true;
+    //       if (seenIds[id]) return false;
+    //       seenIds[id] = true;
+    //       return true;
+    //     });
 
-        this.allMessages.sort((a, b) => {
-          const ta =
-            Number(a.timestamp) || new Date(a.timestamp || 0).getTime();
-          const tb =
-            Number(b.timestamp) || new Date(b.timestamp || 0).getTime();
-          return ta - tb;
-        });
+    //     this.allMessages.sort((a, b) => {
+    //       const ta =
+    //         Number(a.timestamp) || new Date(a.timestamp || 0).getTime();
+    //       const tb =
+    //         Number(b.timestamp) || new Date(b.timestamp || 0).getTime();
+    //       return ta - tb;
+    //     });
 
-        const visibleAllMessages = this.allMessages.filter(
-          (m) => !this.applyDeletionFilters(m)
-        );
-        const keepCount = Math.max(
-          this.limit || 50,
-          this.displayedMessages?.length || 0
-        );
-        const startIdx = Math.max(0, visibleAllMessages.length - keepCount);
-        this.displayedMessages = visibleAllMessages.slice(startIdx);
+    //     const visibleAllMessages = this.allMessages.filter(
+    //       (m) => !this.applyDeletionFilters(m)
+    //     );
+    //     const keepCount = Math.max(
+    //       this.limit || 50,
+    //       this.displayedMessages?.length || 0
+    //     );
+    //     const startIdx = Math.max(0, visibleAllMessages.length - keepCount);
+    //     this.displayedMessages = visibleAllMessages.slice(startIdx);
 
-        this.groupedMessages = await this.groupMessagesByDate(
-          this.displayedMessages
-        );
-        this.saveToLocalStorage();
+    //     this.groupedMessages = await this.groupMessagesByDate(
+    //       this.displayedMessages
+    //     );
+    //     this.saveToLocalStorage();
 
-        if (this.pinnedMessage) {
-          this.findPinnedMessageDetails(this.pinnedMessage.key);
-        }
+    //     if (this.pinnedMessage) {
+    //       this.findPinnedMessageDetails(this.pinnedMessage.key);
+    //     }
 
-        await Promise.resolve();
-        this.scrollToBottom();
-        this.observeVisibleMessages();
-      });
+    //     await Promise.resolve();
+    //     this.scrollToBottom();
+    //     this.observeVisibleMessages();
+    //   });
   }
 
   private async markDisplayedMessagesAsRead() {
@@ -2490,217 +2490,217 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   async loadMessagesFromFirebase(loadMore = false) {
-    try {
-      const db = getDatabase();
-      const messagesRef = ref(db, `chats/${this.roomId}`);
+    // try {
+    //   const db = getDatabase();
+    //   const messagesRef = ref(db, `chats/${this.roomId}`);
 
-      let qry;
-      if (loadMore && this.lastMessageKey) {
-        qry = query(
-          messagesRef,
-          orderByKey(),
-          endBefore(this.lastMessageKey),
-          limitToLast(this.limit)
-        );
-      } else {
-        qry = query(messagesRef, orderByKey(), limitToLast(this.limit));
-      }
+    //   let qry;
+    //   if (loadMore && this.lastMessageKey) {
+    //     qry = query(
+    //       messagesRef,
+    //       orderByKey(),
+    //       endBefore(this.lastMessageKey),
+    //       limitToLast(this.limit)
+    //     );
+    //   } else {
+    //     qry = query(messagesRef, orderByKey(), limitToLast(this.limit));
+    //   }
 
-      const snapshot = await get(qry);
+    //   const snapshot = await get(qry);
 
-      if (snapshot.exists()) {
-        const messagesData = snapshot.val();
-        const messageKeys = Object.keys(messagesData).sort();
+    //   if (snapshot.exists()) {
+    //     const messagesData = snapshot.val();
+    //     const messageKeys = Object.keys(messagesData).sort();
 
-        const decryptTasks = messageKeys.map(async (key) => {
-          const msg = messagesData[key];
+    //     const decryptTasks = messageKeys.map(async (key) => {
+    //       const msg = messagesData[key];
 
-          // decrypt text
-          let decryptedText = '';
-          try {
-            decryptedText = await this.encryptionService.decrypt(
-              msg.text || ''
-            );
-          } catch (e) {
-            console.warn('decrypt text failed for key', key, e);
-            decryptedText = '';
-          }
+    //       // decrypt text
+    //       let decryptedText = '';
+    //       try {
+    //         decryptedText = await this.encryptionService.decrypt(
+    //           msg.text || ''
+    //         );
+    //       } catch (e) {
+    //         console.warn('decrypt text failed for key', key, e);
+    //         decryptedText = '';
+    //       }
 
-          // decrypt attachment.caption if present
-          if (msg.attachment && msg.attachment.caption) {
-            try {
-              const decryptedCaption = await this.encryptionService.decrypt(
-                msg.attachment.caption
-              );
-              msg.attachment.caption = decryptedCaption; // overwrite with plaintext
-              // OR: msg.attachment.captionPlain = decryptedCaption;
-            } catch (e) {
-              console.warn('decrypt attachment caption failed for key', key, e);
-            }
-          }
+    //       // decrypt attachment.caption if present
+    //       if (msg.attachment && msg.attachment.caption) {
+    //         try {
+    //           const decryptedCaption = await this.encryptionService.decrypt(
+    //             msg.attachment.caption
+    //           );
+    //           msg.attachment.caption = decryptedCaption; // overwrite with plaintext
+    //           // OR: msg.attachment.captionPlain = decryptedCaption;
+    //         } catch (e) {
+    //           console.warn('decrypt attachment caption failed for key', key, e);
+    //         }
+    //       }
 
-          return {
-            ...msg,
-            key: key,
-            text: decryptedText,
-          } as Message;
-        });
+    //       return {
+    //         ...msg,
+    //         key: key,
+    //         text: decryptedText,
+    //       } as Message;
+    //     });
 
-        const results = await Promise.all(decryptTasks);
+    //     const results = await Promise.all(decryptTasks);
 
-        // -----------------------
-        // FILTER OUT MESSAGES HIDDEN FOR THIS USER (deletedFor / deletedForEveryone)
-        // -----------------------
-        const filteredResults = results.filter((msg: Message) => {
-          // if applyDeletionFilters returns true -> message should be hidden for current user
-          try {
-            return !this.applyDeletionFilters(msg);
-          } catch (e) {
-            // fail open (show message) if filter crashes
-            console.warn(
-              'applyDeletionFilters error while loading firebase messages',
-              e
-            );
-            return true;
-          }
-        });
+    //     // -----------------------
+    //     // FILTER OUT MESSAGES HIDDEN FOR THIS USER (deletedFor / deletedForEveryone)
+    //     // -----------------------
+    //     const filteredResults = results.filter((msg: Message) => {
+    //       // if applyDeletionFilters returns true -> message should be hidden for current user
+    //       try {
+    //         return !this.applyDeletionFilters(msg);
+    //       } catch (e) {
+    //         // fail open (show message) if filter crashes
+    //         console.warn(
+    //           'applyDeletionFilters error while loading firebase messages',
+    //           e
+    //         );
+    //         return true;
+    //       }
+    //     });
 
-        // Merge into allMessages / displayedMessages keeping chronological order
-        if (loadMore) {
-          // older messages prepended (results are sorted ascending by key/name)
-          this.allMessages = [...filteredResults, ...this.allMessages];
-          this.displayedMessages = [
-            ...filteredResults,
-            ...this.displayedMessages,
-          ];
-        } else {
-          this.allMessages = filteredResults;
-          this.displayedMessages = filteredResults;
-        }
+    //     // Merge into allMessages / displayedMessages keeping chronological order
+    //     if (loadMore) {
+    //       // older messages prepended (results are sorted ascending by key/name)
+    //       this.allMessages = [...filteredResults, ...this.allMessages];
+    //       this.displayedMessages = [
+    //         ...filteredResults,
+    //         ...this.displayedMessages,
+    //       ];
+    //     } else {
+    //       this.allMessages = filteredResults;
+    //       this.displayedMessages = filteredResults;
+    //     }
 
-        // Keep lastMessageKey based on raw results (so pagination works even when some were filtered out)
-        if (results.length > 0 && results[0]?.key) {
-          this.lastMessageKey = results[0].key;
-        }
+    //     // Keep lastMessageKey based on raw results (so pagination works even when some were filtered out)
+    //     if (results.length > 0 && results[0]?.key) {
+    //       this.lastMessageKey = results[0].key;
+    //     }
 
-        // hasMoreMessages should be true if the query returned 'limit' keys (raw)
-        this.hasMoreMessages = messageKeys.length === this.limit;
+    //     // hasMoreMessages should be true if the query returned 'limit' keys (raw)
+    //     this.hasMoreMessages = messageKeys.length === this.limit;
 
-        this.groupedMessages = await this.groupMessagesByDate(
-          this.displayedMessages
-        );
+    //     this.groupedMessages = await this.groupMessagesByDate(
+    //       this.displayedMessages
+    //     );
 
-        this.saveToLocalStorage();
+    //     this.saveToLocalStorage();
 
-        await this.markDisplayedMessagesAsRead();
-      } else {
-        this.hasMoreMessages = false;
-      }
-    } catch (error) {
-      console.error('Error loading messages from Firebase:', error);
-    }
+    //     await this.markDisplayedMessagesAsRead();
+    //   } else {
+    //     this.hasMoreMessages = false;
+    //   }
+    // } catch (error) {
+    //   console.error('Error loading messages from Firebase:', error);
+    // }
 
-    this.chatService.getMessages().subscribe((messages) => {
-      console.log('message', messages);
-    });
+    // this.chatService.getMessages().subscribe((messages) => {
+    //   console.log('message', messages);
+    // });
   }
 
-  async addReaction(msg: Message, emoji: string) {
-    const userId = this.senderId;
-    const current = msg.reactions?.[userId] || null;
-    const newVal = current === emoji ? null : emoji;
+  async addReaction(msg: IMessage, emoji: string) {
+    // const userId = this.senderId;
+    // const current = msg.reactions?.findIndex(r=>r.userId == userId) || null;
+    // const newVal = current?.emoji === emoji ? null : emoji;
 
-    // 1) Optimistic UI update
-    msg.reactions = { ...(msg.reactions || {}) };
-    if (newVal) msg.reactions[userId] = newVal;
-    else delete msg.reactions[userId];
+    // // 1) Optimistic UI update
+    // msg.reactions = { ...(msg.reactions || {}) };
+    // if (newVal) msg.reactions[userId] = newVal;
+    // else delete msg.reactions[userId];
 
-    // If you maintain grouped/displayed arrays, ensure they reflect the change:
-    try {
-      // update the message inside displayed/all arrays if present
-      const idxAll = this.allMessages.findIndex((m) => m.key === msg.key);
-      if (idxAll !== -1) {
-        this.allMessages[idxAll] = { ...this.allMessages[idxAll], ...msg };
-      }
-      const idxDisp = this.displayedMessages.findIndex(
-        (m) => m.key === msg.key
-      );
-      if (idxDisp !== -1) {
-        this.displayedMessages[idxDisp] = {
-          ...this.displayedMessages[idxDisp],
-          ...msg,
-        };
-      }
-      // refresh grouped view (optional, expensive if called very often)
-      this.groupedMessages = await this.groupMessagesByDate(
-        this.displayedMessages
-      );
-      // persist a small cache
-      this.saveToLocalStorage();
-    } catch (e) {
-      console.warn('update local arrays failed', e);
-    }
+    // // If you maintain grouped/displayed arrays, ensure they reflect the change:
+    // try {
+    //   // update the message inside displayed/all arrays if present
+    //   const idxAll = this.allMessages.findIndex((m) => m.msgId === msg.key);
+    //   if (idxAll !== -1) {
+    //     this.allMessages[idxAll] = { ...this.allMessages[idxAll], ...msg };
+    //   }
+    //   const idxDisp = this.displayedMessages.findIndex(
+    //     (m) => m.key === msg.key
+    //   );
+    //   if (idxDisp !== -1) {
+    //     this.displayedMessages[idxDisp] = {
+    //       ...this.displayedMessages[idxDisp],
+    //       ...msg,
+    //     };
+    //   }
+    //   // refresh grouped view (optional, expensive if called very often)
+    //   this.groupedMessages = await this.groupMessagesByDate(
+    //     this.displayedMessages
+    //   );
+    //   // persist a small cache
+    //   this.saveToLocalStorage();
+    // } catch (e) {
+    //   console.warn('update local arrays failed', e);
+    // }
 
     // 2) Persist to Firebase
-    try {
-      const db = getDatabase();
-      const path = `chats/${this.roomId}/${msg.key}/reactions/${userId}`;
+    // try {
+    //   const db = getDatabase();
+    //   const path = `chats/${this.roomId}/${msg.key}/reactions/${userId}`;
 
-      if (newVal) {
-        await set(ref(db, path), newVal);
-        //console.log('✅ Reaction saved:', newVal);
-      } else {
-        await remove(ref(db, path));
-        //console.log('✅ Reaction removed');
-      }
+    //   if (newVal) {
+    //     await set(ref(db, path), newVal);
+    //     //console.log('✅ Reaction saved:', newVal);
+    //   } else {
+    //     await remove(ref(db, path));
+    //     //console.log('✅ Reaction removed');
+    //   }
 
-      // 3) After successful write -> exit selection mode
-      this.selectedMessages = [];
-      this.lastPressedMessage = null;
+    //   // 3) After successful write -> exit selection mode
+    //   this.selectedMessages = [];
+    //   this.lastPressedMessage = null;
 
-      // if you have UI flags for selection, reset them too:
-      // e.g. this.showSelectionToolbar = false; (replace with your actual flag)
-      // Also ensure any CSS 'selected' classes will update because selectedMessages empty
-    } catch (err) {
-      console.error('❌ Reaction save/remove error:', err);
+    //   // if you have UI flags for selection, reset them too:
+    //   // e.g. this.showSelectionToolbar = false; (replace with your actual flag)
+    //   // Also ensure any CSS 'selected' classes will update because selectedMessages empty
+    // } catch (err) {
+    //   console.error('❌ Reaction save/remove error:', err);
 
-      // Optionally rollback optimistic UI on error:
-      try {
-        // revert local change by refetching msg from allMessages (if exists) or clear reaction
-        const idx = this.allMessages.findIndex((m) => m.key === msg.key);
-        if (idx !== -1) {
-          // re-sync from stored version if you have one; fallback: remove current user's reaction
-          delete this.allMessages[idx].reactions?.[userId];
-          delete msg.reactions?.[userId];
-        }
-        // this.displayedMessages = this.displayedMessages.map(m => m.key === msg.key ? { ...this.displayedMessages.find(x => x.key === msg.key) } : m);
-        this.displayedMessages = this.displayedMessages.map((m) =>
-          m.key === msg.key
-            ? {
-                ...(this.displayedMessages.find((x) => x.key === msg.key) ||
-                  ({} as Message)),
-              }
-            : m
-        );
-        this.groupedMessages = await this.groupMessagesByDate(
-          this.displayedMessages
-        );
-        this.saveToLocalStorage();
-      } catch (e) {
-        /* ignore rollback errors */
-      }
+    //   // Optionally rollback optimistic UI on error:
+    //   try {
+    //     // revert local change by refetching msg from allMessages (if exists) or clear reaction
+    //     const idx = this.allMessages.findIndex((m) => m.key === msg.key);
+    //     if (idx !== -1) {
+    //       // re-sync from stored version if you have one; fallback: remove current user's reaction
+    //       delete this.allMessages[idx].reactions?.[userId];
+    //       delete msg.reactions?.[userId];
+    //     }
+    //     // this.displayedMessages = this.displayedMessages.map(m => m.key === msg.key ? { ...this.displayedMessages.find(x => x.key === msg.key) } : m);
+    //     this.displayedMessages = this.displayedMessages.map((m) =>
+    //       m.key === msg.key
+    //         ? {
+    //             ...(this.displayedMessages.find((x) => x.key === msg.key) ||
+    //               ({} as Message)),
+    //           }
+    //         : m
+    //     );
+    //     this.groupedMessages = await this.groupMessagesByDate(
+    //       this.displayedMessages
+    //     );
+    //     this.saveToLocalStorage();
+    //   } catch (e) {
+    //     /* ignore rollback errors */
+    //   }
 
-      // keep UI selection cleared? you can choose to keep selection if error:
-      this.selectedMessages = [];
-      this.lastPressedMessage = null;
+    //   // keep UI selection cleared? you can choose to keep selection if error:
+    //   this.selectedMessages = [];
+    //   this.lastPressedMessage = null;
 
-      const t = await this.toastCtrl.create({
-        message: 'Failed to update reaction',
-        duration: 1600,
-        color: 'danger',
-      });
-      await t.present();
-    }
+    //   const t = await this.toastCtrl.create({
+    //     message: 'Failed to update reaction',
+    //     duration: 1600,
+    //     color: 'danger',
+    //   });
+    //   await t.present();
+    // }
   }
 
   openEmojiKeyboard(msg: Message) {
@@ -2723,7 +2723,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     const val = (ev.detail as any)?.value || '';
     const emoji = val?.trim();
     if (!emoji || !this.emojiTargetMsg) return;
-    this.addReaction(this.emojiTargetMsg, emoji);
+    // this.addReaction(this.emojiTargetMsg, emoji);
 
     // clear input so next pick fires change again
     const native = (ev.target as any)?.querySelector?.(
@@ -2799,7 +2799,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
         icon: 'trash',
         handler: async () => {
           // call existing addReaction which toggles/remove when same emoji present
-          await this.addReaction(msg, badge.emoji);
+          // await this.addReaction(msg, badge.emoji);
         },
       });
     } else {
@@ -2808,7 +2808,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
         text: `React with ${badge.emoji}`,
         icon: undefined,
         handler: async () => {
-          await this.addReaction(msg, badge.emoji);
+          // await this.addReaction(msg, badge.emoji);
         },
       });
     }

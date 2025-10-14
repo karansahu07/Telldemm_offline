@@ -81,18 +81,18 @@
       <ion-avatar slot="start" (click)="selected.length ? toggleSelection(it, $event) : null">
         <img *ngIf="it.avatar; else initials" [src]="it.avatar" alt="avatar" />
         <ng-template #initials>
-          <div class="avatar-fallback">{{ (it.name||'?').slice(0,1) }}</div>
+          <div class="avatar-fallback">{{ (it.title||'?').slice(0,1) }}</div>
         </ng-template>
       </ion-avatar>
 
       <ion-label>
-        <h3 class="name">{{ it.name }}</h3>
-        <p class="preview">{{ it.message }}</p>
+        <h3 class="name">{{ it.title }}</h3>
+        <p class="preview">{{ it.lastMessage }}</p>
       </ion-label>
 
       <div slot="end" class="meta">
-        <div class="time">{{ it.time }}</div>
-        <ion-badge *ngIf="it.unreadCount > 0" color="danger">{{ it.unreadCount }}</ion-badge>
+        <div class="time">{{ it.lastMessageAt }}</div>
+        <!-- <ion-badge *ngIf="it.unreadCount > 0" color="danger">{{ it.unreadCount }}</ion-badge> -->
         <!-- per-row unarchive removed -->
       </div>
     </ion-item>

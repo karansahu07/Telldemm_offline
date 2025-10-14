@@ -41,6 +41,7 @@ import {
 import { ContactSyncService } from './contact-sync.service';
 import { Platform } from '@ionic/angular';
 import { NetworkService } from './network-connection/network.service';
+import { EncryptionService } from './encryption.service';
 
 @Injectable({ providedIn: 'root' })
 export class FirebaseChatService {
@@ -77,7 +78,8 @@ export class FirebaseChatService {
     private contactsyncService: ContactSyncService,
     private platform: Platform,
     private apiService: ApiService,
-    private networkService: NetworkService
+    private networkService: NetworkService,
+    private encryptionService: EncryptionService
   ) {}
 
   // =====================
@@ -151,9 +153,10 @@ export class FirebaseChatService {
     }
     this.currentChat = { ...(conv as IConversation) };
     this._roomMessageListner = this.listenRoomStream(conv?.roomId as string, {
-      onAdd: (msgKey, data, isNew) => {
+      onAdd: async (msgKey, data, isNew) => {
         if (isNew && data.sender !== this.senderId) {
-          this.pushMsgToChat({ msgId: msgKey, ...data });
+          const decryptedText = await this.encryptionService.decrypt(data.text as string)
+          this.pushMsgToChat({ msgId: msgKey, ...data, text : decryptedText });
         }
       },
       onChange(msgKey, data) {
@@ -331,6 +334,7 @@ export class FirebaseChatService {
                 'Unknown';
             }
 
+            const decryptedText = await this.encryptionService.decrypt(meta.lastmessage)
             conversations.push({
               roomId,
               type: 'private',
@@ -342,7 +346,7 @@ export class FirebaseChatService {
               isArchived: meta.isArchived,
               isPinned: meta.isPinned,
               isLocked: meta.isLocked,
-              lastMessage: meta.lastmessage ?? undefined,
+              lastMessage: decryptedText ?? undefined,
               lastMessageType: meta.lastmessageType ?? undefined,
               lastMessageAt: parseDate(meta.lastmessageAt),
               unreadCount:
@@ -364,6 +368,7 @@ export class FirebaseChatService {
                 membersObj[mId]?.role === 'owner'
             );
 
+            const decryptedText = await this.encryptionService.decrypt(meta.lastmessage)
             conversations.push({
               roomId,
               type: type === 'community' ? 'community' : 'group',
@@ -377,7 +382,7 @@ export class FirebaseChatService {
               createdAt: group.createdAt
                 ? new Date(Number(group.createdAt))
                 : undefined,
-              lastMessage: meta.lastmessage ?? undefined,
+              lastMessage: decryptedText ?? undefined,
               lastMessageType: meta.lastmessageType ?? undefined,
               lastMessageAt: parseDate(meta.lastmessageAt),
               unreadCount: Number(meta.unreadCount) || 0,
@@ -432,17 +437,18 @@ export class FirebaseChatService {
       }
 
       // 🔸 Realtime updates listener
-      const onUserChatsChange = (snap: DataSnapshot) => {
+      const onUserChatsChange = async (snap: DataSnapshot) => {
         const updatedData = snap.val() || {};
         const current = [...this._conversations$.value];
 
         for (const [roomId, meta] of Object.entries(updatedData)) {
           const idx = current.findIndex((c) => c.roomId === roomId);
+          const decryptedText = await this.encryptionService.decrypt((meta as any).lastmessage)
           if (idx > -1) {
             const conv = current[idx];
             current[idx] = {
               ...conv,
-              lastMessage: (meta as any)?.lastmessage ?? conv.lastMessage,
+              lastMessage: decryptedText ?? conv.lastMessage,
               lastMessageType:
                 (meta as any)?.lastmessageType ?? conv.lastMessageType,
               lastMessageAt: (meta as any)?.lastmessageAt
@@ -458,9 +464,10 @@ export class FirebaseChatService {
             };
           } else {
             console.warn(
-              'New room detected in userchats but not present locally:',
+              'New room detected in userchats but not present locally:',  //new conveersation to do
               roomId
             );
+            //to do fetch detail according to meta if private fetch like we did it above and for group vice versa
           }
         }
 
@@ -480,7 +487,7 @@ export class FirebaseChatService {
     }
   }
 
- async syncMessagesWithServer(): Promise<void> {
+  async syncMessagesWithServer(): Promise<void> {
     try {
       console.count('syncserverwithmessages');
       const roomId = this.currentChat?.roomId;
@@ -491,43 +498,94 @@ export class FirebaseChatService {
       const baseRef = rtdbRef(this.db, `chats/${roomId}`);
       const currentMap = new Map(this._messages$.value); // clone map
       const currentArr = currentMap.get(roomId) ?? [];
- 
-      const snapToMsg = (s: DataSnapshot): IMessage => {
+
+      // const snapToMsg = async (s: DataSnapshot): Promise<IMessage> => {
+      //   const payload = s.val() ?? {};
+      //   // console.log("before", payload.text);
+      //   const decryptedText = await this.encryptionService.decrypt(
+      //     payload.text as string
+      //   );
+      //   // console.log("after",decryptedText)
+      //   return {
+      //     msgId: s.key!,
+      //     isMe: payload.sender === this.senderId,
+      //     ...payload,
+      //     text: decryptedText,
+      //   };
+      // };
+
+      const snapToMsg = async (s: DataSnapshot): Promise<any> => {
         const payload = s.val() ?? {};
+        const decryptedText = await this.encryptionService.decrypt(
+          payload.text as string
+        );
+        let cdnUrl = '';
+        if (payload.attachment) {
+          const res = await firstValueFrom(
+            this.apiService.getDownloadUrl(payload.attachment.mediaId)
+          );
+          cdnUrl = res.status ? res.downloadUrl : '';
+        }
         return {
           msgId: s.key!,
           isMe: payload.sender === this.senderId,
           ...payload,
+          text: decryptedText,
+          ...(payload.attachment && {
+            attachment: { ...payload.attachment, previewUrl: cdnUrl },
+          }),
         };
       };
- 
+
       if (!currentArr.length) {
         const pageSize = 50;
         const q = query(baseRef, orderByKey());
         const snap = await rtdbGet(q);
- 
+
         const fetched: IMessage[] = [];
-        snap.forEach((s) => {
-          const m = snapToMsg(s);
-          fetched.push(m);
-          try {
-            this.sqliteService.saveMessage(m);
-          } catch (e) {
-            console.warn('sqlite saveMessage failed for', m.msgId, e);
-          }
+        // snap.forEach(async (s) => {
+        //   try {
+        //     const m = await snapToMsg(s);
+        //     fetched.push(m);
+        //     this.sqliteService.saveMessage(m);
+        //   } catch (e) {
+        //     console.warn('sqlite saveMessage failed for', m.msgId, e);
+        //   }
+        //   return false;
+        // });
+
+        const children: any[] = [];
+        snap.forEach((child: any) => {
+          children.push(child);
           return false;
         });
- 
+
+        for (const s of children) {
+          try {
+            const m = await snapToMsg(s);
+            fetched.push(m);
+            // await if saveMessage returns a Promise
+            await this.sqliteService.saveMessage(m);
+          } catch (err) {
+            // use s or s.key to identify which item failed — avoid referencing `m` here
+            console.warn(
+              'sqlite saveMessage failed for item',
+              s?.key ?? s?.id ?? s,
+              err
+            );
+          }
+        }
+
         fetched.sort((a, b) =>
           a.msgId! < b.msgId! ? -1 : a.msgId! > b.msgId! ? 1 : 0
         );
- 
+
         currentMap.set(roomId, fetched);
         this._messages$.next(currentMap);
         console.log('Messages when no prev ->', fetched);
         return;
       }
- 
+
       const last =
         currentArr?.sort((a, b) =>
           a.msgId! < b.msgId! ? -1 : a.msgId! > b.msgId! ? 1 : 0
@@ -542,16 +600,38 @@ export class FirebaseChatService {
         const q = query(baseRef, orderByKey(), limitToLast(pageSize));
         const snap = await rtdbGet(q);
         const fetched: IMessage[] = [];
-        snap.forEach((s) => {
-          const m = snapToMsg(s);
-          fetched.push(m);
-          try {
-            this.sqliteService.saveMessage(m);
-          } catch (e) {
-            console.warn(e);
-          }
+        // snap.forEach((s) => {
+        //   const m = snapToMsg(s);
+        //   fetched.push(m);
+        //   try {
+        //     this.sqliteService.saveMessage(m);
+        //   } catch (e) {
+        //     console.warn(e);
+        //   }
+        //   return false;
+        // });
+
+        const children: any[] = [];
+        snap.forEach((child: any) => {
+          children.push(child);
           return false;
         });
+
+        for (const s of children) {
+          try {
+            const m = await snapToMsg(s);
+            fetched.push(m);
+            // await if saveMessage returns a Promise
+            await this.sqliteService.saveMessage(m);
+          } catch (err) {
+            // use s or s.key to identify which item failed — avoid referencing `m` here
+            console.warn(
+              'sqlite saveMessage failed for item',
+              s?.key ?? s?.id ?? s,
+              err
+            );
+          }
+        }
         fetched.sort((a, b) =>
           a.msgId! < b.msgId! ? -1 : a.msgId! > b.msgId! ? 1 : 0
         );
@@ -559,25 +639,47 @@ export class FirebaseChatService {
         this._messages$.next(currentMap);
         return;
       }
- 
+
       const qNew = query(baseRef, orderByKey(), startAt(lastKey as string));
       const snapNew = await rtdbGet(qNew);
- 
+
       const newMessages: IMessage[] = [];
-      snapNew.forEach((s) => {
-        const m = snapToMsg(s);
-        newMessages.push(m);
+      // snapNew.forEach((s) => {
+      //   const m = snapToMsg(s);
+      //   newMessages.push(m);
+      //   return false;
+      // });
+
+      const children: any[] = [];
+      snapNew.forEach((child: any) => {
+        children.push(child);
         return false;
       });
- 
+
+      for (const s of children) {
+        try {
+          const m = await snapToMsg(s);
+          newMessages.push(m);
+          // await if saveMessage returns a Promise
+          await this.sqliteService.saveMessage(m);
+        } catch (err) {
+          // use s or s.key to identify which item failed — avoid referencing `m` here
+          console.warn(
+            'sqlite saveMessage failed for item',
+            s?.key ?? s?.id ?? s,
+            err
+          );
+        }
+      }
+
       if (newMessages.length && newMessages[0].msgId === lastKey) {
         newMessages.shift();
       }
- 
+
       if (newMessages.length === 0) {
         return;
       }
- 
+
       for (const m of newMessages) {
         try {
           this.sqliteService.saveMessage(m);
@@ -586,16 +688,15 @@ export class FirebaseChatService {
         }
         currentArr.push(m);
       }
- 
+
       currentMap.set(roomId, [...currentArr]);
       this._messages$.next(currentMap);
- 
+
       console.log('Current messages when some already exists->', currentArr);
     } catch (error) {
       console.error('syncMessagesWithServer error:', error);
     }
   }
- 
 
   getMessages(): Observable<IMessage[] | undefined> {
     return this._messages$.asObservable().pipe(
@@ -1063,17 +1164,20 @@ export class FirebaseChatService {
     try {
       const { attachment, ...message } = msg;
       const roomId = this.currentChat?.roomId as string;
-      const db = getDatabase();
+      // const db = getDatabase();
       const members = this.currentChat?.members || roomId.split('_');
+      const encryptedText = await this.encryptionService.encrypt(
+        msg.text as string
+      );
       const meta: Partial<IChatMeta> = {
         type: this.currentChat?.type || 'private',
         lastmessageAt: message.timestamp as string,
         lastmessageType: attachment ? attachment.type : 'text',
-        lastmessage: message.text || '',
+        lastmessage: encryptedText || '',
       };
 
       for (const member of members) {
-        const ref = rtdbRef(db, `userchats/${member}/${roomId}`);
+        const ref = rtdbRef(this.db, `userchats/${member}/${roomId}`);
         const idxSnap = await rtdbGet(ref);
         if (!idxSnap.exists()) {
           await rtdbSet(ref, {
@@ -1087,10 +1191,13 @@ export class FirebaseChatService {
         }
       }
 
-      const messagesRef = ref(db, `chats/${roomId}/${message.msgId}`);
+      const messagesRef = ref(this.db, `chats/${roomId}/${message.msgId}`);
       await rtdbSet(messagesRef, {
         ...message,
-        ...(attachment && { attachment }),
+        text: encryptedText,
+        ...(attachment && {
+          attachment: { ...attachment, caption: encryptedText },
+        }),
       });
 
       if (attachment) {

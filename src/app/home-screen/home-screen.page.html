@@ -229,7 +229,7 @@
 
   <!-- Meta rows: Locked & Archived -->
   <ion-list
-    *ngIf="!isLoading && (lockedCount > 0 || archivedCount > 0)"
+    *ngIf="!isLoading && (lockedCount > 0 || archievedCount > 0)"
     lines="none"
     class="meta-list"
   >
@@ -252,7 +252,7 @@
     >
       <ion-icon name="archive-outline" slot="start"></ion-icon>
       <ion-label>Archived</ion-label>
-      <ion-badge slot="end" color="medium">{{ archivedCount }}</ion-badge>
+      <ion-badge slot="end" color="medium">{{ archievedCount }}</ion-badge>
     </ion-item>
   </ion-list>
 
@@ -265,9 +265,10 @@
       (touchstart)="startHomeLongPress(chat)"
       (touchend)="cancelHomeLongPress()"
       (touchmove)="cancelHomeLongPress()"
+      [class.selected]="isChatSelected(chat)"
     >
       <!-- ✅ Selection tick when in selection mode -->
-      <div
+      <!-- <div
         slot="start"
         class="select-tick"
         *ngIf="selectedChats.length > 0"
@@ -276,7 +277,14 @@
         <ion-icon
           [name]="chat.isSelected ? 'checkmark-circle' : 'ellipse-outline'"
         ></ion-icon>
-      </div>
+      </div> -->
+      <ion-checkbox
+        *ngIf="hasSelection"
+        slot="start"
+        [checked]="isConvSelected(chat.roomId)"
+        (ionChange)="toggleChatSelection(chat, $event)"
+      >
+      </ion-checkbox>
 
       <!-- ✅ Avatar / Image -->
       <ion-avatar

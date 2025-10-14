@@ -39,7 +39,7 @@ export interface IMessage {
     everyone: boolean;
     users: [];
   };
-  reactions: Record<string, string>[];
+  reactions: {userId : string, emoji : string}[];
   replyToMsgId: string;
   isEdit: boolean;
   receipts?: {

@@ -329,6 +329,7 @@ import { ArchItem } from 'src/types';
 import { SecureStorageService } from 'src/app/services/secure-storage/secure-storage.service';
 import { ContactSyncService } from 'src/app/services/contact-sync.service'; // ✅ NEW
 import { ArchieveMenuPopoverComponent } from 'src/app/components/archieve-menu-popover/archieve-menu-popover.component';
+import { IConversation } from 'src/app/services/sqlite.service';
 
 @Component({
   selector: 'app-archieved-screen',
@@ -338,11 +339,11 @@ import { ArchieveMenuPopoverComponent } from 'src/app/components/archieve-menu-p
   styleUrls: ['./archieved-screen.page.scss'],
 })
 export class ArchievedScreenPage implements OnInit, OnDestroy {
-  items: any[] = [];
+  items: IConversation[] = [];
   isLoading = true;
 
   // selection state
-  selected: ArchItem[] = [];
+  selected: IConversation[] = [];
   private longPressTimer: any = null;
 
   private userId = '';
@@ -395,8 +396,8 @@ export class ArchievedScreenPage implements OnInit, OnDestroy {
     const sel = this.selected;
     if (!sel || sel.length === 0) return 'none';
 
-    const hasPriv = sel.some((s) => !s.isGroup);
-    const hasGroup = sel.some((s) => s.isGroup);
+    const hasPriv = sel.some((s) => s.type !== 'group');
+    const hasGroup = sel.some((s) => s.type == 'group');
 
     if (hasPriv && hasGroup) return 'mixed';
     if (hasPriv) return sel.length === 1 ? 'single-private' : 'multi-private';
@@ -466,17 +467,19 @@ export class ArchievedScreenPage implements OnInit, OnDestroy {
   }
 
   private async openSelectedContactProfile(): Promise<void> {
-    const sel = this.selected.filter((s) => !s.isGroup);
+    const sel = this.selected.filter((s) => s.type !== 'group');
     const it = sel[0];
-    if (!it || !it.otherUserId) return;
+    // if (!it || !it.otherUserId) return;
+    const parts = it.roomId?.split('_');
+            const receiverId = parts.find((p) => p !== this.userId) ?? parts[parts.length - 1];
 
-    const user = await this.fetchUser(it.otherUserId);
+    const user = await this.fetchUser(receiverId);
     const phoneNorm = this.normalizePhone(user?.phone_number);
 
     const queryParams: any = {
-      receiverId: String(it.otherUserId),
-      receiver_phone: phoneNorm || String(it.otherUserId),
-      receiver_name: it.name,
+      receiverId: String(receiverId),
+      receiver_phone: phoneNorm || String(receiverId),
+      receiver_name: it.title,
       isGroup: false,
     };
 
@@ -485,14 +488,14 @@ export class ArchievedScreenPage implements OnInit, OnDestroy {
   }
 
   private openSelectedGroupInfo(): void {
-    const sel = this.selected.filter((s) => s.isGroup);
+    const sel = this.selected.filter((s) => s.type == 'group');
     const it = sel[0];
     if (!it) return;
 
     const queryParams: any = {
       receiverId: it.roomId,
       receiver_phone: '',
-      receiver_name: it.name,
+      receiver_name: it.title,
       isGroup: true,
     };
 
@@ -502,13 +505,13 @@ export class ArchievedScreenPage implements OnInit, OnDestroy {
 
   /** Exit ONE selected group (Archived screen) */
   private async confirmAndExitSingleSelectedGroup(): Promise<void> {
-    const sel = this.selected.filter((s) => s.isGroup);
+    const sel = this.selected.filter((s) => s.type == 'group');
     const it = sel[0];
     if (!it) return;
 
     const alert = await this.alertCtrl.create({
       header: 'Exit Group',
-      message: `Are you sure you want to exit "${it.name}"?`,
+      message: `Are you sure you want to exit "${it.title}"?`,
       buttons: [
         { text: 'Cancel', role: 'cancel' },
         {
@@ -548,7 +551,7 @@ export class ArchievedScreenPage implements OnInit, OnDestroy {
 
   /** Exit MANY selected groups (Archived screen) */
   private async confirmAndExitMultipleSelectedGroups(): Promise<void> {
-    const groups = this.selected.filter((s) => s.isGroup);
+    const groups = this.selected.filter((s) => s.type == 'group');
     if (groups.length === 0) return;
 
     const alert = await this.alertCtrl.create({
@@ -679,26 +682,26 @@ export class ArchievedScreenPage implements OnInit, OnDestroy {
 
   /** live list of archived rooms */
   private startArchiveListener() {
-    const db = getDatabase();
-    const ref = rtdbRef(db, `archivedChats/${this.userId}`);
-    const cb = onValue(ref, async (snap) => {
-      const map = snap.exists() ? snap.val() : {};
-      const roomIds = Object.keys(map).filter(
-        (k) => map[k]?.isArchived === true
-      );
+    // const db = getDatabase();
+    // const ref = rtdbRef(db, `archivedChats/${this.userId}`);
+    // const cb = onValue(ref, async (snap) => {
+    //   const map = snap.exists() ? snap.val() : {};
+    //   const roomIds = Object.keys(map).filter(
+    //     (k) => map[k]?.isArchived === true
+    //   );
 
-      const items = await Promise.all(
-        roomIds.map((rid) => this.buildItem(rid))
-      );
-      this.items = items.sort((a, b) => {
-        const ta = a.timestamp ? new Date(a.timestamp).getTime() : 0;
-        const tb = b.timestamp ? new Date(b.timestamp).getTime() : 0;
-        return tb - ta;
-      });
-      this.isLoading = false;
-    });
+    //   const items = await Promise.all(
+    //     roomIds.map((rid) => this.buildItem(rid))
+    //   );
+    //   this.items = items.sort((a, b) => {
+    //     const ta = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+    //     const tb = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+    //     return tb - ta;
+    //   });
+    //   this.isLoading = false;
+    // });
 
-    this.unsubArchive = () => off(ref, 'value', cb);
+    // this.unsubArchive = () => off(ref, 'value', cb);
   }
 
   /** construct one row (name, avatar, preview, unread) */
@@ -878,11 +881,11 @@ export class ArchievedScreenPage implements OnInit, OnDestroy {
   }
 
   /** open like home screen (exact parity) */
-  async open(item: ArchItem) {
+  async open(item: IConversation) {
     const receiverId = item.roomId;
-    const receiver_name = item.name;
+    const receiver_name = item.title;
 
-    await this.secureStorage.setItem('receiver_name', receiver_name);
+    // await this.secureStorage.setItem('receiver_name', receiver_name);
 
     if ((item as any).isCommunity) {
       this.router.navigate(['/community-detail'], {
@@ -890,16 +893,20 @@ export class ArchievedScreenPage implements OnInit, OnDestroy {
       });
       return;
     }
+    await this.firebaseChat.openChat(item);   // Buggy area
 
-    if (item.isGroup) {
+    if (item.type == 'group') {
       this.router.navigate(['/chatting-screen'], {
         queryParams: { receiverId, isGroup: true },
       });
     } else {
-      const receiver_phone = item.otherUserId!;
-      await this.secureStorage.setItem('receiver_phone', receiver_phone);
+      // const receiver_phone = item.otherUserId!;
+      // await this.secureStorage.setItem('receiver_phone', receiver_phone);
+      const parts = item.roomId.split('_');
+            const receiverId =
+              parts.find((p) => p !== this.userId) ?? parts[parts.length - 1];
       this.router.navigate(['/chatting-screen'], {
-        queryParams: { receiverId: receiver_phone, receiver_phone },
+        queryParams: { receiverId: receiverId },
       });
     }
   }
@@ -907,8 +914,8 @@ export class ArchievedScreenPage implements OnInit, OnDestroy {
   /* ---------- selection helpers ---------- */
   get selectionMeta() {
     const sel = this.selected || [];
-    const hasPriv = sel.some((s) => !s.isGroup);
-    const hasGroup = sel.some((s) => s.isGroup);
+    const hasPriv = sel.some((s) => s.type !== 'group');
+    const hasGroup = sel.some((s) => s.type == 'group');
     return {
       count: sel.length,
       onlyPrivates: hasPriv && !hasGroup,
@@ -917,11 +924,11 @@ export class ArchievedScreenPage implements OnInit, OnDestroy {
     };
   }
 
-  isSelected(it: ArchItem): boolean {
+  isSelected(it: IConversation): boolean {
     return this.selected.some((s) => s.roomId === it.roomId);
   }
 
-  toggleSelection(it: ArchItem, ev?: Event) {
+  toggleSelection(it: IConversation, ev?: Event) {
     if (ev) ev.stopPropagation();
     const i = this.selected.findIndex((s) => s.roomId === it.roomId);
     if (i > -1) this.selected.splice(i, 1);
@@ -934,7 +941,7 @@ export class ArchievedScreenPage implements OnInit, OnDestroy {
     this.cancelLongPress();
   }
 
-  onRowClick(it: ArchItem, ev: Event) {
+  onRowClick(it: IConversation, ev: Event) {
     if (this.selected.length > 0) {
       this.toggleSelection(it, ev);
       return;
@@ -942,7 +949,7 @@ export class ArchievedScreenPage implements OnInit, OnDestroy {
     this.open(it);
   }
 
-  startLongPress(it: ArchItem) {
+  startLongPress(it: IConversation) {
     this.cancelLongPress();
     this.longPressTimer = setTimeout(() => {
       if (!this.isSelected(it)) this.selected = [it];
@@ -973,7 +980,7 @@ export class ArchievedScreenPage implements OnInit, OnDestroy {
   // delete for me — only privates
   async deleteSelected() {
     const db = getDatabase();
-    const privates = this.selected.filter((s) => !s.isGroup);
+    const privates = this.selected.filter((s) => s.type !== 'group');
     if (privates.length === 0) {
       this.clearSelection();
       return;

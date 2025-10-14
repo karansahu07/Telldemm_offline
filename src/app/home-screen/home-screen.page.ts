@@ -149,6 +149,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
 
       this.firebaseChatService.conversations$.subscribe((convs) => {
         this.archievedCount = convs.filter((c) => c.isArchived).length || 0;
+        console.log("this archievwed count",this.archievedCount)
         this.conversations = convs
           .map((c) => ({
             ...c,
@@ -158,7 +159,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
           }))
           .filter((c) => !c.isLocked && !c.isArchived);
 
-        console.log('Conversations updated:', this.conversations);
+        console.log('Conversations updated:', convs);
       });
       this.isLoading = false;
       console.info('Loading home page complete!');
@@ -458,112 +459,282 @@ export class HomeScreenPage implements OnInit, OnDestroy {
   }
 
   /* ===== Selection mode logic ===== */
-  isChatSelected(chat: any): boolean {
-    return this.selectedChats.some(
-      (c) =>
-        c.receiver_Id === chat.receiver_Id &&
-        !!c.isCommunity === !!chat.isCommunity &&
-        !!c.group === !!chat.group
-    );
+
+//   onChatRowClick(chat: any, ev: Event) {
+//     if (this.selectedChats.length > 0) {
+//       this.toggleChatSelection(chat, ev);
+//       if (this.selectedConversations.has(chat.roomId)) {
+//         this.selectedConversations.add(chat.roomId);
+//       } else {
+//         this.selectedConversations.delete(chat.roomId);
+//       }
+//     }
+//     this.openChat(chat);
+//   }
+
+//    isConvSelected(roomId: string) {
+//     return this.selectedConversations.has(roomId);
+//   }
+
+//  isChatSelected(chat: any): boolean {
+//   return this.selectedChats.some(c => {
+//     const sameId = c.receiver_Id === chat.receiver_Id;
+//     const sameGroup = !!c.group === !!chat.group;
+//     const sameCommunity = !!c.isCommunity === !!chat.isCommunity;
+    
+//     return sameId && sameGroup && sameCommunity;
+//   });
+// }
+
+// get selectedCount(): number {
+//   return this.selectedChats.length;
+// }
+
+// get hasSelection(): boolean {
+//   return this.selectedChats.length > 0;
+// }
+
+
+//   toggleChatSelection(chat: any, ev?: Event) {
+//     if (ev) ev.stopPropagation();
+
+//     const isCommunity = !!chat.isCommunity;
+//     const already = this.selectedChats.find((c) => this.sameItem(c, chat));
+
+//     // --- COMMUNITY SELECTION RULES ---
+//     if (isCommunity) {
+//       // non-community already selected → ignore community tap
+//       if (this.hasNonCommunitySelected()) return;
+
+//       // community already selected
+//       const previouslySelectedCommunity = this.selectedChats.find(
+//         (c) => !!c.isCommunity
+//       );
+//       if (already) {
+//         // tap again → unselect
+//         this.selectedChats = this.selectedChats.filter(
+//           (c) => !this.sameItem(c, chat)
+//         );
+//       } else if (previouslySelectedCommunity) {
+//         // switch to this community (never allow 2 communities together)
+//         this.selectedChats = [chat];
+//       } else {
+//         // first community → single select
+//         this.selectedChats = [chat];
+//       }
+//       if (this.selectedChats.length === 0) this.cancelHomeLongPress();
+//       return;
+//     }
+
+//     // --- NON-COMMUNITY (PRIVATE/GROUP) RULES ---
+//     // if a community is selected, clear it (community can’t coexist)
+//     if (this.hasCommunitySelected()) this.selectedChats = [];
+
+//     if (already) {
+//       // toggle off
+//       this.selectedChats = this.selectedChats.filter(
+//         (c) => !this.sameItem(c, chat)
+//       );
+//       if (this.selectedChats.length === 0) this.cancelHomeLongPress();
+//     } else {
+//       // add alongside other non-communities
+//       this.selectedChats.push(chat);
+//     }
+//   }
+
+//   /** selection guards */
+//   private hasCommunitySelected(): boolean {
+//     return this.selectedChats.some((c) => !!c.isCommunity);
+//   }
+//   private hasNonCommunitySelected(): boolean {
+//     return this.selectedChats.some((c) => !c.isCommunity);
+//   }
+//   private sameItem(a: any, b: any): boolean {
+//     return (
+//       a?.receiver_Id === b?.receiver_Id &&
+//       !!a?.group === !!b?.group &&
+//       !!a?.isCommunity === !!b?.isCommunity
+//     );
+//   }
+
+//   clearChatSelection() {
+//     this.selectedChats = [];
+//     this.cancelHomeLongPress();
+//   }
+
+
+
+//   startHomeLongPress(chat: any) {
+//     this.cancelHomeLongPress();
+//     this.longPressTimer = setTimeout(() => {
+//       if (!this.isChatSelected(chat)) this.selectedChats = [chat];
+//     }, 500);
+//   }
+//   cancelHomeLongPress() {
+//     if (this.longPressTimer) {
+//       clearTimeout(this.longPressTimer);
+//       this.longPressTimer = null;
+//     }
+//   }
+
+// ============================================
+// REPLACE THESE METHODS IN YOUR NEW HOME PAGE
+// ============================================
+
+/* ===== Selection mode logic ===== */
+
+// ✅ Fix: Click handler with proper selection toggle
+onChatRowClick(chat: any, ev: Event) {
+  if (this.selectedChats.length > 0) {
+    // In selection mode: toggle selection
+    this.toggleChatSelection(chat, ev);
+    return;
   }
+  // Normal mode: open chat
+  this.openChat(chat);
+}
 
-  isConvSelected(roomId: string) {
-    return this.selectedConversations.has(roomId);
+// ✅ Fix: Check if conversation is selected (works with conversations array)
+isConvSelected(roomId: string): boolean {
+  return this.selectedConversations.has(roomId);
+}
+
+// ✅ Fix: Check if chat object is selected
+isChatSelected(chat: any): boolean {
+  // Check by roomId (preferred for conversations)
+  if (chat.roomId) {
+    return this.selectedConversations.has(chat.roomId);
   }
+  
+  // Fallback: check by receiver_Id, group, community flags
+  return this.selectedChats.some(c => {
+    const sameId = c.receiver_Id === chat.receiver_Id;
+    const sameGroup = !!c.group === !!chat.group;
+    const sameCommunity = !!c.isCommunity === !!chat.isCommunity;
+    return sameId && sameGroup && sameCommunity;
+  });
+}
 
-  toggleChatSelection(chat: any, ev?: Event) {
-    if (ev) ev.stopPropagation();
+// ✅ New: Get selected count
+get selectedCount(): number {
+  return this.selectedChats.length;
+}
 
-    const isCommunity = !!chat.isCommunity;
-    const already = this.selectedChats.find((c) => this.sameItem(c, chat));
+// ✅ New: Check if has selection
+get hasSelection(): boolean {
+  return this.selectedChats.length > 0;
+}
 
-    // --- COMMUNITY SELECTION RULES ---
-    if (isCommunity) {
-      // non-community already selected → ignore community tap
-      if (this.hasNonCommunitySelected()) return;
+// ✅ Fix: Toggle selection (sync both arrays)
+toggleChatSelection(chat: any, ev?: Event) {
+  if (ev) ev.stopPropagation();
 
-      // community already selected
-      const previouslySelectedCommunity = this.selectedChats.find(
-        (c) => !!c.isCommunity
-      );
-      if (already) {
-        // tap again → unselect
-        this.selectedChats = this.selectedChats.filter(
-          (c) => !this.sameItem(c, chat)
-        );
-      } else if (previouslySelectedCommunity) {
-        // switch to this community (never allow 2 communities together)
-        this.selectedChats = [chat];
-      } else {
-        // first community → single select
-        this.selectedChats = [chat];
-      }
-      if (this.selectedChats.length === 0) this.cancelHomeLongPress();
-      return;
-    }
+  const isCommunity = !!chat.isCommunity;
+  const already = this.selectedChats.find(c => this.sameItem(c, chat));
 
-    // --- NON-COMMUNITY (PRIVATE/GROUP) RULES ---
-    // if a community is selected, clear it (community can’t coexist)
-    if (this.hasCommunitySelected()) this.selectedChats = [];
+  // --- COMMUNITY SELECTION RULES ---
+  if (isCommunity) {
+    if (this.hasNonCommunitySelected()) return;
 
+    const previouslySelectedCommunity = this.selectedChats.find(c => !!c.isCommunity);
+    
     if (already) {
-      // toggle off
-      this.selectedChats = this.selectedChats.filter(
-        (c) => !this.sameItem(c, chat)
-      );
-      if (this.selectedChats.length === 0) this.cancelHomeLongPress();
+      // Unselect
+      this.selectedChats = this.selectedChats.filter(c => !this.sameItem(c, chat));
+      if (chat.roomId) this.selectedConversations.delete(chat.roomId);
+    } else if (previouslySelectedCommunity) {
+      // Switch to this community
+      if (previouslySelectedCommunity.roomId) {
+        this.selectedConversations.delete(previouslySelectedCommunity.roomId);
+      }
+      this.selectedChats = [chat];
+      if (chat.roomId) this.selectedConversations.add(chat.roomId);
     } else {
-      // add alongside other non-communities
-      this.selectedChats.push(chat);
+      // First community
+      this.selectedChats = [chat];
+      if (chat.roomId) this.selectedConversations.add(chat.roomId);
     }
+    
+    if (this.selectedChats.length === 0) this.cancelHomeLongPress();
+    return;
   }
 
-  /** selection guards */
-  private hasCommunitySelected(): boolean {
-    return this.selectedChats.some((c) => !!c.isCommunity);
-  }
-  private hasNonCommunitySelected(): boolean {
-    return this.selectedChats.some((c) => !c.isCommunity);
-  }
-  private sameItem(a: any, b: any): boolean {
-    return (
-      a?.receiver_Id === b?.receiver_Id &&
-      !!a?.group === !!b?.group &&
-      !!a?.isCommunity === !!b?.isCommunity
-    );
-  }
-
-  clearChatSelection() {
+  // --- NON-COMMUNITY (PRIVATE/GROUP) RULES ---
+  if (this.hasCommunitySelected()) {
+    // Clear community selection
+    this.selectedChats.forEach(c => {
+      if (c.roomId) this.selectedConversations.delete(c.roomId);
+    });
     this.selectedChats = [];
-    this.cancelHomeLongPress();
   }
-  onChatRowClick(chat: any, ev: Event) {
-    if (this.selectedChats.length > 0) {
-      this.toggleChatSelection(chat, ev);
-      if (this.selectedConversations.has(chat.roomId)) {
+
+  if (already) {
+    // Toggle off
+    this.selectedChats = this.selectedChats.filter(c => !this.sameItem(c, chat));
+    if (chat.roomId) this.selectedConversations.delete(chat.roomId);
+    if (this.selectedChats.length === 0) this.cancelHomeLongPress();
+  } else {
+    // Add
+    this.selectedChats.push(chat);
+    if (chat.roomId) this.selectedConversations.add(chat.roomId);
+  }
+}
+
+/** selection guards */
+private hasCommunitySelected(): boolean {
+  return this.selectedChats.some(c => !!c.isCommunity);
+}
+
+private hasNonCommunitySelected(): boolean {
+  return this.selectedChats.some(c => !c.isCommunity);
+}
+
+private sameItem(a: any, b: any): boolean {
+  // Prefer roomId comparison
+  if (a?.roomId && b?.roomId) {
+    return a.roomId === b.roomId;
+  }
+  
+  // Fallback to old logic
+  return (
+    a?.receiver_Id === b?.receiver_Id &&
+    !!a?.group === !!b?.group &&
+    !!a?.isCommunity === !!b?.isCommunity
+  );
+}
+
+// ✅ Fix: Clear selection (sync both arrays)
+clearChatSelection() {
+  this.selectedChats = [];
+  this.selectedConversations.clear();
+  this.cancelHomeLongPress();
+}
+
+// ✅ Unchanged: Long press handlers
+startHomeLongPress(chat: any) {
+  this.cancelHomeLongPress();
+  this.longPressTimer = setTimeout(() => {
+    if (!this.isChatSelected(chat)) {
+      this.selectedChats = [chat];
+      if (chat.roomId) {
+        this.selectedConversations.clear();
         this.selectedConversations.add(chat.roomId);
-      } else {
-        this.selectedConversations.delete(chat.roomId);
       }
     }
-    this.openChat(chat);
+  }, 500);
+}
+
+cancelHomeLongPress() {
+  if (this.longPressTimer) {
+    clearTimeout(this.longPressTimer);
+    this.longPressTimer = null;
   }
-  startHomeLongPress(chat: any) {
-    this.cancelHomeLongPress();
-    this.longPressTimer = setTimeout(() => {
-      if (!this.isChatSelected(chat)) this.selectedChats = [chat];
-    }, 500);
-  }
-  cancelHomeLongPress() {
-    if (this.longPressTimer) {
-      clearTimeout(this.longPressTimer);
-      this.longPressTimer = null;
-    }
-  }
+}
 
   /* ===== Selection meta (for header icon logic) ===== */
   get selectionMeta() {
     const sel = this.selectedChats || [];
+    // console.log({sel})
     const count = sel.length;
     const includesCommunity = sel.some((c) => c.isCommunity);
     const includesGroup = sel.some((c) => c.group && !c.isCommunity);
@@ -835,6 +1006,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
       await this.firebaseChatService.setArchiveConversation(
         this.selectedChats.map((c) => c.roomId)
       );
+      this.clearChatSelection();
       return;
       // if (archivables.length === 0) {
       //   const alert = await this.alertCtrl.create({
@@ -891,31 +1063,6 @@ export class HomeScreenPage implements OnInit, OnDestroy {
       console.error('❌ Error archiving chats:', error);
     }
   }
-
-  // private async startArchiveListener() {
-  //   try {
-  //     const userId = this.senderUserId || this.authService.authData?.userId || '';
-  //     if (!userId || this.archiveUnsub) return;
-
-  //     const db = getDatabase();
-  //     const archiveRef = rtdbRef(db, `archivedChats/${userId}`);
-
-  //     this.archiveUnsub = rtdbOnValue(archiveRef, (snapshot) => {
-  //       const archivedMap = snapshot.exists() ? snapshot.val() : {};
-
-  //       // Filter out archived chats from chatList
-  //       this.chatList = this.chatList.filter(chat => {
-  //         const roomId = chat.group
-  //           ? chat.receiver_Id
-  //           : this.getRoomId(userId, chat.receiver_Id);
-
-  //         return !archivedMap[roomId]?.isArchived;
-  //       });
-  //     });
-  //   } catch (err) {
-  //     console.warn('startArchiveListener error:', err);
-  //   }
-  // }
 
   private startArchiveListener() {
     try {
