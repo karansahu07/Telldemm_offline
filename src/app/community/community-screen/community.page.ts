@@ -186,7 +186,7 @@ export class CommunityPage implements OnInit {
         handler: async (data) => {
           if (!data?.name || !this.selectedCommunity) return;
           const groupId = 'group_' + Date.now();
-          await this.firebaseService.createGroup(groupId, data.name, [this.userId], this.selectedCommunity.id);
+          // await this.firebaseService.createGroup({groupId, groupName : data.name, this.selectedCommunity.id});
           this.openCommunityGroups(this.selectedCommunity);
           const toast = await this.toastCtrl.create({
             message: t.instant('community.toasts.groupCreated'),

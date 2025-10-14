@@ -30,7 +30,7 @@ export class CreateNewGroupPage implements OnInit {
   permissions: string = 'Members can send messages'; // placeholder
 
   // members management (simple single-user default)
-  members: Array<{ user_id: string; name?: string; phone_number?: string }> = [];
+  members: Array<{ userId: string; username: string; phoneNumber: string }> = [];
 
   creating = false;
 
@@ -58,14 +58,14 @@ export class CreateNewGroupPage implements OnInit {
     const name = user?.name ?? 'You';
     const phone = user?.phone_number ?? '';
     if (uid) {
-      this.members = [{ user_id: uid, name, phone_number: phone }];
+      this.members = [{ userId: uid, username : name, phoneNumber: phone }];
     }
      const navState: any = this.router.getCurrentNavigation()?.extras?.state;
   if (navState?.selectedMembers) {
     // merge new members with existing ones (avoid duplicates)
     const newMembers = navState.selectedMembers;
     newMembers.forEach((m: any) => {
-      if (!this.members.find(existing => existing.user_id === m.user_id)) {
+      if (!this.members.find(existing => existing.userId === m.user_id)) {
         this.members.push(m);
       }
     });
@@ -151,7 +151,7 @@ async addMemberPrompt() {
       const groupId = `group_${Date.now()}`;
 
       // create group node using service
-      await this.firebaseService.createGroup(groupId, this.groupName.trim(), this.members, userId);
+      await this.firebaseService.createGroup({groupId, groupName : this.groupName.trim(), members : this.members});
 
       // Prepare multi-path updates to link group with community and user index
       const updates: any = {};

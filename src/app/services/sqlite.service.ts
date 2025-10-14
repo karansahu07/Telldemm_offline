@@ -90,7 +90,31 @@ export interface IConversation {
   isPinned: boolean;
   isLocked: boolean;
 }
+export interface IGroup {
+  roomId: string;
+  title?: string;
+  type:'group';
+  avatar?: string;
+  description : string;
+  members?: Record<string,IGroupMember>;
+  adminIds?: string[];
+  createdBy : string;
+  createdAt?: Date | string | number;
+  updatedAt?: Date |string | number;
+  lastMessage?: string;
+  lastMessageType?: string;
+  lastMessageAt?: Date | string | number;
+  unreadCount?: number;
+  isArchived: boolean;
+  isPinned: boolean;
+  isLocked: boolean;
+}
 
+export interface IGroupMember{
+  username: string;
+  phoneNumber : string;
+  isActive : boolean;
+}
 export interface IOpState {
   id: string;
   isLoading: boolean;

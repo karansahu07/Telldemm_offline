@@ -352,224 +352,225 @@ private pfUsersSub?: Subscription;
     }
   }
 
-  // async ionViewWillEnter() {
-  //   Keyboard.setScroll({ isDisabled: false });
-  //   this.senderId = this.authService.authData?.userId || '';
-  //   this.sender_phone = this.authService.authData?.phone_number || '';
-  //   this.sender_name = this.authService.authData?.name || '';
+  async ionViewWillEnter() {
+    Keyboard.setScroll({ isDisabled: false });
+    this.senderId = this.authService.authData?.userId || '';
+    this.sender_phone = this.authService.authData?.phone_number || '';
+    this.sender_name = this.authService.authData?.name || '';
 
-
-  // //    try {
-  // //   this.pfUsersSub = this.chatService.platformUsers$.subscribe((users) => {
-  // //     // Normalize fields to be consistent with what ContactsPage does
-  // //     this.pfUsers = (users || []).map((u: any) => ({
-  // //       userId: u.userId ?? u.user_id ?? u.id ?? null,
-  // //       username: u.username ?? u.name ?? u.displayName ?? '',
-  // //       phoneNumber: u.phoneNumber ?? u.phone_number ?? '',
-  // //       avatar: u.avatar ?? u.profile ?? null,
-  // //       // isOnPlatform: !!u.isOnPlatform ?? true,
-  // //     }));
-
-  // //     console.log("this.pfUsers",this.pfUsers)
-
-  // //     // optional debug
-  // //     // console.log('pfUsers updated', this.pfUsers);
-  // //   });
-  // // } catch (err) {
-  // //   console.warn('Failed to subscribe to platform users', err);
-  // // }
-
-  //   const nameFromQuery =
-  //     this.route.snapshot.queryParamMap.get('receiver_name');
-  //   this.receiver_name =
-  //     nameFromQuery ||
-  //     (await this.secureStorage.getItem('receiver_name')) ||
-  //     '';
-
-  //   const rawId = this.route.snapshot.queryParamMap.get('receiverId') || '';
-  //   const chatTypeParam = this.route.snapshot.queryParamMap.get('isGroup');
-  //   const phoneFromQuery =
-  //     this.route.snapshot.queryParamMap.get('receiver_phone');
-
-  //   // this.chatType = chatTypeParam === 'true' ? 'group' : 'private';
-
-  //   // if (this.chatType === 'group') {
-  //   //   this.roomId = decodeURIComponent(rawId);
-
-  //   //   try {
-  //   //     const res = await this.chatService.fetchGroupWithProfiles(this.roomId);
-  //   //     if (!res) return;
-  //   //     const { groupName, groupMembers } = res;
-  //   //     this.groupName = groupName;
-  //   //     this.groupMembers = groupMembers;
-  //   //   } catch (err) {
-  //   //     console.warn('Failed to fetch group with profiles', err);
-  //   //     this.groupName = 'Group';
-  //   //     this.groupMembers = [];
-  //   //   }
-
-  //   //   this.setupTypingListener();
-  //   // } else {
-  //   //   this.receiverId = decodeURIComponent(rawId);
-  //   //   this.roomId = this.getRoomId(this.senderId, this.receiverId);
-  //   //   this.receiver_phone =
-  //   //     phoneFromQuery || localStorage.getItem('receiver_phone') || '';
-  //   //   localStorage.setItem('receiver_phone', this.receiver_phone);
-  //   // }
-
-  //   // await this.chatService.resetUnreadCount(this.roomId, this.senderId);
-  //   // await this.markMessagesAsRead();
-
-  //   // // await this.loadFromLocalStorage();
-  //   // // this.listenForMessages();
-
-  //   // const nav = this.router.getCurrentNavigation();
-  //   // const state = nav?.extras?.state;
-
-  //   // if (state && state['imageToSend']) {
-  //   //   this.attachmentPath = state['imageToSend'];
-  //   // }
-
-  //   // this.loadReceiverProfile();
-  // }
-
-async ionViewWillEnter() {
-  Keyboard.setScroll({ isDisabled: false });
-  
-  this.senderId = this.authService.authData?.userId || '';
-  this.sender_phone = this.authService.authData?.phone_number || '';
-  this.sender_name = this.authService.authData?.name || '';
-
-  // Get current chat data from Firebase Chat Service
+    // Get current chat data from Firebase Chat Service
   const currentChat = this.chatService.currentChat;
   this.receiverProfile = (currentChat as any).avatar || (currentChat as any).groupAvatar || null;
   
-  if (currentChat) {
-    // Set room and chat details from currentChat
-    
-  //   if (this.chatType === 'group') {
-  //     this.groupName = currentChat.title || 'Group';
-  //     this.receiver_name = currentChat.title || 'private';
-  //     this.receiverId = currentChat.roomId;
-      
-  //     // Set group avatar from currentChat
-      
-  //     // Load group members if available
-  //     if (currentChat.members && currentChat.members.length > 0) {
-  //       // Fetch group member details
-  //       try {
-  //         const res = await this.chatService.fetchGroupWithProfiles(this.roomId);
-  //         if (res) {
-  //           const { groupName, groupMembers } = res;
-  //           this.groupName = groupName;
-  //           this.groupMembers = groupMembers;
-  //         }
-  //       } catch (err) {
-  //         console.warn('Failed to fetch group with profiles', err);
-  //         this.groupMembers = [];
-  //       }
-  //     }
-      
-  //     this.setupTypingListener();
-  //   } else {
-  //     // Private chat
-  //     this.receiver_name = currentChat.title || '';
-      
-  //     // Extract receiver ID from members array
-  //     const members = currentChat.members || [];
-  //     this.receiverId = members.find((m: string) => m !== this.senderId) || '';
-      
-  //     // Set receiver avatar from currentChat
-  //     this.receiverProfile = (currentChat as any).avatar || (currentChat as any).receiverAvatar || null;
-      
-  //     // Get receiver phone if available from query params or storage
-  //     const phoneFromQuery = this.route.snapshot.queryParamMap.get('receiver_phone');
-  //     this.receiver_phone = phoneFromQuery || localStorage.getItem('receiver_phone') || '';
-      
-  //     if (this.receiver_phone) {
-  //       localStorage.setItem('receiver_phone', this.receiver_phone);
-  //     }
-  //   }
-    
-  //   // Store chat info in secure storage for future reference
-  //   await this.secureStorage.setItem('receiver_name', this.receiver_name);
-  //   await this.secureStorage.setItem('roomId', this.roomId);
-    
-  //   // If avatar not available in currentChat, load from API as fallback
-  //   if (!this.receiverProfile) {
-  //     this.loadReceiverProfile();
-  //   }
-    
-  // } else {
-  //   // Fallback: Try to get data from query params (for backward compatibility)
-  //   const nameFromQuery = this.route.snapshot.queryParamMap.get('receiver_name');
-  //   this.receiver_name = nameFromQuery || (await this.secureStorage.getItem('receiver_name')) || '';
-    
-  //   const rawId = this.route.snapshot.queryParamMap.get('receiverId') || '';
-  //   const chatTypeParam = this.route.snapshot.queryParamMap.get('isGroup');
-  //   const phoneFromQuery = this.route.snapshot.queryParamMap.get('receiver_phone');
-    
-  //   this.chatType = chatTypeParam === 'true' ? 'group' : 'private';
-    
-  //   if (this.chatType === 'group') {
-  //     this.roomId = decodeURIComponent(rawId);
-      
-  //     try {
-  //       const res = await this.chatService.fetchGroupWithProfiles(this.roomId);
-  //       if (res) {
-  //         const { groupName, groupMembers } = res;
-  //         this.groupName = groupName;
-  //         this.groupMembers = groupMembers;
-  //       }
-  //     } catch (err) {
-  //       console.warn('Failed to fetch group with profiles', err);
-  //       this.groupName = 'Group';
-  //       this.groupMembers = [];
-  //     }
-      
-  //     this.setupTypingListener();
-  //   } else {
-  //     this.receiverId = decodeURIComponent(rawId);
-  //     this.roomId = this.getRoomId(this.senderId, this.receiverId);
-  //     this.receiver_phone = phoneFromQuery || localStorage.getItem('receiver_phone') || '';
-  //     localStorage.setItem('receiver_phone', this.receiver_phone);
-  //   }
+  if (currentChat) {}
+
+  //    try {
+  //   this.pfUsersSub = this.chatService.platformUsers$.subscribe((users) => {
+  //     // Normalize fields to be consistent with what ContactsPage does
+  //     this.pfUsers = (users || []).map((u: any) => ({
+  //       userId: u.userId ?? u.user_id ?? u.id ?? null,
+  //       username: u.username ?? u.name ?? u.displayName ?? '',
+  //       phoneNumber: u.phoneNumber ?? u.phone_number ?? '',
+  //       avatar: u.avatar ?? u.profile ?? null,
+  //       // isOnPlatform: !!u.isOnPlatform ?? true,
+  //     }));
+
+  //     console.log("this.pfUsers",this.pfUsers)
+
+  //     // optional debug
+  //     // console.log('pfUsers updated', this.pfUsers);
+  //   });
+  // } catch (err) {
+  //   console.warn('Failed to subscribe to platform users', err);
   // }
+
+    // const nameFromQuery =
+    //   this.route.snapshot.queryParamMap.get('receiver_name');
+    // this.receiver_name =
+    //   nameFromQuery ||
+    //   (await this.secureStorage.getItem('receiver_name')) ||
+    //   '';
+
+    // const rawId = this.route.snapshot.queryParamMap.get('receiverId') || '';
+    // const chatTypeParam = this.route.snapshot.queryParamMap.get('isGroup');
+    // const phoneFromQuery =
+    //   this.route.snapshot.queryParamMap.get('receiver_phone');
+
+    // this.chatType = chatTypeParam === 'true' ? 'group' : 'private';
+
+    // if (this.chatType === 'group') {
+    //   this.roomId = decodeURIComponent(rawId);
+
+    //   try {
+    //     const res = await this.chatService.fetchGroupWithProfiles(this.roomId);
+    //     if (!res) return;
+    //     const { groupName, groupMembers } = res;
+    //     this.groupName = groupName;
+    //     this.groupMembers = groupMembers;
+    //   } catch (err) {
+    //     console.warn('Failed to fetch group with profiles', err);
+    //     this.groupName = 'Group';
+    //     this.groupMembers = [];
+    //   }
+
+    //   this.setupTypingListener();
+    // } else {
+    //   this.receiverId = decodeURIComponent(rawId);
+    //   this.roomId = this.getRoomId(this.senderId, this.receiverId);
+    //   this.receiver_phone =
+    //     phoneFromQuery || localStorage.getItem('receiver_phone') || '';
+    //   localStorage.setItem('receiver_phone', this.receiver_phone);
+    // }
+
+    // await this.chatService.resetUnreadCount(this.roomId, this.senderId);
+    // await this.markMessagesAsRead();
+
+    // // await this.loadFromLocalStorage();
+    // // this.listenForMessages();
+
+    // const nav = this.router.getCurrentNavigation();
+    // const state = nav?.extras?.state;
+
+    // if (state && state['imageToSend']) {
+    //   this.attachmentPath = state['imageToSend'];
+    // }
+
+    // this.loadReceiverProfile();
+  }
+
+// async ionViewWillEnter() {
+//   Keyboard.setScroll({ isDisabled: false });
   
-  // // Common initialization for both paths
-  // await this.chatService.resetUnreadCount(this.roomId, this.senderId);
-  // await this.markMessagesAsRead();
+//   this.senderId = this.authService.authData?.userId || '';
+//   this.sender_phone = this.authService.authData?.phone_number || '';
+//   this.sender_name = this.authService.authData?.name || '';
+
   
-  // // Setup typing for private chats
-  // if (this.chatType === 'private') {
-  //   try {
-  //     const db = getDatabase();
-  //     const myTypingRef = dbRef(db, `typing/${this.roomId}/${this.senderId}`);
-  //     onDisconnect(myTypingRef).remove();
-  //   } catch (err) {
-  //     console.warn('onDisconnect setup failed', err);
-  //   }
+//     // Set room and chat details from currentChat
     
-  //   const tsub = this.typingInput$
-  //     .pipe(throttleTime(1200, undefined, { leading: true, trailing: true }))
-  //     .subscribe(() => {
-  //       this.sendTypingSignal();
-  //     });
-  //   this.typingRxSubs.push(tsub);
-  // }
+//   //   if (this.chatType === 'group') {
+//   //     this.groupName = currentChat.title || 'Group';
+//   //     this.receiver_name = currentChat.title || 'private';
+//   //     this.receiverId = currentChat.roomId;
+      
+//   //     // Set group avatar from currentChat
+      
+//   //     // Load group members if available
+//   //     if (currentChat.members && currentChat.members.length > 0) {
+//   //       // Fetch group member details
+//   //       try {
+//   //         const res = await this.chatService.fetchGroupWithProfiles(this.roomId);
+//   //         if (res) {
+//   //           const { groupName, groupMembers } = res;
+//   //           this.groupName = groupName;
+//   //           this.groupMembers = groupMembers;
+//   //         }
+//   //       } catch (err) {
+//   //         console.warn('Failed to fetch group with profiles', err);
+//   //         this.groupMembers = [];
+//   //       }
+//   //     }
+      
+//   //     this.setupTypingListener();
+//   //   } else {
+//   //     // Private chat
+//   //     this.receiver_name = currentChat.title || '';
+      
+//   //     // Extract receiver ID from members array
+//   //     const members = currentChat.members || [];
+//   //     this.receiverId = members.find((m: string) => m !== this.senderId) || '';
+      
+//   //     // Set receiver avatar from currentChat
+//   //     this.receiverProfile = (currentChat as any).avatar || (currentChat as any).receiverAvatar || null;
+      
+//   //     // Get receiver phone if available from query params or storage
+//   //     const phoneFromQuery = this.route.snapshot.queryParamMap.get('receiver_phone');
+//   //     this.receiver_phone = phoneFromQuery || localStorage.getItem('receiver_phone') || '';
+      
+//   //     if (this.receiver_phone) {
+//   //       localStorage.setItem('receiver_phone', this.receiver_phone);
+//   //     }
+//   //   }
+    
+//   //   // Store chat info in secure storage for future reference
+//   //   await this.secureStorage.setItem('receiver_name', this.receiver_name);
+//   //   await this.secureStorage.setItem('roomId', this.roomId);
+    
+//   //   // If avatar not available in currentChat, load from API as fallback
+//   //   if (!this.receiverProfile) {
+//   //     this.loadReceiverProfile();
+//   //   }
+    
+//   // } else {
+//   //   // Fallback: Try to get data from query params (for backward compatibility)
+//   //   const nameFromQuery = this.route.snapshot.queryParamMap.get('receiver_name');
+//   //   this.receiver_name = nameFromQuery || (await this.secureStorage.getItem('receiver_name')) || '';
+    
+//   //   const rawId = this.route.snapshot.queryParamMap.get('receiverId') || '';
+//   //   const chatTypeParam = this.route.snapshot.queryParamMap.get('isGroup');
+//   //   const phoneFromQuery = this.route.snapshot.queryParamMap.get('receiver_phone');
+    
+//   //   this.chatType = chatTypeParam === 'true' ? 'group' : 'private';
+    
+//   //   if (this.chatType === 'group') {
+//   //     this.roomId = decodeURIComponent(rawId);
+      
+//   //     try {
+//   //       const res = await this.chatService.fetchGroupWithProfiles(this.roomId);
+//   //       if (res) {
+//   //         const { groupName, groupMembers } = res;
+//   //         this.groupName = groupName;
+//   //         this.groupMembers = groupMembers;
+//   //       }
+//   //     } catch (err) {
+//   //       console.warn('Failed to fetch group with profiles', err);
+//   //       this.groupName = 'Group';
+//   //       this.groupMembers = [];
+//   //     }
+      
+//   //     this.setupTypingListener();
+//   //   } else {
+//   //     this.receiverId = decodeURIComponent(rawId);
+//   //     this.roomId = this.getRoomId(this.senderId, this.receiverId);
+//   //     this.receiver_phone = phoneFromQuery || localStorage.getItem('receiver_phone') || '';
+//   //     localStorage.setItem('receiver_phone', this.receiver_phone);
+//   //   }
+//   // }
   
-  // // Load receiver profile
-  // this.loadReceiverProfile();
+//   // // Common initialization for both paths
+//   // await this.chatService.resetUnreadCount(this.roomId, this.senderId);
+//   // await this.markMessagesAsRead();
   
-  // // Check block status
-  // await this.checkIfBlocked();
+//   // // Setup typing for private chats
+//   // if (this.chatType === 'private') {
+//   //   try {
+//   //     const db = getDatabase();
+//   //     const myTypingRef = dbRef(db, `typing/${this.roomId}/${this.senderId}`);
+//   //     onDisconnect(myTypingRef).remove();
+//   //   } catch (err) {
+//   //     console.warn('onDisconnect setup failed', err);
+//   //   }
+    
+//   //   const tsub = this.typingInput$
+//   //     .pipe(throttleTime(1200, undefined, { leading: true, trailing: true }))
+//   //     .subscribe(() => {
+//   //       this.sendTypingSignal();
+//   //     });
+//   //   this.typingRxSubs.push(tsub);
+//   // }
   
-  // // Start receiver status polling for private chats
-  // if (this.chatType === 'private') {
-  //   this.startReceiverStatusPoll();
-  // }
-}
-}
+//   // // Load receiver profile
+//   // this.loadReceiverProfile();
+  
+//   // // Check block status
+//   // await this.checkIfBlocked();
+  
+//   // // Start receiver status polling for private chats
+//   // if (this.chatType === 'private') {
+//   //   this.startReceiverStatusPoll();
+//   // }
+
+// }
 
   async ionViewDidEnter() {
     await this.chatService.loadMessages();

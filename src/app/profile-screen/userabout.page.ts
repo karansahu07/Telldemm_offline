@@ -609,19 +609,19 @@ async openActionSheet(member: any) {
 
     const members = [
       {
-        user_id: currentUserId,
-        name: currentUserName,
-        phone_number: currentUserPhone
+        userId: currentUserId,
+        username: currentUserName as string,
+        phoneNumber: currentUserPhone as  string
       },
       {
-        user_id: this.receiverId,
-        name: this.receiver_name,
-        phone_number: this.receiver_phone
+        userId: this.receiverId,
+        username: this.receiver_name,
+        phoneNumber: this.receiver_phone
       }
     ];
 
     try {
-      await this.firebaseChatService.createGroup(groupId, groupName, members, currentUserId);
+      await this.firebaseChatService.createGroup({groupId,groupName,members });
       this.router.navigate(['/chatting-screen'], {
         queryParams: { receiverId: groupId, isGroup: true }
       });

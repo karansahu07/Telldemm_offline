@@ -34,6 +34,8 @@ import { ApiService } from './api/api.service';
 import {
   IAttachment,
   IConversation,
+  IGroup,
+  IGroupMember,
   IMessage,
   IUser,
   SqliteService,
@@ -42,6 +44,7 @@ import { ContactSyncService } from './contact-sync.service';
 import { Platform } from '@ionic/angular';
 import { NetworkService } from './network-connection/network.service';
 import { EncryptionService } from './encryption.service';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class FirebaseChatService {
@@ -69,7 +72,7 @@ export class FirebaseChatService {
   private _userChatsListener: (() => void) | null = null;
   private _roomMessageListner: any = null;
 
-   currentChat: IConversation | null = null;
+  currentChat: IConversation | null = null;
 
   constructor(
     private db: Database,
@@ -79,7 +82,8 @@ export class FirebaseChatService {
     private platform: Platform,
     private apiService: ApiService,
     private networkService: NetworkService,
-    private encryptionService: EncryptionService
+    private encryptionService: EncryptionService,
+    private authService : AuthService
   ) {}
 
   // =====================
@@ -155,8 +159,10 @@ export class FirebaseChatService {
     this._roomMessageListner = this.listenRoomStream(conv?.roomId as string, {
       onAdd: async (msgKey, data, isNew) => {
         if (isNew && data.sender !== this.senderId) {
-          const decryptedText = await this.encryptionService.decrypt(data.text as string)
-          this.pushMsgToChat({ msgId: msgKey, ...data, text : decryptedText });
+          const decryptedText = await this.encryptionService.decrypt(
+            data.text as string
+          );
+          this.pushMsgToChat({ msgId: msgKey, ...data, text: decryptedText });
         }
       },
       onChange(msgKey, data) {
@@ -253,6 +259,177 @@ export class FirebaseChatService {
     }
   }
 
+  // Refactor: extracted helpers for fetching conversation details
+  // Place this inside the same service/class where syncConversationWithServer lives.
+
+  private async fetchPrivateConvDetails(
+    roomId: string,
+    meta: any
+  ): Promise<IConversation> {
+    const isWeb =
+      !!this.isNativePlatform() === false
+        ? false
+        : this.isNativePlatform() === false
+        ? false
+        : !!this.isNativePlatform();
+    // The above line only ensures `isWeb` is computed similarly to the original method. In practice this.isNativePlatform() returns boolean.
+
+    const parts = roomId.split('_');
+    const receiverId =
+      parts.find((p) => p !== this.senderId) ?? parts[parts.length - 1];
+
+    const localUser: Partial<IUser> | undefined =
+      this._platformUsers$.value.find((u) => u.userId === receiverId);
+
+    let profileResp: {
+      phone_number: string;
+      profile: string | null;
+      name: string;
+      publicKeyHex?: string;
+    } | null = null;
+
+    // Fetch profile when needed (web or when native and localUser not present)
+    if (isWeb) {
+      try {
+        profileResp = await firstValueFrom(
+          this.apiService.getUserProfilebyId(receiverId)
+        );
+      } catch (err) {
+        console.warn('Failed to fetch profile (web)', receiverId, err);
+      }
+    } else if (!localUser) {
+      try {
+        profileResp = await firstValueFrom(
+          this.apiService.getUserProfilebyId(receiverId)
+        );
+      } catch (err) {
+        console.warn(
+          'Failed to fetch profile (native fallback)',
+          receiverId,
+          err
+        );
+      }
+    }
+
+    let titleToShow = 'Unknown';
+    if (isWeb) {
+      titleToShow =
+        profileResp?.phone_number ??
+        localUser?.phoneNumber ??
+        profileResp?.name ??
+        localUser?.username ??
+        'Unknown';
+    } else {
+      titleToShow =
+        localUser?.username ??
+        profileResp?.name ??
+        profileResp?.phone_number ??
+        localUser?.phoneNumber ??
+        'Unknown';
+    }
+
+    const decryptedText = await this.encryptionService.decrypt(
+      meta?.lastmessage
+    );
+
+    const conv: IConversation = {
+      roomId,
+      type: 'private',
+      title: titleToShow,
+      phoneNumber: profileResp?.phone_number ?? localUser?.phoneNumber,
+      avatar: localUser?.avatar ?? profileResp?.profile ?? undefined,
+      members: [this.senderId, receiverId],
+      isMyself: false,
+      isArchived: meta?.isArchived,
+      isPinned: meta?.isPinned,
+      isLocked: meta?.isLocked,
+      lastMessage: decryptedText ?? undefined,
+      lastMessageType: meta?.lastmessageType ?? undefined,
+      lastMessageAt: meta?.lastmessageAt
+        ? new Date(Number(meta.lastmessageAt))
+        : undefined,
+      unreadCount:
+        typeof meta?.unreadCount === 'number'
+          ? meta.unreadCount
+          : Number(meta?.unreadCount) || 0,
+      updatedAt: meta?.lastmessageAt
+        ? new Date(Number(meta.lastmessageAt))
+        : undefined,
+    } as IConversation;
+
+    return conv;
+  }
+
+private parseDate(value: any): Date | undefined {
+  if (!value && value !== 0) return undefined;
+  // If already a Date
+  if (value instanceof Date) return value;
+  // If numeric string or number
+  const n = typeof value === 'string' && /^\d+$/.test(value) ? Number(value) : value;
+  if (typeof n === 'number' && !Number.isNaN(n)) return new Date(n);
+  // Fallback try
+  const parsed = Date.parse(String(value));
+  return isNaN(parsed) ? undefined : new Date(parsed);
+}
+
+private async fetchGroupConDetails(
+  roomId: string,
+  meta: IChatMeta
+): Promise<IConversation> {
+  const groupRef = rtdbRef(this.db, `groups/${roomId}`);
+  const groupSnap = await rtdbGet(groupRef);
+  const group: Partial<IGroup> = groupSnap.val() || {};
+
+  const membersObj: Record<string, Partial<IGroupMember>> = group.members || {};
+  const members = Object.keys(membersObj);
+
+  let adminIds: string[] = [];
+
+  if (Array.isArray(group.adminIds) && group.adminIds.length) {
+    adminIds = group.adminIds as string[];
+  } else {
+    adminIds = members.filter((mId) => {
+      const m = membersObj[mId] || {};
+      const role = (m as any).role;
+      const isAdminFlag = (m as any).isAdmin;
+      return role === 'admin' || role === 'owner' || isAdminFlag === true;
+    });
+  }
+
+  // Last message decryption (defensive)
+  let decryptedText: string | undefined;
+  try {
+    decryptedText = await this.encryptionService.decrypt(meta?.lastmessage);
+  } catch (e) {
+    console.warn('fetchGroupConDetails: decrypt failed for', roomId, e);
+    decryptedText = typeof meta?.lastmessage === 'string' ? meta.lastmessage : undefined;
+  }
+
+  // Build conversation using normalized dates
+  const conv: IConversation = {
+    roomId,
+    type: (meta?.type === 'community' ? 'community' : 'group') as 'group' | 'community',
+    title: group.title || 'group',
+    avatar: group.avatar || '' ,
+    members,
+    adminIds,
+    isArchived:  !!meta.isArchived,
+    isPinned: !!meta.isPinned,
+    isLocked: !!meta.isLocked,
+    createdAt: group.createdAt ? this.parseDate(group.createdAt) : undefined,
+    lastMessage: decryptedText ?? undefined,
+    lastMessageType: meta?.lastmessageType ?? undefined,
+    lastMessageAt: meta?.lastmessageAt ? this.parseDate(meta.lastmessageAt) : undefined,
+    unreadCount:  meta.unreadCount || 0,
+    updatedAt: meta?.lastmessageAt ? this.parseDate(meta.lastmessageAt) : (group.updatedAt ? this.parseDate(group.updatedAt) : undefined),
+  } as IConversation;
+
+  return conv;
+}
+
+ 
+  // --- Updated syncConversationWithServer: only changed to call the new helpers ---
+
   async syncConversationWithServer(): Promise<void> {
     try {
       if (!this.senderId) {
@@ -266,136 +443,38 @@ export class FirebaseChatService {
       const userChatsRef = rtdbRef(this.db, userChatsPath);
       const snapshot: DataSnapshot = await rtdbGet(userChatsRef);
       const userChats = snapshot.val() || {};
+      console.log({userChats})
 
       const conversations: IConversation[] = [];
-      const parseDate = (v: any) => (v ? new Date(Number(v)) : undefined);
       const roomIds = Object.keys(userChats);
 
       const isWeb = !!this.isNativePlatform();
 
       for (const roomId of roomIds) {
         const meta: IChatMeta = userChats[roomId] || {};
-        const type: 'private' | 'group' | 'community' = meta.type || 'private';
 
         try {
+          const type: 'private' | 'group' | 'community' =
+            meta.type || 'private';
+
           if (type === 'private') {
-            const parts = roomId.split('_');
-            const receiverId =
-              parts.find((p) => p !== this.senderId) ?? parts[parts.length - 1];
-
-            const localUser: Partial<IUser> | undefined =
-              this._platformUsers$.value.find((u) => u.userId === receiverId);
-
-            let profileResp: {
-              phone_number: string;
-              profile: string | null;
-              name: string;
-              publicKeyHex?: string;
-            } | null = null;
-
-            // 🔸 Profile fetch logic depending on platform
-            if (isWeb) {
-              try {
-                profileResp = await firstValueFrom(
-                  this.apiService.getUserProfilebyId(receiverId)
-                );
-              } catch (err) {
-                console.warn('Failed to fetch profile (web)', receiverId, err);
-              }
-            } else if (!localUser) {
-              try {
-                profileResp = await firstValueFrom(
-                  this.apiService.getUserProfilebyId(receiverId)
-                );
-              } catch (err) {
-                console.warn(
-                  'Failed to fetch profile (native fallback)',
-                  receiverId,
-                  err
-                );
-              }
-            }
-
-            let titleToShow = 'Unknown';
-            if (isWeb) {
-              titleToShow =
-                profileResp?.phone_number ??
-                localUser?.phoneNumber ??
-                profileResp?.name ??
-                localUser?.username ??
-                'Unknown';
-            } else {
-              titleToShow =
-                localUser?.username ??
-                profileResp?.name ??
-                profileResp?.phone_number ??
-                localUser?.phoneNumber ??
-                'Unknown';
-            }
-
-            const decryptedText = await this.encryptionService.decrypt(meta.lastmessage)
-            conversations.push({
-              roomId,
-              type: 'private',
-              title: titleToShow,
-              phoneNumber: profileResp?.phone_number ?? localUser?.phoneNumber,
-              avatar: localUser?.avatar ?? profileResp?.profile ?? undefined,
-              members: [this.senderId, receiverId],
-              isMyself: false,
-              isArchived: meta.isArchived,
-              isPinned: meta.isPinned,
-              isLocked: meta.isLocked,
-              lastMessage: decryptedText ?? undefined,
-              lastMessageType: meta.lastmessageType ?? undefined,
-              lastMessageAt: parseDate(meta.lastmessageAt),
-              unreadCount:
-                typeof meta.unreadCount === 'number'
-                  ? meta.unreadCount
-                  : Number(meta.unreadCount) || 0,
-              updatedAt: parseDate(meta.lastmessageAt),
-            });
+            const conv = await this.fetchPrivateConvDetails(roomId, meta);
+            conversations.push(conv);
           } else if (type === 'group' || type === 'community') {
-            const groupRef = rtdbRef(this.db, `groups/${roomId}`);
-            const groupSnap = await rtdbGet(groupRef);
-            const group = groupSnap.val() || {};
-
-            const membersObj = group.members || {};
-            const members = Object.keys(membersObj);
-            const adminIds = members.filter(
-              (mId) =>
-                membersObj[mId]?.role === 'admin' ||
-                membersObj[mId]?.role === 'owner'
-            );
-
-            const decryptedText = await this.encryptionService.decrypt(meta.lastmessage)
-            conversations.push({
-              roomId,
-              type: type === 'community' ? 'community' : 'group',
-              title: group.name ?? '',
-              avatar: group.dp ?? group.displayPic ?? undefined,
-              members,
-              adminIds,
-              isArchived: meta.isArchived,
-              isPinned: meta.isPinned,
-              isLocked: meta.isLocked,
-              createdAt: group.createdAt
-                ? new Date(Number(group.createdAt))
-                : undefined,
-              lastMessage: decryptedText ?? undefined,
-              lastMessageType: meta.lastmessageType ?? undefined,
-              lastMessageAt: parseDate(meta.lastmessageAt),
-              unreadCount: Number(meta.unreadCount) || 0,
-              updatedAt: parseDate(meta.lastmessageAt),
-            });
+            const conv = await this.fetchGroupConDetails(roomId, meta);
+            console.log("for group : conv",conv, roomId, meta)
+            conversations.push(conv);
           } else {
-            // Unknown type fallback
+            // unknown fallback
             conversations.push({
               roomId,
               type: 'private',
               title: roomId,
-              lastMessage: meta.lastmessage,
-              lastMessageAt: parseDate(meta.lastmessageAt),
-              unreadCount: Number(meta.unreadCount) || 0,
+              lastMessage: meta?.lastmessage,
+              lastMessageAt: meta?.lastmessageAt
+                ? new Date(Number(meta.lastmessageAt))
+                : undefined,
+              unreadCount: Number(meta?.unreadCount) || 0,
             } as IConversation);
           }
         } catch (innerErr) {
@@ -403,7 +482,7 @@ export class FirebaseChatService {
         }
       }
 
-      // 🔸 Merge new conversations with existing BehaviorSubject value
+      // Merge new conversations with existing BehaviorSubject value
       const existing = this._conversations$.value;
       const newConversations = conversations.filter(
         ({ roomId }) => !existing.some((c) => c.roomId === roomId)
@@ -427,7 +506,7 @@ export class FirebaseChatService {
         this._conversations$.next([...existing, ...newConversations]);
       }
 
-      // 🔸 Clear any previous listeners
+      // Clear previous listener
       if (this._userChatsListener) {
         try {
           this._userChatsListener();
@@ -435,38 +514,105 @@ export class FirebaseChatService {
         this._userChatsListener = null;
       }
 
-      // 🔸 Realtime updates listener
+      // Realtime updates listener
       const onUserChatsChange = async (snap: DataSnapshot) => {
         const updatedData = snap.val() || {};
         const current = [...this._conversations$.value];
 
         for (const [roomId, meta] of Object.entries(updatedData)) {
           const idx = current.findIndex((c) => c.roomId === roomId);
-          const decryptedText = await this.encryptionService.decrypt((meta as any).lastmessage)
-          if (idx > -1) {
-            const conv = current[idx];
-            current[idx] = {
-              ...conv,
-              lastMessage: decryptedText ?? conv.lastMessage,
-              lastMessageType:
-                (meta as any)?.lastmessageType ?? conv.lastMessageType,
-              lastMessageAt: (meta as any)?.lastmessageAt
-                ? new Date(Number((meta as any).lastmessageAt))
-                : conv.lastMessageAt,
-              unreadCount:
-                typeof (meta as any)?.unreadcount === 'number'
-                  ? (meta as any).unreadcount
-                  : Number((meta as any)?.unreadcount) || 0,
-              updatedAt: (meta as any)?.lastmessageAt
-                ? new Date(Number((meta as any).lastmessageAt))
-                : conv.updatedAt,
-            };
-          } else {
-            console.warn(
-              'New room detected in userchats but not present locally:',  //new conveersation to do
-              roomId
-            );
-            //to do fetch detail according to meta if private fetch like we did it above and for group vice versa
+
+          try {
+            if (idx > -1) {
+              const decryptedText = await this.encryptionService.decrypt(
+                (meta as any).lastmessage
+              );
+              const conv = current[idx];
+              current[idx] = {
+                ...conv,
+                lastMessage: decryptedText ?? conv.lastMessage,
+                lastMessageType:
+                  (meta as any)?.lastmessageType ?? conv.lastMessageType,
+                lastMessageAt: (meta as any)?.lastmessageAt
+                  ? new Date(Number((meta as any).lastmessageAt))
+                  : conv.lastMessageAt,
+                unreadCount:
+                  typeof (meta as any)?.unreadcount === 'number'
+                    ? (meta as any).unreadcount
+                    : Number((meta as any)?.unreadcount) || 0,
+                updatedAt: (meta as any)?.lastmessageAt
+                  ? new Date(Number((meta as any).lastmessageAt))
+                  : conv.updatedAt,
+              };
+            } else {
+              console.warn(
+                'New room detected in userchats but not present locally:',
+                roomId
+              );
+
+              // New conversation: fetch details according to meta.type
+              const type: 'private' | 'group' | 'community' =
+                (meta as any)?.type || 'private';
+              try {
+                let newConv: IConversation | null = null;
+
+                if (type === 'private') {
+                  newConv = await this.fetchPrivateConvDetails(
+                    roomId,
+                    meta as any
+                  );
+                } else if (type === 'group' || type === 'community') {
+                  newConv = await this.fetchGroupConDetails(
+                    roomId,
+                    meta as any
+                  );
+                } else {
+                  newConv = {
+                    roomId,
+                    type: 'private',
+                    title: roomId,
+                    lastMessage: (meta as any)?.lastmessage,
+                    lastMessageAt: (meta as any)?.lastmessageAt
+                      ? new Date(Number((meta as any).lastmessageAt))
+                      : undefined,
+                    unreadCount: Number((meta as any)?.unreadCount) || 0,
+                  } as IConversation;
+                }
+
+                if (newConv) {
+                  current.push(newConv);
+
+                  // persist to sqlite
+                  try {
+                    await this.sqliteService.createConversation({
+                      roomId: newConv.roomId,
+                      type: newConv.type,
+                      avatar: newConv.avatar,
+                      members: newConv.members,
+                      title: newConv.title,
+                      isMyself: false,
+                      isArchived: newConv.isArchived,
+                      isPinned: newConv.isPinned,
+                      isLocked: newConv.isLocked,
+                    });
+                  } catch (e) {
+                    console.warn(
+                      'sqlite createConversation failed for new room',
+                      roomId,
+                      e
+                    );
+                  }
+                }
+              } catch (e) {
+                console.error(
+                  'Failed to fetch details for new room',
+                  roomId,
+                  e
+                );
+              }
+            }
+          } catch (e) {
+            console.error('onUserChatsChange inner error for', roomId, e);
           }
         }
 
@@ -1264,114 +1410,112 @@ export class FirebaseChatService {
   //   await set(groupRef, groupData);
   // }
 
-async createGroup(
-  groupId: string,
-  groupName: string,
-  members: any[],
-  currentUserId: string
+ async createGroup(
+  {
+    groupId,
+    groupName,
+    members,
+  }: {
+    groupId: string;
+    groupName: string;
+    members: Array<{ userId: string; username: string; phoneNumber?: string }>;
+  }
 ) {
   try {
-    // --- 1) prepare and save group data ---
-    const groupRef = rtdbRef(this.db, `groups/${groupId}`);
+    if (!this.senderId) throw new Error('createGroup: senderId not set');
 
-    const currentUser = members.find((m) => m.user_id === currentUserId);
-    const currentUserName = currentUser?.name ?? 'Unknown';
+    const now = Date.now();
 
-    const groupData = {
-      name: groupName,
-      groupId,
+    // --- 1️⃣ Prepare members object for /groups/{groupId}/members
+    const membersObj: Record<string, IGroupMember> = {};
+    const memberIds = members.map((m) => m.userId);
+
+    for (const m of members) {
+      membersObj[m.userId] = {
+        username: m.username,
+        phoneNumber: m.phoneNumber ?? '',
+        isActive: true,
+      };
+    }
+
+    membersObj[this.senderId] = {
+      username : this.authService.authData?.name as string,
+      phoneNumber : this.authService.authData?.phone_number as string,
+      isActive : true,
+
+    }
+
+    // --- 2️⃣ Build group data for /groups/{groupId}
+    const groupDataForRTDB : IGroup = {
+      roomId: groupId,
+      title: groupName,
       description: 'Hey I am using Telldemm',
-      createdBy: currentUserId,
-      createdByName: currentUserName,
-      createdAt: Date.now(),
-      members: members.reduce((acc, member) => {
-        acc[member.user_id] = {
-          name: member.name,
-          phone_number: member.phone_number,
-          status: 'active',
-          role: member.user_id === currentUserId ? 'admin' : 'member',
-        };
-        return acc;
-      }, {} as Record<string, any>),
-      membersCount: members.length,
+      adminIds: [this.senderId],
+      createdBy : this.senderId,
+      createdAt: now,
+      members: membersObj,
+      type: 'group',
+      isArchived: false,
+      isPinned: false,
+      isLocked: false
     };
 
-    await rtdbSet(groupRef, groupData);
-
-    // --- 2) build IChatMeta (shape you required) ---
-    const now = Date.now();
+    // --- 3️⃣ Chat metadata for /userchats/{userId}/{groupId}
     const chatMeta: IChatMeta = {
       type: 'group',
       lastmessageAt: now,
-      lastmessageType: 'text', // set reasonable default
-      lastmessage: '',         // no last message yet
+      lastmessageType: 'text',
+      lastmessage: '',
       unreadCount: 0,
       isArchived: false,
       isPinned: false,
       isLocked: false,
     };
 
-    // --- 3) for each member, write userchats/{memberId}/{groupId} with meta ---
-    const memberIds = members.map((m) => m.user_id);
+    // --- 4️⃣ Multi-path update (atomic write)
+    const updates: Record<string, any> = {};
+    updates[`/groups/${groupId}`] = groupDataForRTDB;
+
     for (const member of members) {
-      const userChatRef = rtdbRef(this.db, `userchats/${member.user_id}/${groupId}`);
-      const snap = await rtdbGet(userChatRef);
-
-      // payload under userchats: store meta + some UI-friendly fields
-      // (you can flatten meta fields instead if you prefer)
-      const payload = {
-        meta: chatMeta,
-        title: groupName,
-        roomId: groupId,
-        avatar: '', // optional group avatar URL later
-        members: memberIds,
-        adminIds: [currentUserId],
-        createdAt: now,
-        updatedAt: now,
-      };
-
-      if (!snap.exists()) {
-        await rtdbSet(userChatRef, payload);
-      } else {
-        // update to keep the entry fresh (you may choose to merge differently)
-        await rtdbUpdate(userChatRef, {
-          'meta': chatMeta,
-          'title': groupName,
-          'updatedAt': now,
-        });
-      }
+      updates[`/userchats/${member.userId}/${groupId}`] = chatMeta;
     }
 
-    // --- 4) Save a conversation record in local SQLite (saveConversation) ---
-    // Build IConversation object similar to your IConversation type
+    await rtdbUpdate(rtdbRef(this.db, '/'), updates);
+
+    // --- 5️⃣ Save local conversation (SQLite)
     const convo: IConversation = {
       roomId: groupId,
       title: groupName,
       type: 'group',
-      avatar: '', // optional
+      avatar: '',
       members: memberIds,
-      adminIds: [currentUserId],
+      adminIds: [this.senderId],
       createdAt: new Date(now),
       updatedAt: new Date(now),
       lastMessage: chatMeta.lastmessage,
       lastMessageType: chatMeta.lastmessageType,
-      lastMessageAt: new Date(chatMeta.lastmessageAt as number),
-      unreadCount: Number(chatMeta.unreadCount) || 0,
-      isArchived: chatMeta.isArchived,
-      isPinned: chatMeta.isPinned,
-      isLocked: chatMeta.isLocked,
-      isMyself: true, // for the creator's local copy, commonly true
+      lastMessageAt: new Date(now),
+      unreadCount: 0,
+      isArchived: false,
+      isPinned: false,
+      isLocked: false,
+      isMyself: true,
     };
 
-    await this.sqliteService.createConversation(convo);
+    try {
+      await this.sqliteService.createConversation(convo);
+    } catch (e) {
+      console.warn('SQLite conversation save failed:', e);
+    }
 
-    console.log(`✅ Group "${groupName}" created, userchats updated, and conversation saved locally.`);
+    const existingConvs = this._conversations$.value
+    this._conversations$.next([...existingConvs, convo])
+    console.log(`✅ Group "${groupName}" created successfully with ${members.length} members.`);
   } catch (err) {
     console.error('Error creating group:', err);
     throw err;
   }
 }
-
 
 
   async updateBackendGroupId(groupId: string, backendGroupId: string) {

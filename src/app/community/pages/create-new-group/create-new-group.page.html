@@ -65,8 +65,8 @@
         <img src="assets/images/user.jfif" />
       </ion-avatar>
       <ion-label>
-        <h3>{{ m.name || m.user_id }}</h3>
-        <p class="muted">{{ m.phone_number || '' }}</p>
+        <h3>{{ m.username || m.userId }}</h3>
+        <p class="muted">{{ m.phoneNumber || '' }}</p>
       </ion-label>
       <ion-button fill="clear" slot="end" (click)="removeMember(i)">
         <ion-icon name="close-outline"></ion-icon>
