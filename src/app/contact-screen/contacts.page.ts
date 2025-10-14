@@ -276,7 +276,7 @@ export class ContactsPage implements OnInit {
     if (!userId) return;
   }
   async loadDeviceMatchedContacts(): Promise<void> {
-    // current user phone from auth; fallback to localStorage if authService not ready
+    // current user phone from auth; fallback. to localStorage if authService not ready
     const currentUserPhone: string | undefined =
       this.authService?.authData?.phone_number ??
       localStorage.getItem('phone_number') ??
@@ -427,10 +427,8 @@ export class ContactsPage implements OnInit {
   // }
 
 async createGroup() {
-  // selectedUsers: treat truthy selected property (may be undefined if not initialized)
   const selectedUsers = this.allUsers.filter(u => !!(u as any).selected);
 
-  // current user info from auth
   const currentUserId = this.authService.authData?.userId ?? '';
   const currentUserPhone = this.authService.authData?.phone_number ?? '';
   const currentUserName = this.authService.authData?.name ?? '';

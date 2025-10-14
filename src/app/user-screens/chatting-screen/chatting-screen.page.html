@@ -95,6 +95,8 @@
             <ion-avatar slot="start">
               <img [src]="receiverProfile || 'assets/images/default-avatar.png'" alt="User Avatar"
                 (error)="setDefaultAvatar($event)" />
+              <!-- <img [src]="currentChat.avatar || 'assets/images/default-avatar.png'" alt="User Avatar"
+                (error)="setDefaultAvatar($event)" /> -->
             </ion-avatar>
             <ion-label (click)="goToProfile()"
               style="width: auto; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;">

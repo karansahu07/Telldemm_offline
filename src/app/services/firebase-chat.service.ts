@@ -69,7 +69,7 @@ export class FirebaseChatService {
   private _userChatsListener: (() => void) | null = null;
   private _roomMessageListner: any = null;
 
-  private currentChat: IConversation | null = null;
+   currentChat: IConversation | null = null;
 
   constructor(
     private db: Database,
@@ -262,9 +262,8 @@ export class FirebaseChatService {
 
       this._isSyncing$.next(true);
 
-      const db = getDatabase();
       const userChatsPath = `userchats/${this.senderId}`;
-      const userChatsRef = rtdbRef(db, userChatsPath);
+      const userChatsRef = rtdbRef(this.db, userChatsPath);
       const snapshot: DataSnapshot = await rtdbGet(userChatsRef);
       const userChats = snapshot.val() || {};
 
@@ -356,7 +355,7 @@ export class FirebaseChatService {
               updatedAt: parseDate(meta.lastmessageAt),
             });
           } else if (type === 'group' || type === 'community') {
-            const groupRef = rtdbRef(db, `groups/${roomId}`);
+            const groupRef = rtdbRef(this.db, `groups/${roomId}`);
             const groupSnap = await rtdbGet(groupRef);
             const group = groupSnap.val() || {};
 
@@ -1112,54 +1111,6 @@ export class FirebaseChatService {
   // Core methods that perform writes / important operations
   // =====================
 
-  // async sendMessage(
-  //   roomId: string,
-  //   message: Message,
-  //   chatType: string,
-  //   senderId: string
-  // ) {
-  //   try {
-  //     const db = getDatabase();
-
-  //     try {
-  //       const idxSnap = await rtdbGet(rtdbRef(db, `roomIds/${roomId}`));
-  //       if (!idxSnap.exists()) {
-  //         await rtdbSet(rtdbRef(db, `roomIds/${roomId}`), {
-  //           createdAt: Date.now(),
-  //         });
-  //       }
-  //     } catch (err) {
-  //       console.warn('Could not verify/write roomIds entry (continuing):', err);
-  //     }
-
-  //     const messagesRef = ref(this.db, `chats/${roomId}`);
-  //     await push(messagesRef, message);
-
-  //     // unread logic
-  //     if (chatType === 'private') {
-  //       const receiverId = message.receiver_id;
-  //       if (receiverId && receiverId !== senderId) {
-  //         this.incrementUnreadCount(roomId, receiverId);
-  //       }
-  //     } else if (chatType === 'group') {
-  //       const groupSnapshot = await get(
-  //         ref(this.db, `groups/${roomId}/members`)
-  //       );
-  //       const members = groupSnapshot.val();
-  //       if (members) {
-  //         Object.keys(members).forEach((memberId) => {
-  //           if (memberId !== senderId) {
-  //             this.incrementUnreadCount(roomId, memberId);
-  //           }
-  //         });
-  //       }
-  //     }
-  //   } catch (err) {
-  //     console.error('sendMessage error:', err);
-  //     throw err;
-  //   }
-  // }
-
   async sendMessage(msg: Partial<IMessage & { attachment: IAttachment }>) {
     try {
       const { attachment, ...message } = msg;
@@ -1280,17 +1231,51 @@ export class FirebaseChatService {
   }
 
   // Group and community operations
-  async createGroup(
-    groupId: string,
-    groupName: string,
-    members: any[],
-    currentUserId: string
-  ) {
-    const db = getDatabase();
-    const groupRef = ref(db, `groups/${groupId}`);
+  // async createGroup(
+  //   groupId: string,
+  //   groupName: string,
+  //   members: any[],
+  //   currentUserId: string
+  // ) {
+  //   const groupRef = ref(this.db, `groups/${groupId}`);
+
+  //   const currentUser = members.find((m) => m.user_id === currentUserId);
+  //   const currentUserName = currentUser?.name || 'Unknown';
+
+  //   const groupData = {
+  //     name: groupName,
+  //     groupId,
+  //     description: 'Hey I am using Telldemm',
+  //     createdBy: currentUserId,
+  //     createdByName: currentUserName,
+  //     createdAt: Date.now(),
+  //     members: members.reduce((acc, member) => {
+  //       acc[member.user_id] = {
+  //         name: member.name,
+  //         phone_number: member.phone_number,
+  //         status: 'active',
+  //         role: member.user_id === currentUserId ? 'admin' : 'member',
+  //       };
+  //       return acc;
+  //     }, {}),
+  //     membersCount: members.length,
+  //   };
+
+  //   await set(groupRef, groupData);
+  // }
+
+async createGroup(
+  groupId: string,
+  groupName: string,
+  members: any[],
+  currentUserId: string
+) {
+  try {
+    // --- 1) prepare and save group data ---
+    const groupRef = rtdbRef(this.db, `groups/${groupId}`);
 
     const currentUser = members.find((m) => m.user_id === currentUserId);
-    const currentUserName = currentUser?.name || 'Unknown';
+    const currentUserName = currentUser?.name ?? 'Unknown';
 
     const groupData = {
       name: groupName,
@@ -1307,12 +1292,87 @@ export class FirebaseChatService {
           role: member.user_id === currentUserId ? 'admin' : 'member',
         };
         return acc;
-      }, {}),
+      }, {} as Record<string, any>),
       membersCount: members.length,
     };
 
-    await set(groupRef, groupData);
+    await rtdbSet(groupRef, groupData);
+
+    // --- 2) build IChatMeta (shape you required) ---
+    const now = Date.now();
+    const chatMeta: IChatMeta = {
+      type: 'group',
+      lastmessageAt: now,
+      lastmessageType: 'text', // set reasonable default
+      lastmessage: '',         // no last message yet
+      unreadCount: 0,
+      isArchived: false,
+      isPinned: false,
+      isLocked: false,
+    };
+
+    // --- 3) for each member, write userchats/{memberId}/{groupId} with meta ---
+    const memberIds = members.map((m) => m.user_id);
+    for (const member of members) {
+      const userChatRef = rtdbRef(this.db, `userchats/${member.user_id}/${groupId}`);
+      const snap = await rtdbGet(userChatRef);
+
+      // payload under userchats: store meta + some UI-friendly fields
+      // (you can flatten meta fields instead if you prefer)
+      const payload = {
+        meta: chatMeta,
+        title: groupName,
+        roomId: groupId,
+        avatar: '', // optional group avatar URL later
+        members: memberIds,
+        adminIds: [currentUserId],
+        createdAt: now,
+        updatedAt: now,
+      };
+
+      if (!snap.exists()) {
+        await rtdbSet(userChatRef, payload);
+      } else {
+        // update to keep the entry fresh (you may choose to merge differently)
+        await rtdbUpdate(userChatRef, {
+          'meta': chatMeta,
+          'title': groupName,
+          'updatedAt': now,
+        });
+      }
+    }
+
+    // --- 4) Save a conversation record in local SQLite (saveConversation) ---
+    // Build IConversation object similar to your IConversation type
+    const convo: IConversation = {
+      roomId: groupId,
+      title: groupName,
+      type: 'group',
+      avatar: '', // optional
+      members: memberIds,
+      adminIds: [currentUserId],
+      createdAt: new Date(now),
+      updatedAt: new Date(now),
+      lastMessage: chatMeta.lastmessage,
+      lastMessageType: chatMeta.lastmessageType,
+      lastMessageAt: new Date(chatMeta.lastmessageAt as number),
+      unreadCount: Number(chatMeta.unreadCount) || 0,
+      isArchived: chatMeta.isArchived,
+      isPinned: chatMeta.isPinned,
+      isLocked: chatMeta.isLocked,
+      isMyself: true, // for the creator's local copy, commonly true
+    };
+
+    await this.sqliteService.createConversation(convo);
+
+    console.log(`✅ Group "${groupName}" created, userchats updated, and conversation saved locally.`);
+  } catch (err) {
+    console.error('Error creating group:', err);
+    throw err;
   }
+}
+
+
 
   async updateBackendGroupId(groupId: string, backendGroupId: string) {
     const db = getDatabase();
