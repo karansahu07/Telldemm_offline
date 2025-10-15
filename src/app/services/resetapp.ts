@@ -77,7 +77,6 @@
 //   }
 // }
 
-
 // import { Injectable } from '@angular/core';
 // import { Preferences } from '@capacitor/preferences';
 // import { Filesystem, Directory } from '@capacitor/filesystem';
@@ -159,25 +158,24 @@
 //   }
 // }
 
-
-
 import { Injectable } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { SecureStoragePlugin } from 'capacitor-secure-storage-plugin';
 import { AuthService } from '../auth/auth.service';
 import { FcmService } from './fcm-service';
+import { SqliteService } from './sqlite.service';
 // import { App } from '@capacitor/app';
 // import { CapacitorSQLite } from '@capacitor-community/sqlite';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class Resetapp {
-
   constructor(
-    private authService : AuthService,
-    private fcmService : FcmService
+    private authService: AuthService,
+    private fcmService: FcmService,
+    private sqliteService: SqliteService
   ) {}
 
   /** Clear LocalStorage */
@@ -218,7 +216,7 @@ export class Resetapp {
       await Filesystem.rmdir({
         path: 'appdata',
         directory: Directory.Documents,
-        recursive: true
+        recursive: true,
       });
     } catch (err) {
       console.warn('FileSystem clear failed', err);
@@ -233,7 +231,7 @@ export class Resetapp {
   }
 
   /** Reset everything */
-   async resetApp() {
+  async resetApp() {
     const userId = await this.authService.authData?.userId;
 
     if (userId) {
@@ -256,6 +254,7 @@ export class Resetapp {
     await this.clearSecureStorage();
     await this.clearSQLite();
     await this.clearFileSystem();
+    await this.sqliteService.resetDB();
 
     this.reloadApp();
   }

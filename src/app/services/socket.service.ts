@@ -40,8 +40,6 @@
 //   }
 // }
 
-
-
 // import { Injectable } from '@angular/core';
 // import { io, Socket } from 'socket.io-client';
 // import { environment } from 'src/environments/environment';
@@ -52,8 +50,8 @@
 // })
 // export class SocketService {
 //   private socket: Socket;
-//   // private readonly serverUrl = 'http://localhost:3000'; 
-//   private readonly serverUrl = 'https://telldemm-backend.onrender.com/'; 
+//   // private readonly serverUrl = 'http://localhost:3000';
+//   private readonly serverUrl = 'https://telldemm-backend.onrender.com/';
 
 //   constructor() {
 //     const userId = localStorage.getItem('userId');
@@ -82,9 +80,6 @@
 //     }
 //   }
 // }
-
-
-
 
 // import { Injectable } from '@angular/core';
 // import { io, Socket } from 'socket.io-client';
@@ -150,11 +145,9 @@
 //   });
 // }
 
-
 // //  emitMessage(data: any) {
 // //     this.socket.emit('send_message', data);
 // //   }
-
 
 //   /**
 //    * Listen for incoming messages broadcasted by backend.
@@ -165,7 +158,7 @@
 //         //console.log('Received message:', msg);
 //         observer.next(msg);
 //       });
-//     }); 
+//     });
 //   }
 
 //   // disconnect() {
@@ -175,20 +168,16 @@
 //   // }
 // }
 
-
-
-
 import { Injectable } from '@angular/core';
-import { io, Socket } from 'socket.io-client';
-import { environment } from 'src/environments/environment'; // or use your server URL directly
 import { Observable } from 'rxjs';
+import { io, Socket } from 'socket.io-client';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SocketService {
   private socket: Socket;
-  private readonly serverUrl = 'https://telldemm-backend.onrender.com'; 
+  private readonly serverUrl = 'https://telldemm-backend.onrender.com';
 
   constructor() {
     const userId = localStorage.getItem('userId');
@@ -203,7 +192,7 @@ export class SocketService {
   }
 
   onMessage(): Observable<any> {
-    return new Observable(observer => {
+    return new Observable((observer) => {
       this.socket.on('privateMessageFromServer', (msg) => {
         //console.log(msg);
         observer.next(msg);

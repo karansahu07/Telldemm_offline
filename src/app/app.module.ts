@@ -1,25 +1,29 @@
-import { NgModule, APP_INITIALIZER } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
 
+import {
+  HTTP_INTERCEPTORS,
+  HttpClient,
+  HttpClientModule,
+} from '@angular/common/http';
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
-import { HttpClientModule, HTTP_INTERCEPTORS, HttpClient } from '@angular/common/http';
 
-import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
 
 // import { environment } from '../environments/environment';
 
 // ✅ Modular Firebase imports
-import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
-import { provideDatabase, getDatabase } from '@angular/fire/database';
+import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { getDatabase, provideDatabase } from '@angular/fire/database';
 import { IonicStorageModule } from '@ionic/storage-angular';
 
 // ✅ Custom imports
-import { ServerErrorInterceptor } from './interceptors/http-error.interceptor';
-import { AuthService } from './auth/auth.service';
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { environment } from 'src/environments/environment.prod';
-import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { AuthService } from './auth/auth.service';
+import { ServerErrorInterceptor } from './interceptors/http-error.interceptor';
 import { HttpLoaderFactory } from './translate-loader';
 
 // ✅ APP_INITIALIZER to hydrate auth state before app starts
@@ -40,15 +44,14 @@ export function initAuth(authService: AuthService) {
       loader: {
         provide: TranslateLoader,
         useFactory: HttpLoaderFactory,
-        deps: [HttpClient]
-      }
+        deps: [HttpClient],
+      },
     }),
     IonicStorageModule.forRoot(),
-    
 
     // ✅ Modular Firebase setup
     provideFirebaseApp(() => initializeApp(environment.firebase)),
-    provideDatabase(() => getDatabase())
+    provideDatabase(() => getDatabase()),
   ],
 
   providers: [
@@ -62,8 +65,8 @@ export function initAuth(authService: AuthService) {
       provide: APP_INITIALIZER,
       useFactory: initAuth,
       deps: [AuthService],
-      multi: true
-    }
+      multi: true,
+    },
   ],
 
   bootstrap: [AppComponent],

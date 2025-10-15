@@ -39,7 +39,7 @@ export interface IMessage {
     everyone: boolean;
     users: [];
   };
-  reactions: {userId : string, emoji : string}[];
+  reactions: { userId: string; emoji: string }[];
   replyToMsgId: string;
   isEdit: boolean;
   receipts?: {
@@ -93,14 +93,14 @@ export interface IConversation {
 export interface IGroup {
   roomId: string;
   title?: string;
-  type:'group';
+  type: 'group';
   avatar?: string;
-  description : string;
-  members?: Record<string,IGroupMember>;
+  description: string;
+  members?: Record<string, IGroupMember>;
   adminIds?: string[];
-  createdBy : string;
+  createdBy: string;
   createdAt?: Date | string | number;
-  updatedAt?: Date |string | number;
+  updatedAt?: Date | string | number;
   lastMessage?: string;
   lastMessageType?: string;
   lastMessageAt?: Date | string | number;
@@ -110,10 +110,10 @@ export interface IGroup {
   isLocked: boolean;
 }
 
-export interface IGroupMember{
+export interface IGroupMember {
   username: string;
-  phoneNumber : string;
-  isActive : boolean;
+  phoneNumber: string;
+  isActive: boolean;
 }
 export interface IOpState {
   id: string;
@@ -151,44 +151,44 @@ const TABLE_SCHEMAS = {
       avatar TEXT,
       members TEXT,
       adminIds TEXT,
-      iaArchieved INTEGER DEFAULT 0,
+      isArchived INTEGER DEFAULT 0,
       isPinned INTEGER DEFAULT 0,
       isLocked INTEGER DEFAULT 0,
       createdAt TEXT NOT NULL,
       updatedAt TEXT NOT NULL
     );
   `,
-  messages: `
-    CREATE TABLE IF NOT EXISTS messages (
-      msgId TEXT PRIMARY KEY,
-      roomId TEXT NOT NULL,
-      sender TEXT NOT NULL,
-      type TEXT DEFAULT 'text',
-      text TEXT,
-      isMe INTEGER DEFAULT 0,
-      status TEXT,
-      timestamp TEXT NOT NULL,
-      receipts TEXT,
-      replyToMsgId TEXT,
-      isEdit INTEGER DEFAULT 0,
-      reactions TEXT,
-      deletedFor TEXT,
-      mediaId TEXT
-      FOREIGN KEY (roomId) REFERENCES conversations(roomId),
-      FOREIGN KEY (mediaId) REFERENCES attachments(mediaId)
+  attachments: `
+    CREATE TABLE IF NOT EXISTS attachments (
+      mediaId INTEGER PRIMARY KEY AUTOINCREMENT,
+      type TEXT,
+      fileName TEXT,
+      mimeType TEXT,
+      fileSize TEXT,
+      caption TEXT,
+      localUrl TEXT,
+      cdnUrl TEXT
     );
   `,
-  attachments: `
-  CREATE TABLE IF NOT EXISTS attachments (
-    mediaId INTEGER AUTOINCREMENT PRIMARY KEY,
-    type TEXT,
-    fileName TEXT,
-    mimeType TEXT,
-    fileSize TEXT,
-    caption TEXT,
-    localUrl TEXT,
-    cdnUrl TEXT
-  )
+  messages: `
+   CREATE TABLE IF NOT EXISTS messages (
+    msgId TEXT PRIMARY KEY,
+    roomId TEXT NOT NULL,
+    sender TEXT NOT NULL,
+    type TEXT DEFAULT 'text',
+    text TEXT,
+    isMe INTEGER DEFAULT 0,
+    status TEXT,
+    timestamp TEXT NOT NULL,
+    receipts TEXT,
+    replyToMsgId TEXT,
+    isEdit INTEGER DEFAULT 0,
+    reactions TEXT,
+    deletedFor TEXT,
+    mediaId TEXT,
+    FOREIGN KEY (roomId) REFERENCES conversations(roomId),
+    FOREIGN KEY (mediaId) REFERENCES attachments(mediaId)
+  );
   `,
 };
 
@@ -244,6 +244,7 @@ export class SqliteService {
     try {
       for (const schema of Object.values(TABLE_SCHEMAS)) {
         await this.db.execute(schema);
+        console.log('Table created for ', schema);
       }
       console.info('SQLite tables created! ✅');
     } catch (err) {
@@ -306,7 +307,7 @@ export class SqliteService {
 
   /** ----------------- HELPERS ----------------- **/
   private toDate(value?: string | null): Date | undefined {
-    return value ? new Date(value) : undefined;
+    return value ? new Date(Number(value)) : undefined;
   }
 
   /** ----------------- CONTACTS ----------------- **/

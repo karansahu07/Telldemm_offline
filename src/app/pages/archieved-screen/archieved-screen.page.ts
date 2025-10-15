@@ -371,7 +371,7 @@ export class ArchievedScreenPage implements OnInit, OnDestroy {
   async ionViewWillEnter() {
     try {
       this.isLoading = true;
-      this.firebaseChat.conversations$.subscribe((conv) => {
+      this.firebaseChat.conversations.subscribe((conv) => {
         this.items = conv.filter((c) => c.isArchived);
       });
       this.isLoading = false;
@@ -471,7 +471,8 @@ export class ArchievedScreenPage implements OnInit, OnDestroy {
     const it = sel[0];
     // if (!it || !it.otherUserId) return;
     const parts = it.roomId?.split('_');
-            const receiverId = parts.find((p) => p !== this.userId) ?? parts[parts.length - 1];
+    const receiverId =
+      parts.find((p) => p !== this.userId) ?? parts[parts.length - 1];
 
     const user = await this.fetchUser(receiverId);
     const phoneNorm = this.normalizePhone(user?.phone_number);
@@ -689,7 +690,6 @@ export class ArchievedScreenPage implements OnInit, OnDestroy {
     //   const roomIds = Object.keys(map).filter(
     //     (k) => map[k]?.isArchived === true
     //   );
-
     //   const items = await Promise.all(
     //     roomIds.map((rid) => this.buildItem(rid))
     //   );
@@ -700,7 +700,6 @@ export class ArchievedScreenPage implements OnInit, OnDestroy {
     //   });
     //   this.isLoading = false;
     // });
-
     // this.unsubArchive = () => off(ref, 'value', cb);
   }
 
@@ -893,7 +892,7 @@ export class ArchievedScreenPage implements OnInit, OnDestroy {
       });
       return;
     }
-    await this.firebaseChat.openChat(item);   // Buggy area
+    await this.firebaseChat.openChat(item); // Buggy area
 
     if (item.type == 'group') {
       this.router.navigate(['/chatting-screen'], {
@@ -903,8 +902,8 @@ export class ArchievedScreenPage implements OnInit, OnDestroy {
       // const receiver_phone = item.otherUserId!;
       // await this.secureStorage.setItem('receiver_phone', receiver_phone);
       const parts = item.roomId.split('_');
-            const receiverId =
-              parts.find((p) => p !== this.userId) ?? parts[parts.length - 1];
+      const receiverId =
+        parts.find((p) => p !== this.userId) ?? parts[parts.length - 1];
       this.router.navigate(['/chatting-screen'], {
         queryParams: { receiverId: receiverId },
       });

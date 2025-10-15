@@ -1,14 +1,16 @@
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { from, Observable } from 'rxjs';
 // import { environment } from 'src/environments/environment';
-import { CreateCommunityPayload, CreateCommunityResponse, GetSocialMediaResponse } from 'src/types';
 import { environment } from 'src/environments/environment.prod';
-
-
+import {
+  CreateCommunityPayload,
+  CreateCommunityResponse,
+  GetSocialMediaResponse,
+} from 'src/types';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ApiService {
   private baseUrl = environment.apiBaseUrl;
@@ -27,7 +29,7 @@ export class ApiService {
     return this.http.get<T>(`${this.baseUrl}${url}`, { params });
   }
 
-   /**
+  /**
    * 📌 Update User Display Picture
    * @param user_id number
    * @param file File (profile picture)
@@ -41,53 +43,61 @@ export class ApiService {
   }
 
   /**
- * Mark user as online
- */
-markUserOnline(user_id: number): Observable<any> {
-  return this.post('/api/users/markuser_online', { user_id });
-}
+   * Mark user as online
+   */
+  markUserOnline(user_id: number): Observable<any> {
+    return this.post('/api/users/markuser_online', { user_id });
+  }
 
-/**
- * Mark user as offline
- */
-markUserOffline(user_id: number): Observable<any> {
-  return this.post('/api/users/markuser_offline', { user_id });
-}
+  /**
+   * Mark user as offline
+   */
+  markUserOffline(user_id: number): Observable<any> {
+    return this.post('/api/users/markuser_offline', { user_id });
+  }
 
-/**
- * Get user online status
- */
-getUserStatus(user_id: number): Observable<{ status: boolean; data: { is_online: number; last_seen: string } }> {
-  return this.get(`/api/users/status/${user_id}`);
-}
+  /**
+   * Get user online status
+   */
+  getUserStatus(user_id: number): Observable<{
+    status: boolean;
+    data: { is_online: number; last_seen: string };
+  }> {
+    return this.get(`/api/users/status/${user_id}`);
+  }
 
-/**
- * Update user's timezone on backend
- */
-setUserTimezone(user_id: number, timezone: string): Observable<any> {
-  return this.post('/api/users/status_timezone', { user_id, timezone });
-}
+  /**
+   * Update user's timezone on backend
+   */
+  setUserTimezone(user_id: number, timezone: string): Observable<any> {
+    return this.post('/api/users/status_timezone', { user_id, timezone });
+  }
 
-/** Get user email by ID */
+  /** Get user email by ID */
   getUserEmail(userId: number): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}/api/users/email/${userId}`);
   }
- 
+
   /** Update user email */
   updateUserEmail(userId: number, email: string): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}/api/users/update-email`, { user_id: userId, email });
+    return this.http.post<any>(`${this.baseUrl}/api/users/update-email`, {
+      user_id: userId,
+      email,
+    });
   }
 
-/**
- * Check if backend forces logout for a user
- */
-checkUserLogout(user_id: number): Observable<{ status: boolean; force_logout: number }> {
-  return this.get(`/api/users/check-logout/${user_id}`);
-}
+  /**
+   * Check if backend forces logout for a user
+   */
+  checkUserLogout(
+    user_id: number
+  ): Observable<{ status: boolean; force_logout: number }> {
+    return this.get(`/api/users/check-logout/${user_id}`);
+  }
 
   // ----------------- 🔐 push fcm to admin APIs -----------------
 
-    /**
+  /**
    * ✅ Send FCM token to admin
    * @param userId The user ID
    * @param fcmToken The Firebase device token
@@ -98,20 +108,23 @@ checkUserLogout(user_id: number): Observable<{ status: boolean; force_logout: nu
       fcm_token: fcmToken,
     };
 
-    return this.http.post(`${this.baseUrl}/api/notification/save_fcm_token`, payload);
+    return this.http.post(
+      `${this.baseUrl}/api/notification/save_fcm_token`,
+      payload
+    );
   }
 
   /**
- * ✅ Logout user from admin
- * @param userId The user ID
- */
-logoutUser(userId: number) {
-  const payload = {
-    user_id: userId
-  };
+   * ✅ Logout user from admin
+   * @param userId The user ID
+   */
+  logoutUser(userId: number) {
+    const payload = {
+      user_id: userId,
+    };
 
-  return this.http.post(`${this.baseUrl}/api/notification/logout`, payload);
-}
+    return this.http.post(`${this.baseUrl}/api/notification/logout`, payload);
+  }
 
   // ----------------- 🔐 AUTH APIs -----------------
 
@@ -133,12 +146,12 @@ logoutUser(userId: number) {
   getUserProfilebyId(user_id: string): Observable<{
     phone_number: string;
     profile: null;
-    name: string; publicKeyHex: string
-}> {
-    return this.http.post<any>(
-      `${this.baseUrl}/api/users/profile_by_userid`,
-      { user_id }
-    );
+    name: string;
+    publicKeyHex: string;
+  }> {
+    return this.http.post<any>(`${this.baseUrl}/api/users/profile_by_userid`, {
+      user_id,
+    });
   }
 
   getAllUsers(): Observable<any[]> {
@@ -146,24 +159,29 @@ logoutUser(userId: number) {
   }
 
   /**
- * Update social media link (e.g. Instagram)
- */
-updateSocialMedia(user_id: number, social_media_id: number, profile_url: string): Observable<any> {
-  const payload = {
-    user_id,
-    social_media_id,
-    profile_url
-  };
-  return this.post('/api/users/update-social-media', payload);
-}
+   * Update social media link (e.g. Instagram)
+   */
+  updateSocialMedia(
+    user_id: number,
+    social_media_id: number,
+    profile_url: string
+  ): Observable<any> {
+    const payload = {
+      user_id,
+      social_media_id,
+      profile_url,
+    };
+    return this.post('/api/users/update-social-media', payload);
+  }
 
-/**
- * Fetch social media links for a user
- */
-getSocialMedia(user_id: number): Observable<GetSocialMediaResponse> {
-  return this.post<GetSocialMediaResponse>('/api/users/get-social-media', { user_id });
-}
-
+  /**
+   * Fetch social media links for a user
+   */
+  getSocialMedia(user_id: number): Observable<GetSocialMediaResponse> {
+    return this.post<GetSocialMediaResponse>('/api/users/get-social-media', {
+      user_id,
+    });
+  }
 
   // ----------------- 👥 GROUP APIs -----------------
 
@@ -177,7 +195,7 @@ getSocialMedia(user_id: number): Observable<GetSocialMediaResponse> {
       group_name,
       created_by,
       firebase_group_id,
-      members
+      members,
     };
     return this.post('/api/groups/create', payload);
   }
@@ -204,26 +222,34 @@ getSocialMedia(user_id: number): Observable<GetSocialMediaResponse> {
     const params = {
       user_id: user_id.toString(),
       page: page.toString(),
-      limit: limit.toString()
+      limit: limit.toString(),
     };
 
     return this.get('/api/groups', params);
   }
 
-  addGroupMember(group_id: number, user_id: number, role_id: number): Observable<any> {
+  addGroupMember(
+    group_id: number,
+    user_id: number,
+    role_id: number
+  ): Observable<any> {
     return this.post('/api/groups/members/add', {
       group_id,
       user_id,
-      role_id
+      role_id,
     });
   }
 
-  updateMemberStatus(group_id: number, user_id: number, is_active: boolean): Observable<any> {
+  updateMemberStatus(
+    group_id: number,
+    user_id: number,
+    is_active: boolean
+  ): Observable<any> {
     const payload = { group_id, user_id, is_active };
     return this.put('/api/groups/members/status', payload);
   }
 
-    /**
+  /**
    * 📌 Update Group Display Picture
    * @param group_id number | null
    * @param firebase_group_id string | null
@@ -249,11 +275,13 @@ getSocialMedia(user_id: number): Observable<GetSocialMediaResponse> {
   }
 
   /**
- * Get group display picture by firebase_group_id
- */
-getGroupDp(firebase_group_id: string): Observable<{ status: boolean; group_dp: string }> {
-  return this.get('/api/groups/group-dp', { firebase_group_id });
-}
+   * Get group display picture by firebase_group_id
+   */
+  getGroupDp(
+    firebase_group_id: string
+  ): Observable<{ status: boolean; group_dp: string }> {
+    return this.get('/api/groups/group-dp', { firebase_group_id });
+  }
 
   // ----------------- 📎 MEDIA APIs -----------------
 
@@ -276,7 +304,7 @@ getGroupDp(firebase_group_id: string): Observable<{ status: boolean; group_dp: s
       media_type,
       file_size,
       content_type,
-      metadata
+      metadata,
     });
   }
 
@@ -290,7 +318,7 @@ getGroupDp(firebase_group_id: string): Observable<{ status: boolean; group_dp: s
       fetch(uploadUrl, {
         method: 'PUT',
         headers: { 'Content-Type': file.type },
-        body: file
+        body: file,
       })
     );
   }
@@ -305,7 +333,7 @@ getGroupDp(firebase_group_id: string): Observable<{ status: boolean; group_dp: s
     return this.get(`/api/media/download-url/${media_id}`);
   }
 
-   // ----------------- ✏️ USER UPDATES -----------------
+  // ----------------- ✏️ USER UPDATES -----------------
 
   /**
    * Update user name
@@ -315,45 +343,51 @@ getGroupDp(firebase_group_id: string): Observable<{ status: boolean; group_dp: s
   }
 
   /**
- * Update user status
- */
-updateUserStatus(user_id: number, status: string): Observable<any> {
-  return this.post('/api/users/update-status', { user_id, status });
-}
+   * Update user status
+   */
+  updateUserStatus(user_id: number, status: string): Observable<any> {
+    return this.post('/api/users/update-status', { user_id, status });
+  }
 
-/**
- * Create a new community
- */
-createCommunity(payload: CreateCommunityPayload): Observable<CreateCommunityResponse> {
-  return this.post<CreateCommunityResponse>('/api/communities/create', payload);
-}
+  /**
+   * Create a new community
+   */
+  createCommunity(
+    payload: CreateCommunityPayload
+  ): Observable<CreateCommunityResponse> {
+    return this.post<CreateCommunityResponse>(
+      '/api/communities/create',
+      payload
+    );
+  }
 
-/**
- * ➕ Add an existing group to a community
- *
- * @param community_id number | string
- * @param group_id number | string
- * @param requester_id number
- */
-addGroupToCommunity(
-  community_id: number | string,
-  group_id: number | string,
-  requester_id: number
-): Observable<any> {
-  const url = `/api/communities/${community_id}/groups`;
-  const payload = {
-    group_id: String(group_id),
-    requester_id
-  };
+  /**
+   * ➕ Add an existing group to a community
+   *
+   * @param community_id number | string
+   * @param group_id number | string
+   * @param requester_id number
+   */
+  addGroupToCommunity(
+    community_id: number | string,
+    group_id: number | string,
+    requester_id: number
+  ): Observable<any> {
+    const url = `/api/communities/${community_id}/groups`;
+    const payload = {
+      group_id: String(group_id),
+      requester_id,
+    };
 
-  return this.post<any>(url, payload);
-}
+    return this.post<any>(url, payload);
+  }
 
-/**
- * Get community details by community_id
- */
-getCommunityById(community_id: string): Observable<any> {
-  return this.http.get<any>(`${this.baseUrl}/api/communities/community/${community_id}`);
-}
-
+  /**
+   * Get community details by community_id
+   */
+  getCommunityById(community_id: string): Observable<any> {
+    return this.http.get<any>(
+      `${this.baseUrl}/api/communities/community/${community_id}`
+    );
+  }
 }

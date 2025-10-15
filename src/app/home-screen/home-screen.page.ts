@@ -142,7 +142,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
         this.authService.senderId as string
       );
 
-      this.firebaseChatService.conversations$.subscribe((convs) => {
+      this.firebaseChatService.conversations.subscribe((convs) => {
         this.archievedCount = convs.filter((c) => c.isArchived).length || 0;
         // console.log('this archievwed count', this.archievedCount);
         this.conversations = convs
@@ -399,7 +399,6 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     this.showPopup = false;
   }
 
-
   /* ===== Selection mode logic ===== */
 
   // ✅ Fix: Click handler with proper selection toggle
@@ -581,45 +580,37 @@ export class HomeScreenPage implements OnInit, OnDestroy {
   // }
 
   get selectionMeta() {
-  const sel = this.selectedChats || [];
-  const count = sel.length;
+    const sel = this.selectedChats || [];
+    const count = sel.length;
 
-  // ✅ Check for types directly
-  const includesCommunity = sel.some((c) => c.type === 'community');
-  const includesGroup = sel.some((c) => c.type === 'group');
-  const includesUser = sel.some((c) => c.type === 'private');
+    // ✅ Check for types directly
+    const includesCommunity = sel.some((c) => c.type === 'community');
+    const includesGroup = sel.some((c) => c.type === 'group');
+    const includesUser = sel.some((c) => c.type === 'private');
 
-  // ✅ Only users selected
-  const onlyUsers =
-    includesUser &&
-    !includesGroup &&
-    !includesCommunity &&
-    sel.every((c) => c.type === 'private');
+    // ✅ Only users selected
+    const onlyUsers =
+      includesUser &&
+      !includesGroup &&
+      !includesCommunity &&
+      sel.every((c) => c.type === 'private');
 
-  return {
-    count,
-    includesCommunity,
-    includesGroup,
-    includesUser,
+    return {
+      count,
+      includesCommunity,
+      includesGroup,
+      includesUser,
 
-    // ✅ Single non-pinned user chat
-    isSingleUser:
-      count === 1 &&
-      onlyUsers &&
-      !(sel[0]?.isPinned === true),
+      // ✅ Single non-pinned user chat
+      isSingleUser: count === 1 && onlyUsers && !(sel[0]?.isPinned === true),
 
-    // ✅ Single pinned user chat
-    isSinglePinned:
-      count === 1 &&
-      onlyUsers &&
-      sel[0]?.isPinned === true,
+      // ✅ Single pinned user chat
+      isSinglePinned: count === 1 && onlyUsers && sel[0]?.isPinned === true,
 
-    // ✅ Multiple user chats (no groups/communities)
-    isMultiUsersOnly:
-      count > 1 && onlyUsers,
-  };
-}
-
+      // ✅ Multiple user chats (no groups/communities)
+      isMultiUsersOnly: count > 1 && onlyUsers,
+    };
+  }
 
   async onPinSelected() {
     const userId = this.senderUserId || this.authService.authData?.userId || '';
@@ -632,7 +623,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     );
     this.clearChatSelection();
   }
-  
+
   async onUnpinSelected() {
     // console.log("the unpin function is selected")
     const userId = this.senderUserId || this.authService.authData?.userId || '';
@@ -646,7 +637,6 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     );
     this.clearChatSelection();
   }
-
 
   // delete chat code start
   async onDeleteSelected() {
@@ -820,105 +810,108 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     this.router.navigate(['/archieved-screen']);
   }
 
- async onMoreSelected(ev: any) {
-  const sel = this.selectedChats || [];
-  // console.log({ sel });
+  async onMoreSelected(ev: any) {
+    const sel = this.selectedChats || [];
+    // console.log({ sel });
 
-  const users = sel.filter((c) => c.type === 'private');
-  const groups = sel.filter((c) => c.type === 'group' || c.type === 'community');
+    const users = sel.filter((c) => c.type === 'private');
+    const groups = sel.filter(
+      (c) => c.type === 'group' || c.type === 'community'
+    );
 
-  const isSingleUser = users.length === 1 && groups.length === 0;
-  const isMultiUsers = users.length > 1 && groups.length === 0;
-  const isSingleGroup = groups.length === 1 && users.length === 0;
-  const isMultiGroups = groups.length > 1 && users.length === 0;
-  const isMixedChats = users.length > 0 && groups.length > 0;
+    const isSingleUser = users.length === 1 && groups.length === 0;
+    const isMultiUsers = users.length > 1 && groups.length === 0;
+    const isSingleGroup = groups.length === 1 && users.length === 0;
+    const isMultiGroups = groups.length > 1 && users.length === 0;
+    const isMixedChats = users.length > 0 && groups.length > 0;
 
-  const unreadOf = (x: any) => Number(x?.unreadCount || 0) > 0;
+    const unreadOf = (x: any) => Number(x?.unreadCount || 0) > 0;
 
-  const single = sel.length === 1 ? sel[0] : null;
-  const canMarkReadSingle = !!single && unreadOf(single);
-  const canMarkUnreadSingle = !!single && !unreadOf(single);
+    const single = sel.length === 1 ? sel[0] : null;
+    const canMarkReadSingle = !!single && unreadOf(single);
+    const canMarkUnreadSingle = !!single && !unreadOf(single);
 
-  const anyUnreadSelected = sel.some(unreadOf);
-  const allSelectedRead = sel.length > 0 && sel.every((x) => !unreadOf(x));
-  const canMarkReadMulti = !single && anyUnreadSelected;
-  const canMarkUnreadMulti = !single && allSelectedRead;
+    const anyUnreadSelected = sel.some(unreadOf);
+    const allSelectedRead = sel.length > 0 && sel.every((x) => !unreadOf(x));
+    const canMarkReadMulti = !single && anyUnreadSelected;
+    const canMarkUnreadMulti = !single && allSelectedRead;
 
-  const pop = await this.popoverCtrl.create({
-    component: MenuHomePopoverComponent,
-    event: ev,
-    translucent: true,
-    componentProps: {
-      canLock: true,
-      allSelected: this.areAllVisibleSelected(),
-      isAllSelectedMode: this.areAllVisibleSelected(),
+    const pop = await this.popoverCtrl.create({
+      component: MenuHomePopoverComponent,
+      event: ev,
+      translucent: true,
+      componentProps: {
+        canLock: true,
+        allSelected: this.areAllVisibleSelected(),
+        isAllSelectedMode: this.areAllVisibleSelected(),
 
-      isSingleUser,
-      isMultiUsers,
-      isSingleGroup,
-      isMultiGroups,
-      isMixedChats,
+        isSingleUser,
+        isMultiUsers,
+        isSingleGroup,
+        isMultiGroups,
+        isMixedChats,
 
-      canMarkReadSingle,
-      canMarkUnreadSingle,
-      canMarkReadMulti,
-      canMarkUnreadMulti,
-    },
-  });
-  await pop.present();
+        canMarkReadSingle,
+        canMarkUnreadSingle,
+        canMarkReadMulti,
+        canMarkUnreadMulti,
+      },
+    });
+    await pop.present();
 
-  const { data } = await pop.onDidDismiss();
-  if (!data?.action) return;
+    const { data } = await pop.onDidDismiss();
+    if (!data?.action) return;
 
-  switch (data.action) {
-    case 'viewContact':
-      this.openSelectedContactProfile();
-      break;
+    switch (data.action) {
+      case 'viewContact':
+        this.openSelectedContactProfile();
+        break;
 
-    case 'groupInfo':
-      this.openSelectedGroupInfo();
-      break;
+      case 'groupInfo':
+        this.openSelectedGroupInfo();
+        break;
 
-    case 'markUnread':
-      this.markAsUnread();
-      break;
-    case 'markRead':
-      this.markRoomAsRead();
-      break;
-    case 'selectAll':
-      this.selectAllVisible();
-      break;
-    case 'lockChat':
-    case 'lockChats':
-      break;
-    case 'favorite':
-      break;
-    case 'addToList':
-      break;
-    case 'exitGroup':
-      await this.confirmAndExitSingleSelectedGroup();
-      break;
-    case 'exitGroups':
-      await this.confirmAndExitMultipleSelectedGroups();
-      break;
-    case 'exitCommunity':
-      break;
-    case 'communityInfo':
-      break;
+      case 'markUnread':
+        this.markAsUnread();
+        break;
+      case 'markRead':
+        this.markRoomAsRead();
+        break;
+      case 'selectAll':
+        this.selectAllVisible();
+        break;
+      case 'lockChat':
+      case 'lockChats':
+        break;
+      case 'favorite':
+        break;
+      case 'addToList':
+        break;
+      case 'exitGroup':
+        await this.confirmAndExitSingleSelectedGroup();
+        break;
+      case 'exitGroups':
+        await this.confirmAndExitMultipleSelectedGroups();
+        break;
+      case 'exitCommunity':
+        break;
+      case 'communityInfo':
+        break;
+    }
   }
-}
-
 
   private openSelectedContactProfile(): void {
     // //console.log("selectedChats",this.selectedChats);
     // const sel = this.selectedChats.filter((c) => c.type === 'private');
     //  console.log("selected contact",sel)
     const chat = this.selectedChats[0];
-    console.log({chat})
+    console.log({ chat });
     if (!chat) return;
 
     const parts = chat.roomId.split('_');
-    const receiverId = parts.find((p: string | null) => p !== this.senderUserId) ?? parts[parts.length - 1];
+    const receiverId =
+      parts.find((p: string | null) => p !== this.senderUserId) ??
+      parts[parts.length - 1];
 
     // console.log({receiverId})
 
@@ -937,7 +930,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     if (!chat) return;
 
     const queryParams: any = {
-      receiverId: chat.roomId
+      receiverId: chat.roomId,
     };
 
     this.router.navigate(['/profile-screen'], { queryParams });
@@ -1460,25 +1453,25 @@ export class HomeScreenPage implements OnInit, OnDestroy {
   async openChat(chat: any) {
     console.log({ chat });
     await this.firebaseChatService.openChat(chat);
-    if(chat.type == 'private'){
+    if (chat.type == 'private') {
       const parts = chat.roomId.split('_');
-    const receiverId = parts.find((p: string | null) => p !== this.senderUserId) ?? parts[parts.length - 1];
-    console.log({receiverId})
-    this.router.navigate(['/chatting-screen'], {
-      // queryParams: { receiverId: '', isGroup: true },
-      queryParams: { receiverId: receiverId },
-    });
-  }else{
-    const receiverId = chat.roomId;
-    this.router.navigate(['/chatting-screen'], {
-      // queryParams: { receiverId: '', isGroup: true },
-      queryParams: { receiverId: receiverId },
-    
-    });
-    
+      const receiverId =
+        parts.find((p: string | null) => p !== this.senderUserId) ??
+        parts[parts.length - 1];
+      console.log({ receiverId });
+      this.router.navigate(['/chatting-screen'], {
+        // queryParams: { receiverId: '', isGroup: true },
+        queryParams: { receiverId: receiverId },
+      });
+    } else {
+      const receiverId = chat.roomId;
+      this.router.navigate(['/chatting-screen'], {
+        // queryParams: { receiverId: '', isGroup: true },
+        queryParams: { receiverId: receiverId },
+      });
+    }
+    return;
   }
-  return;
-}
 
   async loadUserCommunitiesForHome() {
     try {

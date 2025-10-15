@@ -58,6 +58,7 @@ import { AuthService } from 'src/app/auth/auth.service';
 import { ApiService } from 'src/app/services/api/api.service';
 import {
   IAttachment,
+  IConversation,
   IMessage,
   SqliteService,
 } from 'src/app/services/sqlite.service';
@@ -155,7 +156,8 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   page = 0;
   isLoadingMore = false;
   hasMoreMessages = true;
-  allMessages: (IMessage & { attachment? : IAttachment, fadeOut : boolean})[] = []; // Store all messages
+  allMessages: (IMessage & { attachment?: IAttachment; fadeOut: boolean })[] =
+    []; // Store all messages
   displayedMessages: Message[] = []; // Messages currently shown
   private lastMessageKey: string | null = null;
 
@@ -163,14 +165,16 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   chatTitle: string | null = null;
 
   pfUsers: Array<{
-  userId?: string | number;
-  username?: string;
-  phoneNumber?: string;
-  avatar?: string | null;
-  isOnPlatform?: boolean;
-}> = [];
+    userId?: string | number;
+    username?: string;
+    phoneNumber?: string;
+    avatar?: string | null;
+    isOnPlatform?: boolean;
+  }> = [];
 
-private pfUsersSub?: Subscription;
+  currentConv: IConversation | null = null;
+
+  private pfUsersSub?: Subscription;
 
   // block state flags
   iBlocked = false;
@@ -232,8 +236,7 @@ private pfUsersSub?: Subscription;
     private el: ElementRef,
     private zone: NgZone,
     private presence: PresenceService,
-    private actionSheetCtrl: ActionSheetController, // private toastCtrl: ToastController, // private modalCtrl: ModalController,
-    // private firebaseChatService : FirebaseChatService
+    private actionSheetCtrl: ActionSheetController // private toastCtrl: ToastController, // private modalCtrl: ModalController, // private firebaseChatService : FirebaseChatService
   ) {}
 
   async ngOnInit() {
@@ -353,104 +356,88 @@ private pfUsersSub?: Subscription;
     }
   }
 
-  async ionViewWillEnter() {
-    Keyboard.setScroll({ isDisabled: false });
-    this.senderId = this.authService.authData?.userId || '';
-    this.sender_phone = this.authService.authData?.phone_number || '';
-    this.sender_name = this.authService.authData?.name || '';
-
-    // Get current chat data from Firebase Chat Service
-  const currentChat = this.chatService.currentChat;
-  this.receiverProfile = (currentChat as any).avatar || (currentChat as any).groupAvatar || null;
-  this.chatTitle = currentChat?.title || null;
-
-  // console.log({chatTitle})
-  
-  // if (currentChat) {}
-
-  //    try {
-  //   this.pfUsersSub = this.chatService.platformUsers$.subscribe((users) => {
-  //     // Normalize fields to be consistent with what ContactsPage does
-  //     this.pfUsers = (users || []).map((u: any) => ({
-  //       userId: u.userId ?? u.user_id ?? u.id ?? null,
-  //       username: u.username ?? u.name ?? u.displayName ?? '',
-  //       phoneNumber: u.phoneNumber ?? u.phone_number ?? '',
-  //       avatar: u.avatar ?? u.profile ?? null,
-  //       // isOnPlatform: !!u.isOnPlatform ?? true,
-  //     }));
-
-  //     console.log("this.pfUsers",this.pfUsers)
-
-  //     // optional debug
-  //     // console.log('pfUsers updated', this.pfUsers);
-  //   });
-  // } catch (err) {
-  //   console.warn('Failed to subscribe to platform users', err);
+  // async ionViewWillEnter() {
+  //   // console.log({chatTitle})
+  //   // if (currentChat) {}
+  //   //    try {
+  //   //   this.pfUsersSub = this.chatService.platformUsers$.subscribe((users) => {
+  //   //     // Normalize fields to be consistent with what ContactsPage does
+  //   //     this.pfUsers = (users || []).map((u: any) => ({
+  //   //       userId: u.userId ?? u.user_id ?? u.id ?? null,
+  //   //       username: u.username ?? u.name ?? u.displayName ?? '',
+  //   //       phoneNumber: u.phoneNumber ?? u.phone_number ?? '',
+  //   //       avatar: u.avatar ?? u.profile ?? null,
+  //   //       // isOnPlatform: !!u.isOnPlatform ?? true,
+  //   //     }));
+  //   //     console.log("this.pfUsers",this.pfUsers)
+  //   //     // optional debug
+  //   //     // console.log('pfUsers updated', this.pfUsers);
+  //   //   });
+  //   // } catch (err) {
+  //   //   console.warn('Failed to subscribe to platform users', err);
+  //   // }
+  //   // const nameFromQuery =
+  //   //   this.route.snapshot.queryParamMap.get('receiver_name');
+  //   // this.receiver_name =
+  //   //   nameFromQuery ||
+  //   //   (await this.secureStorage.getItem('receiver_name')) ||
+  //   //   '';
+  //   // const rawId = this.route.snapshot.queryParamMap.get('receiverId') || '';
+  //   // const chatTypeParam = this.route.snapshot.queryParamMap.get('isGroup');
+  //   // const phoneFromQuery =
+  //   //   this.route.snapshot.queryParamMap.get('receiver_phone');
+  //   // this.chatType = chatTypeParam === 'true' ? 'group' : 'private';
+  //   // if (this.chatType === 'group') {
+  //   //   this.roomId = decodeURIComponent(rawId);
+  //   //   try {
+  //   //     const res = await this.chatService.fetchGroupWithProfiles(this.roomId);
+  //   //     if (!res) return;
+  //   //     const { groupName, groupMembers } = res;
+  //   //     this.groupName = groupName;
+  //   //     this.groupMembers = groupMembers;
+  //   //   } catch (err) {
+  //   //     console.warn('Failed to fetch group with profiles', err);
+  //   //     this.groupName = 'Group';
+  //   //     this.groupMembers = [];
+  //   //   }
+  //   //   this.setupTypingListener();
+  //   // } else {
+  //   //   this.receiverId = decodeURIComponent(rawId);
+  //   //   this.roomId = this.getRoomId(this.senderId, this.receiverId);
+  //   //   this.receiver_phone =
+  //   //     phoneFromQuery || localStorage.getItem('receiver_phone') || '';
+  //   //   localStorage.setItem('receiver_phone', this.receiver_phone);
+  //   // }
+  //   // await this.chatService.resetUnreadCount(this.roomId, this.senderId);
+  //   // await this.markMessagesAsRead();
+  //   // // await this.loadFromLocalStorage();
+  //   // // this.listenForMessages();
+  //   // const nav = this.router.getCurrentNavigation();
+  //   // const state = nav?.extras?.state;
+  //   // if (state && state['imageToSend']) {
+  //   //   this.attachmentPath = state['imageToSend'];
+  //   // }
+  //   // this.loadReceiverProfile();
   // }
 
-    // const nameFromQuery =
-    //   this.route.snapshot.queryParamMap.get('receiver_name');
-    // this.receiver_name =
-    //   nameFromQuery ||
-    //   (await this.secureStorage.getItem('receiver_name')) ||
-    //   '';
-
-    // const rawId = this.route.snapshot.queryParamMap.get('receiverId') || '';
-    // const chatTypeParam = this.route.snapshot.queryParamMap.get('isGroup');
-    // const phoneFromQuery =
-    //   this.route.snapshot.queryParamMap.get('receiver_phone');
-
-    // this.chatType = chatTypeParam === 'true' ? 'group' : 'private';
-
-    // if (this.chatType === 'group') {
-    //   this.roomId = decodeURIComponent(rawId);
-
-    //   try {
-    //     const res = await this.chatService.fetchGroupWithProfiles(this.roomId);
-    //     if (!res) return;
-    //     const { groupName, groupMembers } = res;
-    //     this.groupName = groupName;
-    //     this.groupMembers = groupMembers;
-    //   } catch (err) {
-    //     console.warn('Failed to fetch group with profiles', err);
-    //     this.groupName = 'Group';
-    //     this.groupMembers = [];
-    //   }
-
-    //   this.setupTypingListener();
-    // } else {
-    //   this.receiverId = decodeURIComponent(rawId);
-    //   this.roomId = this.getRoomId(this.senderId, this.receiverId);
-    //   this.receiver_phone =
-    //     phoneFromQuery || localStorage.getItem('receiver_phone') || '';
-    //   localStorage.setItem('receiver_phone', this.receiver_phone);
-    // }
-
-    // await this.chatService.resetUnreadCount(this.roomId, this.senderId);
-    // await this.markMessagesAsRead();
-
-    // // await this.loadFromLocalStorage();
-    // // this.listenForMessages();
-
-    // const nav = this.router.getCurrentNavigation();
-    // const state = nav?.extras?.state;
-
-    // if (state && state['imageToSend']) {
-    //   this.attachmentPath = state['imageToSend'];
-    // }
-
-    // this.loadReceiverProfile();
-  }
-
-  async ionViewDidEnter() {
+  async ionViewWillEnter() {
     await this.chatService.loadMessages();
     this.chatService.syncMessagesWithServer();
-
     this.chatService.getMessages().subscribe(async (msgs) => {
+      console.log('Received for ui->', msgs);
       this.groupedMessages = (await this.groupMessagesByDate(
         msgs as any[]
       )) as any[];
     });
+    this.currentConv = this.chatService.currentChat;
+    Keyboard.setScroll({ isDisabled: false });
+    this.senderId = this.authService.authData?.userId || '';
+    this.sender_phone = this.authService.authData?.phone_number || '';
+    this.sender_name = this.authService.authData?.name || '';
+    const currentChat = this.chatService.currentChat;
+    this.receiverProfile =
+      (currentChat as any).avatar || (currentChat as any).groupAvatar || null;
+    this.chatTitle = currentChat?.title || null;
   }
 
   async ionViewWillLeave() {
@@ -1089,7 +1076,9 @@ private pfUsersSub?: Subscription;
     this.replyToMessage = null;
   }
 
-  getRepliedMessage(replyToMessageId: string): (IMessage & {attachment? : IAttachment, fadeOut : boolean}) | null {
+  getRepliedMessage(
+    replyToMessageId: string
+  ): (IMessage & { attachment?: IAttachment; fadeOut: boolean }) | null {
     const msg =
       this.allMessages.find((msg) => {
         return msg.msgId == replyToMessageId;
@@ -1787,12 +1776,10 @@ private pfUsersSub?: Subscription;
 
   async listenForMessages() {
     // this.messageSub?.unsubscribe();
-
     // this.messageSub = this.chatService
     //   .getMessages()
     //   .subscribe(async (newMessages: any) => {
     //     if (!Array.isArray(newMessages)) return;
-
     //     const decryptPromises = newMessages.map((msg) =>
     //       this.encryptionService
     //         .decrypt(msg.text || '')
@@ -1802,18 +1789,15 @@ private pfUsersSub?: Subscription;
     //           return { msg, decryptedText: '' };
     //         })
     //     );
-
     //     const decryptedPairs = await Promise.all(decryptPromises);
     //     const existingById: Record<string, number> = {};
     //     this.allMessages.forEach((m, i) => {
     //       if (m.msgId) existingById[String(m.msgId)] = i;
     //     });
-
     //     for (const pair of decryptedPairs) {
     //       const msg = pair.msg;
     //       const serverKey = msg.key || null;
     //       const messageId = msg.message_id || uuidv4();
-
     //       const dm: Message = {
     //         ...msg,
     //         key: serverKey,
@@ -1821,7 +1805,6 @@ private pfUsersSub?: Subscription;
     //         text: pair.decryptedText,
     //         reactions: msg.reactions || {}, // ✅ Ensure reactions are included
     //       };
-
     //       if (dm.attachment && (dm.attachment as any).caption) {
     //         try {
     //           const encCap = (dm.attachment as any).caption;
@@ -1839,7 +1822,6 @@ private pfUsersSub?: Subscription;
     //           );
     //         }
     //       }
-
     //       if (this.applyDeletionFilters(dm)) {
     //         if (existingById[String(messageId)] !== undefined) {
     //           const idx = existingById[String(messageId)];
@@ -1847,9 +1829,7 @@ private pfUsersSub?: Subscription;
     //         }
     //         continue;
     //       }
-
     //       const existingIndex = existingById[String(messageId)];
-
     //       if (existingIndex !== undefined) {
     //         const old = this.allMessages[existingIndex];
     //         const merged: Message = {
@@ -1858,18 +1838,15 @@ private pfUsersSub?: Subscription;
     //           key: dm.key || old.key,
     //           reactions: dm.reactions || old.reactions || {}, // ✅ Merge reactions
     //         };
-
     //         if ((old as any).localOnly !== undefined)
     //           (merged as any).localOnly = (old as any).localOnly;
     //         if ((old as any).isLocallyEdited !== undefined)
     //           (merged as any).isLocallyEdited = (old as any).isLocallyEdited;
-
     //         this.allMessages[existingIndex] = merged;
     //       } else {
     //         this.allMessages.push(dm);
     //         existingById[String(messageId)] = this.allMessages.length - 1;
     //       }
-
     //       if (dm.receiver_id === this.senderId && !dm.read) {
     //         try {
     //           await this.chatService.markRead(this.roomId, dm.key);
@@ -1882,7 +1859,6 @@ private pfUsersSub?: Subscription;
     //         }
     //       }
     //     }
-
     //     const seenIds: Record<string, boolean> = {};
     //     this.allMessages = this.allMessages.filter((m) => {
     //       const id = String(m.message_id || '');
@@ -1891,7 +1867,6 @@ private pfUsersSub?: Subscription;
     //       seenIds[id] = true;
     //       return true;
     //     });
-
     //     this.allMessages.sort((a, b) => {
     //       const ta =
     //         Number(a.timestamp) || new Date(a.timestamp || 0).getTime();
@@ -1899,7 +1874,6 @@ private pfUsersSub?: Subscription;
     //         Number(b.timestamp) || new Date(b.timestamp || 0).getTime();
     //       return ta - tb;
     //     });
-
     //     const visibleAllMessages = this.allMessages.filter(
     //       (m) => !this.applyDeletionFilters(m)
     //     );
@@ -1909,16 +1883,13 @@ private pfUsersSub?: Subscription;
     //     );
     //     const startIdx = Math.max(0, visibleAllMessages.length - keepCount);
     //     this.displayedMessages = visibleAllMessages.slice(startIdx);
-
     //     this.groupedMessages = await this.groupMessagesByDate(
     //       this.displayedMessages
     //     );
     //     this.saveToLocalStorage();
-
     //     if (this.pinnedMessage) {
     //       this.findPinnedMessageDetails(this.pinnedMessage.key);
     //     }
-
     //     await Promise.resolve();
     //     this.scrollToBottom();
     //     this.observeVisibleMessages();
@@ -2534,7 +2505,6 @@ private pfUsersSub?: Subscription;
     // try {
     //   const db = getDatabase();
     //   const messagesRef = ref(db, `chats/${this.roomId}`);
-
     //   let qry;
     //   if (loadMore && this.lastMessageKey) {
     //     qry = query(
@@ -2546,16 +2516,12 @@ private pfUsersSub?: Subscription;
     //   } else {
     //     qry = query(messagesRef, orderByKey(), limitToLast(this.limit));
     //   }
-
     //   const snapshot = await get(qry);
-
     //   if (snapshot.exists()) {
     //     const messagesData = snapshot.val();
     //     const messageKeys = Object.keys(messagesData).sort();
-
     //     const decryptTasks = messageKeys.map(async (key) => {
     //       const msg = messagesData[key];
-
     //       // decrypt text
     //       let decryptedText = '';
     //       try {
@@ -2566,7 +2532,6 @@ private pfUsersSub?: Subscription;
     //         console.warn('decrypt text failed for key', key, e);
     //         decryptedText = '';
     //       }
-
     //       // decrypt attachment.caption if present
     //       if (msg.attachment && msg.attachment.caption) {
     //         try {
@@ -2579,16 +2544,13 @@ private pfUsersSub?: Subscription;
     //           console.warn('decrypt attachment caption failed for key', key, e);
     //         }
     //       }
-
     //       return {
     //         ...msg,
     //         key: key,
     //         text: decryptedText,
     //       } as Message;
     //     });
-
     //     const results = await Promise.all(decryptTasks);
-
     //     // -----------------------
     //     // FILTER OUT MESSAGES HIDDEN FOR THIS USER (deletedFor / deletedForEveryone)
     //     // -----------------------
@@ -2605,7 +2567,6 @@ private pfUsersSub?: Subscription;
     //         return true;
     //       }
     //     });
-
     //     // Merge into allMessages / displayedMessages keeping chronological order
     //     if (loadMore) {
     //       // older messages prepended (results are sorted ascending by key/name)
@@ -2618,21 +2579,16 @@ private pfUsersSub?: Subscription;
     //       this.allMessages = filteredResults;
     //       this.displayedMessages = filteredResults;
     //     }
-
     //     // Keep lastMessageKey based on raw results (so pagination works even when some were filtered out)
     //     if (results.length > 0 && results[0]?.key) {
     //       this.lastMessageKey = results[0].key;
     //     }
-
     //     // hasMoreMessages should be true if the query returned 'limit' keys (raw)
     //     this.hasMoreMessages = messageKeys.length === this.limit;
-
     //     this.groupedMessages = await this.groupMessagesByDate(
     //       this.displayedMessages
     //     );
-
     //     this.saveToLocalStorage();
-
     //     await this.markDisplayedMessagesAsRead();
     //   } else {
     //     this.hasMoreMessages = false;
@@ -2640,7 +2596,6 @@ private pfUsersSub?: Subscription;
     // } catch (error) {
     //   console.error('Error loading messages from Firebase:', error);
     // }
-
     // this.chatService.getMessages().subscribe((messages) => {
     //   console.log('message', messages);
     // });
@@ -2650,12 +2605,10 @@ private pfUsersSub?: Subscription;
     // const userId = this.senderId;
     // const current = msg.reactions?.findIndex(r=>r.userId == userId) || null;
     // const newVal = current?.emoji === emoji ? null : emoji;
-
     // // 1) Optimistic UI update
     // msg.reactions = { ...(msg.reactions || {}) };
     // if (newVal) msg.reactions[userId] = newVal;
     // else delete msg.reactions[userId];
-
     // // If you maintain grouped/displayed arrays, ensure they reflect the change:
     // try {
     //   // update the message inside displayed/all arrays if present
@@ -2681,12 +2634,10 @@ private pfUsersSub?: Subscription;
     // } catch (e) {
     //   console.warn('update local arrays failed', e);
     // }
-
     // 2) Persist to Firebase
     // try {
     //   const db = getDatabase();
     //   const path = `chats/${this.roomId}/${msg.key}/reactions/${userId}`;
-
     //   if (newVal) {
     //     await set(ref(db, path), newVal);
     //     //console.log('✅ Reaction saved:', newVal);
@@ -2694,17 +2645,14 @@ private pfUsersSub?: Subscription;
     //     await remove(ref(db, path));
     //     //console.log('✅ Reaction removed');
     //   }
-
     //   // 3) After successful write -> exit selection mode
     //   this.selectedMessages = [];
     //   this.lastPressedMessage = null;
-
     //   // if you have UI flags for selection, reset them too:
     //   // e.g. this.showSelectionToolbar = false; (replace with your actual flag)
     //   // Also ensure any CSS 'selected' classes will update because selectedMessages empty
     // } catch (err) {
     //   console.error('❌ Reaction save/remove error:', err);
-
     //   // Optionally rollback optimistic UI on error:
     //   try {
     //     // revert local change by refetching msg from allMessages (if exists) or clear reaction
@@ -2730,11 +2678,9 @@ private pfUsersSub?: Subscription;
     //   } catch (e) {
     //     /* ignore rollback errors */
     //   }
-
     //   // keep UI selection cleared? you can choose to keep selection if error:
     //   this.selectedMessages = [];
     //   this.lastPressedMessage = null;
-
     //   const t = await this.toastCtrl.create({
     //     message: 'Failed to update reaction',
     //     duration: 1600,

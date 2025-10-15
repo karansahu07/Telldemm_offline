@@ -65,35 +65,30 @@
 
   <!-- List -->
   <ion-list *ngIf="!isLoading">
-    <ion-item
-      *ngFor="let it of items"
-      [class.selected]="isSelected(it)"
-      (click)="onRowClick(it, $event)"
-      (touchstart)="startLongPress(it)"
-      (touchend)="cancelLongPress()"
-      (touchmove)="cancelLongPress()">
+    <ion-item *ngFor="let it of items" [class.selected]="isSelected(it)" (click)="onRowClick(it, $event)"
+      (touchstart)="startLongPress(it)" (touchend)="cancelLongPress()" (touchmove)="cancelLongPress()">
+      <div class="chat-item">
+        <div slot="start" class="select-tick" *ngIf="selected.length > 0" (click)="toggleSelection(it, $event)">
+          <ion-icon [name]="isSelected(it) ? 'checkmark-circle' : 'ellipse-outline'"></ion-icon>
+        </div>
 
-      <!-- selection tick when in selection mode -->
-      <div slot="start" class="select-tick" *ngIf="selected.length > 0" (click)="toggleSelection(it, $event)">
-        <ion-icon [name]="isSelected(it) ? 'checkmark-circle' : 'ellipse-outline'"></ion-icon>
-      </div>
+        <ion-avatar (click)="selected.length ? toggleSelection(it, $event) : null">
+          <img *ngIf="it.avatar; else initials" [src]="it.avatar" alt="avatar" />
+          <ng-template #initials>
+            <div class="avatar-fallback">{{ (it.title||'?').slice(0,1) }}</div>
+          </ng-template>
+        </ion-avatar>
 
-      <ion-avatar slot="start" (click)="selected.length ? toggleSelection(it, $event) : null">
-        <img *ngIf="it.avatar; else initials" [src]="it.avatar" alt="avatar" />
-        <ng-template #initials>
-          <div class="avatar-fallback">{{ (it.title||'?').slice(0,1) }}</div>
-        </ng-template>
-      </ion-avatar>
+        <ion-label>
+          <h3 class="name">{{ it.title }}</h3>
+          <p class="preview">{{ it.lastMessage }}</p>
+        </ion-label>
 
-      <ion-label>
-        <h3 class="name">{{ it.title }}</h3>
-        <p class="preview">{{ it.lastMessage }}</p>
-      </ion-label>
+        <div class="meta">
+          <div class="time">{{ it.lastMessageAt | date: 'shortTime' }}</div>
+          <ion-badge *ngIf="(it?.unreadCount||0) > 0" color="danger">{{ it?.unreadCount }}</ion-badge>
 
-      <div slot="end" class="meta">
-        <div class="time">{{ it.lastMessageAt }}</div>
-        <!-- <ion-badge *ngIf="it.unreadCount > 0" color="danger">{{ it.unreadCount }}</ion-badge> -->
-        <!-- per-row unarchive removed -->
+        </div>
       </div>
     </ion-item>
 
