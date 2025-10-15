@@ -129,11 +129,6 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     this.senderUserId = this.authService.authData?.userId || '';
     this.isLoading = true;
 
-    // await this.loadData();
-    await this.syncPinnedFromServer();
-    await this.startPinListener();
-    await this.startArchiveListener();
-
     this.trackRouteChanges();
   }
 
@@ -149,7 +144,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
 
       this.firebaseChatService.conversations$.subscribe((convs) => {
         this.archievedCount = convs.filter((c) => c.isArchived).length || 0;
-        console.log('this archievwed count', this.archievedCount);
+        // console.log('this archievwed count', this.archievedCount);
         this.conversations = convs
           .map((c) => ({
             ...c,
@@ -175,15 +170,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     const verified = await this.verifyDeviceOnEnter();
     if (!verified) return; // stop if mismatch
 
-    // 2) Existing logic (kept as before)
-    // const shouldRefresh = localStorage.getItem('shouldRefreshHome');
-
-    // if (shouldRefresh === 'true') {
-    // //console.log('Refreshing home page after group creation...');
-    // localStorage.removeItem('shouldRefreshHome');
     this.clearChatData();
-    await this.refreshHomeData();
-    // await this.loadData();
     this.sender_name = this.authService.authData?.name || '';
     // }
   }
@@ -300,18 +287,6 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     }
   }
 
-  //this is for testing
-  //   ionViewWillEnter() {
-  //     //console.log('Forecast ionViewWillEnter')
-  //     console.timeLog();
-  //     console.timeStamp('Forecast ionViewWillEnter');
-  // }
-
-  // ionViewDidEnter() {
-
-  //     //console.log('Forecast ionViewDidEnter start')
-  //     console.timeLog();
-  // }
   private async checkForceLogout(): Promise<void> {
     try {
       const uidStr = this.senderUserId || this.authService.authData?.userId;
@@ -361,40 +336,6 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     this.typingUnsubs.clear();
 
     this.chatList = [];
-  }
-
-  private async refreshHomeData() {
-    try {
-      this.currUserId = this.authService.authData?.phone_number || '';
-      this.senderUserId = this.authService.authData?.userId || '';
-
-      this.chatList = [];
-
-      await Promise.all([
-        // this.getAllUsers(),
-        this.loadUserGroups(),
-        this.loadUserCommunitiesForHome(),
-      ]);
-
-      //console.log('Home page refreshed successfully');
-    } catch (error) {
-      console.error('Error refreshing home data:', error);
-    }
-  }
-
-  async loadData() {
-    try {
-      this.isLoading = true;
-      await Promise.all([
-        // this.getAllUsers(),
-        // this.loadUserGroups(),
-        // this.loadUserCommunitiesForHome()
-      ]);
-      this.isLoading = false;
-    } catch (err) {
-      console.error('Error loading home data:', err);
-      this.isLoading = false;
-    }
   }
 
   ngOnDestroy() {
@@ -458,25 +399,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     this.showPopup = false;
   }
 
-  /* ===== Selection mode logic ===== */
 
-  //   onChatRowClick(chat: any, ev: Event) {
-  //     if (this.selectedChats.length > 0) {
-  //       this.toggleChatSelection(chat, ev);
-  //       if (this.selectedConversations.has(chat.roomId)) {
-  //         this.selectedConversations.add(chat.roomId);
-  //       } else {
-  //         this.selectedConversations.delete(chat.roomId);
-  //       }
-  //     }
-  //     this.openChat(chat);
-  //   }
-
-  //    isConvSelected(roomId: string) {
-  //     return this.selectedConversations.has(roomId);
-  //   }
-
-  
   /* ===== Selection mode logic ===== */
 
   // ✅ Fix: Click handler with proper selection toggle
@@ -634,28 +557,69 @@ export class HomeScreenPage implements OnInit, OnDestroy {
   }
 
   /* ===== Selection meta (for header icon logic) ===== */
+  // get selectionMeta() {
+  //   const sel = this.selectedChats || [];
+  //   // console.log({sel})
+  //   const count = sel.length;
+  //   const includesCommunity = sel.some((c) => c.isCommunity);
+  //   const includesGroup = sel.some((c) => c.group && !c.isCommunity);
+  //   const includesUser = sel.some((c) => !c.group && !c.isCommunity);
+  //   const onlyUsers =
+  //     includesUser &&
+  //     !includesGroup &&
+  //     !includesCommunity &&
+  //     sel.every((c) => !c.group && !c.isCommunity);
+  //   return {
+  //     count,
+  //     includesCommunity,
+  //     includesGroup,
+  //     includesUser,
+  //     isSingleUser: count === 1 && onlyUsers && !(sel[0]?.isPinned === true),
+  //     isSinglePinned: count === 1 && onlyUsers && sel[0]?.isPinned === true,
+  //     isMultiUsersOnly: count > 1 && onlyUsers,
+  //   };
+  // }
+
   get selectionMeta() {
-    const sel = this.selectedChats || [];
-    // console.log({sel})
-    const count = sel.length;
-    const includesCommunity = sel.some((c) => c.isCommunity);
-    const includesGroup = sel.some((c) => c.group && !c.isCommunity);
-    const includesUser = sel.some((c) => !c.group && !c.isCommunity);
-    const onlyUsers =
-      includesUser &&
-      !includesGroup &&
-      !includesCommunity &&
-      sel.every((c) => !c.group && !c.isCommunity);
-    return {
-      count,
-      includesCommunity,
-      includesGroup,
-      includesUser,
-      isSingleUser: count === 1 && onlyUsers && !(sel[0]?.pinned === true),
-      isSinglePinned: count === 1 && onlyUsers && sel[0]?.pinned === true,
-      isMultiUsersOnly: count > 1 && onlyUsers,
-    };
-  }
+  const sel = this.selectedChats || [];
+  const count = sel.length;
+
+  // ✅ Check for types directly
+  const includesCommunity = sel.some((c) => c.type === 'community');
+  const includesGroup = sel.some((c) => c.type === 'group');
+  const includesUser = sel.some((c) => c.type === 'private');
+
+  // ✅ Only users selected
+  const onlyUsers =
+    includesUser &&
+    !includesGroup &&
+    !includesCommunity &&
+    sel.every((c) => c.type === 'private');
+
+  return {
+    count,
+    includesCommunity,
+    includesGroup,
+    includesUser,
+
+    // ✅ Single non-pinned user chat
+    isSingleUser:
+      count === 1 &&
+      onlyUsers &&
+      !(sel[0]?.isPinned === true),
+
+    // ✅ Single pinned user chat
+    isSinglePinned:
+      count === 1 &&
+      onlyUsers &&
+      sel[0]?.isPinned === true,
+
+    // ✅ Multiple user chats (no groups/communities)
+    isMultiUsersOnly:
+      count > 1 && onlyUsers,
+  };
+}
+
 
   async onPinSelected() {
     const userId = this.senderUserId || this.authService.authData?.userId || '';
@@ -668,45 +632,9 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     );
     this.clearChatSelection();
   }
-
-  //   this.clearChatSelection();
-  // }
-
-  private getPinKey(chat: any): string {
-    // groups use groupId; 1:1 uses the same roomId you already use
-    if (chat.group) return String(chat.receiver_Id);
-    const me = this.senderUserId || this.authService.authData?.userId || '';
-    return this.getRoomId(me, String(chat.receiver_Id));
-  }
-
-  private async syncPinnedFromServer(): Promise<void> {
-    try {
-      const userId =
-        this.senderUserId || this.authService.authData?.userId || '';
-      if (!userId) return;
-
-      const db = getDatabase();
-      const snap = await get(rtdbRef(db, `pinnedChats/${userId}`));
-      const map = snap.exists() ? snap.val() : {};
-
-      // reset pin flags locally
-      this.chatList.forEach((c) => {
-        c.pinned = false;
-        c.pinnedAt = 0;
-      });
-
-      // apply from server
-      this.chatList.forEach((c) => {
-        const k = this.getPinKey(c);
-        if (map && map[k]) {
-          c.pinned = true;
-          c.pinnedAt = Number(map[k]?.pinnedAt || 0);
-        }
-      });
-    } catch {}
-  }
-
+  
   async onUnpinSelected() {
+    // console.log("the unpin function is selected")
     const userId = this.senderUserId || this.authService.authData?.userId || '';
     if (!userId) {
       this.clearChatSelection();
@@ -719,32 +647,6 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     this.clearChatSelection();
   }
 
-  private startPinListener() {
-    if (this.pinUnsub) return;
-    const userId = this.senderUserId || this.authService.authData?.userId || '';
-    if (!userId) return;
-
-    const db = getDatabase();
-    const ref = rtdbRef(db, `pinnedChats/${userId}`);
-    const unsub = rtdbOnValue(ref, (snap) => {
-      const map = snap.exists() ? snap.val() : {};
-      this.chatList.forEach((c) => {
-        const k = this.getPinKey(c);
-        if (map[k]) {
-          c.pinned = true;
-          c.pinnedAt = Number(map[k].pinnedAt || 0);
-        } else {
-          c.pinned = false;
-          c.pinnedAt = 0;
-        }
-      });
-    });
-    this.pinUnsub = () => {
-      try {
-        rtdbOff(ref);
-      } catch {}
-    };
-  }
 
   // delete chat code start
   async onDeleteSelected() {
@@ -882,17 +784,6 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     this.clearChatSelection();
   }
 
-  // async onArchievedSelected() {
-  //   // //console.log('Export threads:', this.selectedChats.map(c => c.receiver_Id));
-  //   const alert = await this.alertCtrl.create({
-  //     header: 'Archieved chat',
-  //     message: 'Work in progress',
-  //     buttons: ['OK']
-  //   });
-  //   await alert.present();
-  //   this.clearChatSelection();
-  // }
-
   async onArchievedSelected() {
     try {
       const userId =
@@ -910,102 +801,8 @@ export class HomeScreenPage implements OnInit, OnDestroy {
       );
       this.clearChatSelection();
       return;
-      // if (archivables.length === 0) {
-      //   const alert = await this.alertCtrl.create({
-      //     header: this.translate.instant('home.archive.cannotArchive'),
-      //     message: this.translate.instant('home.archive.communityNotAllowed'),
-      //     buttons: [this.translate.instant('common.ok')],
-      //   });
-      //   await alert.present();
-      //   this.clearChatSelection();
-      //   return;
-      // }
-
-      // const db = getDatabase();
-
-      // for (const chat of archivables) {
-      //   console.log({ chat });
-      //   // const roomId = chat.group
-      //   //   ? chat.receiver_Id
-      //   //   : this.getRoomId(userId, chat.receiver_Id);
-      //   const roomId = chat.roomId;
-
-      //   // Archive in Firebase
-      //   await set(rtdbRef(db, `archivedChats/${userId}/${roomId}`), {
-      //     archivedAt: Date.now(),
-      //     isArchived: true,
-      //   });
-
-      //   // Remove from local chatList
-      //   this.chatList = this.chatList.filter(
-      //     (c) =>
-      //       !(
-      //         c.receiver_Id === chat.receiver_Id &&
-      //         !!c.group === !!chat.group &&
-      //         !!c.isCommunity === !!chat.isCommunity
-      //       )
-      //   );
-
-      //   // Stop typing listener
-      //   this.stopTypingListenerForChat(chat);
-
-      //   // Unsubscribe unread listener
-      //   const unreadSub = this.unreadSubs.find((sub) => {
-      //     return true; // You can add specific logic if needed
-      //   });
-      //   if (unreadSub) {
-      //     unreadSub.unsubscribe();
-      //     this.unreadSubs = this.unreadSubs.filter((s) => s !== unreadSub);
-      //   }
-      // }
-
-      // //console.log('✅ Chats archived successfully');
-      // this.clearChatSelection();
     } catch (error) {
       console.error('❌ Error archiving chats:', error);
-    }
-  }
-
-  private startArchiveListener() {
-    try {
-      const userId =
-        this.senderUserId || this.authService.authData?.userId || '';
-      if (!userId || this.archiveUnsub) return;
-
-      const db = getDatabase();
-      const archiveRef = rtdbRef(db, `archivedChats/${userId}`);
-
-      this.archiveUnsub = rtdbOnValue(archiveRef, (snapshot) => {
-        // keep a local mirror (for count)
-        this.archivedMap = snapshot.exists() ? snapshot.val() : {};
-
-        // filter archived out from visible list
-        this.chatList = this.chatList.filter((chat) => {
-          const roomId = chat.group
-            ? chat.receiver_Id
-            : this.getRoomId(userId, String(chat.receiver_Id));
-          return !this.archivedMap[roomId]?.isArchived;
-        });
-      });
-    } catch (err) {
-      console.warn('startArchiveListener error:', err);
-    }
-  }
-
-  private async isRoomArchived(roomId: string): Promise<boolean> {
-    try {
-      const userId =
-        this.senderUserId || this.authService.authData?.userId || '';
-      if (!userId) return false;
-
-      const db = getDatabase();
-      const archiveSnap = await get(
-        rtdbRef(db, `archivedChats/${userId}/${roomId}`)
-      );
-
-      return archiveSnap.exists() && archiveSnap.val()?.isArchived === true;
-    } catch {
-      return false;
     }
   }
 
@@ -1023,105 +820,110 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     this.router.navigate(['/archieved-screen']);
   }
 
-  async onMoreSelected(ev: any) {
-    const sel = this.selectedChats || [];
-    const users = sel.filter((c) => !c.group && !c.isCommunity);
-    const groups = sel.filter((c) => c.group && !c.isCommunity);
+ async onMoreSelected(ev: any) {
+  const sel = this.selectedChats || [];
+  // console.log({ sel });
 
-    const isSingleUser = users.length === 1 && groups.length === 0;
-    const isMultiUsers = users.length > 1 && groups.length === 0;
-    const isSingleGroup = groups.length === 1 && users.length === 0;
-    const isMultiGroups = groups.length > 1 && users.length === 0;
-    const isMixedChats = users.length > 0 && groups.length > 0;
+  const users = sel.filter((c) => c.type === 'private');
+  const groups = sel.filter((c) => c.type === 'group' || c.type === 'community');
 
-    const unreadOf = (x: any) => Number(x?.unreadCount || 0) > 0;
+  const isSingleUser = users.length === 1 && groups.length === 0;
+  const isMultiUsers = users.length > 1 && groups.length === 0;
+  const isSingleGroup = groups.length === 1 && users.length === 0;
+  const isMultiGroups = groups.length > 1 && users.length === 0;
+  const isMixedChats = users.length > 0 && groups.length > 0;
 
-    const single = sel.length === 1 ? sel[0] : null;
-    const canMarkReadSingle = !!single && unreadOf(single);
-    const canMarkUnreadSingle = !!single && !unreadOf(single);
+  const unreadOf = (x: any) => Number(x?.unreadCount || 0) > 0;
 
-    const anyUnreadSelected = sel.some(unreadOf);
-    const allSelectedRead = sel.length > 0 && sel.every((x) => !unreadOf(x));
-    const canMarkReadMulti = !single && anyUnreadSelected;
-    const canMarkUnreadMulti = !single && allSelectedRead;
+  const single = sel.length === 1 ? sel[0] : null;
+  const canMarkReadSingle = !!single && unreadOf(single);
+  const canMarkUnreadSingle = !!single && !unreadOf(single);
 
-    const pop = await this.popoverCtrl.create({
-      component: MenuHomePopoverComponent,
-      event: ev,
-      translucent: true,
-      componentProps: {
-        canLock: true,
-        allSelected: this.areAllVisibleSelected(),
-        isAllSelectedMode: this.areAllVisibleSelected(),
+  const anyUnreadSelected = sel.some(unreadOf);
+  const allSelectedRead = sel.length > 0 && sel.every((x) => !unreadOf(x));
+  const canMarkReadMulti = !single && anyUnreadSelected;
+  const canMarkUnreadMulti = !single && allSelectedRead;
 
-        isSingleUser,
-        isMultiUsers,
-        isSingleGroup,
-        isMultiGroups,
-        isMixedChats,
+  const pop = await this.popoverCtrl.create({
+    component: MenuHomePopoverComponent,
+    event: ev,
+    translucent: true,
+    componentProps: {
+      canLock: true,
+      allSelected: this.areAllVisibleSelected(),
+      isAllSelectedMode: this.areAllVisibleSelected(),
 
-        canMarkReadSingle,
-        canMarkUnreadSingle,
-        canMarkReadMulti,
-        canMarkUnreadMulti,
-      },
-    });
-    await pop.present();
+      isSingleUser,
+      isMultiUsers,
+      isSingleGroup,
+      isMultiGroups,
+      isMixedChats,
 
-    const { data } = await pop.onDidDismiss();
-    if (!data?.action) return;
+      canMarkReadSingle,
+      canMarkUnreadSingle,
+      canMarkReadMulti,
+      canMarkUnreadMulti,
+    },
+  });
+  await pop.present();
 
-    switch (data.action) {
-      case 'viewContact':
-        this.openSelectedContactProfile();
-        break;
+  const { data } = await pop.onDidDismiss();
+  if (!data?.action) return;
 
-      case 'groupInfo':
-        this.openSelectedGroupInfo();
-        break;
+  switch (data.action) {
+    case 'viewContact':
+      this.openSelectedContactProfile();
+      break;
 
-      case 'markUnread':
-        this.markAsUnread();
-        break;
-      case 'markRead':
-        this.markRoomAsRead();
-        break;
-      case 'selectAll':
-        this.selectAllVisible();
-        break;
-      case 'lockChat':
-      case 'lockChats':
-        /* ... */ break;
-      case 'favorite':
-        /* ... */ break;
-      case 'addToList':
-        /* ... */ break;
+    case 'groupInfo':
+      this.openSelectedGroupInfo();
+      break;
 
-      case 'exitGroup':
-        await this.confirmAndExitSingleSelectedGroup();
-        break;
-
-      case 'exitGroups':
-        await this.confirmAndExitMultipleSelectedGroups();
-        break;
-      case 'exitCommunity':
-        /* ... */ break;
-      case 'communityInfo':
-        /* ... */ break;
-    }
+    case 'markUnread':
+      this.markAsUnread();
+      break;
+    case 'markRead':
+      this.markRoomAsRead();
+      break;
+    case 'selectAll':
+      this.selectAllVisible();
+      break;
+    case 'lockChat':
+    case 'lockChats':
+      break;
+    case 'favorite':
+      break;
+    case 'addToList':
+      break;
+    case 'exitGroup':
+      await this.confirmAndExitSingleSelectedGroup();
+      break;
+    case 'exitGroups':
+      await this.confirmAndExitMultipleSelectedGroups();
+      break;
+    case 'exitCommunity':
+      break;
+    case 'communityInfo':
+      break;
   }
+}
+
 
   private openSelectedContactProfile(): void {
     // //console.log("selectedChats",this.selectedChats);
-    const sel = this.selectedChats.filter((c) => !c.group && !c.isCommunity);
-    const chat = sel[0];
+    // const sel = this.selectedChats.filter((c) => c.type === 'private');
+    //  console.log("selected contact",sel)
+    const chat = this.selectedChats[0];
+    console.log({chat})
     if (!chat) return;
 
+    const parts = chat.roomId.split('_');
+    const receiverId = parts.find((p: string | null) => p !== this.senderUserId) ?? parts[parts.length - 1];
+
+    // console.log({receiverId})
+
     const queryParams: any = {
-      receiverId: chat.receiver_Id,
-      receiver_phone: chat.receiver_phone,
-      receiver_name: chat.name,
-      isGroup: false,
+      receiverId: receiverId,
     };
 
     this.router.navigate(['/profile-screen'], { queryParams });
@@ -1129,15 +931,13 @@ export class HomeScreenPage implements OnInit, OnDestroy {
   }
 
   private openSelectedGroupInfo(): void {
-    const sel = this.selectedChats.filter((c) => c.group && !c.isCommunity);
-    const chat = sel[0];
+    // console.log("this group info options is selected")
+    // const sel = this.selectedChats.filter((c) => c.group && !c.isCommunity);
+    const chat = this.selectedChats[0];
     if (!chat) return;
 
     const queryParams: any = {
-      receiverId: chat.receiver_Id,
-      receiver_phone: '',
-      receiver_name: chat.group_name || chat.name,
-      isGroup: true,
+      receiverId: chat.roomId
     };
 
     this.router.navigate(['/profile-screen'], { queryParams });
@@ -1461,144 +1261,6 @@ export class HomeScreenPage implements OnInit, OnDestroy {
   /**
    * ---------- Chat loading (users) ----------
    */
-  // async getAllUsers() {
-  //   const currentSenderId = this.senderUserId;
-  //   if (!currentSenderId) return;
-  //   // const matched = await this.contactSyncService.getMatchedUsers()
-  //   this.contactSyncService.getMatchedUsers().then((matched) => {
-  //     const deviceNameMap = new Map<string, string>();
-  //     // (matched || []).forEach((m: IUser) => {
-  //     //   const key = this.normalizePhone(m.phone_number);
-  //     //   if (key && m.name) deviceNameMap.set(key, m.name);
-  //     // });
-  //     this.userRooms().subscribe(async (roomIds) => {
-
-  //       const myRoomIds = roomIds.filter(id => id.includes(currentSenderId))
-  //       // //console.log({myRoomIds});
-  //       const receivers = matched.filter(c => myRoomIds.includes(this.getRoomId(currentSenderId, String(c.user_id))) && String(c.user_id) !== currentSenderId)
-  //       const availableRoomIds = receivers.map(r => this.getRoomId(currentSenderId, String(r.user_id)))
-  //       const missingReceiverIds = myRoomIds.filter(r => !availableRoomIds.includes(r)).map(r => r.split("_").find(id => id != currentSenderId))
-  //       // //console.log({myRoomIds})
-  //       for (const receiverId of missingReceiverIds) {
-  //         // //console.log({receiverId})
-  //         // const receiver = this.service.getUserProfilebyId(receiverId as string)
-  //         const res: any = await firstValueFrom(this.service.getUserProfilebyId(String(receiverId)));
-  //         const receiver = res;
-
-  //         //console.log({receiver})
-  //         //  receivers.push({...receiver, user_id: Number(receiverId),} as any)
-  //         receivers.push({
-  //           // ...receiver,
-  //           user_id: Number(receiverId),
-  //           name: (receiver as any)?.phone_number ?? '',
-  //           phone_number: (receiver as any)?.phone_number ?? '',
-  //           email: (receiver as any)?.email ?? null,
-  //           profile_picture_url: (receiver as any)?.profile ?? null,
-  //           status: (receiver as any)?.status ?? 'unverified',
-  //           user_created_at: (receiver as any)?.user_created_at ?? null,
-  //           otp_id: (receiver as any)?.otp_id ?? null,
-  //           otp_code: (receiver as any)?.otp_code ?? null,
-  //           is_verified: (receiver as any)?.is_verified ?? null,
-  //           otp_created_at: (receiver as any)?.otp_created_at ?? null,
-  //           expires_at: (receiver as any)?.expires_at ?? null,
-  //           bio: (receiver as any)?.bio ?? null,
-  //         } as any);
-
-  //       }
-  //       // //console.log({receivers})
-
-  //       // //console.log({matched})
-  //       // const users = matched.map(m =>({}))
-  //       receivers.forEach(async receiver => {
-  //         const receiverId = String(receiver.user_id);
-
-  //         const existingChat = this.chatList.find(
-  //           (c: IChat) => receiverId === String(c.receiver_Id) && !c.group);
-  //         if (existingChat) return;
-
-  //         const roomId = this.getRoomId(currentSenderId, receiverId);
-  //         const isArchived = await this.isRoomArchived(roomId);
-  //         if (isArchived) return;
-
-  //         // ⛔️ DO NOT push yet. Wait for first messages.
-  //         this.firebaseChatService.listenForMessages(roomId).subscribe(async (messages) => {
-  //           // compute preview (may be null)
-  //           const preview = await this.getPreviewFromMessages(messages);
-
-  //           // if no visible message for me → make sure row is removed/not added
-  //           if (!preview) {
-  //             // remove if somehow present
-  //             this.chatList = this.chatList.filter(
-  //               c => !(c.receiver_Id === receiverId && !c.group && !c.isCommunity)
-  //             );
-  //             return;
-  //           }
-
-  //           // ✅ ensure row exists (create once)
-  //           let chat: IChat = this.chatList.find((c: any) => c.receiver_Id === receiverId && !c.group) as IChat;
-  //           if (!chat) {
-  //             chat = {
-  //               ...receiver,
-  //               name: receiver.name || receiver.phoneNumber || 'Unknown',
-  //               receiver_Id: receiverId,
-  //               profile_picture_url: receiver.profile_picture_url || null,
-  //               receiver_phone: this.normalizePhone(receiver.phone_number),
-  //               group: false,
-  //               message: '',
-  //               time: '',
-  //               unreadCount: 0,
-  //               unread: false,
-  //               isTyping: false,
-  //               typingText: null,
-  //               typingCount: 0,
-  //               isCommunity: false,
-  //               dp: null,
-  //               pinned: null,
-  //               pinnedAt: null,
-
-  //             };
-  //             this.chatList.push(chat);
-
-  //             // start typing + unread only when row exists
-  //             this.startTypingListenerForChat(chat);
-  //             const sub = this.firebaseChatService
-  //               .listenToUnreadCount(roomId, currentSenderId)
-  //               .subscribe((count: number) => {
-  //                 chat.unreadCount = count;
-  //                 chat.unread = count > 0;
-  //               });
-  //             this.unreadSubs.push(sub);
-  //           }
-
-  //           // update preview/time
-  //           chat.message = preview.previewText || '';
-  //           if (preview.timestamp) {
-  //             chat.time = this.formatTimestamp(preview.timestamp);
-  //             (chat as any).timestamp = preview.timestamp;
-  //           }
-  //         });
-  //       })
-  //     })
-
-  //     // this.service.getAllUsers().subscribe((users: any[]) => {
-  //     //   users.forEach(async (user) => {
-  //     //     const receiverId = user.user_id?.toString();
-  //     //     if (!receiverId || receiverId === currentSenderId) return;
-
-  //     //     const phoneKey = this.normalizePhone(user.phone_number?.toString());
-  //     //     const deviceName = phoneKey ? deviceNameMap.get(phoneKey) : null;
-  //     //     const backendPhoneDisplay = phoneKey ? phoneKey.slice(-10) : null;
-  //     //     const displayName = deviceName || backendPhoneDisplay || user.name || 'Unknown';
-
-  //     //     this.checkUserInRooms(receiverId).subscribe(async (hasChat: boolean) => {
-  //     //       if (!hasChat) return;
-
-  //     //     });
-
-  //     //   });
-  //     // });
-  //   });
-  // }
 
   getChatAvatarUrl(chat: any): string | null {
     const id = chat.group ? chat.receiver_Id : chat.receiver_Id;
@@ -1609,10 +1271,6 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     return url && String(url).trim() ? url : null;
   }
 
-  // getChatAlt(chat: any): string {
-  //   const name = chat.group ? (chat.group_name || chat.name) : chat.name;
-  //   return name || 'Profile';
-  // }
   getChatAlt(chat: any): string {
     const name = chat.group ? chat.group_name || chat.name : chat.name;
     return name || this.translate.instant('home.alt.profile');
@@ -1628,39 +1286,6 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     const id = chat.group ? chat.receiver_Id : chat.receiver_Id;
     if (id) this.avatarErrorIds.add(String(id));
   }
-
-  // checkUserInRooms(userId: string): Observable<boolean> {
-  //   return new Observable(observer => {
-  //     const chatsRef = rtdbRef(getDatabase(), 'chats');
-
-  //     // Firebase listener
-  //     const unsub = rtdbOnValue(chatsRef, (snapshot: any) => {
-  //       const data = snapshot.val();
-  //       let userFound = false;
-  //       //console.log("data", data);
-  //       if (data) {
-  //         Object.keys(data).some((roomId: string) => {
-  //           const userIds = roomId.split('_');
-  //           if (userIds.includes(this.senderUserId as string) && userIds.includes(userId)) {
-  //             userFound = true;
-  //             return true;
-  //           }
-  //           return false;
-  //         });
-  //       }
-
-  //       observer.next(userFound);
-  //     });
-
-  //     // cleanup for the onValue we created. onValue returns an unsubscribe function in modular firebase,
-  //     // but angularfire wrapper behaves differently; ensure we detach if needed.
-  //     return {
-  //       unsubscribe() {
-  //         try { unsub(); } catch (e) { }
-  //       }
-  //     };
-  //   });
-  // }
 
   userRooms(): Observable<string[]> {
     return new Observable((observer) => {
@@ -1680,152 +1305,6 @@ export class HomeScreenPage implements OnInit, OnDestroy {
         },
       };
     });
-  }
-
-  async loadUserGroups() {
-    const userid = this.senderUserId;
-    if (!userid) return;
-
-    const groupIds: string[] =
-      (await this.firebaseChatService.getGroupsForUser(userid)) || [];
-
-    for (const groupId of groupIds) {
-      // --- FILTER: skip community groups whose id/name prefix is "comm_group_" ---
-      if (typeof groupId === 'string' && groupId.startsWith('comm_group_')) {
-        continue;
-      }
-
-      // skip if already present
-      const existingGroup = this.chatList.find(
-        (chat: any) => chat.receiver_Id === groupId && chat.group
-      );
-      if (existingGroup) {
-        continue;
-      }
-
-      const groupInfo = await this.firebaseChatService.getGroupInfo(groupId);
-
-      // NEW: skip groups that are already assigned to a community
-      if (!groupInfo) {
-        continue;
-      }
-      if (groupInfo.communityId) {
-        continue;
-      }
-
-      if (!groupInfo.members || !groupInfo.members[userid]) {
-        // user is not member -> skip
-        continue;
-      }
-
-      const isArchived = await this.isRoomArchived(groupId);
-      if (isArchived) {
-        //console.log('Skipping archived group:', groupId);
-        continue;
-      }
-
-      const groupName = groupInfo.name || 'Unnamed Group';
-      const groupDpDefault = 'assets/images/user.jfif';
-
-      // Fetch group DP (subscribe; update dp when available)
-      this.service.getGroupDp(groupId).subscribe({
-        next: (res: any) => {
-          if (res?.group_dp_url) {
-            const targetGroup = this.chatList.find(
-              (chat: any) => chat.receiver_Id === groupId
-            );
-            if (targetGroup) {
-              targetGroup.dp = res.group_dp_url;
-            }
-          }
-        },
-        error: (err: any) => {
-          console.error('❌ Failed to fetch group DP:', err);
-        },
-      });
-
-      // create typed groupChat object
-      const groupChat: GroupChat = {
-        name: groupName,
-        receiver_Id: groupId,
-        group: true,
-        message: '',
-        time: '',
-        unread: false,
-        unreadCount: 0,
-        dp: groupDpDefault,
-        isTyping: false,
-        typingText: null,
-        typingCount: 0,
-        members: groupInfo.members || {},
-      };
-
-      // push typed object
-      this.chatList.push(groupChat);
-
-      // Start typing listener for this group
-      this.startTypingListenerForChat(groupChat);
-
-      // Listen for messages for preview + update existing entry
-      this.firebaseChatService
-        .listenForMessages(groupId)
-        .subscribe(async (messages: any[]) => {
-          const preview = await this.getPreviewFromMessages(messages);
-
-          if (!preview) {
-            // remove if present (no visible message for me)
-            this.chatList = this.chatList.filter(
-              (c: any) =>
-                !(c.group && c.receiver_Id === groupId && !c.isCommunity)
-            );
-            return;
-          }
-
-          // ensure typed row exists (may already exist)
-          let existing: GroupChat | undefined = this.chatList.find(
-            (c: any) => c.group && c.receiver_Id === groupId
-          ) as GroupChat | undefined;
-
-          if (!existing) {
-            existing = {
-              name: groupName,
-              receiver_Id: groupId,
-              group: true,
-              message: '',
-              time: '',
-              unread: false,
-              unreadCount: 0,
-              dp: groupDpDefault,
-              isTyping: false,
-              typingText: null,
-              typingCount: 0,
-              members: groupInfo.members || {},
-            };
-            this.chatList.push(existing as any);
-          }
-
-          // update preview/time fields
-          existing.message = preview.previewText || '';
-          if (preview.timestamp) {
-            existing.time = this.formatTimestamp(preview.timestamp);
-            existing.timestamp = preview.timestamp;
-          }
-        });
-
-      // Unread count listener for this group (keeps unreadCount updated)
-      const unreadSub = this.firebaseChatService
-        .listenToUnreadCount(groupId, userid)
-        .subscribe((count: number) => {
-          const target = this.chatList.find(
-            (c: any) => c.group && c.receiver_Id === groupId
-          );
-          if (target) {
-            target.unreadCount = count;
-            target.unread = count > 0;
-          }
-        });
-      this.unreadSubs.push(unreadSub);
-    }
   }
 
   get isSelectionMode(): boolean {
@@ -1930,36 +1409,6 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     return null;
   }
 
-  // get filteredChats() {
-  //   this.chatList.sort((a: any, b: any) => {
-  //     const ta = a.timestamp ? new Date(a.timestamp).getTime() : 0;
-  //     const tb = b.timestamp ? new Date(b.timestamp).getTime() : 0;
-  //     return tb - ta;
-  //   });
-  //   let filtered = this.chatList;
-
-  //   if (this.selectedFilter === 'read') {
-  //     filtered = filtered.filter(chat => !chat.unread && !chat.group);
-  //   } else if (this.selectedFilter === 'unread') {
-  //     filtered = filtered.filter(chat => chat.unread && !chat.group);
-  //   } else if (this.selectedFilter === 'groups') {
-  //     filtered = filtered.filter(chat => chat.group);
-  //   }
-
-  //   if (this.searchText.trim() !== '') {
-  //     const searchLower = this.searchText.toLowerCase();
-  //     filtered = filtered.filter(chat =>
-  //       (chat.name || '').toLowerCase().includes(searchLower) ||
-  //       (chat.message || '').toLowerCase().includes(searchLower)
-  //     );
-  //   }
-
-  //   // //console.log("filtered",filtered);
-  //   return filtered;
-  //   // Sort by unread count (highest first)
-  //   // return filtered.sort((a, b) => b.unreadCount - a.unreadCount);
-  // }
-
   get filteredChats() {
     let filtered = this.chatList;
 
@@ -1983,7 +1432,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     return [...filtered].sort((a: any, b: any) => {
       const ap = a.pinned ? 1 : 0;
       const bp = b.pinned ? 1 : 0;
-      if (ap !== bp) return bp - ap; // pinned first
+      if (ap !== bp) return bp - ap;
 
       if (ap === 1 && bp === 1) {
         const pa = Number(a.pinnedAt || 0);
@@ -2011,57 +1460,25 @@ export class HomeScreenPage implements OnInit, OnDestroy {
   async openChat(chat: any) {
     console.log({ chat });
     await this.firebaseChatService.openChat(chat);
+    if(chat.type == 'private'){
+      const parts = chat.roomId.split('_');
+    const receiverId = parts.find((p: string | null) => p !== this.senderUserId) ?? parts[parts.length - 1];
+    console.log({receiverId})
     this.router.navigate(['/chatting-screen'], {
-      queryParams: { receiverId: '', isGroup: true },
+      // queryParams: { receiverId: '', isGroup: true },
+      queryParams: { receiverId: receiverId },
     });
-
-    return;
-    const receiverId = chat.receiver_Id;
-    const receiverPhone = chat.receiver_phone;
-    const receiverName = chat.name;
-
-    await this.secureStorage.setItem('receiver_name', receiverName);
-
-    // 👉 before navigating, clear "marked as unread" (if present)
-    const me = this.senderUserId || this.authService.authData?.userId || '';
-    if (me) {
-      const roomId = chat.group
-        ? String(chat.receiver_Id)
-        : this.getRoomId(String(me), String(chat.receiver_Id));
-
-      // If this row shows unread, clear the UI unread flag/badge in RTDB
-      if (chat.unread || (chat.unreadCount ?? 0) > 0) {
-        try {
-          await this.firebaseChatService.removeMarkAsUnread(roomId, String(me));
-          // optimistic UI
-          chat.unread = false;
-          chat.unreadCount = 0;
-        } catch (_) {
-          /* ignore */
-        }
-      }
-    }
-
-    // community routes as before
-    if (chat.isCommunity) {
-      this.router.navigate(['/community-detail'], {
-        queryParams: { communityId: receiverId },
-      });
-      return;
-    }
-
-    // existing behavior for group or private
-    if (chat.group) {
-      this.router.navigate(['/chatting-screen'], {
-        queryParams: { receiverId, isGroup: true },
-      });
-    } else {
-      await this.secureStorage.setItem('receiver_phone', receiverPhone);
-      this.router.navigate(['/chatting-screen'], {
-        queryParams: { receiverId: receiverId, receiver_phone: receiverPhone },
-      });
-    }
+  }else{
+    const receiverId = chat.roomId;
+    this.router.navigate(['/chatting-screen'], {
+      // queryParams: { receiverId: '', isGroup: true },
+      queryParams: { receiverId: receiverId },
+    
+    });
+    
   }
+  return;
+}
 
   async loadUserCommunitiesForHome() {
     try {

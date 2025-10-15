@@ -52,6 +52,7 @@ export class UseraboutPage implements OnInit {
   groupCreatedAt: string = '';
   hasPastMembers = false;
   receiverProfile: string | null = null;
+  chatTitle: string | null = null;
 
   isScrolled: boolean = false;
   currentUserId = "";
@@ -85,108 +86,86 @@ socialMediaLinks: { platform: string; profile_url: string }[] = [];
   ) { }
 
   ngOnInit() {
-    this.route.queryParams.subscribe(async params => {
-      this.receiverId = params['receiverId'] || '';
-      this.receiver_phone = params['receiver_phone'] || '';
-      this.isGroup = params['isGroup'] === 'true';
-      this.chatType = this.isGroup ? 'group' : 'private';
-      this.receiver_name = (await this.secureStorage.getItem('receiver_name')) || '';
-      this.currentUserId = this.authService.authData?.userId || '';
-      this.groupId = this.route.snapshot.queryParamMap.get('receiverId') || '';
-      //console.log("group id checking:", this.groupId);
-      //console.log("isGroup:", this.isGroup);
+    // this.route.queryParams.subscribe(async params => {
+    //   this.receiverId = params['receiverId'] || '';
+    //   this.receiver_phone = params['receiver_phone'] || '';
+    //   this.isGroup = params['isGroup'] === 'true';
+    //   this.chatType = this.isGroup ? 'group' : 'private';
+    //   this.receiver_name = (await this.secureStorage.getItem('receiver_name')) || '';
+    //   this.currentUserId = this.authService.authData?.userId || '';
+    //   this.groupId = this.route.snapshot.queryParamMap.get('receiverId') || '';
+    //   //console.log("group id checking:", this.groupId);
+    //   //console.log("isGroup:", this.isGroup);
 
-      this.loadReceiverProfile();
+    //   this.loadReceiverProfile();
 
-      this.communityId = this.route.snapshot.queryParamMap.get('communityId') || '';
+    //   this.communityId = this.route.snapshot.queryParamMap.get('communityId') || '';
 
-      if (this.chatType === 'group') {
-        // use shared service to fetch group + member profiles
-        try {
-          const { groupName, groupMembers } = await this.firebaseChatService.fetchGroupWithProfiles(this.receiverId);
-          this.groupName = groupName;
-          this.groupMembers = groupMembers;
-        } catch (err) {
-          console.warn('Failed to fetch group with profiles', err);
-          this.groupName = 'Group';
-          this.groupMembers = [];
-        }
+    //   if (this.chatType === 'group') {
+    //     // use shared service to fetch group + member profiles
+    //     try {
+    //       const { groupName, groupMembers } = await this.firebaseChatService.fetchGroupWithProfiles(this.receiverId);
+    //       this.groupName = groupName;
+    //       this.groupMembers = groupMembers;
+    //     } catch (err) {
+    //       console.warn('Failed to fetch group with profiles', err);
+    //       this.groupName = 'Group';
+    //       this.groupMembers = [];
+    //     }
 
-        await this.fetchGroupMeta(this.receiverId);
-      } else {
-        // await this.fetchReceiverAbout(this.receiverId);
-      }
-    });
+    //     await this.fetchGroupMeta(this.receiverId);
+    //   } else {
+    //     // await this.fetchReceiverAbout(this.receiverId);
+    //   }
+    // });
 
-    this.checkForPastMembers();
-    this.findCommonGroups(this.currentUserId, this.receiverId);
-    this.checkIfBlocked();
+    // this.checkForPastMembers();
+    // this.findCommonGroups(this.currentUserId, this.receiverId);
+    // this.checkIfBlocked();
   }
 
   ionViewWillEnter() {
-    this.route.queryParams.subscribe(async params => {
-      this.receiverId = params['receiverId'] || '';
-      this.receiver_phone = params['receiver_phone'] || '';
-      this.isGroup = params['isGroup'] === 'true';
-      this.chatType = this.isGroup ? 'group' : 'private';
-      this.receiver_name = params['receiver_name'] || '';
-      //console.log("redirect name", this.receiver_name);
-      this.currentUserId = this.authService.authData?.userId || '';
-      this.groupId = this.route.snapshot.queryParamMap.get('receiverId') || '';
-
-      this.loadReceiverProfile();
-
-      this.communityId = this.route.snapshot.queryParamMap.get('communityId') || '';
-
-      if (this.chatType === 'group') {
-        try {
-          const { groupName, groupMembers } = await this.firebaseChatService.fetchGroupWithProfiles(this.receiverId);
-          this.groupName = groupName;
-          this.groupMembers = groupMembers;
-        } catch (err) {
-          console.warn('Failed to fetch group with profiles', err);
-          this.groupName = 'Group';
-          this.groupMembers = [];
-        }
-
-        await this.fetchGroupMeta(this.receiverId);
-      } else {
-        // await this.fetchReceiverAbout(this.receiverId);
-      }
-    });
-
-    this.checkForPastMembers();
-    this.findCommonGroups(this.currentUserId, this.receiverId);
+    // this.route.queryParams.subscribe(async params => {
+    //   this.receiverId = params['receiverId'] || '';
+    //   this.receiver_phone = params['receiver_phone'] || '';
+    //   this.isGroup = params['isGroup'] === 'true';
+    //   this.chatType = this.isGroup ? 'group' : 'private';
+    //   // this.receiver_name = params['receiver_name'] || '';
+    //   //console.log("redirect name", this.receiver_name);
+    //   this.currentUserId = this.authService.authData?.userId || '';
+    //   this.groupId = this.route.snapshot.queryParamMap.get('receiverId') || '';
+      
+    //   // this.loadReceiverProfile();
+      
+    //   this.communityId = this.route.snapshot.queryParamMap.get('communityId') || '';
+      
+    //   if (this.chatType === 'group') {
+    //     try {
+    //       const { groupName, groupMembers } = await this.firebaseChatService.fetchGroupWithProfiles(this.receiverId);
+    //       this.groupName = groupName;
+    //       this.groupMembers = groupMembers;
+    //     } catch (err) {
+    //       console.warn('Failed to fetch group with profiles', err);
+    //       this.groupName = 'Group';
+    //       this.groupMembers = [];
+    //     }
+        
+    //     await this.fetchGroupMeta(this.receiverId);
+    //   } else {
+    //     // await this.fetchReceiverAbout(this.receiverId);
+    //   }
+    // });
+    
+            const currentChat = this.firebaseChatService.currentChat;
+      this.receiverProfile = (currentChat as any).avatar || (currentChat as any).groupAvatar || null;
+      this.chatTitle = currentChat?.title || null;
+    
+      // console.log("this chattitle",this.chatTitle)
+    
+    // this.checkForPastMembers();
+    // this.findCommonGroups(this.currentUserId, this.receiverId);
   }
 
-  // loadReceiverProfile() {
-  //   if (!this.receiverId) return;
-
-  //   if (this.chatType === 'group') {
-  //     // Group DP API call with groupId (jo receiverId me aa raha hai)
-  //     this.service.getGroupDp(this.receiverId).subscribe({
-  //       next: (res: any) => {
-  //         this.receiverProfile = res?.group_dp_url || 'assets/images/user.jfif';
-  //       },
-  //       error: (err) => {
-  //         console.error("❌ Error loading group profile:", err);
-  //         this.receiverProfile = 'assets/images/user.jfif';
-  //       }
-  //     });
-  //   } else {
-  //     // User DP API call with userId (receiverId)
-  //     this.service.getUserProfilebyId(this.receiverId).subscribe({
-  //       next: (res: any) => {
-  //         this.receiverProfile = res?.profile || 'assets/images/user.jfif';
-  //         this.receiverAbout = res?.dp_status;
-  //       },
-  //       error: (err) => {
-  //         console.error("❌ Error loading user profile:", err);
-  //         this.receiverProfile = 'assets/images/user.jfif';
-  //       }
-  //     });
-  //   }
-  // }
 
   loadReceiverProfile() {
   if (!this.receiverId) return;

@@ -100,9 +100,10 @@
             </ion-avatar>
             <ion-label (click)="goToProfile()"
               style="width: auto; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;">
-              <h2 style="margin: 0; font-size: 16px;">
+              <!-- <h2 style="margin: 0; font-size: 16px;">
                 {{ chatType === 'group' ? groupName : receiver_name }}
-              </h2>
+              </h2> -->
+              <h2>{{ chatTitle }}</h2>
 
               <!-- ---- Presence (Online / Last seen) ---- -->
               <div

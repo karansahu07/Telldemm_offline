@@ -19,7 +19,8 @@
           (error)="setDefaultAvatar($event)" />
       </ion-avatar>
 
-      <ion-label class="profile-name"> {{ isGroup ? groupName : receiver_name }}</ion-label>
+      <ion-label class="profile-name"> <h2>{{ chatTitle }}</h2></ion-label>
+       
     </div>
 
   </ion-toolbar>
@@ -36,7 +37,7 @@
     {{ isGroup ? groupMembers.length + ' members' : receiver_phone }}
   </ion-label> -->
     <ion-label class="username">
-      {{ isGroup ? groupName : receiver_name }}
+      {{ chatTitle}}
     </ion-label>
 
     <ion-label class="usernumber">
