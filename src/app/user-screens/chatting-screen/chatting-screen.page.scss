@@ -986,6 +986,16 @@ ion-datetime {
   }
 }
 
+.message-bubble.fade-out {
+  pointer-events: none;
+}
+
+/* already present in your CSS, keep as-is */
+.message-bubble {
+  position: relative;
+  overflow: visible;
+}
+
 /* Message breaking into particles */
 .message-bubble.fade-out::before,
 .message-bubble.fade-out::after {
