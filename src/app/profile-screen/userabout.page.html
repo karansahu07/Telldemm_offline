@@ -41,7 +41,8 @@
     </ion-label>
 
     <ion-label class="usernumber">
-      {{ isGroup ? (groupMembers.length + ' ' + ('userabout.members' | translate)) : receiver_phone }}
+      <!-- {{ isGroup ? (groupMembers.length + ' ' + ('userabout.members' | translate)) : receiver_phone }} -->
+        {{groupMembers.length}} members
     </ion-label>
   </div>
 
@@ -272,21 +273,22 @@
 </ion-item>
 
     <ion-item *ngFor="let member of groupMembers" (click)="openActionSheet(member)">
-      <ion-avatar slot="start">
-        <img [src]="member.avatar || 'assets/images/user.jfif'" />
-      </ion-avatar>
+  <ion-avatar slot="start">
+    <img [src]="member.avatar || 'assets/images/user.jfif'" />
+  </ion-avatar>
 
-      <ion-label>
-        <div class="Encry">
-          {{ member.name }}
-        </div>
-        <!-- <div class="encrypted">{{ member.phone_number }}</div> -->
-      </ion-label>
+  <ion-label>
+    <div class="Encry">
+      {{ member.username }}
+    </div>
+    <!-- Optional: Show phone number -->
+    <!-- <p style="font-size: 12px; color: gray;">{{ member.phoneNumber }}</p> -->
+  </ion-label>
 
-      <ion-badge *ngIf="member.role === 'admin'" class="admin-badge" style="margin-left:6px;font-size:10px;color:red;background-color:#FFD4D4;">
-  {{ 'userabout.groupAdmin' | translate }}
-</ion-badge>
-    </ion-item>
+  <ion-badge *ngIf="isAdmin(member.user_id)" class="admin-badge" style="margin-left:6px;font-size:10px;color:red;background-color:#FFD4D4;">
+    {{ 'userabout.groupAdmin' | translate }}
+  </ion-badge>
+</ion-item>
 
 
     <ion-item *ngIf="hasPastMembers">

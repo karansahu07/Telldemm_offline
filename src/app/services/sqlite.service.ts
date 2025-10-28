@@ -117,7 +117,15 @@ export interface IGroup {
 export interface IGroupMember {
   username: string;
   phoneNumber: string;
-  isActive: boolean;
+  isActive?: boolean;
+}
+
+  export interface GroupMemberDisplay extends IGroupMember {
+  user_id: string;
+  phone: string;  // alias for phoneNumber
+  avatar?: string;
+  role?: string;
+  publicKeyHex?: string | null;
 }
 export interface IOpState {
   id: string;

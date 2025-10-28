@@ -264,7 +264,7 @@
 
   <ion-list *ngIf="!isLoading">
     <ion-item
-      *ngFor="let chat of conversations"
+      *ngFor="let chat of filteredChats"
       [class.selected]="chat.isSelected"
       [class.archived]="chat.isArchived"
       (click)="onChatRowClick(chat, $event)"

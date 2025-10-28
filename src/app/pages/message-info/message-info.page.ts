@@ -75,7 +75,7 @@ export class MessageInfoPage implements OnInit {
         return this.formatDateFromDate(d);
       }
       tnum = parsed;
-    } else if (typeof ts === 'number') {
+    ``} else if (typeof ts === 'number') {
       tnum = ts;
     } else {
       return '';

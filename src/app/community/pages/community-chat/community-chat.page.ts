@@ -5247,7 +5247,7 @@ export class CommunityChatPage implements OnInit, AfterViewInit, OnDestroy {
       this.lastPressedMessage?.media
     );
 
-    const isPinned = this.pinnedMessage?.key === this.lastPressedMessage?.key;
+    const isPinned = this.pinnedMessage?.messageId === this.lastPressedMessage?.msgId;
 
     const popover = await this.popoverController.create({
       component: MessageMorePopoverComponent,
@@ -5351,7 +5351,7 @@ export class CommunityChatPage implements OnInit, AfterViewInit, OnDestroy {
   pinMessage() {
     const pin: PinnedMessage = {
       messageId: this.lastPressedMessage?.message_id as string,
-      key: this.lastPressedMessage?.key,
+      // key: this.lastPressedMessage?.key,
       pinnedAt: Date.now(),
       pinnedBy: this.senderId,
       roomId: this.roomId,
@@ -5368,7 +5368,7 @@ export class CommunityChatPage implements OnInit, AfterViewInit, OnDestroy {
       (pinnedMessage) => {
         this.pinnedMessage = pinnedMessage;
         if (pinnedMessage) {
-          this.findPinnedMessageDetails(pinnedMessage.key);
+          this.findPinnedMessageDetails(pinnedMessage.messageId);
         } else {
           this.pinnedMessageDetails = null;
         }
@@ -5376,7 +5376,7 @@ export class CommunityChatPage implements OnInit, AfterViewInit, OnDestroy {
     );
   }
 
-  findPinnedMessageDetails(messageId: string) {
+  findPinnedMessageDetails(messageId: string | undefined) {
     for (const group of this.groupedMessages) {
       const foundMessage = group.messages.find(msg => msg.message_id === messageId);
       if (foundMessage) {
@@ -5770,7 +5770,7 @@ async listenForMessages() {
     this.saveToLocalStorage();
 
     if (this.pinnedMessage) {
-      this.findPinnedMessageDetails(this.pinnedMessage.key);
+      this.findPinnedMessageDetails(this.pinnedMessage.messageId);
     }
 
     await Promise.resolve();

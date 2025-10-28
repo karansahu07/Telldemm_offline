@@ -8,6 +8,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import { AuthService } from 'src/app/auth/auth.service';
 import { ApiService } from 'src/app/services/api/api.service';
+import { FirebaseChatService } from 'src/app/services/firebase-chat.service';
 
 @Component({
   selector: 'app-add-members',
@@ -29,7 +30,8 @@ export class AddMembersPage implements OnInit {
     private route: ActivatedRoute,
     private toastCtrl: ToastController,
     private authService: AuthService,
-    private service : ApiService
+    private service : ApiService,
+    private firebaseChatService : FirebaseChatService
   ) {}
 
   ngOnInit() {
@@ -48,42 +50,55 @@ export class AddMembersPage implements OnInit {
   toast.present();
 }
 
-  async loadDeviceMatchedContacts() {
+async loadDeviceMatchedContacts(): Promise<void> {
   const currentUserPhone = this.authService.authData?.phone_number;
-  // const currentUserPhone = localStorage.getItem('phone_number');
   this.allUsers = [];
   this.isLoading = true;
 
   try {
-    // Get already added members
-    const db = getDatabase();
-    const membersSnap = await get(dbRef(db, `groups/${this.groupId}/members`));
-    const existingMembers = membersSnap.exists() ? membersSnap.val() : {};
-    const existingIds = Object.keys(existingMembers);
+    const pfUsers = this.firebaseChatService.currentUsers || [];
+    const deviceContacts = this.firebaseChatService.currentDeviceContacts || [];
 
-    const matchedUsers = await this.contactSyncService.getMatchedUsers();
-    matchedUsers.forEach((user : any) => {
-      if (user.phone_number !== currentUserPhone) {
-        const isAlreadyAdded = existingIds.includes(user.user_id);
-        this.allUsers.push({
-          ...user,
-          name: user.name || user.phone_number,
-          message: user.bio || '',
-          image: user.image || 'assets/images/user.jfif',
-          receiver_Id: user.phone_number,
-          selected: false,
-          disabled: isAlreadyAdded
-        });
-      }
-    });
+    // Extract platform user phone numbers for reference
+    const pfUserPhones = pfUsers.map((pu: any) => String(pu.phoneNumber));
 
+    // Optionally: find device contacts not on the platform
+    const nonPfUsers = deviceContacts.filter(
+      (dc: any) => !pfUserPhones.includes(String(dc.phoneNumber))
+    );
+
+    // Normalize platform users to match your HTML structure
+    this.allUsers = [
+      ...pfUsers.map((u: any) => ({
+        user_id: String(u.userId ?? u.user_id ?? ''), // backend ID
+        name: u.username ?? u.name ?? u.phoneNumber ?? 'Unknown',
+        image: u.avatar ?? u.profile ?? 'assets/images/user.jfif',
+        phone_number: String(u.phoneNumber ?? ''),
+        isOnPlatform: true,
+        selected: false,
+      })),
+      // Optional: Uncomment if you want to include non-platform device contacts
+      // ...nonPfUsers.map((dc: any) => ({
+      //   user_id: null,
+      //   name: dc.username ?? dc.phoneNumber,
+      //   image: dc.avatar ?? 'assets/images/user.jfif',
+      //   phone_number: String(dc.phoneNumber),
+      //   isOnPlatform: false,
+      //   selected: false,
+      // })),
+    ];
+
+    // Initialize filtered list for search
     this.filteredContacts = [...this.allUsers];
-  } catch (err) {
-    console.error('Error loading matched contacts:', err);
+  } catch (error) {
+    console.error('Error loading contacts', error);
   } finally {
     this.isLoading = false;
   }
 }
+
+
+//pfUsers
 
   get selectedUsers() {
     return this.allUsers.filter(user => user.selected);
@@ -100,73 +115,157 @@ export class AddMembersPage implements OnInit {
     );
   }
 
+// async addSelectedMembers() {
+//   if (!this.groupId) {
+//     this.showToast('Group ID not found', 'danger');
+//     return;
+//   }
+
+//   const selected = this.selectedUsers.map(u => ({
+//     user_id: u.user_id,
+//     name: u.name,
+//     phone_number: u.phone_number
+//   }));
+
+//   if (selected.length === 0) {
+//     this.showToast('No members selected', 'danger');
+//     return;
+//   }
+
+//   const db = getDatabase();
+//   const updates: any = {};
+
+//   selected.forEach(member => {
+//     // Add to group members in Firebase
+//     updates[`groups/${this.groupId}/members/${member.user_id}`] = {
+//       name: member.name,
+//       phone_number: member.phone_number,
+//       status: 'active',
+//       role: 'member'
+//     };
+
+//     // Remove from pastmembers if exists
+//     updates[`groups/${this.groupId}/pastmembers/${member.user_id}`] = null;
+//   });
+
+//   try {
+//     // Update Firebase
+//     await update(ref(db), updates);
+
+//     // Get backendGroupId from Firebase
+//     const backendGroupIdSnap = await get(ref(db, `groups/${this.groupId}/backendGroupId`));
+//     const backendGroupId = backendGroupIdSnap.val();
+
+//     if (!backendGroupId) {
+//       this.showToast("Backend group ID missing", "danger");
+//       return;
+//     }
+
+//     // Sync each member to backend
+//     selected.forEach(member => {
+//       this.service.addGroupMember(
+//         Number(backendGroupId), // backend group_id
+//         Number(member.user_id), // user_id
+//         2 // role_id (2 = member, 1 = admin etc.)
+//       ).subscribe({
+//         next: () => {},
+//         error: () => {
+//           this.showToast(`Failed to sync member ${member.name}`, 'danger');
+//         }
+//       });
+//     });
+
+//     this.showToast('Members added successfully 🎉', 'success');
+//     this.navCtrl.back();
+
+//   } catch {
+//     this.showToast('Error adding members', 'danger');
+//   }
+// }
+
 async addSelectedMembers() {
   if (!this.groupId) {
     this.showToast('Group ID not found', 'danger');
     return;
   }
 
-  const selected = this.selectedUsers.map(u => ({
-    user_id: u.user_id,
-    name: u.name,
-    phone_number: u.phone_number
-  }));
-
-  if (selected.length === 0) {
+  // collect selected user ids (normalize whether it's user_id or user_id)
+  const selected = this.selectedUsers;
+  if (!selected || selected.length === 0) {
     this.showToast('No members selected', 'danger');
     return;
   }
 
-  const db = getDatabase();
-  const updates: any = {};
+  // Normalize user ids to strings (firebase user ids)
+  const userIds: string[] = selected
+    .map((u: any) => u.user_id ?? u.userId ?? u.userId) // try common keys
+    .filter(Boolean)
+    .map((id: any) => String(id));
 
-  selected.forEach(member => {
-    // Add to group members in Firebase
-    updates[`groups/${this.groupId}/members/${member.user_id}`] = {
-      name: member.name,
-      phone_number: member.phone_number,
-      status: 'active',
-      role: 'member'
-    };
+  if (userIds.length === 0) {
+    this.showToast('No valid user ids found', 'danger');
+    return;
+  }
 
-    // Remove from pastmembers if exists
-    updates[`groups/${this.groupId}/pastmembers/${member.user_id}`] = null;
-  });
-
+  this.isLoading = true;
   try {
-    // Update Firebase
-    await update(ref(db), updates);
+    // 1) Update Firebase members via the shared service function
+    await this.firebaseChatService.addMembersToGroup(this.groupId, userIds);
 
-    // Get backendGroupId from Firebase
+    // 2) Read backendGroupId from Firebase (if you still want to sync to backend)
+    const db = getDatabase();
     const backendGroupIdSnap = await get(ref(db, `groups/${this.groupId}/backendGroupId`));
     const backendGroupId = backendGroupIdSnap.val();
 
     if (!backendGroupId) {
-      this.showToast("Backend group ID missing", "danger");
+      // still OK: show success but warn backend sync didn't happen
+      this.showToast('Members added in Firebase (backend id missing)', 'success');
+      this.navCtrl.back();
       return;
     }
 
-    // Sync each member to backend
-    selected.forEach(member => {
-      this.service.addGroupMember(
-        Number(backendGroupId), // backend group_id
-        Number(member.user_id), // user_id
-        2 // role_id (2 = member, 1 = admin etc.)
-      ).subscribe({
-        next: () => {},
-        error: () => {
-          this.showToast(`Failed to sync member ${member.name}`, 'danger');
-        }
+    // 3) Map userIds to numeric user IDs expected by your API if possible.
+    //    Try to find matching platform user info from firebaseChatService.currentUsers
+    const platformUsers = this.firebaseChatService.currentUsers || [];
+
+    // Build an array of numeric ids (or fallback to Number(userId))
+    const backendCalls = userIds.map((uid) => {
+      // try to find the matching user object
+      const found = platformUsers.find(
+        (p: any) => String(p.userId) === String(uid) || String(p.user_id) === String(uid)
+      );
+      const numericUserId = Number(found?.userId ?? found?.userId ?? uid);
+      const userIdForApi = Number.isFinite(numericUserId) ? numericUserId : Number(uid);
+
+      // call backend api
+      return new Promise<void>((resolve, reject) => {
+        this.service
+          .addGroupMember(Number(backendGroupId), Number(userIdForApi), 2)
+          .subscribe({
+            next: () => resolve(),
+            error: (err) => {
+              console.error('Failed to sync member to backend', uid, err);
+              // still resolve so single failure doesn't block everyone
+              // but show toast for this failure afterwards
+              resolve();
+            },
+          });
       });
     });
 
+    // wait for all backend sync promises to finish
+    await Promise.all(backendCalls);
+
     this.showToast('Members added successfully 🎉', 'success');
     this.navCtrl.back();
-
-  } catch {
+  } catch (err) {
+    console.error('Error adding members', err);
     this.showToast('Error adding members', 'danger');
+  } finally {
+    this.isLoading = false;
   }
 }
+
 
 
   checkboxChanged(user: any) {

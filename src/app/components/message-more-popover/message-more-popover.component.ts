@@ -114,6 +114,7 @@
 import { Component, Input } from '@angular/core';
 import { IonicModule, PopoverController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
+import { IMessage } from 'src/app/services/sqlite.service';
 
 @Component({
   selector: 'app-message-more-popover',
@@ -125,7 +126,7 @@ export class MessageMorePopoverComponent {
   @Input() hasText: boolean = true;
   @Input() hasAttachment: boolean = false;
   @Input() isPinned: boolean = false;
-  @Input() message: any = null;
+  @Input() message: IMessage | null = null;
   @Input() currentUserId: string = '';
 
   constructor(private popoverCtrl: PopoverController) {}
@@ -170,7 +171,7 @@ export class MessageMorePopoverComponent {
     const msgTime = new Date(this.message.timestamp).getTime();
     const diff = now - msgTime;
     return (
-      String(this.message.sender_id) === String(this.currentUserId) &&
+      String(this.message.sender) === String(this.currentUserId) &&
       diff < 15 * 60 * 1000
     );
   }

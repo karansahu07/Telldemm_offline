@@ -1656,7 +1656,7 @@ export class FirebaseChatService {
     const snapshot = await get(pinRef);
 
     const pinData = {
-      key: message.key,
+      // key: message.key,
       roomId: message.roomId,
       messageId: message.messageId,
       pinnedBy: message.pinnedBy,
@@ -1694,6 +1694,28 @@ export class FirebaseChatService {
       console.error('Error unpinning message:', error);
     }
   }
+
+  async editMessage(roomId: string, msgId: string, newText: string): Promise<void> {
+  try {
+    if (!roomId || !msgId || !newText.trim()) {
+      throw new Error('editMessageInDb: Missing required parameters');
+    }
+
+    const encryptedText = await this.encryptionService.encrypt(newText.trim());
+    const msgRef = rtdbRef(this.db, `chats/${roomId}/${msgId}`);
+
+    await rtdbUpdate(msgRef, {
+      text: encryptedText,
+      isEdit: true,
+      editedAt: Date.now(),
+    });
+
+    console.log(`✅ Message ${msgId} updated successfully in ${roomId}`);
+  } catch (err) {
+    console.error('❌ editMessageInDb error:', err);
+    throw err;
+  }
+}
 
   // Group and community operations
   // async createGroup(
@@ -1827,10 +1849,104 @@ export class FirebaseChatService {
   }
 
   async updateBackendGroupId(groupId: string, backendGroupId: string) {
-    const db = getDatabase();
-    const groupRef = ref(db, `groups/${groupId}/backendGroupId`);
+    const groupRef = ref(this.db, `groups/${groupId}/backendGroupId`);
     await set(groupRef, backendGroupId);
   }
+
+
+async getGroupAdminIds(groupId: string): Promise<string[]> {
+  try {
+    const adminIdsRef = ref(this.db, `groups/${groupId}/adminIds`);
+    const snapshot = await get(adminIdsRef);
+    return snapshot.exists() ? snapshot.val() : [];
+  } catch (error) {
+    console.error('Error fetching admin IDs:', error);
+    return [];
+  }
+}
+
+/**
+ * Check if a user is admin in a group
+ */
+async isUserAdmin(groupId: string, userId: string): Promise<boolean> {
+  try {
+    const adminIds = await this.getGroupAdminIds(groupId);
+    return adminIds.includes(String(userId));
+  } catch (error) {
+    console.error('Error checking admin status:', error);
+    return false;
+  }
+}
+
+/**
+ * Make a user admin in a group
+ */
+async makeGroupAdmin(groupId: string, userId: string): Promise<boolean> {
+  try {
+    const adminIdsRef = ref(this.db, `groups/${groupId}/adminIds`);
+    
+    // Get current adminIds
+    const snapshot = await get(adminIdsRef);
+    const currentAdminIds: string[] = snapshot.exists() ? snapshot.val() : [];
+    
+    // Add new admin if not already present
+    if (!currentAdminIds.includes(String(userId))) {
+      currentAdminIds.push(String(userId));
+      await set(adminIdsRef, currentAdminIds);
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Error making user admin:', error);
+    return false;
+  }
+}
+
+/**
+ * Remove admin privileges from a user
+ */
+async dismissGroupAdmin(groupId: string, userId: string): Promise<boolean> {
+  try {
+    const adminIdsRef = ref(this.db, `groups/${groupId}/adminIds`);
+    
+    // Get current adminIds
+    const snapshot = await get(adminIdsRef);
+    const currentAdminIds: string[] = snapshot.exists() ? snapshot.val() : [];
+    
+    // Remove admin
+    const updatedAdminIds = currentAdminIds.filter(id => String(id) !== String(userId));
+    await set(adminIdsRef, updatedAdminIds);
+    
+    return true;
+  } catch (error) {
+    console.error('Error dismissing admin:', error);
+    return false;
+  }
+}
+
+/**
+ * Get admin check details for action sheet
+ */
+async getAdminCheckDetails(groupId: string, currentUserId: string, targetUserId: string) {
+  try {
+    const adminIds = await this.getGroupAdminIds(groupId);
+    
+    return {
+      adminIds,
+      isCurrentUserAdmin: adminIds.includes(String(currentUserId)),
+      isTargetUserAdmin: adminIds.includes(String(targetUserId)),
+      isSelf: String(targetUserId) === String(currentUserId)
+    };
+  } catch (error) {
+    console.error('Error getting admin check details:', error);
+    return {
+      adminIds: [],
+      isCurrentUserAdmin: false,
+      isTargetUserAdmin: false,
+      isSelf: false
+    };
+  }
+}
 
   async createCommunity(
     communityId: string,
@@ -1958,105 +2074,134 @@ export class FirebaseChatService {
     return userGroups;
   }
 
-  async fetchGroupWithProfiles(
-    groupId: string
-  ): Promise<{ groupName: string; groupMembers: any[] }> {
-    try {
-      const db = getDatabase();
-      const groupRef = ref(db, `groups/${groupId}`);
-      const snapshot = await get(groupRef);
+  // async fetchGroupWithProfiles(
+  //   groupId: string
+  // ): Promise<{ groupName: string; groupMembers: any[] }> {
+  //   try {
+  //     const db = getDatabase();
+  //     const groupRef = ref(db, `groups/${groupId}`);
+  //     const snapshot = await get(groupRef);
 
-      if (!snapshot.exists()) {
-        return { groupName: 'Group', groupMembers: [] };
-      }
+  //     if (!snapshot.exists()) {
+  //       return { groupName: 'Group', groupMembers: [] };
+  //     }
 
-      const groupData = snapshot.val();
-      const groupName = groupData.name || 'Group';
+  //     const groupData = snapshot.val();
+  //     const groupName = groupData.name || 'Group';
 
-      const rawMembers = groupData.members || {};
-      const members: any[] = Object.entries(rawMembers).map(
-        ([userId, userData]: [string, any]) => ({
+  //     const rawMembers = groupData.members || {};
+  //     const members: any[] = Object.entries(rawMembers).map(
+  //       ([userId, userData]: [string, any]) => ({
+  //         user_id: userId,
+  //         phone_number: userData?.phone_number,
+  //         ...userData,
+  //       })
+  //     );
+
+  //     const membersWithProfiles = await Promise.all(
+  //       members.map(async (m) => {
+  //         try {
+  //           const res: any = await firstValueFrom(
+  //             this.service.getUserProfilebyId(String(m.user_id))
+  //           );
+  //           m.avatar =
+  //             res?.profile || m.avatar || 'assets/images/default-avatar.png';
+  //           m.name = m.name || res?.name || `User ${m.user_id}`;
+  //           m.publicKeyHex = res?.publicKeyHex || m.publicKeyHex || null;
+  //           m.phone_number =
+  //             m.phone_number || res?.phone_number || m.phone_number;
+  //         } catch (err) {
+  //           console.warn(
+  //             `fetchGroupWithProfiles: failed to fetch profile for ${m.user_id}`,
+  //             err
+  //           );
+  //           m.avatar = m.avatar || 'assets/images/default-avatar.png';
+  //           m.name = m.name || `User ${m.user_id}`;
+  //         }
+  //         return m;
+  //       })
+  //     );
+
+  //     return { groupName, groupMembers: membersWithProfiles };
+  //   } catch (err) {
+  //     console.error('fetchGroupWithProfiles error', err);
+  //     return { groupName: 'Group', groupMembers: [] };
+  //   }
+  // }
+
+  async fetchGroupWithProfiles(groupId: string): Promise<{
+  groupName: string;
+  groupMembers: Array<{
+    user_id: string;
+    username: string;
+    phone: string;
+    phoneNumber: string;
+    avatar?: string;
+    role?: string;
+    isActive?: boolean;
+    publicKeyHex?: string | null;
+  }>;
+}> {
+  const db = getDatabase();
+  const groupRef = ref(db, `groups/${groupId}`);
+
+  try {
+    const snapshot = await get(groupRef);
+    if (!snapshot.exists()) {
+      console.warn(`Group ${groupId} not found`);
+      return { groupName: 'Unknown Group', groupMembers: [] };
+    }
+
+    const groupData = snapshot.val() as IGroup;
+    const groupName = groupData.title || 'Unnamed Group';
+    const members = groupData.members || {};
+
+    // Get admin IDs
+    const adminIds = groupData.adminIds || [];
+
+    const memberPromises = Object.entries(members).map(async ([userId, memberData]) => {
+      try {
+        const userProfileRes: any = await firstValueFrom(
+          this.service.getUserProfilebyId(userId)
+        );
+        
+        return {
           user_id: userId,
-          phone_number: userData?.phone_number,
-          ...userData,
-        })
-      );
-
-      const membersWithProfiles = await Promise.all(
-        members.map(async (m) => {
-          try {
-            const res: any = await firstValueFrom(
-              this.service.getUserProfilebyId(String(m.user_id))
-            );
-            m.avatar =
-              res?.profile || m.avatar || 'assets/images/default-avatar.png';
-            m.name = m.name || res?.name || `User ${m.user_id}`;
-            m.publicKeyHex = res?.publicKeyHex || m.publicKeyHex || null;
-            m.phone_number =
-              m.phone_number || res?.phone_number || m.phone_number;
-          } catch (err) {
-            console.warn(
-              `fetchGroupWithProfiles: failed to fetch profile for ${m.user_id}`,
-              err
-            );
-            m.avatar = m.avatar || 'assets/images/default-avatar.png';
-            m.name = m.name || `User ${m.user_id}`;
-          }
-          return m;
-        })
-      );
-
-      return { groupName, groupMembers: membersWithProfiles };
-    } catch (err) {
-      console.error('fetchGroupWithProfiles error', err);
-      return { groupName: 'Group', groupMembers: [] };
-    }
-  }
-
-   async getGroupAdminIds(groupId: string): Promise<string[]> {
-    if (!groupId) return [];
-
-    try {
-      const db = getDatabase();
-      const snap = await get(ref(db, `groups/${groupId}/adminIds`));
-      if (!snap.exists()) return [];
-
-      const val = snap.val();
-
-      let adminIds: string[] = [];
-
-      if (Array.isArray(val)) {
-        adminIds = val.filter(Boolean).map(String);
-      } else if (typeof val === 'object' && val !== null) {
-        const values = Object.values(val);
-        // If values are primitive ids, use them
-        if (values.every(v => typeof v === 'string' || typeof v === 'number')) {
-          adminIds = values.map(String);
-        } else {
-          // fallback: use keys (useful when stored as { "78": true })
-          adminIds = Object.keys(val).map(String);
-        }
-      } else {
-        // single primitive
-        adminIds = [String(val)];
+          username: memberData.username,
+          phone: memberData.phoneNumber,
+          phoneNumber: memberData.phoneNumber,
+          avatar: userProfileRes?.profile || 'assets/images/user.jfif',
+          isActive: memberData.isActive ?? true,
+          role: adminIds.includes(userId) ? 'admin' : 'member',
+          publicKeyHex: null
+        };
+      } catch (err) {
+        console.warn(`Failed to fetch profile for user ${userId}`, err);
+        return {
+          user_id: userId,
+          username: memberData.username,
+          phone: memberData.phoneNumber,
+          phoneNumber: memberData.phoneNumber,
+          avatar: 'assets/images/user.jfif',
+          isActive: memberData.isActive ?? true,
+          role: adminIds.includes(userId) ? 'admin' : 'member',
+          publicKeyHex: null
+        };
       }
+    });
 
-      // dedupe
-      return Array.from(new Set(adminIds));
-    } catch (err) {
-      console.error('getGroupAdminIds error:', err);
-      return [];
-    }
-  }
+    const groupMembers = await Promise.all(memberPromises);
 
-  /**
-   * Check if userId is admin in the group (always reads from DB).
-   */
-  async isUserAdmin(groupId: string, userId: string): Promise<boolean> {
-    if (!groupId || !userId) return false;
-    const adminIds = await this.getGroupAdminIds(groupId);
-    return adminIds.includes(String(userId));
+    return {
+      groupName,
+      groupMembers: groupMembers.filter(m => m.isActive !== false)
+    };
+  } catch (error) {
+    console.error('Error fetching group with profiles:', error);
+    return { groupName: 'Error Loading Group', groupMembers: [] };
   }
+}
+
 
   async getGroupsInCommunity(communityId: string): Promise<string[]> {
     const snapshot = await get(
@@ -2243,6 +2388,125 @@ export class FirebaseChatService {
     }
     await update(rtdbRef(db, '/'), updates);
   }
+
+  async getGroupDetails(groupId: string): Promise<{
+  adminIds: string[];
+  members: Array<Record<string, any>>;
+} | null> {
+  try {
+    if (!groupId) return null;
+    const groupRef = ref(this.db, `groups/${groupId}`);
+    const snap = await get(groupRef);
+    if (!snap.exists()) return null;
+
+    const groupData: any = snap.val() || {};
+
+    // normalize adminIds (support array / object / single value)
+    let adminIdsRaw = groupData.adminIds ?? groupData.adminIdsList ?? null;
+    let adminIds: string[] = [];
+
+    if (Array.isArray(adminIdsRaw)) {
+      adminIds = adminIdsRaw.filter(Boolean).map((id) => String(id));
+    } else if (adminIdsRaw && typeof adminIdsRaw === 'object') {
+      // could be { "0": "78" } or { "78": true }
+      const vals = Object.values(adminIdsRaw);
+      // if values are booleans (true), fall back to keys
+      const areValuesBoolean = vals.length && vals.every((v) => typeof v === 'boolean');
+      if (areValuesBoolean) {
+        adminIds = Object.keys(adminIdsRaw).map((k) => String(k));
+      } else {
+        adminIds = vals.filter(Boolean).map((v) => String(v));
+      }
+    } else if (adminIdsRaw !== null && adminIdsRaw !== undefined) {
+      adminIds = [String(adminIdsRaw)];
+    }
+
+    // dedupe and return
+    adminIds = Array.from(new Set(adminIds));
+
+    // normalize members (object -> array of { user_id, ...data })
+    const membersObj: Record<string, any> = groupData.members || {};
+    const members = Object.keys(membersObj).map((userId) => ({
+      user_id: String(userId),
+      ...(membersObj[userId] || {}),
+    }));
+
+    return { adminIds, members };
+  } catch (err) {
+    console.error('getGroupDetails error', err);
+    return null;
+  }
+}
+
+  async addMembersToGroup(roomId : string, userIds : string[]){
+    try {
+      const memberRef = rtdbRef(
+      this.db,
+      `groups/${roomId}/members`
+    );
+    const snap = await rtdbGet(memberRef);
+    const members : IGroup["members"] = snap.val();
+    const newMembers : IGroup["members"] = {}
+    for(const userId of userIds){
+
+      console.log(this.currentUsers,"this.currentUsers")
+      const user = this.currentUsers.find(u=> u.userId == userId)
+      console.log(user,"this.currentUsers")
+      newMembers[userId] = {isActive : true, phoneNumber : user?.phoneNumber as string, username : user?.username as string}
+    }
+    console.log({newMembers})
+    await rtdbSet(memberRef, {...members, ...newMembers})
+    } catch (error) {
+      console.error("Error adding members in group", error);
+    }
+  }
+
+ async removeMembersToGroup(roomId: string, userIds: string[]) {
+  try {
+    const memberRef = rtdbRef(this.db, `groups/${roomId}/members`);
+    const pastMemberRef = rtdbRef(this.db, `groups/${roomId}/pastmembers`);
+
+    // Fetch current members snapshot
+    const snap = await rtdbGet(memberRef);
+    const members: IGroup['members'] = snap.exists() ? snap.val() : {};
+
+    if (!members || Object.keys(members).length === 0) {
+      console.warn(`No members found for group ${roomId}`);
+      return;
+    }
+
+    // Prepare updates
+    const updates: Record<string, any> = {};
+
+    for (const userId of userIds) {
+      const member = members[userId];
+      if (!member) continue;
+
+      // 1️⃣ Mark as inactive in current members
+      updates[`groups/${roomId}/members/${userId}`] = {
+        ...member,
+        isActive: false,
+        // status: 'removed',
+      };
+
+      // 2️⃣ Move to pastmembers node with timestamp
+      updates[`groups/${roomId}/pastmembers/${userId}`] = {
+        ...member,
+        removedAt: new Date().toISOString(),
+      };
+    }
+
+    // Apply updates atomically
+    await rtdbUpdate(rtdbRef(this.db), updates);
+
+    console.log(`✅ Successfully removed ${userIds.length} members from group ${roomId}`);
+  } catch (error) {
+    console.error('❌ Error removing members from group:', error);
+  }
+}
+
+
+
 
   // =====================
   // ===== DELETIONS =====

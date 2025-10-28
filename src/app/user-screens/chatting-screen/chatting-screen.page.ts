@@ -451,7 +451,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       this.allMessage = msgs as IMessage[];
       for (const msg of msgs) {
         if (!msg.isMe) {
-          console.log('Marking read from chat screen');
+          // console.log('Marking read from chat screen');
           this.chatService.markAsRead(msg.msgId);
         }
       }
@@ -472,6 +472,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     this.senderId = this.authService.authData?.userId || '';
     this.sender_phone = this.authService.authData?.phone_number || '';
     this.sender_name = this.authService.authData?.name || '';
+    this.roomId = this.currentConv?.roomId || '';
     const currentChat = this.chatService.currentChat;
     console.log({ currentChat });
     this.chatType = currentChat?.type || '';
@@ -1485,14 +1486,18 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
 
   async onMore(ev?: Event) {
     const hasText = !!this.lastPressedMessage?.text;
+    console.log({ hasText });
     const hasAttachment = !!(
       this.lastPressedMessage?.attachment ||
       this.lastPressedMessage?.file ||
       this.lastPressedMessage?.image ||
       this.lastPressedMessage?.media
     );
+    // console.log({hasAttachment})
 
-    const isPinned = this.pinnedMessage?.key === this.lastPressedMessage?.key;
+    const isPinned =
+      this.pinnedMessage?.messageId === this.lastPressedMessage?.message_id;
+    // console.log({isPinned})
 
     const popover = await this.popoverController.create({
       component: MessageMorePopoverComponent,
@@ -1528,7 +1533,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
         this.shareMessage();
         break;
       case 'pin':
-        this.pinMessage();
+        this.pinMessage(this.lastPressedMessage);
         break;
       case 'unpin':
         this.unpinMessage();
@@ -1555,21 +1560,15 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     }
 
     try {
-      // store selected message in the chat service (mirror of forward behaviour)
-      // Implement setSelectedMessageInfo in FirebaseChatService (see snippet below)
       this.chatService.setSelectedMessageInfo(msg);
 
       // clear UI selection state
       this.selectedMessages = [];
       this.lastPressedMessage = null;
 
-      // navigate to message-info page — you can choose queryParams or router state.
-      // I'll use the same approach you used for forward (route path), but pass the messageId/key
-      // so message-info page can fetch or read from chatService.
       this.router.navigate(['/message-info'], {
         queryParams: {
-          // pass a small identifier; page can request the full object from chatService
-          messageKey: msg.key || msg.message_id || '',
+          messageKey: msg.msgId || '',
         },
       });
     } catch (err) {
@@ -1583,7 +1582,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  async editMessage(message: Message) {
+  async editMessage(message: IMessage) {
     const alert = await this.alertCtrl.create({
       header: 'Edit Message',
       inputs: [
@@ -1601,23 +1600,22 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
         {
           text: 'Save',
           handler: async (data: any) => {
-            if (data.text && data.text.trim() !== '') {
-              const encryptedText = await this.encryptionService.encrypt(
-                data.text.trim()
+            const newText = data.text?.trim();
+            if (!newText) return;
+
+            try {
+              await this.chatService.editMessage(
+                this.roomId,
+                message.msgId,
+                newText
               );
 
-              const db = getDatabase();
-              const msgRef = ref(db, `chats/${this.roomId}/${message.key}`);
-
-              await update(msgRef, {
-                text: encryptedText,
-                isEdit: true,
-              });
-
-              message.text = data.text.trim();
+              message.text = newText;
               message.isEdit = true;
-
               this.lastPressedMessage = { ...message };
+              this.lastPressedMessage = [];
+            } catch (err) {
+              console.error('Failed to edit message:', err);
             }
           },
         },
@@ -1639,15 +1637,17 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     //console.log('Share clicked for attachment:', this.lastPressedMessage);
   }
 
-  pinMessage() {
+  pinMessage(message: IMessage) {
+    console.log('last pressed message ', this.lastPressedMessage);
     const pin: PinnedMessage = {
-      messageId: this.lastPressedMessage?.message_id as string,
-      key: this.lastPressedMessage?.key,
+      messageId: message.msgId as string,
+      // key: this.lastPressedMessage?.key,
       pinnedAt: Date.now(),
       pinnedBy: this.senderId,
       roomId: this.roomId,
       scope: 'global',
     };
+    console.log({ pin });
     this.chatService.pinMessage(pin);
     this.selectedMessages = [];
     this.lastPressedMessage = null;
@@ -1659,7 +1659,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       (pinnedMessage) => {
         this.pinnedMessage = pinnedMessage;
         if (pinnedMessage) {
-          this.findPinnedMessageDetails(pinnedMessage.key);
+          this.findPinnedMessageDetails(pinnedMessage.messageId);
         } else {
           this.pinnedMessageDetails = null;
         }
@@ -1667,7 +1667,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     );
   }
 
-  findPinnedMessageDetails(messageId: string) {
+  findPinnedMessageDetails(messageId: string | undefined) {
     for (const group of this.groupedMessages) {
       const foundMessage = group.messages.find(
         (msg) => msg.msgId === messageId
@@ -1680,7 +1680,10 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   unpinMessage() {
+    console.log('this unpin message function before is called');
+    // console.log("this pinnedeMessage", message)
     if (this.pinnedMessage) {
+      console.log('this unpin message function after is called');
       this.chatService.unpinMessage(this.roomId);
       this.selectedMessages = [];
       this.lastPressedMessage = null;

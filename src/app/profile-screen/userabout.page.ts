@@ -1013,7 +1013,7 @@ import { ApiService } from '../services/api/api.service';
 import { push } from 'firebase/database';
 import { query, limitToLast, onValue } from "firebase/database";
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { IGroup, IGroupMember } from '../services/sqlite.service';
+import { GroupMemberDisplay, IGroup, IGroupMember } from '../services/sqlite.service';
 // removed unused firstValueFrom import
 // import { firstValueFrom } from 'rxjs';
 
@@ -1033,15 +1033,18 @@ export class UseraboutPage implements OnInit {
   isGroup: boolean = false;
   chatType: 'private' | 'group' = 'private';
   groupName: string = '';
-  groupMembers: {
-    user_id: string;
-    name: string;
-    phone: string;
-    avatar?: string;
-    role?: string;
-    phone_number?: string;
-    publicKeyHex?: string | null;
-  }[] = [];
+  // groupMembers: {
+  //   user_id: string;
+  //   name: string;
+  //   phone: string;
+  //   avatar?: string;
+  //   role?: string;
+  //   phone_number?: string;
+  //   publicKeyHex?: string | null;
+  // }[] = [];
+
+
+groupMembers: GroupMemberDisplay[] = [];
 
   groupData: IGroup | null = null;
 groupMemberssda: { userId: string; data: IGroupMember; avatar?: string }[] = [];    //new type of groupMember
@@ -1050,6 +1053,7 @@ groupMemberssda: { userId: string; data: IGroupMember; avatar?: string }[] = [];
   statusTime: string = '';
   receiverAboutUpdatedAt: string = '';
 
+adminIds: string[] = [];
   groupDescription: string = '';
   groupCreatedBy: string = '';
   groupCreatedAt: string = '';
@@ -1127,60 +1131,53 @@ socialMediaLinks: { platform: string; profile_url: string }[] = [];
     // this.checkIfBlocked();
   }
 
-  async ionViewWillEnter() {
-    // this.route.queryParams.subscribe(async params => {
-    //   this.receiverId = params['receiverId'] || '';
-    //   this.receiver_phone = params['receiver_phone'] || '';
-    //   this.isGroup = params['isGroup'] === 'true';
-    //   this.chatType = this.isGroup ? 'group' : 'private';
-    //   // this.receiver_name = params['receiver_name'] || '';
-    //   //console.log("redirect name", this.receiver_name);
-    //   this.currentUserId = this.authService.authData?.userId || '';
-    //   this.groupId = this.route.snapshot.queryParamMap.get('receiverId') || '';
+  isAdmin(userId: string): boolean {
+  return this.adminIds.includes(String(userId));
+}
+
+async ionViewWillEnter() {
+  this.route.queryParams.subscribe(params => {
+    this.receiverId = params['receiverId'] || null;
+    const isGroupParam = params['isGroup'];
+    this.chatType = isGroupParam === 'true' ? 'group' : 'private';
+    console.log("this chatType", this.chatType);
+    console.log('Receiver ID:', this.receiverId);
+  });
+  
+  this.loadReceiverProfile();
+  
+  const currentChat = this.firebaseChatService.currentChat;
+  this.receiverProfile = (currentChat as any).avatar || (currentChat as any).groupAvatar || null;
+  this.chatTitle = currentChat?.title || null;
+  
+  if (this.chatType === 'group') {
+    try {
+      const { groupName, groupMembers } = await this.firebaseChatService.fetchGroupWithProfiles(this.receiverId);
+      this.groupName = groupName;
+      this.groupMembers = groupMembers;
       
-    //   // this.loadReceiverProfile();
+      // Load admin IDs
+      this.adminIds = await this.firebaseChatService.getGroupAdminIds(this.receiverId);
+      console.log('Loaded admin IDs:', this.adminIds);
+      console.log('Group members:', this.groupMembers);
       
-    //   this.communityId = this.route.snapshot.queryParamMap.get('communityId') || '';
-      
-    // });
-    
-    
-    this.route.queryParams.subscribe(params => {
-      this.receiverId = params['receiverId'] || null;
-      const isGroupParam = params['isGroup'];
-      this.chatType = isGroupParam === 'true' ? 'group' : 'private';
-      console.log("this chatType", this.chatType)
-      console.log('Receiver ID:', this.receiverId);
-    });
-    
-    this.loadReceiverProfile();
-    
-    const currentChat = this.firebaseChatService.currentChat;
-    this.receiverProfile = (currentChat as any).avatar || (currentChat as any).groupAvatar || null;
-    this.chatTitle = currentChat?.title || null;
-    
-    if (this.chatType === 'group') {
-      try {
-        const { groupName, groupMembers } = await this.firebaseChatService.fetchGroupWithProfiles(this.receiverId);
-        this.groupName = groupName;
-        this.groupMembers = groupMembers;
-      } catch (err) {
-        console.warn('Failed to fetch group with profiles', err);
-        this.groupName = 'Group';
-        this.groupMembers = [];
-      }
-      
-      await this.fetchGroupMeta(this.receiverId);
-    } else {
-      // await this.fetchReceiverAbout(this.receiverId);
+    } catch (err) {
+      console.warn('Failed to fetch group with profiles', err);
+      this.groupName = 'Group';
+      this.groupMembers = [];
+      this.adminIds = [];
     }
     
-    // console.log("this chattitle",this.chatTitle)
-    
-    // this.checkForPastMembers();
-    // this.findCommonGroups(this.currentUserId, this.receiverId);
+    await this.fetchGroupMeta(this.receiverId);
   }
-  
+
+  this.groupId = this.receiverId || '';
+
+  if (!this.groupId) {
+    console.warn('No groupId found in route');
+    return;
+  }
+}
   
   loadReceiverProfile() {
   if (!this.receiverId) return;
@@ -1244,29 +1241,6 @@ openExternalLink(url: string) {
     this.isScrolled = scrollTop > 10;
   }
 
-//   goBackToChat() {
-//   if (this.communityId) {
-//     // 👈 agar communityId present hai
-//     this.router.navigate(['/community-chat'], {
-//       queryParams: {
-//         receiverId: this.receiverId,
-//         receiver_phone: this.receiver_phone,
-//         isGroup: this.isGroup,
-//         communityId: this.communityId
-//       }
-//     });
-//   } else {
-//     // 👈 normal chat screen
-//     this.router.navigate(['/chatting-screen'], {
-//       queryParams: {
-//         receiverId: this.receiverId,
-//         receiver_phone: this.receiver_phone,
-//         isGroup: this.isGroup
-//       }
-//     });
-//   }
-// }
-
 goBackToChat() {
   try {
     this.navCtrl.back();
@@ -1309,11 +1283,11 @@ goBackToChat() {
   }
 
   onAddMember() {
-    const memberPhones = this.groupMembers.map(member => member.phone);
+    // const memberPhones = this.groupMembers.map(member => member.phone);
     this.router.navigate(['/add-members'], {
       queryParams: {
         groupId: this.receiverId,
-        members: JSON.stringify(memberPhones)
+        // members: JSON.stringify(memberPhones)
       }
     });
   }
@@ -1366,9 +1340,12 @@ goBackToChat() {
   }
 
  // ---- ACTION SHEET ----
-async openActionSheet(member: any) {
-  const t = this.translate; // shorthand
+// userabout.page.ts
 
+async openActionSheet(member: any) {
+  const t = this.translate;
+  console.log({member});
+  
   const buttons: ActionSheetButton[] = [
     {
       text: t.instant('userabout.actions.message'),
@@ -1377,41 +1354,153 @@ async openActionSheet(member: any) {
     },
   ];
 
-  const isCurrentUserAdmin = this.groupMembers.find(m => m.user_id === this.currentUserId)?.role === 'admin';
-  const isTargetUserAdmin = member.role === 'admin';
-  const isSelf = member.user_id === this.currentUserId;
+  const groupId = this.receiverId || this.groupId;
+  const currentUserId = this.authService.authData?.userId || '';
+  
+  try {
+    // Get admin details from service
+    const { adminIds, isCurrentUserAdmin, isTargetUserAdmin, isSelf } = 
+      await this.firebaseChatService.getAdminCheckDetails(groupId, currentUserId, member.user_id);
 
-  if (isCurrentUserAdmin && !isSelf) {
-    if (isTargetUserAdmin) {
+    console.log('Admin check:', { 
+      adminIds, 
+      currentUserId,
+      isCurrentUserAdmin, 
+      isTargetUserAdmin, 
+      isSelf 
+    });
+
+    if (isCurrentUserAdmin && !isSelf) {
+      if (isTargetUserAdmin) {
+        buttons.push({
+          text: t.instant('userabout.actions.dismissAdmin'),
+          icon: 'remove-circle',
+          handler: () => this.dismissAdmin(member)
+        });
+      } else {
+        buttons.push({
+          text: t.instant('userabout.actions.makeAdmin'),
+          icon: 'person-add',
+          handler: () => this.makeAdmin(member)
+        });
+      }
+
       buttons.push({
-        text: t.instant('userabout.actions.dismissAdmin'),
-        icon: 'remove-circle',
-        handler: () => this.dismissAdmin(member)
-      });
-    } else {
-      buttons.push({
-        text: t.instant('userabout.actions.makeAdmin'),
-        icon: 'person-add',
-        handler: () => this.makeAdmin(member)
+        text: t.instant('userabout.actions.removeFromGroup'),
+        icon: 'person-remove',
+        role: 'destructive',
+        handler: () => this.removeMemberFromGroup(member)
       });
     }
 
-    buttons.push({
-      text: t.instant('userabout.actions.removeFromGroup'),
-      icon: 'person-remove',
-      role: 'destructive',
-      handler: () => this.removeMemberFromGroup(member)
+    buttons.push({ text: t.instant('common.cancel'), role: 'cancel' });
+
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: member.name || member.username || 'Member',
+      buttons
     });
+    await actionSheet.present();
+    
+  } catch (error) {
+    console.error('Error loading admin data:', error);
+    
+    // Fallback: show basic options only
+    buttons.push({ text: t.instant('common.cancel'), role: 'cancel' });
+    
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: member.name || member.username || 'Member',
+      buttons
+    });
+    await actionSheet.present();
+  }
+}
+
+async makeAdmin(member: any) {
+  const groupId = this.groupId || this.receiverId;
+
+  if (!groupId || !member?.user_id) {
+    console.error('Missing groupId or member.user_id');
+    return;
   }
 
-  buttons.push({ text: t.instant('common.cancel'), role: 'cancel' });
+  try {
+    const success = await this.firebaseChatService.makeGroupAdmin(groupId, member.user_id);
+    
+    if (success) {
+      // Update local groupMembers array to show admin badge
+      const memberIndex = this.groupMembers.findIndex(m => m.user_id === member.user_id);
+      if (memberIndex !== -1) {
+        this.groupMembers[memberIndex].role = 'admin';
+      }
 
-  const actionSheet = await this.actionSheetCtrl.create({
-    header: member.name,
-    buttons
-  });
-  await actionSheet.present();
+      const toast = await this.toastCtrl.create({
+        message: this.translate.instant('userabout.toasts.madeAdmin', { 
+          name: member.name || member.username 
+        }),
+        duration: 2000,
+        color: 'success'
+      });
+      await toast.present();
+    } else {
+      throw new Error('Failed to make admin');
+    }
+  } catch (error) {
+    console.error('Error making admin:', error);
+    const toast = await this.toastCtrl.create({
+      message: this.translate.instant('userabout.errors.makeAdmin', { 
+        name: member.name || member.username 
+      }),
+      duration: 2000,
+      color: 'danger'
+    });
+    await toast.present();
+  }
 }
+
+async dismissAdmin(member: any) {
+  const groupId = this.groupId || this.receiverId;
+
+  if (!groupId || !member?.user_id) {
+    console.error('Missing groupId or member.user_id');
+    return;
+  }
+
+  try {
+    const success = await this.firebaseChatService.dismissGroupAdmin(groupId, member.user_id);
+    
+    if (success) {
+      // Update local groupMembers array
+      const memberIndex = this.groupMembers.findIndex(m => m.user_id === member.user_id);
+      if (memberIndex !== -1) {
+        this.groupMembers[memberIndex].role = 'member';
+      }
+
+      const toast = await this.toastCtrl.create({
+        message: this.translate.instant('userabout.toasts.dismissedAdmin', { 
+          name: member.name || member.username 
+        }),
+        duration: 2000,
+        color: 'medium'
+      });
+      await toast.present();
+    } else {
+      throw new Error('Failed to dismiss admin');
+    }
+  } catch (error) {
+    console.error('Error dismissing admin:', error);
+    const toast = await this.toastCtrl.create({
+      message: this.translate.instant('userabout.errors.dismissAdmin', { 
+        name: member.name || member.username 
+      }),
+      duration: 2000,
+      color: 'danger'
+    });
+    await toast.present();
+  }
+}
+
+
+
   messageMember(member: any) {
     const senderId = this.authService.authData?.userId || '';
     const receiverId = member.user_id;
@@ -1427,72 +1516,12 @@ async openActionSheet(member: any) {
     this.router.navigate(['/chatting-screen'], {
       queryParams: {
         receiverId: receiverId,
-        receiver_phone: receiverPhone,
-        roomId: roomId,
-        receiver_name: member.name,
-        chatType: 'private'
+        // receiver_phone: receiverPhone,
+        // roomId: roomId,
+        // receiver_name: member.name,
+        // chatType: 'private'
       }
     });
-  }
-
-  async makeAdmin(member: any) {
-    const db = getDatabase();
-    const groupId = this.groupId || this.receiverId;
-
-    if (!groupId || !member?.user_id) {
-      console.error('Missing groupId or member.user_id');
-      return;
-    }
-
-    const memberRef = ref(db, `groups/${groupId}/members/${member.user_id}`);
-
-  try {
-    await update(memberRef, { role: 'admin' });
-    // ... (update local array)
-    const toast = await this.toastCtrl.create({
-      message: this.translate.instant('userabout.toasts.madeAdmin', { name: member.name }),
-      duration: 2000,
-      color: 'success'
-    });
-    await toast.present();
-  } catch (error) {
-    const toast = await this.toastCtrl.create({
-      message: this.translate.instant('userabout.errors.makeAdmin', { name: member.name }),
-      duration: 2000,
-      color: 'danger'
-    });
-    await toast.present();
-  }
-  }
-
-  async dismissAdmin(member: any) {
-    const db = getDatabase();
-    const groupId = this.groupId || this.receiverId;
-
-    if (!groupId || !member?.user_id) {
-      console.error('Missing groupId or member.user_id');
-      return;
-    }
-
-    const memberRef = ref(db, `groups/${groupId}/members/${member.user_id}`);
-
-    try {
-    await update(memberRef, { role: 'member' });
-    // ...
-    const toast = await this.toastCtrl.create({
-      message: this.translate.instant('userabout.toasts.dismissedAdmin', { name: member.name }),
-      duration: 2000,
-      color: 'medium'
-    });
-    await toast.present();
-  } catch (error) {
-    const toast = await this.toastCtrl.create({
-      message: this.translate.instant('userabout.errors.dismissAdmin', { name: member.name }),
-      duration: 2000,
-      color: 'danger'
-    });
-    await toast.present();
-  }
   }
 
   async removeMemberFromGroup(member: any) {

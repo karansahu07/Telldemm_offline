@@ -1471,13 +1471,14 @@ getPreviewText(chat: any): string {
 
   get filteredChats() {
     // console.log("visible.length",this.chatList)
-    let filtered = this.chatList;
+    let filtered = this.conversations;
     // console.log({filtered})
+    // console.log("this.selectedFilter", this.selectedFilter);
 
     if (this.selectedFilter === 'read') {
       filtered = filtered.filter((chat) => chat.unreadCount === 0);
     } else if (this.selectedFilter === 'unread') {
-      filtered = filtered.filter((chat) => chat.unreadCount > 0);
+      filtered = filtered.filter((chat) => (chat.unreadCount as number) > 0);
     } else if (this.selectedFilter === 'groups') {
       filtered = filtered.filter((chat) => chat.type === 'group');
     }
@@ -1486,8 +1487,8 @@ getPreviewText(chat: any): string {
       const q = this.searchText.toLowerCase();
       filtered = filtered.filter(
         (chat) =>
-          (chat.name || '').toLowerCase().includes(q) ||
-          (chat.message || '').toLowerCase().includes(q)
+          (chat.title || '').toLowerCase().includes(q)
+          // (chat.message || '').toLowerCase().includes(q)
       );
     }
 
@@ -1509,7 +1510,7 @@ getPreviewText(chat: any): string {
   }
 
   get totalUnreadCount(): number {
-    return this.chatList.reduce(
+    return this.conversations.reduce(
       (sum, chat) => sum + (chat.unreadCount || 0),
       0
     );
