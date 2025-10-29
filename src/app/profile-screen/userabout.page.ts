@@ -1145,6 +1145,7 @@ async ionViewWillEnter() {
   });
   
   this.loadReceiverProfile();
+  this.checkForPastMembers();
   
   const currentChat = this.firebaseChatService.currentChat;
   this.receiverProfile = (currentChat as any).avatar || (currentChat as any).groupAvatar || null;
@@ -1344,7 +1345,7 @@ goBackToChat() {
 
 async openActionSheet(member: any) {
   const t = this.translate;
-  console.log({member});
+  // console.log({member});
   
   const buttons: ActionSheetButton[] = [
     {
@@ -1510,65 +1511,44 @@ async dismissAdmin(member: any) {
       return;
     }
 
-    const roomId = senderId < receiverId ? `${senderId}_${receiverId}` : `${receiverId}_${senderId}`;
-    const receiverPhone = member.phone_number || member.phone;
+    // const roomId = senderId < receiverId ? `${senderId}_${receiverId}` : `${receiverId}_${senderId}`;
+    // const receiverPhone = member.phone_number || member.phone;
 
     this.router.navigate(['/chatting-screen'], {
       queryParams: {
         receiverId: receiverId,
-        // receiver_phone: receiverPhone,
-        // roomId: roomId,
-        // receiver_name: member.name,
-        // chatType: 'private'
       }
     });
   }
 
   async removeMemberFromGroup(member: any) {
-    const db = getDatabase();
     const groupId = this.groupId || this.receiverId;
-
-    if (!groupId || !member?.user_id) {
-      console.error('Missing groupId or member.user_id');
-      return;
-    }
-
-    const memberPath = `groups/${groupId}/members/${member.user_id}`;
-    const pastMemberPath = `groups/${groupId}/pastmembers/${member.user_id}`;
-
-    //console.log('Deactivating and moving to pastmembers:', memberPath);
-
+    
     try {
-      await update(ref(db, memberPath), {
-        ...member,
-        status: 'inactive'
-      });
-
-      await set(ref(db, pastMemberPath), {
-        ...member,
-        status: 'inactive',
-        removedAt: new Date().toLocaleString()
-      });
-
-      await remove(ref(db, memberPath));
-
-      const backendGroupId = await this.getBackendGroupId(groupId);
-
+      if (!groupId || !member?.user_id) {
+        console.error('Missing groupId or member.user_id');
+        return;
+      }
+      // console.log("groupId and memmber.userId", groupId, member.user_id)
+      await this.firebaseChatService.removeMembersToGroup(groupId, [member.user_id])
+      
+      const backendGroupId = await this.firebaseChatService.getBackendGroupId(groupId);
+  
       if (backendGroupId) {
         this.service.updateMemberStatus(backendGroupId, Number(member.user_id), false).subscribe({
           next: (res: any) => {
-            //console.log('Member status updated in backend:', res);
+            console.log('Member status updated in backend:', res);
           },
           error: (error: any) => {
             console.error('Error updating member status in backend:', error);
           }
         });
       }
-
+  
       this.groupMembers = this.groupMembers.filter(m => m.user_id !== member.user_id);
-
+  
       const toast = await this.toastCtrl.create({
-      message: this.translate.instant('userabout.toasts.removedFromGroup', { name: member.name }),
+      message: this.translate.instant('userabout.toasts.removedFromGroup', { name: member.username }),
       duration: 2000,
       color: 'success'
     });
@@ -1581,26 +1561,15 @@ async dismissAdmin(member: any) {
       color: 'danger'
     });
       await toast.present();
-    }
-  }
-
-  async getBackendGroupId(firebaseGroupId: string): Promise<number | null> {
-    try {
-      const db = getDatabase();
-      const groupRef = ref(db, `groups/${firebaseGroupId}/backendGroupId`);
-      const snapshot = await get(groupRef);
-      return snapshot.exists() ? snapshot.val() : null;
-    } catch (error) {
-      console.error('Error getting backend group ID:', error);
-      return null;
+      
     }
   }
 
   async checkForPastMembers() {
-    if (!this.groupId) return;
+    if (!this.receiverId) return;
 
     const db = getDatabase();
-    const pastRef = ref(db, `groups/${this.groupId}/pastmembers`);
+    const pastRef = ref(db, `groups/${this.receiverId}/pastmembers`);
 
     try {
       const snapshot = await get(pastRef);
@@ -1609,12 +1578,64 @@ async dismissAdmin(member: any) {
       this.zone.run(() => {
         this.hasPastMembers = exists;
       });
+      console.log("checking for past members", this.hasPastMembers)
     } catch (error) {
       console.error('Error checking past members:', error);
       this.zone.run(() => {
         this.hasPastMembers = false;
       });
     }
+  }
+
+   async confirmExitGroup() {
+    // console.log("this exit group function is called")
+    const alert = await this.alertCtrl.create({
+      header: this.translateText('userabout.exitGroupConfirmHeader', 'Exit group'),
+      message: this.translateText('userabout.exitGroupConfirmMsg', 'Are you sure you want to exit this group?'),
+      buttons: [
+        {
+          text: this.translateText('common.cancel', 'Cancel'),
+          role: 'cancel'
+        },
+        {
+          text: this.translateText('common.exit', 'Exit'),
+          handler: () => {
+            this.exitGroup();
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  async exitGroup() {
+    try {
+      this.currentUserId = this.authService.authData?.userId || '';
+      console.log("this.currentUserId", this.currentUserId)
+      this.firebaseChatService.exitGroup(this.receiverId, [this.currentUserId])
+      const toast = await this.toastCtrl.create({
+        message: this.translateText('userabout.exitSuccess', 'You have exited the group.'),
+        duration: 2000,
+        position: 'bottom'
+      });
+      await toast.present();
+
+      // this.navCtrl.back();
+
+    } catch (err) {
+      console.error('Error exiting group:', err);
+      const toast = await this.toastCtrl.create({
+        message: this.translateText('userabout.exitError', 'Failed to exit group. Please try again.'),
+        duration: 2500,
+        position: 'bottom'
+      });
+      await toast.present();
+    }
+  }
+
+  translateText(key: string, fallback: string) {
+    return fallback;
   }
 
   async createGroupWithMember() {

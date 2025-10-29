@@ -403,31 +403,23 @@ export class HomeScreenPage implements OnInit, OnDestroy {
 
   /* ===== Selection mode logic ===== */
 
-  // ✅ Fix: Click handler with proper selection toggle
   onChatRowClick(chat: any, ev: Event) {
     if (this.selectedChats.length > 0) {
       console.log('this selectedChats', this.selectedChats);
-      // In selection mode: toggle selection
       this.toggleChatSelection(chat, ev);
       return;
     }
-    // Normal mode: open chat
     this.openChat(chat);
   }
 
-  // ✅ Fix: Check if conversation is selected (works with conversations array)
   isConvSelected(roomId: string): boolean {
     return this.selectedConversations.has(roomId);
   }
 
-  // ✅ Fix: Check if chat object is selected
   isChatSelected(chat: any): boolean {
-    // Check by roomId (preferred for conversations)
     if (chat.roomId) {
       return this.selectedConversations.has(chat.roomId);
     }
-
-    // Fallback: check by receiver_Id, group, community flags
     return this.selectedChats.some((c) => {
       const sameId = c.receiver_Id === chat.receiver_Id;
       const sameGroup = !!c.group === !!chat.group;
@@ -436,17 +428,14 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     });
   }
 
-  // ✅ New: Get selected count
   get selectedCount(): number {
     return this.selectedChats.length;
   }
 
-  // ✅ New: Check if has selection
   get hasSelection(): boolean {
     return this.selectedChats.length > 0;
   }
 
-  // ✅ Fix: Toggle selection (sync both arrays)
   toggleChatSelection(chat: any, ev?: Event) {
     if (ev) ev.stopPropagation();
 
@@ -642,6 +631,18 @@ export class HomeScreenPage implements OnInit, OnDestroy {
   }
 
   // delete chat code start
+
+  async deleteMultipleChats() {
+  try {
+    const result = await this.firebaseChatService.deleteChats(
+      this.selectedChats.map((c) => c.roomId),
+    );
+  } catch (error) {
+    console.error('Error deleting chats:', error);
+  }
+  this.clearChatSelection();
+}
+
   async onDeleteSelected() {
     try {
       const deletables = this.selectedChats.filter((c) => !c.isCommunity);

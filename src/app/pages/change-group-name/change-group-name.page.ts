@@ -72,7 +72,7 @@ export class ChangeGroupNamePage implements OnInit {
     if (!trimmedName) return;
 
     const db = getDatabase();
-    const nameRef = ref(db, `groups/${this.groupId}/name`);
+    const nameRef = ref(db, `groups/${this.groupId}/title`);
 
     try {
       await set(nameRef, trimmedName);

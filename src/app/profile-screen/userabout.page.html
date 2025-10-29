@@ -29,21 +29,13 @@
 
 <ion-content [[fullscreen]="true" (ionScroll)="onScroll($event)" scrollEvents="true">
   <div class="center-content">
-    <!-- <ion-label class="username">
-      {{ isGroup ? groupName : receiver_name }}
-    </ion-label>
-
-    <ion-label class="usernumber">
-    {{ isGroup ? groupMembers.length + ' members' : receiver_phone }}
-  </ion-label> -->
     <ion-label class="username">
       {{ chatTitle}}
     </ion-label>
 
-    <ion-label class="usernumber">
-      <!-- {{ isGroup ? (groupMembers.length + ' ' + ('userabout.members' | translate)) : receiver_phone }} -->
-        {{groupMembers.length}} members
-    </ion-label>
+    <ion-label class="usernumber" *ngIf="chatType === 'group'">
+    {{ groupMembers.length }} {{ 'userabout.members' | translate }}
+  </ion-label>
   </div>
 
   <!-- Social Media Links -->
@@ -311,6 +303,12 @@
   <ion-icon name="person-add-outline" slot="start" class="all-icon"></ion-icon>
   <ion-label class="Encry">{{ 'userabout.addToList' | translate }}</ion-label>
 </ion-item>
+    
+ <ion-item class="jha exit-group-item" *ngIf="chatType === 'group'" (click)="confirmExitGroup()" >
+    <ion-icon name="log-out-outline" slot="start" class="all-icon"></ion-icon>
+    <!-- <ion-label class="Encry">{{ 'userabout.exitGroup' | translate }}</ion-label> -->
+    <ion-label class="Encry">Exit Group</ion-label>
+  </ion-item>
 
     <!-- ✅ Block / Unblock toggle (only private chat) -->
     <!-- <ion-item 

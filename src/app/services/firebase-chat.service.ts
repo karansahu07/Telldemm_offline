@@ -311,8 +311,6 @@ export class FirebaseChatService {
         return;
       }
 
-      // 📝 This acts like "onConnect"
-      // First, register the onDisconnect hook with the server
       onDisconnect(userStatusRef)
         .set({
           isOnline: false,
@@ -2463,6 +2461,7 @@ async getAdminCheckDetails(groupId: string, currentUserId: string, targetUserId:
 
  async removeMembersToGroup(roomId: string, userIds: string[]) {
   try {
+    // console.log("groupId and memmber.userId from firebase chat service", roomId, userIds)
     const memberRef = rtdbRef(this.db, `groups/${roomId}/members`);
     const pastMemberRef = rtdbRef(this.db, `groups/${roomId}/pastmembers`);
 
@@ -2482,14 +2481,14 @@ async getAdminCheckDetails(groupId: string, currentUserId: string, targetUserId:
       const member = members[userId];
       if (!member) continue;
 
-      // 1️⃣ Mark as inactive in current members
-      updates[`groups/${roomId}/members/${userId}`] = {
-        ...member,
-        isActive: false,
-        // status: 'removed',
-      };
+      // updates[`groups/${roomId}/members/${userId}`] = {
+      //   ...member,
+      //   isActive: false,
+      //   // status: 'removed',
+      // };
 
-      // 2️⃣ Move to pastmembers node with timestamp
+       updates[`groups/${roomId}/members/${userId}`] = null
+
       updates[`groups/${roomId}/pastmembers/${userId}`] = {
         ...member,
         removedAt: new Date().toISOString(),
@@ -2505,7 +2504,62 @@ async getAdminCheckDetails(groupId: string, currentUserId: string, targetUserId:
   }
 }
 
+async getBackendGroupId(firebaseGroupId: string): Promise<number | null> {
+    try {
+      const db = getDatabase();
+      const groupRef = ref(db, `groups/${firebaseGroupId}/backendGroupId`);
+      const snapshot = await get(groupRef);
+      return snapshot.exists() ? snapshot.val() : null;
+    } catch (error) {
+      console.error('Error getting backend group ID:', error);
+      return null;
+    }
+  }
 
+async exitGroup(roomId: string, userIds: string[]) {
+  try {
+    // console.log("this exit group function is called", roomId, userIds)
+    const memberRef = rtdbRef(this.db, `groups/${roomId}/members`);
+
+    // Fetch current members snapshot
+    const snap = await rtdbGet(memberRef);
+    const members: IGroup['members'] = snap.exists() ? snap.val() : {};
+
+    if (!members || Object.keys(members).length === 0) {
+      console.warn(`No members found for group ${roomId}`);
+      return;
+    }
+
+    // Prepare updates
+    const updates: Record<string, any> = {};
+
+    for (const userId of userIds) {
+      const member = members[userId];
+      if (!member) {
+        console.warn(`Member ${userId} not found in group ${roomId}`);
+        continue;
+      }
+
+      // Remove from members (set to null to delete)
+      updates[`groups/${roomId}/members/${userId}`] = null;
+
+      // Add to pastmembers with removedAt timestamp
+      updates[`groups/${roomId}/pastmembers/${userId}`] = {
+        ...member,
+        removedAt: new Date().toISOString(),
+      };
+    }
+
+    // Apply updates atomically
+    await rtdbUpdate(rtdbRef(this.db), updates);
+
+    console.log(`✅ Successfully exited ${userIds.length} members from group ${roomId}`);
+  } catch (error) {
+    console.error('❌ Error exiting group:', error);
+    throw error; // Re-throw to handle in calling function
+  }
+}
+  
 
 
   // =====================
@@ -2533,6 +2587,68 @@ async getAdminCheckDetails(groupId: string, currentUserId: string, targetUserId:
       });
     }
   }
+
+  
+async clearChatForUser(roomId?: string): Promise<void> {
+  try {
+    const targetRoomId = roomId || this.currentChat?.roomId;
+    
+    if (!targetRoomId) {
+      throw new Error('Room ID not found');
+    }
+
+    if (!this.senderId) {
+      throw new Error('senderId not set');
+    }
+
+    // Get all messages from the room
+    const messagesRef = rtdbRef(this.db, `chats/${targetRoomId}`);
+    const snapshot = await rtdbGet(messagesRef);
+
+    if (!snapshot.exists()) {
+      console.log('No messages to clear');
+      return;
+    }
+
+    const messages = snapshot.val();
+    const updates: Record<string, any> = {};
+
+    // Mark all messages as deleted for current user
+    Object.keys(messages).forEach((msgId) => {
+      const prevMsg = messages[msgId];
+      const existingUsers = prevMsg?.deletedFor?.users || [];
+      
+      // Only add if not already in the deleted users list
+      if (!existingUsers.includes(this.senderId)) {
+        updates[`chats/${targetRoomId}/${msgId}/deletedFor/users`] = [
+          ...existingUsers,
+          this.senderId
+        ];
+      }
+      
+      // Preserve everyone flag if it exists
+      if (!prevMsg?.deletedFor?.everyone) {
+        updates[`chats/${targetRoomId}/${msgId}/deletedFor/everyone`] = false;
+      }
+    });
+
+    // Apply all updates atomically
+    if (Object.keys(updates).length > 0) {
+      await rtdbUpdate(rtdbRef(this.db), updates);
+    }
+
+    // Reset unread count for this user
+    await rtdbUpdate(
+      rtdbRef(this.db, `unreadCounts/${targetRoomId}`),
+      { [this.senderId]: 0 }
+    );
+
+    console.log(`✅ Chat cleared for user ${this.senderId} in room ${targetRoomId}`);
+  } catch (error) {
+    console.error('❌ Error clearing chat for user:', error);
+    throw error;
+  }
+}
 
   async deleteMessageForMe(
     roomId: string,
@@ -2606,6 +2722,65 @@ async getAdminCheckDetails(groupId: string, currentUserId: string, targetUserId:
       throw error;
     }
   }
+
+  //new delete chats functions
+
+  async deleteChats(
+  roomIds: string[],
+): Promise<void> {
+  try {
+    if (!this.senderId) {
+      throw new Error('senderId not set');
+    }
+
+    if (!Array.isArray(roomIds) || roomIds.length === 0) {
+      console.error('RoomIds is not an array or empty');
+      return;
+    }
+    const updates: Record<string, any> = {};
+
+    for (const roomId of roomIds) {
+      updates[`userchats/${this.senderId}/${roomId}`] = null;
+
+
+        const chatsRef = rtdbRef(this.db, `chats/${roomId}`);
+        const snapshot = await rtdbGet(chatsRef);
+        
+        if (snapshot.exists()) {
+          const messages = snapshot.val();
+          Object.keys(messages).forEach((messageKey) => {
+            updates[`chats/${roomId}/${messageKey}/deletedFor/${this.senderId}`] = true;
+          });
+        }
+        updates[`unreadCounts/${roomId}/${this.senderId}`] = 0;
+
+    }
+    await rtdbUpdate(rtdbRef(this.db), updates);
+
+    const existingConvs = this._conversations$.value.filter(
+      (c) => !roomIds.includes(c.roomId)
+    );
+    this._conversations$.next(existingConvs);
+
+    // Delete from SQLite
+    // for (const roomId of roomIds) {
+    //   try {
+    //     await this.sqliteService.deleteConversation?.(roomId);
+    //     if (deleteType !== 'forMe') {
+    //       await this.sqliteService.deleteMessages?.(roomId);
+    //     }
+    //   } catch (sqlErr) {
+    //     console.warn('SQLite deletion failed for', roomId, sqlErr);
+    //   }
+    // }
+
+    console.log(`✅ Successfully deleted ${roomIds.length} chat(s)`);
+  } catch (error) {
+    console.error('❌ Error deleting chats:', error);
+    throw error;
+  }
+}
+
 
   async deleteGroup(groupId: string): Promise<void> {
     try {

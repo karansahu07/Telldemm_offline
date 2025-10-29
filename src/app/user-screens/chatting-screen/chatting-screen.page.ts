@@ -327,7 +327,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     // }
 
     // await this.loadFromLocalStorage();
-    this.listenForMessages();
+    // this.listenForMessages();
     // this.setupPinnedMessageListener();
     // this.checkMobileView();
     // setTimeout(() => this.scrollToBottom(), 100);
@@ -815,9 +815,8 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
         return;
       }
 
-      await this.chatService.deleteChatForUser(roomId, userId);
+      await this.chatService.clearChatForUser(roomId);
 
-      // Clear local messages array (UI ko refresh karne ke liye)
       this.messages = [];
 
       // Show success toast
@@ -828,7 +827,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       });
       await toast.present();
 
-      //console.log('✅ Chat cleared for user:', userId);
     } catch (error) {
       console.error('❌ Error clearing chat:', error);
 
