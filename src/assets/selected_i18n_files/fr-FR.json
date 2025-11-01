@@ -45,64 +45,65 @@
     "cancel": "Annuler",
     "logout": "Se déconnecter"
   },
-  "settingsPage": {
-    "title": "DemmDesk (સેટિંગ્સ)",
-    "account": { 
-      "title": "MyTell (ખાતું)", 
-      "description": "TellShield (ગુપ્તતા), સુરક્ષા, નંબર બદલો" 
-    },
-    "privacy": { 
-      "title": "TellShield (ગુપ્તતા)", 
-      "description": "તમારી TellShield (ગુપ્તતા) સેટિંગ્સને નિયંત્રિત કરો" 
-    },
-    "avatar": { 
-      "title": "TellFace (પ્રોફાઇલ ચિત્ર)", 
-      "description": "તમારું TellFace (પ્રોફાઇલ ચિત્ર) બદલો" 
-    },
-    "chats": { 
-      "title": "Tells (ચેટ્સ)", 
-      "description": "થીમ, વોલપેપર, SafeDemm (બેકઅપ)" 
-    },
-    "accessibility": { 
-      "title": "Accessibility (પ્રાપ્યતા)", 
-      "description": "ટેક્સ્ટનું કદ અને ડિસ્પ્લે વિકલ્પો સમાયોજિત કરો" 
-    },
-    "notifications": { 
-      "title": "TellAlerts (સૂચનાઓ)", 
-      "description": "Tell (સંદેશ), DemmRoom (ગ્રુપ) અને Connect (કોલ) એલર્ટ્સ મેનેજ કરો" 
-    },
-    "storage": { 
-      "title": "SafeDemm (સ્ટોરેજ અને ડેટા)", 
-      "description": "સ્ટોરેજ અને નેટવર્ક વપરાશ મેનેજ કરો" 
-    },
-    "appLanguage": { 
-      "title": "App Language (એપ ભાષા)", 
-      "description": "TellDemm એપની ભાષા પસંદ કરો" 
-    },
-    "help": { 
-      "title": "DemmHelp (મદદ)", 
-      "description": "હેલ્પ સેન્ટર, સંપર્ક કરો, એપ ઇન્ફો" 
-    },
-    "updates": { 
-      "title": "DemmUpdate (એપ અપડેટ)", 
-      "description": "અપડેટ તપાસો અને ઓટો-અપડેટ સક્ષમ કરો" 
-    },
-    "invite": { 
-      "title": "SpreadDemm (મિત્રને આમંત્રણ આપો)", 
-      "description": "TellDemm એપને તમારા DemmList (સંપર્કો) સાથે શેર કરો" 
-    },
-    "logout": {
-      "title": "Log Out (લૉગ આઉટ)",
-      "description": "એપ ડેટા સાફ કરો અને સાઇન આઉટ કરો",
-      "confirmHeader": "લૉગ આઉટની પુષ્ટિ કરો",
-      "confirmMessage": "શું તમે ખરેખર લૉગ આઉટ કરવા અને એપ ડેટા સાફ કરવા માંગો છો?",
-      "loadingHeader": "Logging Out (લૉગ આઉટ થઈ રહ્યું છે)",
-      "loadingMessage": "કૃપા કરીને રાહ જુઓ...",
-      "successHeader": "Logged Out (લૉગ આઉટ થયું)",
-      "successMessage": "તમે સફળતાપૂર્વક લૉગ આઉટ થયા છો."
-    },
-    "defaultStatus": "ઉપલબ્ધ"
+ "settingsPage": {
+  "title": "DemmDesk (Paramètres)",
+  "account": { 
+    "title": "MyTell (Compte)", 
+    "description": "TellShield (Confidentialité), sécurité, changer de numéro" 
   },
+  "privacy": { 
+    "title": "TellShield (Confidentialité)", 
+    "description": "Gérez vos paramètres de TellShield (Confidentialité)" 
+  },
+  "avatar": { 
+    "title": "TellFace (Photo de profil)", 
+    "description": "Modifiez votre TellFace (Photo de profil)" 
+  },
+  "chats": { 
+    "title": "Tells (Discussions)", 
+    "description": "Thème, fond d’écran, SafeDemm (Sauvegarde)" 
+  },
+  "accessibility": { 
+    "title": "Accessibilité", 
+    "description": "Ajustez la taille du texte et les options d’affichage" 
+  },
+  "notifications": { 
+    "title": "TellAlerts (Notifications)", 
+    "description": "Gérez les alertes Tell (Messages), DemmRoom (Groupes) et Connect (Appels)" 
+  },
+  "storage": { 
+    "title": "SafeDemm (Stockage et Données)", 
+    "description": "Gérez le stockage et l’utilisation du réseau" 
+  },
+  "appLanguage": { 
+    "title": "Langue de l’application", 
+    "description": "Choisissez la langue de l’application TellDemm" 
+  },
+  "help": { 
+    "title": "DemmHelp (Aide)", 
+    "description": "Centre d’aide, contactez-nous, infos sur l’application" 
+  },
+  "updates": { 
+    "title": "DemmUpdate (Mise à jour)", 
+    "description": "Vérifiez les mises à jour et activez la mise à jour automatique" 
+  },
+  "invite": { 
+    "title": "SpreadDemm (Inviter un ami)", 
+    "description": "Partagez l’application TellDemm avec vos DemmList (Contacts)" 
+  },
+  "logout": {
+    "title": "Déconnexion",
+    "description": "Effacez les données de l’application et déconnectez-vous",
+    "confirmHeader": "Confirmer la déconnexion",
+    "confirmMessage": "Voulez-vous vraiment vous déconnecter et effacer les données de l’application ?",
+    "loadingHeader": "Déconnexion en cours",
+    "loadingMessage": "Veuillez patienter…",
+    "successHeader": "Déconnecté",
+    "successMessage": "Vous vous êtes déconnecté avec succès."
+  },
+  "defaultStatus": "Disponible"
+}
+,
   "appUpdates": {
     "title": "Mises à jour de l’application",
     "version": "Version",

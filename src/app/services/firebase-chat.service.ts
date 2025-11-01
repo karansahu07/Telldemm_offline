@@ -30,9 +30,11 @@ import {
 import { runTransaction as rtdbRunTransaction } from 'firebase/database';
 import {
   BehaviorSubject,
+  catchError,
   firstValueFrom,
   map,
   Observable,
+  of,
   retry,
   take,
 } from 'rxjs';
@@ -56,6 +58,7 @@ import { IonCard, Platform } from '@ionic/angular';
 import { NetworkService } from './network-connection/network.service';
 import { EncryptionService } from './encryption.service';
 import { AuthService } from '../auth/auth.service';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 interface MemberPresence {
   isOnline: boolean;
@@ -110,7 +113,9 @@ presenceChanges$ = this._presenceSubject$.asObservable();
     private apiService: ApiService,
     private networkService: NetworkService,
     private encryptionService: EncryptionService,
-    private authService: AuthService
+    private authService: AuthService,
+    private http: HttpClient
+
   ) {}
 
   private isWeb(): boolean {
@@ -121,6 +126,8 @@ presenceChanges$ = this._presenceSubject$.asObservable();
       this.platform.is('iphone')
     );
   }
+
+   private baseUrl = 'https://apps.ekarigar.com/backend/api/users';
 
   get conversations() {
     return this._conversations$
@@ -1934,89 +1941,215 @@ getPresenceObservable(): Observable<Map<string, MemberPresence>> {
   // Core methods that perform writes / important operations
   // =====================
 
-  async sendMessage(msg: Partial<IMessage & { attachment: IAttachment }>) {
-    try {
-      const { attachment, ...message } = msg;
-      const roomId = this.currentChat?.roomId as string;
-      const members = this.currentChat?.members || roomId.split('_');
-      const encryptedText = await this.encryptionService.encrypt(
-        msg.text as string
-      );
-      const messageToSave = {
-        ...message,
-        status: 'sent',
-        roomId,
-        receipts: {
-          read: {
-            status: false,
-            readBy: [],
-          },
-          delivered: {
-            status: false,
-            deliveredTo: [],
-          },
+  // async sendMessage(msg: Partial<IMessage & { attachment: IAttachment }>) {
+  //   try {
+  //     const { attachment, ...message } = msg;
+  //     const roomId = this.currentChat?.roomId as string;
+  //     const members = this.currentChat?.members || roomId.split('_');
+  //     const encryptedText = await this.encryptionService.encrypt(
+  //       msg.text as string
+  //     );
+  //     const messageToSave = {
+  //       ...message,
+  //       status: 'sent',
+  //       roomId,
+  //       receipts: {
+  //         read: {
+  //           status: false,
+  //           readBy: [],
+  //         },
+  //         delivered: {
+  //           status: false,
+  //           deliveredTo: [],
+  //         },
+  //       },
+  //     };
+  //     const meta: Partial<IChatMeta> = {
+  //       type: this.currentChat?.type || 'private',
+  //       lastmessageAt: message.timestamp as string,
+  //       lastmessageType: attachment ? attachment.type : 'text',
+  //       lastmessage: encryptedText || '',
+  //     };
+
+  //     for (const member of members) {
+  //       const ref = rtdbRef(this.db, `userchats/${member}/${roomId}`);
+  //       const idxSnap = await rtdbGet(ref);
+  //       if (!idxSnap.exists()) {
+  //         await rtdbSet(ref, {
+  //           ...meta,
+  //           isArhived: false,
+  //           isPinned: false,
+  //           isLocked: false,
+  //           unreadCount: member==this.senderId ? 0 : 1,
+  //         });
+  //       } else {
+  //         await rtdbUpdate(ref, {
+  //           ...meta,
+  //          ...(member!==this.senderId && { unreadCount: (idxSnap.val().unreadCount || 0) + 1})
+  //         });
+  //       }
+  //     }
+
+  //     const messagesRef = ref(this.db, `chats/${roomId}/${message.msgId}`);
+  //     await rtdbSet(messagesRef, {
+  //       ...messageToSave,
+  //       text: encryptedText,
+  //     });
+
+  //     for (const member of members) {
+  //       if (member === this.senderId) continue;
+  //       const isReceiverOnline = !!this.membersPresence.get(member)?.isOnline;
+  //       if (isReceiverOnline) {
+  //         this.markAsDelivered(message.msgId as string, member);
+  //         console.log('mark delivered clicked');
+  //       }
+  //     }
+  //     if (attachment) {
+  //       this.sqliteService.saveAttachment(attachment);
+  //       this.sqliteService.saveMessage({
+  //         ...messageToSave,
+  //         isMe: true,
+  //       } as IMessage);
+  //     } else {
+  //       this.sqliteService.saveMessage({
+  //         ...messageToSave,
+  //         isMe: true,
+  //       } as IMessage);
+  //     }
+  //     this.pushMsgToChat({
+  //       ...messageToSave,
+  //       isMe: true,
+  //     });
+  //   } catch (error) {
+  //     console.error('Error in sending message', error);
+  //   }
+  // }
+
+  async sendMessage(msg: Partial<IMessage & { attachment?: IAttachment }>) {
+  try {
+    const { attachment, translations, ...message } = msg;
+    const roomId = this.currentChat?.roomId as string;
+    const members = this.currentChat?.members || roomId.split('_');
+
+    // 🧠 Encrypt only the main visible text (translated or original)
+    const encryptedText = await this.encryptionService.encrypt(msg.text as string);
+
+    // Prepare message object for saving
+    const messageToSave: Partial<IMessage> = {
+      ...message,
+      status: 'sent',
+      roomId,
+      text: msg.text, // store plaintext (for SQLite local view)
+      translations: translations || undefined, // ✅ include translation data if available
+      receipts: {
+        read: {
+          status: false,
+          readBy: [],
         },
-      };
-      const meta: Partial<IChatMeta> = {
-        type: this.currentChat?.type || 'private',
-        lastmessageAt: message.timestamp as string,
-        lastmessageType: attachment ? attachment.type : 'text',
-        lastmessage: encryptedText || '',
-      };
+        delivered: {
+          status: false,
+          deliveredTo: [],
+        },
+      },
+    };
 
-      for (const member of members) {
-        const ref = rtdbRef(this.db, `userchats/${member}/${roomId}`);
-        const idxSnap = await rtdbGet(ref);
-        if (!idxSnap.exists()) {
-          await rtdbSet(ref, {
-            ...meta,
-            isArhived: false,
-            isPinned: false,
-            isLocked: false,
-            unreadCount: member==this.senderId ? 0 : 1,
-          });
-        } else {
-          await rtdbUpdate(ref, {
-            ...meta,
-           ...(member!==this.senderId && { unreadCount: (idxSnap.val().unreadCount || 0) + 1})
-          });
-        }
-      }
+    // Prepare meta (for conversation list)
+    const meta: Partial<IChatMeta> = {
+      type: this.currentChat?.type || 'private',
+      lastmessageAt: message.timestamp as string,
+      lastmessageType: attachment ? attachment.type : 'text',
+      lastmessage: encryptedText || '',
+    };
 
-      const messagesRef = ref(this.db, `chats/${roomId}/${message.msgId}`);
-      await rtdbSet(messagesRef, {
-        ...messageToSave,
-        text: encryptedText,
-      });
-
-      for (const member of members) {
-        if (member === this.senderId) continue;
-        const isReceiverOnline = !!this.membersPresence.get(member)?.isOnline;
-        if (isReceiverOnline) {
-          this.markAsDelivered(message.msgId as string, member);
-          console.log('mark delivered clicked');
-        }
-      }
-      if (attachment) {
-        this.sqliteService.saveAttachment(attachment);
-        this.sqliteService.saveMessage({
-          ...messageToSave,
-          isMe: true,
-        } as IMessage);
+    // 🧩 Update unread counts and chat meta in userchats/{member}/{roomId}
+    for (const member of members) {
+      const ref = rtdbRef(this.db, `userchats/${member}/${roomId}`);
+      const idxSnap = await rtdbGet(ref);
+      if (!idxSnap.exists()) {
+        await rtdbSet(ref, {
+          ...meta,
+          isArhived: false,
+          isPinned: false,
+          isLocked: false,
+          unreadCount: member === this.senderId ? 0 : 1,
+        });
       } else {
-        this.sqliteService.saveMessage({
-          ...messageToSave,
-          isMe: true,
-        } as IMessage);
+        await rtdbUpdate(ref, {
+          ...meta,
+          ...(member !== this.senderId && { unreadCount: (idxSnap.val().unreadCount || 0) + 1 }),
+        });
       }
-      this.pushMsgToChat({
-        ...messageToSave,
-        isMe: true,
-      });
-    } catch (error) {
-      console.error('Error in sending message', error);
     }
+
+    // 🧩 Save message in RTDB chats/{roomId}/{msgId}
+    const messagesRef = ref(this.db, `chats/${roomId}/${message.msgId}`);
+    await rtdbSet(messagesRef, {
+      ...messageToSave,
+      text: encryptedText, // store encrypted version
+      // 🔒 store translations unencrypted (for viewing later)
+      ...(translations ? { translations } : {}),
+    });
+
+    // 🧩 Mark delivered if receiver is online
+    for (const member of members) {
+      if (member === this.senderId) continue;
+      const isReceiverOnline = !!this.membersPresence.get(member)?.isOnline;
+      if (isReceiverOnline) {
+        this.markAsDelivered(message.msgId as string, member);
+        console.log('Mark delivered triggered (receiver online)');
+      }
+    }
+
+    // 🧩 Save locally (SQLite)
+    if (attachment) {
+      this.sqliteService.saveAttachment(attachment);
+    }
+    this.sqliteService.saveMessage({
+      ...messageToSave,
+      isMe: true,
+    } as IMessage);
+
+    // 🧩 Push to local chat stream (UI)
+    this.pushMsgToChat({
+      ...messageToSave,
+      isMe: true,
+    });
+
+  } catch (error) {
+    console.error('Error in sending message', error);
   }
+}
+
+
+ getUserLanguage(userId: string | number) {
+    const url = `${this.baseUrl}/get-language/${userId}`;
+    const headers = new HttpHeaders({
+      'Accept': 'application/json',
+    });
+
+    return this.http.get<any>(url, { headers }).pipe(
+      map((res: any) => {
+        // Expected format: { user_id: "52", language: "hi" }
+        if (res && res.language) {
+          return { language: res.language.trim() };
+        }
+
+        // Some APIs wrap data in a 'data' field
+        if (res?.data?.language) {
+          return { language: res.data.language.trim() };
+        }
+
+        // Fallback if nothing found
+        console.warn('Unexpected response structure:', res);
+        return null;
+      }),
+      catchError(err => {
+        console.error('❌ getUserLanguage API error:', err);
+        return of(null);
+      })
+    );
+  }
+
 
   // Pinned message operations
 async pinMessage(message: PinnedMessage) {

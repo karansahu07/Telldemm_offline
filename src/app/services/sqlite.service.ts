@@ -23,15 +23,74 @@ export interface IUser {
   updatedAt?: Date;
 }
 
+// export interface IMessage {
+//   msgId: string;
+//   roomId: string;
+//   sender: string;
+//   type: 'text' | 'image' | 'audio' | 'video' | 'pdf' | 'other';
+  
+//   text?: string;
+//   localUrl?: string;
+//   cdnUrl?: string;
+//   mediaId?: string;
+//   isMe?: boolean;
+//   status?: 'failed' | 'pending' | 'sent' | 'delivered' | 'read';
+//   timestamp: string | Date | number;
+//   deletedFor?: {
+//     everyone: boolean;
+//     users: [];
+//   };
+//   reactions: { userId: string; emoji: string | null }[];
+//   replyToMsgId: string;
+//   isEdit: boolean;
+//   isPinned? : boolean;
+//   isForwarded?: boolean;
+//   receipts?: {
+//     read: {
+//       status: boolean;
+//       readBy: {
+//         userId: string;
+//         timestamp: string | number | Date;
+//       }[];
+//     };
+//     delivered: {
+//       status: boolean;
+//       deliveredTo: {
+//         userId: string;
+//         timestamp: string | number | Date;
+//       }[];
+//     };
+//   };
+// }
+
 export interface IMessage {
   msgId: string;
   roomId: string;
   sender: string;
   type: 'text' | 'image' | 'audio' | 'video' | 'pdf' | 'other';
-  // isTranslated : boolean;   // use in future
-  // translatedIn : string;
-  //translatedText : string;
+  
+  // the text that will be displayed as the message body (for translated-send this may be a translated text)
   text?: string;
+
+  // optional structured translations payload
+  translations?: {
+    original: {
+      code: string;
+      label: string;
+      text: string;
+    };
+    myLanguage?: {
+      code: string;
+      label: string;
+      text: string;
+    };
+    receiverLanguage?: {
+      code: string;
+      label: string;
+      text: string;
+    };
+  };
+
   localUrl?: string;
   cdnUrl?: string;
   mediaId?: string;
@@ -64,6 +123,7 @@ export interface IMessage {
     };
   };
 }
+
 
 export interface IAttachment {
   type: 'audio' | 'video' | 'image' | 'pdf' | 'other';
@@ -268,13 +328,34 @@ const TABLE_SCHEMAS = {
       cdnUrl TEXT
     );
   `,
+  // messages: `
+  //  CREATE TABLE IF NOT EXISTS messages (
+  //   msgId TEXT PRIMARY KEY,
+  //   roomId TEXT NOT NULL,
+  //   sender TEXT NOT NULL,
+  //   type TEXT DEFAULT 'text',
+  //   text TEXT,
+  //   isMe INTEGER DEFAULT 0,
+  //   status TEXT,
+  //   timestamp TEXT NOT NULL,
+  //   receipts TEXT,
+  //   replyToMsgId TEXT,
+  //   isEdit INTEGER DEFAULT 0,
+  //   reactions TEXT,
+  //   deletedFor TEXT,
+  //   mediaId TEXT,
+  //   FOREIGN KEY (roomId) REFERENCES conversations(roomId),
+  //   FOREIGN KEY (mediaId) REFERENCES attachments(mediaId)
+  // );
+  // `,
   messages: `
-   CREATE TABLE IF NOT EXISTS messages (
+  CREATE TABLE IF NOT EXISTS messages (
     msgId TEXT PRIMARY KEY,
     roomId TEXT NOT NULL,
     sender TEXT NOT NULL,
     type TEXT DEFAULT 'text',
     text TEXT,
+    translations TEXT,                       -- NEW: JSON string for translations object
     isMe INTEGER DEFAULT 0,
     status TEXT,
     timestamp TEXT NOT NULL,
@@ -287,7 +368,8 @@ const TABLE_SCHEMAS = {
     FOREIGN KEY (roomId) REFERENCES conversations(roomId),
     FOREIGN KEY (mediaId) REFERENCES attachments(mediaId)
   );
-  `,
+`,
+
 };
 
 @Injectable({
@@ -336,6 +418,8 @@ export class SqliteService {
       console.error('❌ SQLite init error:', error);
     }
   }
+
+
 
   /** ----------------- DB INIT ----------------- **/
   private async initDB() {
@@ -672,32 +756,64 @@ export class SqliteService {
   }
 
   /** ----------------- MESSAGES ----------------- **/
+  // async saveMessage(message: IMessage) {
+  //   return this.withOpState('saveMessage', async () => {
+  //     const sql = `
+  //       INSERT INTO messages 
+  //       (msgId, roomId, sender, type, text,mediaId, isMe, status, timestamp, receipts, deletedFor, replyToMsgId, reactions, isEdit )
+  //       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  //     `;
+  //     const params = [
+  //       message.msgId,
+  //       message.roomId,
+  //       message.sender,
+  //       message.type || 'text',
+  //       message.text || null,
+  //       message.mediaId || null,
+  //       message.isMe ? 1 : 0,
+  //       message.status,
+  //       String(message.timestamp),
+  //       JSON.stringify(message.receipts || {}),
+  //       JSON.stringify(message.deletedFor || {}),
+  //       message.replyToMsgId || '',
+  //       JSON.stringify(message.reactions || []),
+  //       !!message.isEdit ? 1 : 0,
+  //     ];
+  //     await this.db.run(sql, params);
+  //   });
+  // }
+
   async saveMessage(message: IMessage) {
-    return this.withOpState('saveMessage', async () => {
-      const sql = `
-        INSERT INTO messages 
-        (msgId, roomId, sender, type, text,mediaId, isMe, status, timestamp, receipts, deletedFor, replyToMsgId, reactions, isEdit )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `;
-      const params = [
-        message.msgId,
-        message.roomId,
-        message.sender,
-        message.type || 'text',
-        message.text || null,
-        message.mediaId || null,
-        message.isMe ? 1 : 0,
-        message.status,
-        String(message.timestamp),
-        JSON.stringify(message.receipts || {}),
-        JSON.stringify(message.deletedFor || {}),
-        message.replyToMsgId || '',
-        JSON.stringify(message.reactions || []),
-        !!message.isEdit ? 1 : 0,
-      ];
-      await this.db.run(sql, params);
-    });
-  }
+  return this.withOpState('saveMessage', async () => {
+    const sql = `
+      INSERT INTO messages 
+      (msgId, roomId, sender, type, text, translations, mediaId, isMe, status, timestamp, receipts, deletedFor, replyToMsgId, reactions, isEdit)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const params = [
+      message.msgId,
+      message.roomId,
+      message.sender,
+      message.type || 'text',
+      message.text ?? null,
+      // store translations as JSON string or null
+      message.translations ? JSON.stringify(message.translations) : null,
+      message.mediaId ?? null,
+      message.isMe ? 1 : 0,
+      message.status ?? null,
+      String(message.timestamp),
+      JSON.stringify(message.receipts ?? {}),
+      JSON.stringify(message.deletedFor ?? {}),
+      message.replyToMsgId ?? '',
+      JSON.stringify(message.reactions ?? []),
+      message.isEdit ? 1 : 0,
+    ];
+
+    await this.db.run(sql, params);
+  });
+}
+
 
   saveAttachment(attachment: IAttachment) {
     return this.withOpState('saveAttachment', async () => {

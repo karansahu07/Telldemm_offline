@@ -418,76 +418,128 @@
               </ng-container>
             </div>
 
-            <!-- Deleted Message -->
-            <ng-container *ngIf="msg.isDeleted">
-              <ion-text class="message-text" color="medium"
-                ><i>This message was deleted</i></ion-text
-              >
-            </ng-container>
+          <!-- Normal Message -->
+<ng-container *ngIf="!msg.isDeleted">
 
-            <!-- Normal Message -->
-            <ng-container *ngIf="!msg.isDeleted">
-              <ion-text class="message-text" *ngIf="!msg.attachment && msg.text"
-                >{{ msg.text }}</ion-text
-              >
+  <!-- If no attachment and has text -->
+  <ng-container *ngIf="!msg.attachment && msg.text">
 
-              <!-- Attachments -->
-              <ng-container *ngIf="msg.attachment">
-                <img
-                  *ngIf="msg.attachment.type === 'image'"
-                  [src]="msg.attachment.previewUrl"
-                  alt="Image"
-                  style="max-width: 200px; border-radius: 10px; margin: 5px 0"
-                />
-                <video
-                  *ngIf="msg.attachment.type === 'video'"
-                  controls
-                  style="max-width: 200px; border-radius: 10px; margin: 5px 0"
-                >
-                  <source
-                    [src]="msg.attachment.previewUrl"
-                    [type]="msg.attachment.mimeType || 'video/mp4'"
-                  />
-                </video>
-                <audio
-                  *ngIf="msg.attachment.type === 'audio'"
-                  controls
-                  style="margin: 5px 0"
-                >
-                  <source
-                    [src]="msg.attachment.previewUrl"
-                    [type]="msg.attachment.mimeType || 'audio/mpeg'"
-                  />
-                </audio>
-                <div
-                  *ngIf="msg.attachment.type === 'file'"
-                  style="margin: 5px 0"
-                >
-                  <ion-icon
-                    name="document-outline"
-                    style="margin-right: 5px"
-                  ></ion-icon>
-                  <a
-                    [href]="msg.attachment.previewUrl"
-                    [download]="msg.attachment.fileName || 'file'"
-                    target="_blank"
-                    rel="noopener"
-                  >
-                    {{ msg.attachment.fileName || 'Download File' }}
-                  </a>
-                </div>
-                <ion-text
-                  class="message-text"
-                  *ngIf="msg.text"
-                  style="margin-top: 5px"
-                >
-                  {{ msg.text }}
-                </ion-text>
-                <!-- <ion-text class="message-text" *ngIf="msg.attachment.caption">
-          {{ msg.attachment.caption }}
-        </ion-text> -->
-              </ng-container>
-            </ng-container>
+    <!-- TRANSLATION BAR (if translations exist) -->
+    <div class="translation-bar" *ngIf="msg.translations" (click)="$event.stopPropagation()">
+      <div class="translation-label">
+        <small *ngIf="getActiveTranslationLabel(msg) as activeLabel">
+          {{ activeLabel }}
+        </small>
+        <small *ngIf="!getActiveTranslationLabel(msg)">Original</small>
+      </div>
+
+      <div class="translation-actions">
+        <!-- Cycle translations -->
+        <button
+          class="btn-ghost"
+          (click)="cycleTranslation(msg); $event.stopPropagation()"
+          title="Switch translation"
+          aria-label="Switch translation"
+        >
+          ↺
+        </button>
+
+        <!-- Popover/menu trigger (fallback to simple inline menu for compatibility) -->
+        <!-- <button
+          class="btn-ghost"
+          (click)="openTranslationMenu(msg); $event.stopPropagation()"
+          title="Choose translation"
+          aria-label="Choose translation"
+        >
+          ⋯
+        </button> -->
+
+        <!-- Toggle show all translations -->
+        <button
+          class="btn-ghost"
+          (click)="toggleShowAllTranslations(msg); $event.stopPropagation()"
+          [attr.aria-pressed]="isShowingAllTranslations(msg)"
+          title="Show all translations"
+        >
+          ☰
+        </button>
+      </div>
+    </div>
+
+    <!-- VISIBLE TEXT (either active translation or original) -->
+    <ion-text class="message-text" (click)="$event.stopPropagation()">
+      {{ getDisplayedText(msg) }}
+      <span *ngIf="isTranslationLabelled(msg) && !isShowingAllTranslations(msg)"
+            style="color: gray; font-size: 11px; margin-left:6px;">
+        ({{ getActiveTranslationShortCode(msg) }})
+      </span>
+    </ion-text>
+
+    <!-- ALL TRANSLATIONS EXPANDED -->
+    <div class="all-translations" *ngIf="isShowingAllTranslations(msg)">
+      <div class="translation-row" *ngFor="let t of getAllTranslationsArray(msg)">
+        <div class="meta">
+          <div class="lbl">{{ t.label }}</div>
+          <div class="code">{{ t.code }}</div>
+        </div>
+        <div class="txt">{{ t.text }}</div>
+        <div class="actions">
+          <button class="btn-small" (click)="setActiveTranslation(msg, t.code); $event.stopPropagation()">Use</button>
+          <button class="btn-small" (click)="copyToClipboard(t.text); $event.stopPropagation()">Copy</button>
+        </div>
+      </div>
+    </div>
+
+  </ng-container>
+
+  <!-- Attachments (keep existing attachment markup unchanged) -->
+  <ng-container *ngIf="msg.attachment">
+    <!-- existing attachment markup — keep as before -->
+    <img
+      *ngIf="msg.attachment.type === 'image'"
+      [src]="msg.attachment.previewUrl"
+      alt="Image"
+      style="max-width: 200px; border-radius: 10px; margin: 5px 0"
+    />
+    <video
+      *ngIf="msg.attachment.type === 'video'"
+      controls
+      style="max-width: 200px; border-radius: 10px; margin: 5px 0"
+    >
+      <source
+        [src]="msg.attachment.previewUrl"
+        [type]="msg.attachment.mimeType || 'video/mp4'"
+      />
+    </video>
+    <audio
+      *ngIf="msg.attachment.type === 'audio'"
+      controls
+      style="margin: 5px 0"
+    >
+      <source
+        [src]="msg.attachment.previewUrl"
+        [type]="msg.attachment.mimeType || 'audio/mpeg'"
+      />
+    </audio>
+    <div *ngIf="msg.attachment.type === 'file'" style="margin: 5px 0">
+      <ion-icon name="document-outline" style="margin-right: 5px"></ion-icon>
+      <a
+        [href]="msg.attachment.previewUrl"
+        [download]="msg.attachment.fileName || 'file'"
+        target="_blank"
+        rel="noopener"
+      >
+        {{ msg.attachment.fileName || 'Download File' }}
+      </a>
+    </div>
+
+    <ion-text class="message-text" *ngIf="msg.text" style="margin-top: 5px">
+      {{ msg.text }}
+    </ion-text>
+  </ng-container>
+
+</ng-container>
+
 
             <!-- Timestamp -->
             <p class="time-stamp status-container">
@@ -747,67 +799,186 @@
       </div>
     </div>
 
-    <!-- INPUT ROW -->
-    <ion-row class="footer-row" style="align-items: center">
-      <ion-col
-        class="message-input-container"
-        style="display: flex; align-items: center; gap: 8px"
+<!-- INPUT ROW -->
+<!-- INPUT ROW -->
+<ion-row class="footer-row" style="align-items: center">
+  <ion-col
+    class="message-input-container"
+    style="display: flex; flex-direction: column; align-items: stretch; gap: 8px"
+  >
+    <div style="display: flex; align-items: center; gap: 8px">
+      <ion-icon
+        name="document-text-outline"
+        class="icon-left"
+        (click)="openKeyboard()"
+      ></ion-icon>
+
+      <ion-textarea
+        [disabled]="iBlocked"
+        [autoGrow]="true"
+        [(ngModel)]="messageText"
+        placeholder="Message"
+        (ionInput)="onMessageInput($event)"
+        (ionFocus)="onInputFocus()"
+        (ionBlur)="onInputBlur()"
+        (keyup.enter)="sendMessage()"
+        class="message-input"
+      ></ion-textarea>
+
+      <ion-icon
+        name="attach-outline"
+        (click)="pickAttachment()"
+        class="icon-right"
+        [hidden]="iBlocked"
+      ></ion-icon>
+      <ion-icon
+        name="camera-outline"
+        class="icon-right"
+        (click)="openCamera()"
+        [hidden]="iBlocked"
+      ></ion-icon>
+    </div>
+
+    <!-- 🌐 Translation Options -->
+    <div
+      *ngIf="showTranslationOptions"
+      class="translation-options"
+      style="
+        display: flex;
+        justify-content: space-between;
+        background: #f5f5f5;
+        border-radius: 12px;
+        padding: 6px 10px;
+        margin-top: 4px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        gap: 8px;
+      "
+    >
+      <ion-button
+        size="small"
+        fill="outline"
+        color="medium"
+        (click)="translateTo('my')"
+        [disabled]="isTranslatingToMy || isTranslatingToReceiver"
       >
-        <ion-icon
-          name="document-text-outline"
-          class="icon-left"
-          (click)="openKeyboard()"
-        ></ion-icon>
+        <ion-spinner 
+          *ngIf="isTranslatingToMy" 
+          name="crescent" 
+          slot="start"
+          style="width: 14px; height: 14px;"
+        ></ion-spinner>
+        <span *ngIf="!isTranslatingToMy">
+          Translate to My Language ({{ myLangLabel }})
+        </span>
+        <span *ngIf="isTranslatingToMy">
+          Translating...
+        </span>
+      </ion-button>
 
-        <ion-textarea
-          [disabled]="iBlocked"
-          [autoGrow]="true"
-          [(ngModel)]="messageText"
-          placeholder="Message"
-          (ionInput)="onMessageInput($event)"
-          (ionFocus)="onInputFocus()"
-          (ionBlur)="onInputBlur()"
-          (keyup.enter)="sendMessage()"
-          class="message-input"
+      <ion-button
+        size="small"
+        fill="outline"
+        color="medium"
+        (click)="translateTo('receiver')"
+        [disabled]="isTranslatingToMy || isTranslatingToReceiver"
+      >
+        <ion-spinner 
+          *ngIf="isTranslatingToReceiver" 
+          name="crescent" 
+          slot="start"
+          style="width: 14px; height: 14px;"
+        ></ion-spinner>
+        <span *ngIf="!isTranslatingToReceiver">
+          Translate to Receiver ({{ receiverLangLabel }})
+        </span>
+        <span *ngIf="isTranslatingToReceiver">
+          Translating...
+        </span>
+      </ion-button>
+    </div>
+
+    <!-- 🌐 TRANSLATION CARD (MATCHING STYLE) -->
+    <div
+      *ngIf="translationCard?.visible"
+      class="translation-ready-card"
+      role="region"
+      aria-label="Translation preview"
+    >
+      <!-- CARD HEADER -->
+      <div class="card-head">
+        <div class="title">Translation Ready</div>
+        <div class="ts">
+          {{ translationCard?.createdAt | date: 'shortTime' }}
+        </div>
+      </div>
+
+      <!-- CARD BODY -->
+      <div class="card-body">
+        <div
+          class="translation-row"
+          *ngFor="let t of (translationCard?.items || [])"
         >
-        </ion-textarea>
+          <div class="meta">
+            <div class="lbl">{{ t.label }}</div>
+            <div class="code">{{ t.code }}</div>
+          </div>
+          <div class="txt" [attr.title]="t.text">
+            {{ t.text }}
+          </div>
+        </div>
 
-        <ion-icon
-          name="attach-outline"
-          (click)="pickAttachment()"
-          class="icon-right"
-          [hidden]="iBlocked"
-        ></ion-icon>
-        <ion-icon
-          name="camera-outline"
-          class="icon-right"
-          (click)="openCamera()"
-          [hidden]="iBlocked"
-        ></ion-icon>
-      </ion-col>
-
-      <ion-col size="auto" style="display: flex; align-items: center">
-        <ion-button
-          *ngIf="!showSendButton"
-          class="mic-button"
-          shape="round"
-          [disabled]="iBlocked"
+        <!-- EMPTY STATE -->
+        <div
+          *ngIf="!(translationCard?.items?.length)"
+          class="no-items"
         >
-          <ion-icon slot="icon-only" name="mic"></ion-icon>
+          (No translations available)
+        </div>
+      </div>
+
+      <!-- CARD ACTIONS -->
+      <div class="card-actions">
+        <ion-button 
+          size="small" 
+          fill="outline" 
+          (click)="closeTranslationCard()"
+        >
+          Cancel
         </ion-button>
-
-        <ion-button
-          *ngIf="showSendButton"
-          fill="clear"
-          class="send-btn"
-          shape="round"
-          (click)="sendMessage()"
-          [disabled]="iBlocked"
+        <ion-button 
+          size="small" 
+          color="primary" 
+          (click)="sendFromTranslationCard()"
         >
-          <ion-icon slot="icon-only" name="send"></ion-icon>
+          Send Translated
         </ion-button>
-      </ion-col>
-    </ion-row>
+      </div>
+    </div>
+
+  </ion-col>
+
+  <ion-col size="auto" style="display: flex; align-items: center">
+    <ion-button
+      *ngIf="!showSendButton"
+      class="mic-button"
+      shape="round"
+      [disabled]="iBlocked"
+    >
+      <ion-icon slot="icon-only" name="mic"></ion-icon>
+    </ion-button>
+
+    <ion-button
+      *ngIf="showSendButton"
+      fill="clear"
+      class="send-btn"
+      shape="round"
+      (click)="sendMessage()"
+      [disabled]="iBlocked"
+    >
+      <ion-icon slot="icon-only" name="send"></ion-icon>
+    </ion-button>
+  </ion-col>
+</ion-row>
   </div>
 </div>
 <!-- ========================= -->
