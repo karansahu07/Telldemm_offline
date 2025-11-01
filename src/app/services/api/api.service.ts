@@ -390,4 +390,12 @@ export class ApiService {
       `${this.baseUrl}/api/communities/community/${community_id}`
     );
   }
+
+    updateUserLanguage(user_id: number, language: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/api/users/update-language`, { user_id, language });
+  }
+
+  getUserLanguage(user_id: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/api/users/get-language/${user_id}`);
+  }
 }

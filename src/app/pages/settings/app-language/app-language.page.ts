@@ -1,8 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, ToastController } from '@ionic/angular';
+import { IonicModule, LoadingController, ToastController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
+import { AuthService } from 'src/app/auth/auth.service';
+import { ApiService } from 'src/app/services/api/api.service';
 import { Language } from 'src/app/services/language';
 
 // ⬇️ import your Language service (path may differ in your project)
@@ -59,7 +61,10 @@ export class AppLanguagePage implements OnInit, OnDestroy {
 
   constructor(
     private toastCtrl: ToastController,
-    private langSvc: Language
+    private langSvc: Language,
+    private authService:AuthService,
+    private loadingCtrl: LoadingController,
+    private api: ApiService
   ) {}
 
   ngOnInit() {
@@ -94,23 +99,68 @@ export class AppLanguagePage implements OnInit, OnDestroy {
   }
 
   // Central setter
-  private async setLanguage(langCode: string) {
+  // private async setLanguage(langCode: string) {
+  //   if (!langCode) return;
+
+  //   // ⬇️ THIS is the important part: switch translations right now
+  //   await this.langSvc.useLanguage(langCode);
+
+  //   // (The service already persists to localStorage; keeping this is harmless but redundant)
+  //   localStorage.setItem(LANG_STORAGE_KEY, langCode);
+
+  //   this.selectedLanguage = langCode;
+
+  //   const t = await this.toastCtrl.create({
+  //     message: `Language set to ${this.getLabel(langCode)} (${langCode})`,
+  //     duration: 1200,
+  //     position: 'bottom'
+  //   });
+  //   await t.present();
+  // }
+
+    async setLanguage(langCode: string) {
     if (!langCode) return;
 
-    // ⬇️ THIS is the important part: switch translations right now
-    await this.langSvc.useLanguage(langCode);
+    // const user_id = localStorage.getItem(USER_ID_KEY);
+    const userId = Number(this.authService.authData?.userId || 0);
+    // if (!userId) return;
+    if (!userId) {
+      console.warn('User not logged in');
+      return;
+    }
 
-    // (The service already persists to localStorage; keeping this is harmless but redundant)
-    localStorage.setItem(LANG_STORAGE_KEY, langCode);
+    const loader = await this.loadingCtrl.create({ message: 'Updating language...' });
+    await loader.present();
 
-    this.selectedLanguage = langCode;
+    try {
+      // ✅ Update in backend
+      await this.api.updateUserLanguage(+userId, langCode).toPromise();
 
-    const t = await this.toastCtrl.create({
-      message: `Language set to ${this.getLabel(langCode)} (${langCode})`,
-      duration: 1200,
-      position: 'bottom'
-    });
-    await t.present();
+      // ✅ Update in local storage + service
+      await this.langSvc.useLanguage(langCode);
+      localStorage.setItem(LANG_STORAGE_KEY, langCode);
+
+      this.selectedLanguage = langCode;
+
+      const t = await this.toastCtrl.create({
+        message: `Language updated to ${this.getLabel(langCode)} (${langCode})`,
+        duration: 1500,
+        position: 'bottom',
+        color: 'success',
+      });
+      await t.present();
+    } catch (err) {
+      console.error('Error updating language', err);
+      const t = await this.toastCtrl.create({
+        message: 'Failed to update language',
+        duration: 1500,
+        color: 'danger',
+      });
+      await t.present();
+    } finally {
+      loader.dismiss();
+   
+    }
   }
 
   getLabel(code: string) {
