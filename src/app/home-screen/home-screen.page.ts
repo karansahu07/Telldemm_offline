@@ -1524,6 +1524,7 @@ getPreviewText(chat: any): string {
   async openChat(chat: any) {
     console.log({ chat });
     await this.firebaseChatService.openChat(chat);
+    
     if (chat.type == 'private') {
       const parts = chat.roomId.split('_');
       const receiverId =
@@ -1531,13 +1532,16 @@ getPreviewText(chat: any): string {
         parts[parts.length - 1];
       console.log({ receiverId });
       this.router.navigate(['/chatting-screen'], {
-        // queryParams: { receiverId: '', isGroup: true },
+        queryParams: { receiverId: receiverId },
+      });
+    } else if (chat.type == 'community') {
+      const receiverId = chat.roomId;
+      this.router.navigate(['/community-detail'], {
         queryParams: { receiverId: receiverId },
       });
     } else {
       const receiverId = chat.roomId;
       this.router.navigate(['/chatting-screen'], {
-        // queryParams: { receiverId: '', isGroup: true },
         queryParams: { receiverId: receiverId },
       });
     }

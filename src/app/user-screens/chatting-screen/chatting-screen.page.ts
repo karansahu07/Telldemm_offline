@@ -232,6 +232,12 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   private allMessage: IMessage[] = [];
   chatType: string | null = null;
 
+  receiverStatus: 'online' | 'offline' = 'offline';
+  lastSeenTime: string = '';
+  isReceiverTyping: boolean = false;
+  private presenceSubscription?: Subscription;
+  private typingTimeout: any;
+
   constructor(
     private chatService: FirebaseChatService,
     private route: ActivatedRoute,
@@ -457,6 +463,15 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       }
     });
 
+    this.presenceSubscription = this.chatService.presenceChanges$.subscribe(
+      (presenceMap) => {
+        this.updateReceiverStatus();
+      }
+    );
+
+    // Initial status check
+    this.updateReceiverStatus();
+
     //scroll to bottom pagination load messages
     const scrollElement = await this.ionContent.getScrollElement();
     const distanceFromBottom =
@@ -581,6 +596,135 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       default:
         return null;
     }
+  }
+
+  updateReceiverStatus() {
+    const currentChat = this.chatService.currentChat;
+    if (!currentChat) return;
+
+    // Get receiver ID
+    let receiverId: string;
+    if (currentChat.type === 'private') {
+      const parts = currentChat.roomId.split('_');
+      receiverId =
+        parts.find((p) => p !== this.chatService['senderId']) ?? parts[1];
+    } else {
+      // For groups, handle multiple typing statuses
+      this.updateGroupTypingStatus();
+      return;
+    }
+
+    // Get presence status
+    const presence = this.chatService.getPresenceStatus(receiverId);
+
+    if (presence) {
+      this.receiverStatus = presence.isOnline ? 'online' : 'offline';
+      this.isReceiverTyping = presence.isTyping || false; // 🆕
+
+      if (!presence.isOnline && presence.lastSeen) {
+        this.lastSeenTime = this.formatLastSeen(presence.lastSeen);
+      }
+    }
+  }
+
+  updateGroupTypingStatus() {
+    const currentChat = this.chatService.currentChat;
+    if (!currentChat || currentChat.type !== 'group') return;
+
+    const members = currentChat.members || [];
+    let typingCount = 0;
+
+    members.forEach((memberId) => {
+      if (memberId === this.chatService['senderId']) return;
+      const presence = this.chatService.getPresenceStatus(memberId);
+      if (presence?.isTyping) {
+        typingCount++;
+      }
+    });
+
+    this.typingCount = typingCount;
+  }
+
+  // 🆕 Call this when user types in the input
+  onMessageInput(event: any) {
+    const text = event.target.value || '';
+
+    // Show/hide send button based on input
+    this.showSendButton = text.trim().length > 0;
+
+    if (text.trim().length > 0) {
+      this.chatService.setTypingStatus(true);
+
+      // Reset timeout
+      if (this.typingTimeout) {
+        clearTimeout(this.typingTimeout);
+      }
+
+      // Auto-clear after 2 seconds of no typing
+      this.typingTimeout = setTimeout(() => {
+        this.chatService.setTypingStatus(false);
+      }, 2000);
+    } else {
+      this.chatService.setTypingStatus(false);
+    }
+  }
+
+  formatLastSeen(timestamp: number): string {
+    const now = Date.now();
+    const diff = now - timestamp;
+
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (minutes < 1) return 'just now';
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    if (days < 7) return `${days}d ago`;
+
+    return new Date(timestamp).toLocaleDateString();
+  }
+
+  // Alternative: More detailed format
+  formatLastSeenDetailed(timestamp: number): string {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+
+    if (minutes < 1) return 'Last seen just now';
+    if (minutes < 60)
+      return `Last seen ${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+    if (hours < 24) return `Last seen ${hours} hour${hours > 1 ? 's' : ''} ago`;
+
+    // Today
+    if (date.toDateString() === now.toDateString()) {
+      return `Last seen today at ${date.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+      })}`;
+    }
+
+    // Yesterday
+    const yesterday = new Date(now);
+    yesterday.setDate(yesterday.getDate() - 1);
+    if (date.toDateString() === yesterday.toDateString()) {
+      return `Last seen yesterday at ${date.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+      })}`;
+    }
+
+    // Older
+    return `Last seen ${date.toLocaleDateString()} at ${date.toLocaleTimeString(
+      'en-US',
+      {
+        hour: '2-digit',
+        minute: '2-digit',
+      }
+    )}`;
   }
 
   loadReceiverProfile() {
@@ -826,7 +970,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
         color: 'success',
       });
       await toast.present();
-
     } catch (error) {
       console.error('❌ Error clearing chat:', error);
 
@@ -1219,17 +1362,54 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     this.replyToMessage = null;
   }
 
+  // getRepliedMessage(
+  //   replyToMessageId: string
+  // ): (IMessage & { attachment?: IAttachment; fadeOut: boolean }) | null {
+  //   console.log("this all messages", this.allMessages)
+  //   const msg =
+  //     this.allMessages.find((msg) => {
+  //       return msg.msgId === replyToMessageId;
+  //     }) || null;
+  //     console.log({msg})
+  //   return msg;
+  // }
+
   getRepliedMessage(
     replyToMessageId: string
   ): (IMessage & { attachment?: IAttachment; fadeOut: boolean }) | null {
-    const msg =
-      this.allMessages.find((msg) => {
-        return msg.msgId == replyToMessageId;
-      }) || null;
-    return msg;
+    if (!replyToMessageId) return null;
+
+    // console.log("Searching for msgId:", replyToMessageId);
+    // console.log("allMessage array:", this.allMessage);
+
+    let msg = this.allMessage.find((m) => m.msgId === replyToMessageId);
+
+    if (!msg && this.allMessages?.length) {
+      msg = this.allMessages.find((m) => m.msgId === replyToMessageId);
+    }
+
+    if (!msg && this.groupedMessages?.length) {
+      for (const group of this.groupedMessages) {
+        msg = group.messages.find((m: any) => m.msgId === replyToMessageId);
+        if (msg) break;
+      }
+    }
+
+    // console.log("Found message:", msg);
+
+    // ✅ Add fadeOut property before returning
+    if (msg) {
+      return {
+        ...msg,
+        fadeOut: false,
+      } as IMessage & { attachment?: IAttachment; fadeOut: boolean };
+    }
+
+    return null;
   }
 
   getReplyPreviewText(message: any): string {
+    // console.log({message})
     if (message.text) {
       return message.text.length > 50
         ? message.text.substring(0, 50) + '...'
@@ -1253,32 +1433,52 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   scrollToRepliedMessage(replyToMessageId: string) {
-    let targetElement: HTMLElement | any;
-
-    const messageElements = document.querySelectorAll('[data-msg-key]');
-
-    this.allMessages.forEach((msg) => {
-      if (msg.msgId === replyToMessageId) {
-        const element = Array.from(messageElements).find(
-          (el) => el.getAttribute('data-msg-key') === msg.msgId
-        );
-        if (element && element instanceof HTMLElement) {
-          targetElement = element;
-        }
-      }
-    });
-
-    if (targetElement) {
-      targetElement.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-      });
-
-      targetElement.classList.add('highlight-message');
-      setTimeout(() => {
-        targetElement?.classList.remove('highlight-message');
-      }, 2000);
+    if (!replyToMessageId) {
+      // console.warn('No replyToMessageId provided');
+      return;
     }
+
+    // console.log('Scrolling to message:', replyToMessageId);
+
+    setTimeout(() => {
+      let targetElement = document.querySelector(
+        `[data-msg-key="${replyToMessageId}"]`
+      ) as HTMLElement;
+
+      if (!targetElement) {
+        const messageElements = document.querySelectorAll('[data-msg-key]');
+        console.log('Found message elements:', messageElements.length);
+
+        targetElement = Array.from(messageElements).find(
+          (el) => el.getAttribute('data-msg-key') === replyToMessageId
+        ) as HTMLElement;
+      }
+
+      if (targetElement) {
+        console.log('Target element found, scrolling...');
+
+        targetElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+
+        targetElement.classList.add('highlight-message');
+
+        setTimeout(() => {
+          targetElement?.classList.remove('highlight-message');
+        }, 2000);
+      } else {
+        console.warn(
+          'Target message element not found in DOM for msgId:',
+          replyToMessageId
+        );
+
+        const allKeys = Array.from(
+          document.querySelectorAll('[data-msg-key]')
+        ).map((el) => el.getAttribute('data-msg-key'));
+        console.log('Available message keys:', allKeys);
+      }
+    }, 100);
   }
 
   async deleteSelectedMessages() {
@@ -1477,6 +1677,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onForward() {
+    console.log("this. selected message ", this.selectedMessages)
     this.chatService.setForwardMessages(this.selectedMessages);
     this.selectedMessages = [];
     this.router.navigate(['/forwardmessage']);
@@ -1491,11 +1692,13 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       this.lastPressedMessage?.image ||
       this.lastPressedMessage?.media
     );
-    // console.log({hasAttachment})
+    console.log({ hasAttachment });
+    console.log('onMore', this.lastPressedMessage);
 
-    const isPinned =
-      this.pinnedMessage?.messageId === this.lastPressedMessage?.message_id;
-    // console.log({isPinned})
+    // const isPinned =
+    // this.pinnedMessage?.messageId === this.lastPressedMessage?.msgId;
+    const isPinned = !!this.lastPressedMessage?.isPinned;
+    console.log({ isPinned });
 
     const popover = await this.popoverController.create({
       component: MessageMorePopoverComponent,
@@ -1636,19 +1839,26 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   pinMessage(message: IMessage) {
-    console.log('last pressed message ', this.lastPressedMessage);
     const pin: PinnedMessage = {
       messageId: message.msgId as string,
-      // key: this.lastPressedMessage?.key,
       pinnedAt: Date.now(),
       pinnedBy: this.senderId,
       roomId: this.roomId,
       scope: 'global',
     };
-    console.log({ pin });
     this.chatService.pinMessage(pin);
     this.selectedMessages = [];
     this.lastPressedMessage = null;
+  }
+
+  unpinMessage() {
+    if (this.lastPressedMessage && this.lastPressedMessage.isPinned) {
+      this.chatService.unpinMessage(this.lastPressedMessage);
+      this.selectedMessages = [];
+      this.lastPressedMessage = null;
+    } else {
+      console.warn('Message is not pinned or not selected');
+    }
   }
 
   setupPinnedMessageListener() {
@@ -1674,17 +1884,6 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
         this.pinnedMessageDetails = foundMessage;
         break;
       }
-    }
-  }
-
-  unpinMessage() {
-    console.log('this unpin message function before is called');
-    // console.log("this pinnedeMessage", message)
-    if (this.pinnedMessage) {
-      console.log('this unpin message function after is called');
-      this.chatService.unpinMessage(this.roomId);
-      this.selectedMessages = [];
-      this.lastPressedMessage = null;
     }
   }
 
@@ -2399,6 +2598,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
         msgId: uuidv4(),
         replyToMsgId: this.replyTo?.message.msgId || '',
         isEdit: false,
+        isPinned: false,
         type: 'text',
         reactions: [],
       };
@@ -2415,7 +2615,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
             fileName: this.selectedAttachment.fileName,
             mimeType: this.selectedAttachment.mimeType,
             fileSize: this.selectedAttachment.fileSize,
-            caption: plainText, // send encrypted caption
+            caption: plainText,
           };
 
           const file_path = await this.FileService.saveFileToSent(
@@ -2435,13 +2635,19 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       }
 
       await this.chatService.sendMessage(localMessage);
+
       // clear UI state
       this.messageText = '';
+      this.showSendButton = false;
       this.selectedAttachment = null;
       this.showPreviewModal = false;
       this.replyToMessage = null;
       await this.stopTypingSignal();
       this.scrollToBottom();
+      this.chatService.setTypingStatus(false);
+      if (this.typingTimeout) {
+        clearTimeout(this.typingTimeout);
+      }
     } catch (error) {
       console.error('Error sending message:', error);
       const toast = await this.toastCtrl.create({
@@ -2455,11 +2661,9 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  //user online or offline logic
   startReceiverStatusPoll(pollIntervalMs = 30000) {
     if (!this.receiverId) return;
 
-    // immediate fetch, then periodic
     this.presence
       .getStatus(Number(this.receiverId))
       .subscribe((res) => this.handleStatusResponse(res));
@@ -2481,33 +2685,33 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
       : null;
   }
 
-  formatLastSeen(ts: string | null) {
-    if (!ts) return '';
-    const d = new Date(ts); // make sure server returns parseable ISO or 'YYYY-MM-DD hh:mm:ss'
-    // simple formatting — adjust to locale
-    const now = new Date();
-    const sameDay = d.toDateString() === now.toDateString();
-    if (sameDay) {
-      return `Today at, ${d.toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-      })}`;
-    }
-    const yesterday = new Date();
-    yesterday.setDate(now.getDate() - 1);
-    if (d.toDateString() === yesterday.toDateString()) {
-      return `Yesterday, ${d.toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-      })}`;
-    }
-    return d.toLocaleString([], {
-      day: 'numeric',
-      month: 'short',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  }
+  // formatLastSeen(ts: string | null) {
+  //   if (!ts) return '';
+  //   const d = new Date(ts); // make sure server returns parseable ISO or 'YYYY-MM-DD hh:mm:ss'
+  //   // simple formatting — adjust to locale
+  //   const now = new Date();
+  //   const sameDay = d.toDateString() === now.toDateString();
+  //   if (sameDay) {
+  //     return `Today at, ${d.toLocaleTimeString([], {
+  //       hour: '2-digit',
+  //       minute: '2-digit',
+  //     })}`;
+  //   }
+  //   const yesterday = new Date();
+  //   yesterday.setDate(now.getDate() - 1);
+  //   if (d.toDateString() === yesterday.toDateString()) {
+  //     return `Yesterday, ${d.toLocaleTimeString([], {
+  //       hour: '2-digit',
+  //       minute: '2-digit',
+  //     })}`;
+  //   }
+  //   return d.toLocaleString([], {
+  //     day: 'numeric',
+  //     month: 'short',
+  //     hour: '2-digit',
+  //     minute: '2-digit',
+  //   });
+  // }
 
   private async uploadAttachmentToS3(attachment: any): Promise<string> {
     try {
@@ -2933,6 +3137,11 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     });
     this.onValueUnsubs = [];
     this.statusPollSub?.unsubscribe();
+
+    this.presenceSubscription?.unsubscribe();
+    if (this.typingTimeout) {
+      clearTimeout(this.typingTimeout);
+    }
   }
 
   private isGestureNavigation(): boolean {

@@ -5388,7 +5388,7 @@ export class CommunityChatPage implements OnInit, AfterViewInit, OnDestroy {
 
   unpinMessage() {
     if (this.pinnedMessage) {
-      this.chatService.unpinMessage(this.roomId);
+      // this.chatService.unpinMessage(this.roomId);
       this.selectedMessages = [];
       this.lastPressedMessage = null;
     }

@@ -433,17 +433,17 @@ export class ContactsPage implements OnInit {
     const currentUserPhone = this.authService.authData?.phone_number ?? '';
     const currentUserName = this.authService.authData?.name ?? '';
 
-    // require a group name
     if (!this.newGroupName?.trim()) {
       alert('Group name is required');
       return;
     }
 
-    // build members for Firebase using the fields present in your allUsers objects
-    const membersForFirebase: Array<any> = selectedUsers.map((u) => ({userId : u.userId, username: u.username, phoneNumber : u.phoneNumber}));
-    
+    const membersForFirebase: Array<any> = selectedUsers.map((u) => ({
+      userId: u.userId,
+      username: u.username,
+      phoneNumber: u.phoneNumber,
+    }));
 
-    // prepare memberIds for backend (prefer numeric IDs, otherwise string fallback)
     const memberIds = membersForFirebase.map((m) => {
       const id = m.userId;
       // console.log({id})
@@ -454,15 +454,11 @@ export class ContactsPage implements OnInit {
     const groupId = `group_${Date.now()}`;
 
     try {
-      // 1) Create group in Firebase
       await this.firebaseChatService.createGroup({
         groupId,
         groupName: this.newGroupName,
         members: membersForFirebase,
       });
-
-      // 2) Send to backend (pass memberIds so backend knows members)
-      // Note: using your existing api.createGroup signature; adapt if signature differs
 
       this.api
         .createGroup(
@@ -481,7 +477,6 @@ export class ContactsPage implements OnInit {
               res?.data?.group_id ??
               res?.data?.id ??
               res?.id;
-            // console.log({backendGroupId})
             if (backendGroupId) {
               try {
                 await this.firebaseChatService.updateBackendGroupId(

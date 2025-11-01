@@ -41,6 +41,9 @@ import { IChat, IChatMeta, Message, PinnedMessage } from 'src/types';
 import { ApiService } from './api/api.service';
 import {
   IAttachment,
+  ICommunity,
+  ICommunityChatMeta,
+  ICommunityMember,
   IConversation,
   IGroup,
   IGroupMember,
@@ -57,6 +60,7 @@ import { AuthService } from '../auth/auth.service';
 interface MemberPresence {
   isOnline: boolean;
   lastSeen: number | null;
+  isTyping?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -90,6 +94,12 @@ export class FirebaseChatService {
   private _roomMessageListner: any = null;
 
   currentChat: IConversation | null = null;
+
+  private _presenceSubject$ = new BehaviorSubject<Map<string, MemberPresence>>(new Map());
+presenceChanges$ = this._presenceSubject$.asObservable();
+
+  private _typingStatus$ = new BehaviorSubject<Map<string, boolean>>(new Map());
+  typingStatus$ = this._typingStatus$.asObservable();
 
   constructor(
     private db: Database,
@@ -158,7 +168,56 @@ export class FirebaseChatService {
 
   private presenceCleanUp: any = null;
 
-  async openChat(chat: any, isNew: boolean = false) {
+   listenToTypingStatus(roomId: string, userId: string): () => void {
+    const typingRef = ref(this.db, `typing/${roomId}/${userId}`);
+    
+    const unsubscribe = onValue(typingRef, (snap) => {
+      const isTyping = snap.val() || false;
+      
+      // Update the membersPresence map with typing status
+      const currentPresence = this.membersPresence.get(userId);
+      if (currentPresence) {
+        this.membersPresence.set(userId, {
+          ...currentPresence,
+          isTyping
+        });
+      } else {
+        this.membersPresence.set(userId, {
+          isOnline: false,
+          lastSeen: null,
+          isTyping
+        });
+      }
+      
+      // Also update the typing status map
+      const current = new Map(this._typingStatus$.value);
+      current.set(userId, isTyping);
+      this._typingStatus$.next(current);
+      
+      // Emit presence update
+      this._presenceSubject$.next(new Map(this.membersPresence));
+    });
+
+    return unsubscribe;
+  }
+
+  // 🆕 Method to set your own typing status
+  setTypingStatus(isTyping: boolean, roomId?: string) {
+    const targetRoomId = roomId || this.currentChat?.roomId;
+    if (!targetRoomId || !this.senderId) return;
+
+    const typingRef = ref(this.db, `typing/${targetRoomId}/${this.senderId}`);
+    set(typingRef, isTyping);
+
+    // Auto-clear typing after 3 seconds of inactivity
+    if (isTyping) {
+      setTimeout(() => {
+        set(typingRef, false);
+      }, 3000);
+    }
+  }
+
+   async openChat(chat: any, isNew: boolean = false) {
     let conv: any = null;
     if (isNew) {
       const { receiver }: { receiver: IUser } = chat;
@@ -178,6 +237,7 @@ export class FirebaseChatService {
     } else {
       conv = this.currentConversations.find((c) => c.roomId === chat.roomId);
     }
+    
     let memberIds: string[] = [];
     if (conv.type === 'private') {
       const parts = conv.roomId.split('_');
@@ -188,9 +248,31 @@ export class FirebaseChatService {
     } else {
       memberIds = (conv as IConversation).members || [];
     }
+    
     this.currentChat = { ...(conv as IConversation) };
 
+    // Setup presence listener
     this.presenceCleanUp = this.isReceiverOnline(memberIds);
+
+    // 🆕 Setup typing listener for each member
+    const typingUnsubscribers: (() => void)[] = [];
+    for (const memberId of memberIds) {
+      if (memberId !== this.senderId) {
+        const unsub = this.listenToTypingStatus(conv.roomId, memberId);
+        typingUnsubscribers.push(unsub);
+      }
+    }
+
+    // 🆕 Store typing cleanup functions
+    const originalCleanup = this.presenceCleanUp;
+    this.presenceCleanUp = () => {
+      originalCleanup?.();
+      typingUnsubscribers.forEach(unsub => {
+        try {
+          unsub();
+        } catch (e) {}
+      });
+    };
 
     this._roomMessageListner = this.listenRoomStream(conv?.roomId as string, {
       onAdd: async (msgKey, data, isNew) => {
@@ -209,7 +291,7 @@ export class FirebaseChatService {
       },
     });
 
-   this.setUnreadCount();
+    this.setUnreadCount();
   }
 
    async setUnreadCount(roomId : string | null = null, count : number = 0){
@@ -220,8 +302,13 @@ export class FirebaseChatService {
     rtdbUpdate(metaRef, { unreadCount: count });
   }
 
-  async closeChat() {
+    async closeChat() {
     try {
+      // Clear your own typing status
+      if (this.currentChat?.roomId) {
+        this.setTypingStatus(false, this.currentChat.roomId);
+      }
+
       if (this._roomMessageListner) {
         try {
           this._roomMessageListner();
@@ -362,24 +449,44 @@ export class FirebaseChatService {
       this.membersPresence.set(id, { isOnline: false, lastSeen: null });
       const userStatusRef = ref(this.db, `presence/${id}`);
 
+      // const unsubscribe = onValue(userStatusRef, (snap) => {
+      //   const val = snap.val() ?? {};
+      //   const isOnline = !!val.isOnline;
+
+      //   // Support different timestamp keys
+      //   const ts =
+      //     val.lastSeen ??
+      //     val.last_changed ??
+      //     val.last_changed_at ??
+      //     val.timestamp;
+      //   const lastSeen =
+      //     typeof ts === 'number' ? ts : ts ? Number(ts) || null : null;
+
+      //   this.membersPresence.set(id, { isOnline, lastSeen });
+      //   console.log(this.membersPresence);
+      //   // Optionally trigger an observable update:
+      //   // this.membersPresenceSubject?.next(this.membersPresence);
+      // });
+
       const unsubscribe = onValue(userStatusRef, (snap) => {
-        const val = snap.val() ?? {};
-        const isOnline = !!val.isOnline;
+  const val = snap.val() ?? {};
+  const isOnline = !!val.isOnline;
 
-        // Support different timestamp keys
-        const ts =
-          val.lastSeen ??
-          val.last_changed ??
-          val.last_changed_at ??
-          val.timestamp;
-        const lastSeen =
-          typeof ts === 'number' ? ts : ts ? Number(ts) || null : null;
+  const ts =
+    val.lastSeen ??
+    val.last_changed ??
+    val.last_changed_at ??
+    val.timestamp;
+  const lastSeen =
+    typeof ts === 'number' ? ts : ts ? Number(ts) || null : null;
 
-        this.membersPresence.set(id, { isOnline, lastSeen });
-        console.log(this.membersPresence);
-        // Optionally trigger an observable update:
-        // this.membersPresenceSubject?.next(this.membersPresence);
-      });
+  this.membersPresence.set(id, { isOnline, lastSeen });
+  
+  // 🆕 Emit the updated presence map
+  this._presenceSubject$.next(new Map(this.membersPresence));
+  
+  console.log(this.membersPresence);
+});
 
       this._memberUnsubs.set(id, unsubscribe);
     }
@@ -395,6 +502,22 @@ export class FirebaseChatService {
       this.membersPresence.clear();
     };
   }
+
+getPresenceStatus(userId: string): MemberPresence | null {
+  return this.membersPresence.get(userId) || null;
+}
+
+getPresenceObservable(): Observable<Map<string, MemberPresence>> {
+
+  const presenceSubject = new BehaviorSubject<Map<string, MemberPresence>>(
+    new Map(this.membersPresence)
+  );
+  
+  // You'll need to add this property to your class
+  // private _presenceSubject$ = new BehaviorSubject<Map<string, MemberPresence>>(new Map());
+  
+  return presenceSubject.asObservable();
+}
 
   async updateMessageStatusFromReceipts(msg: IMessage) {
     if (!msg.receipts || !this.currentChat?.members) return;
@@ -688,6 +811,162 @@ export class FirebaseChatService {
     return conv;
   }
 
+  // async syncConversationWithServer(): Promise<void> {
+  //   try {
+  //     if (!this.senderId) {
+  //       console.warn('syncConversationWithServer: senderId is not set');
+  //       return;
+  //     }
+
+  //     this._isSyncing$.next(true);
+
+  //     const userChatsPath = `userchats/${this.senderId}`;
+  //     const userChatsRef = rtdbRef(this.db, userChatsPath);
+  //     const snapshot: DataSnapshot = await rtdbGet(userChatsRef);
+  //     const userChats = snapshot.val() || {};
+  //     const conversations: IConversation[] = [];
+  //     const roomIds = Object.keys(userChats);
+  //     for (const roomId of roomIds) {
+  //       const meta: IChatMeta = userChats[roomId] || {};
+  //       try {
+  //         const type: IConversation['type'] = meta.type;
+  //         if (type === 'private') {
+  //           const conv = await this.fetchPrivateConvDetails(roomId, meta);
+  //           conversations.push(conv);
+  //         } else if (type === 'group' || type === 'community') {
+  //           const conv = await this.fetchGroupConDetails(roomId, meta);
+  //           conversations.push(conv);
+  //         } else {
+  //           conversations.push({
+  //             roomId,
+  //             type: 'private',
+  //             title: roomId,
+  //             lastMessage: meta?.lastmessage,
+  //             lastMessageAt: meta?.lastmessageAt
+  //               ? new Date(Number(meta.lastmessageAt))
+  //               : undefined,
+  //             unreadCount: Number(meta?.unreadCount) || 0,
+  //           } as IConversation);
+  //         }
+  //       } catch (innerErr) {
+  //         console.error('Error building conversation for', roomId, innerErr);
+  //       }
+  //     }
+
+  //     const existing = this._conversations$.value;
+  //     const newConversations = conversations.filter(
+  //       ({ roomId }) => !existing.some((c) => c.roomId === roomId)
+  //     );
+
+  //     if (newConversations.length) {
+  //       for (const conv of newConversations) {
+  //         await this.sqliteService.createConversation({ ...conv });
+  //       }
+  //       this._conversations$.next([...existing, ...newConversations]);
+  //     }
+
+  //     if (this._userChatsListener) {
+  //       try {
+  //         this._userChatsListener();
+  //       } catch {}
+  //       this._userChatsListener = null;
+  //     }
+  //     const onUserChatsChange = async (snap: DataSnapshot) => {
+  //       const updatedData: IChatMeta = snap.val() || {};
+  //       const current = [...this._conversations$.value];
+  //       for (const [roomId, meta] of Object.entries(updatedData)) {
+  //         const idx = current.findIndex((c) => c.roomId === roomId);
+  //         const chatMeta: IChatMeta = { ...meta, roomId };
+  //         console.log('chat changed', chatMeta);
+  //         try {
+  //           if (idx > -1) {
+  //             const decryptedText = await this.encryptionService.decrypt(
+  //               chatMeta.lastmessage
+  //             );
+  //             const conv = current[idx];
+  //             current[idx] = {
+  //               ...conv,
+  //               lastMessage: decryptedText ?? conv.lastMessage,
+  //               lastMessageType:
+  //                 chatMeta.lastmessageType ?? conv.lastMessageType,
+  //               lastMessageAt: chatMeta.lastmessageAt
+  //                 ? new Date(Number((meta as any).lastmessageAt))
+  //                 : conv.lastMessageAt,
+  //               unreadCount: Number(chatMeta.unreadCount || 0),
+  //               isArchived: chatMeta.isArchived,
+  //               updatedAt: chatMeta.lastmessageAt
+  //                 ? new Date(Number(chatMeta.lastmessageAt))
+  //                 : conv.updatedAt,
+  //             };
+  //           } else {
+  //             console.warn(
+  //               'New room detected in userchats but not present locally:',
+  //               roomId
+  //             );
+  //             const type: IConversation['type'] = chatMeta.type || 'private';
+  //             try {
+  //               let newConv: IConversation | null = null;
+  //               if (type === 'private') {
+  //                 newConv = await this.fetchPrivateConvDetails(
+  //                   roomId,
+  //                   chatMeta
+  //                 );
+  //               } else if (type === 'group' || type === 'community') {
+  //                 newConv = await this.fetchGroupConDetails(roomId, chatMeta);
+  //               } else {
+  //                 newConv = {
+  //                   roomId,
+  //                   type: 'private',
+  //                   title: roomId,
+  //                   lastMessage: chatMeta.lastmessage,
+  //                   lastMessageAt: chatMeta.lastmessageAt
+  //                     ? new Date(Number(chatMeta.lastmessageAt))
+  //                     : undefined,
+  //                   unreadCount: Number(chatMeta.unreadCount) || 0,
+  //                 } as IConversation;
+  //               }
+
+  //               if (newConv) {
+  //                 current.push(newConv);
+  //                 try {
+  //                   await this.sqliteService.createConversation({ ...newConv });
+  //                 } catch (e) {
+  //                   console.warn(
+  //                     'sqlite createConversation failed for new room',
+  //                     roomId,
+  //                     e
+  //                   );
+  //                 }
+  //               }
+  //             } catch (e) {
+  //               console.error(
+  //                 'Failed to fetch details for new room',
+  //                 roomId,
+  //                 e
+  //               );
+  //             }
+  //           }
+  //         } catch (e) {
+  //           console.error('onUserChatsChange inner error for', roomId, e);
+  //         }
+  //       }
+  //       this.syncReceipt(current.filter(c => (c.unreadCount || 0)>0).map(c=>({roomId : c.roomId, unreadCount: c.unreadCount as number})))
+  //       this._conversations$.next(current);
+  //     };
+
+  //     const unsubscribe = rtdbOnValue(userChatsRef, onUserChatsChange);
+  //     this._userChatsListener = () => {
+  //       try {
+  //         unsubscribe();
+  //       } catch {}
+  //     };
+  //   } catch (error) {
+  //     console.error('syncConversationWithServer error:', error);
+  //   } finally {
+  //     this._isSyncing$.next(false);
+  //   }
+  // }
+
   async syncConversationWithServer(): Promise<void> {
     try {
       if (!this.senderId) {
@@ -703,15 +982,34 @@ export class FirebaseChatService {
       const userChats = snapshot.val() || {};
       const conversations: IConversation[] = [];
       const roomIds = Object.keys(userChats);
+      
       for (const roomId of roomIds) {
         const meta: IChatMeta = userChats[roomId] || {};
         try {
           const type: IConversation['type'] = meta.type;
+          
           if (type === 'private') {
             const conv = await this.fetchPrivateConvDetails(roomId, meta);
             conversations.push(conv);
-          } else if (type === 'group' || type === 'community') {
+          } else if (type === 'group') {
+            // Check if this group belongs to a community
+            const groupRef = rtdbRef(this.db, `groups/${roomId}`);
+            const groupSnap = await rtdbGet(groupRef);
+            const groupData = groupSnap.val() || {};
+            
+            // Skip announcement and general groups that belong to communities
+            const belongsToCommunity = !!groupData.communityId;
+            const isSystemGroup = groupData.title === 'Announcements' || groupData.title === 'General';
+            
+            if (belongsToCommunity && isSystemGroup) {
+              console.log(`Skipping system group ${roomId} from community ${groupData.communityId}`);
+              continue; // Skip this group
+            }
+            
             const conv = await this.fetchGroupConDetails(roomId, meta);
+            conversations.push(conv);
+          } else if (type === 'community') {
+            const conv = await this.fetchCommunityConvDetails(roomId, meta);
             conversations.push(conv);
           } else {
             conversations.push({
@@ -748,13 +1046,16 @@ export class FirebaseChatService {
         } catch {}
         this._userChatsListener = null;
       }
+      
       const onUserChatsChange = async (snap: DataSnapshot) => {
         const updatedData: IChatMeta = snap.val() || {};
         const current = [...this._conversations$.value];
+        
         for (const [roomId, meta] of Object.entries(updatedData)) {
           const idx = current.findIndex((c) => c.roomId === roomId);
           const chatMeta: IChatMeta = { ...meta, roomId };
           console.log('chat changed', chatMeta);
+          
           try {
             if (idx > -1) {
               const decryptedText = await this.encryptionService.decrypt(
@@ -781,15 +1082,30 @@ export class FirebaseChatService {
                 roomId
               );
               const type: IConversation['type'] = chatMeta.type || 'private';
+              
               try {
                 let newConv: IConversation | null = null;
+                
                 if (type === 'private') {
-                  newConv = await this.fetchPrivateConvDetails(
-                    roomId,
-                    chatMeta
-                  );
-                } else if (type === 'group' || type === 'community') {
+                  newConv = await this.fetchPrivateConvDetails(roomId, chatMeta);
+                } else if (type === 'group') {
+                  // Check if this group belongs to a community
+                  const groupRef = rtdbRef(this.db, `groups/${roomId}`);
+                  const groupSnap = await rtdbGet(groupRef);
+                  const groupData = groupSnap.val() || {};
+                  
+                  // Skip announcement and general groups
+                  const belongsToCommunity = !!groupData.communityId;
+                  const isSystemGroup = groupData.title === 'Announcements' || groupData.title === 'General';
+                  
+                  if (belongsToCommunity && isSystemGroup) {
+                    console.log(`Skipping new system group ${roomId}`);
+                    continue;
+                  }
+                  
                   newConv = await this.fetchGroupConDetails(roomId, chatMeta);
+                } else if (type === 'community') {
+                  newConv = await this.fetchCommunityConvDetails(roomId, chatMeta);
                 } else {
                   newConv = {
                     roomId,
@@ -827,7 +1143,12 @@ export class FirebaseChatService {
             console.error('onUserChatsChange inner error for', roomId, e);
           }
         }
-        this.syncReceipt(current.filter(c => (c.unreadCount || 0)>0).map(c=>({roomId : c.roomId, unreadCount: c.unreadCount as number})))
+        
+        this.syncReceipt(current.filter(c => (c.unreadCount || 0) > 0).map(c => ({
+          roomId: c.roomId, 
+          unreadCount: c.unreadCount as number
+        })));
+        
         this._conversations$.next(current);
       };
 
@@ -841,6 +1162,56 @@ export class FirebaseChatService {
       console.error('syncConversationWithServer error:', error);
     } finally {
       this._isSyncing$.next(false);
+    }
+  }
+
+  // New method to fetch community conversation details
+  private async fetchCommunityConvDetails(
+    roomId: string,
+    meta: IChatMeta
+  ): Promise<IConversation> {
+    try {
+      const communityRef = rtdbRef(this.db, `communities/${roomId}`);
+      const communitySnap = await rtdbGet(communityRef);
+      const community: Partial<ICommunity> = communitySnap.val() || {};
+      
+      const membersObj: Record<string, Partial<ICommunityMember>> = community.members || {};
+      const members = Object.keys(membersObj);
+
+      let decryptedText: string | undefined;
+      try {
+        decryptedText = await this.encryptionService.decrypt(meta?.lastmessage);
+      } catch (e) {
+        console.warn('fetchCommunityConvDetails: decrypt failed for', roomId, e);
+        decryptedText = typeof meta?.lastmessage === 'string' ? meta.lastmessage : undefined;
+      }
+
+      const conv: IConversation = {
+        roomId,
+        type: 'community',
+        title: community.title || 'COMMUNITY',
+        avatar: community.avatar || '',
+        members,
+        adminIds: community.adminIds || [],
+        isArchived: !!meta.isArchived,
+        isPinned: !!meta.isPinned,
+        isLocked: !!meta.isLocked,
+        createdAt: community.createdAt ? this.parseDate(community.createdAt) : undefined,
+        lastMessage: decryptedText ?? undefined,
+        lastMessageType: meta.lastmessageType ?? undefined,
+        lastMessageAt: meta.lastmessageAt
+          ? this.parseDate(meta.lastmessageAt)
+          : undefined,
+        unreadCount: meta.unreadCount || 0,
+        updatedAt: meta.lastmessageAt
+          ? this.parseDate(meta.lastmessageAt)
+          : undefined,
+      } as IConversation;
+
+      return conv;
+    } catch (error) {
+      console.error('Error fetching community details:', error);
+      throw error;
     }
   }
 
@@ -1648,28 +2019,64 @@ export class FirebaseChatService {
   }
 
   // Pinned message operations
-  async pinMessage(message: PinnedMessage) {
-    const key = message.roomId;
-    const pinRef = ref(this.db, `pinnedMessages/${key}`);
-    const snapshot = await get(pinRef);
-
-    const pinData = {
-      // key: message.key,
-      roomId: message.roomId,
-      messageId: message.messageId,
-      pinnedBy: message.pinnedBy,
-      pinnedAt: Date.now(),
-      scope: 'global',
-    };
-
+async pinMessage(message: PinnedMessage) {
+  const key = message.roomId;
+  const pinRef = ref(this.db, `pinnedMessages/${key}`);
+  const snapshot = await get(pinRef);
+  
+  const pinData = {
+    roomId: message.roomId,
+    messageId: message.messageId,
+    pinnedBy: message.pinnedBy,
+    pinnedAt: Date.now(),
+    scope: 'global',
+  };
+  
+  try {
     if (snapshot.exists()) {
       await update(pinRef, pinData);
     } else {
       await set(pinRef, pinData);
     }
+    const messageRef = ref(this.db, `chats/${message.roomId}/${message.messageId}`);
+    await update(messageRef, {
+      isPinned: true,
+      // pinnedAt: Date.now(),
+      // pinnedBy: message.pinnedBy
+    });
+  } catch (error) {
+    console.error('❌ Error pinning message:', error);
+    throw error;
   }
+}
+  async unpinMessage(message: IMessage) {
+  try {
+    const roomId = message.roomId;
+    const messageId = message.msgId;
 
-  async getPinnedMessage(roomId: string): Promise<PinnedMessage | null> {
+    const pinRef = ref(this.db, `pinnedMessages/${roomId}`);
+    await remove(pinRef);
+
+    const messageRef = ref(this.db, `chats/${roomId}/${messageId}`);
+    await update(messageRef, {
+      isPinned: false,
+      // pinnedAt: null,
+      // pinnedBy: null
+    });
+    
+    // this is for local state
+    // const localMsg = this.allMessage?.find(m => m.msgId === messageId);
+    // if (localMsg) {
+    //   localMsg.isPinned = false;
+    // }
+    
+  } catch (error) {
+    console.error('❌ Error unpinning message:', error);
+    throw error;
+  }
+}
+
+async getPinnedMessage(roomId: string): Promise<PinnedMessage | null> {
     try {
       const pinRef = ref(this.db, `pinnedMessages/${roomId}`);
       const snapshot = await get(pinRef);
@@ -1684,14 +2091,6 @@ export class FirebaseChatService {
     }
   }
 
-  async unpinMessage(roomId: string) {
-    try {
-      const pinRef = ref(this.db, `pinnedMessages/${roomId}`);
-      await remove(pinRef);
-    } catch (error) {
-      console.error('Error unpinning message:', error);
-    }
-  }
 
   async editMessage(roomId: string, msgId: string, newText: string): Promise<void> {
   try {
@@ -1946,101 +2345,371 @@ async getAdminCheckDetails(groupId: string, currentUserId: string, targetUserId:
   }
 }
 
-  async createCommunity(
-    communityId: string,
-    name: string,
-    description: string,
-    createdBy: string
-  ): Promise<void> {
-    try {
-      const rawDb = getDatabase();
-      const now = Date.now();
-      const annGroupId = `comm_group_${now}_ann`;
-      const generalGroupId = `comm_group_${now}_gen`;
+  // async createCommunity(
+  //   communityId: string,
+  //   name: string,
+  //   description: string,
+  //   createdBy: string
+  // ): Promise<void> {
+  //   try {
+  //     const rawDb = getDatabase();
+  //     const now = Date.now();
+  //     const annGroupId = `comm_group_${now}_ann`;
+  //     const generalGroupId = `comm_group_${now}_gen`;
 
-      let creatorProfile: { name?: string; phone_number?: string } = {};
-      try {
-        const userSnap = await get(ref(rawDb, `users/${createdBy}`));
+  //     let creatorProfile: { name?: string; phone_number?: string } = {};
+  //     try {
+  //       const userSnap = await get(ref(rawDb, `users/${createdBy}`));
+  //       if (userSnap.exists()) {
+  //         const u = userSnap.val();
+  //         creatorProfile.name = u.name || u.fullName || u.displayName || '';
+  //         creatorProfile.phone_number =
+  //           u.phone_number || u.mobile || u.phone || '';
+  //       }
+  //     } catch (err) {
+  //       console.warn(
+  //         'Failed to fetch creator profile, proceeding with fallback values',
+  //         err
+  //       );
+  //     }
+
+  //     const memberDetails = {
+  //       name: creatorProfile.name || '',
+  //       phone_number: creatorProfile.phone_number || '',
+  //       role: 'admin',
+  //       status: 'active',
+  //       joinedAt: now,
+  //     };
+
+  //     const communityObj: any = {
+  //       id: communityId,
+  //       name,
+  //       description: description || '',
+  //       icon: '',
+  //       createdBy,
+  //       createdByName: creatorProfile.name,
+  //       createdAt: now,
+  //       privacy: 'invite_only',
+  //       settings: {
+  //         whoCanCreateGroups: 'admins',
+  //         announcementPosting: 'adminsOnly',
+  //       },
+  //       admins: { [createdBy]: true },
+  //       membersCount: 0,
+  //       groups: { [annGroupId]: true, [generalGroupId]: true },
+  //       members: { [createdBy]: memberDetails },
+  //     };
+
+  //     const annGroupObj = {
+  //       id: annGroupId,
+  //       name: 'Announcements',
+  //       type: 'announcement',
+  //       communityId: communityId,
+  //       createdBy,
+  //       createdByName: creatorProfile.name,
+  //       createdAt: now,
+  //       admins: { [createdBy]: true },
+  //       members: { [createdBy]: memberDetails },
+  //       membersCount: 0,
+  //     };
+
+  //     const genGroupObj = {
+  //       id: generalGroupId,
+  //       name: 'General',
+  //       type: 'general',
+  //       communityId: communityId,
+  //       createdBy,
+  //       createdByName: creatorProfile.name,
+  //       createdAt: now,
+  //       admins: { [createdBy]: true },
+  //       members: { [createdBy]: memberDetails },
+  //       membersCount: 0,
+  //     };
+
+  //     const updates: any = {};
+  //     updates[`/communities/${communityId}`] = communityObj;
+  //     updates[`/groups/${annGroupId}`] = annGroupObj;
+  //     updates[`/groups/${generalGroupId}`] = genGroupObj;
+  //     updates[
+  //       `/usersInCommunity/${createdBy}/joinedCommunities/${communityId}`
+  //     ] = true;
+
+  //     await update(ref(rawDb), updates);
+  //   } catch (err) {
+  //     console.error('createCommunity error', err);
+  //     throw err;
+  //   }
+  // }
+
+async createCommunity({
+  communityId,
+  communityName,
+  description,
+  createdBy,
+  avatar = '',
+  privacy = 'invite_only',
+}: {
+  communityId: string;
+  communityName: string;
+  description?: string;
+  createdBy: string;
+  avatar?: string;
+  privacy?: 'public' | 'invite_only';
+}): Promise<{ communityId: string; announcementGroupId: string; generalGroupId: string }> {
+  try {
+    if (!createdBy) throw new Error('createCommunity: createdBy (userId) is required');
+    
+    const now = Date.now();
+    const announcementGroupId = `${communityId}_announcement`;
+    const generalGroupId = `${communityId}_general`;
+
+    // Get creator profile info
+    let creatorProfile: { username?: string; phoneNumber?: string } = {};
+    try {
+      const user = this.currentUsers.find(u => u.userId === createdBy);
+      if (user) {
+        creatorProfile.username = user.username || '';
+        creatorProfile.phoneNumber = user.phoneNumber || '';
+      } else {
+        // Fallback to API if not in current users
+        const userSnap = await get(ref(this.db, `users/${createdBy}`));
         if (userSnap.exists()) {
           const u = userSnap.val();
-          creatorProfile.name = u.name || u.fullName || u.displayName || '';
-          creatorProfile.phone_number =
-            u.phone_number || u.mobile || u.phone || '';
+          creatorProfile.username = u.name || u.username || '';
+          creatorProfile.phoneNumber = u.phone_number || u.phoneNumber || '';
         }
-      } catch (err) {
-        console.warn(
-          'Failed to fetch creator profile, proceeding with fallback values',
-          err
-        );
       }
-
-      const memberDetails = {
-        name: creatorProfile.name || '',
-        phone_number: creatorProfile.phone_number || '',
-        role: 'admin',
-        status: 'active',
-        joinedAt: now,
-      };
-
-      const communityObj: any = {
-        id: communityId,
-        name,
-        description: description || '',
-        icon: '',
-        createdBy,
-        createdByName: creatorProfile.name,
-        createdAt: now,
-        privacy: 'invite_only',
-        settings: {
-          whoCanCreateGroups: 'admins',
-          announcementPosting: 'adminsOnly',
-        },
-        admins: { [createdBy]: true },
-        membersCount: 0,
-        groups: { [annGroupId]: true, [generalGroupId]: true },
-        members: { [createdBy]: memberDetails },
-      };
-
-      const annGroupObj = {
-        id: annGroupId,
-        name: 'Announcements',
-        type: 'announcement',
-        communityId: communityId,
-        createdBy,
-        createdByName: creatorProfile.name,
-        createdAt: now,
-        admins: { [createdBy]: true },
-        members: { [createdBy]: memberDetails },
-        membersCount: 0,
-      };
-
-      const genGroupObj = {
-        id: generalGroupId,
-        name: 'General',
-        type: 'general',
-        communityId: communityId,
-        createdBy,
-        createdByName: creatorProfile.name,
-        createdAt: now,
-        admins: { [createdBy]: true },
-        members: { [createdBy]: memberDetails },
-        membersCount: 0,
-      };
-
-      const updates: any = {};
-      updates[`/communities/${communityId}`] = communityObj;
-      updates[`/groups/${annGroupId}`] = annGroupObj;
-      updates[`/groups/${generalGroupId}`] = genGroupObj;
-      updates[
-        `/usersInCommunity/${createdBy}/joinedCommunities/${communityId}`
-      ] = true;
-
-      await update(ref(rawDb), updates);
     } catch (err) {
-      console.error('createCommunity error', err);
-      throw err;
+      console.warn('Failed to fetch creator profile, using fallback', err);
+      creatorProfile.username = this.authService.authData?.name || 'User';
+      creatorProfile.phoneNumber = this.authService.authData?.phone_number || '';
     }
+
+    // 1️⃣ Community member details
+    const communityMemberDetails: ICommunityMember = {
+      username: creatorProfile.username || '',
+      phoneNumber: creatorProfile.phoneNumber || '',
+      isActive: true,
+      joinedAt: now,
+      role: 'admin',
+    };
+
+    // 2️⃣ Group member details (for announcement and general groups)
+    const groupMemberDetails: IGroupMember = {
+      username: creatorProfile.username || '',
+      phoneNumber: creatorProfile.phoneNumber || '',
+      isActive: true,
+    };
+
+    // 3️⃣ Community data structure
+    const communityData: ICommunity = {
+      roomId: communityId,
+      title: communityName,
+      description: description || 'Hey, I am using Telldemm',
+      avatar: avatar || '',
+      adminIds: [createdBy],
+      createdBy,
+      createdAt: now,
+      members: {
+        [createdBy]: communityMemberDetails,
+      },
+      groups: {
+        [announcementGroupId]: true,
+        [generalGroupId]: true,
+      },
+      type: 'community',
+      isArchived: false,
+      isPinned: false,
+      isLocked: false,
+      privacy,
+      settings: {
+        whoCanCreateGroups: 'admins',
+        announcementPosting: 'adminsOnly',
+      },
+    };
+
+    // 4️⃣ Announcement Group structure
+    const announcementGroupData: IGroup = {
+      roomId: announcementGroupId,
+      title: 'Announcements',
+      description: 'Important announcements for the community',
+      avatar: '',
+      adminIds: [createdBy],
+      createdBy,
+      createdAt: now,
+      members: {
+        [createdBy]: groupMemberDetails,
+      },
+      type: 'group',
+      isArchived: false,
+      isPinned: false,
+      isLocked: false,
+      communityId, // Link to parent community
+    };
+
+    // 5️⃣ General Group structure
+    const generalGroupData: IGroup = {
+      roomId: generalGroupId,
+      title: 'General',
+      description: 'General discussion for community members',
+      avatar: '',
+      adminIds: [createdBy],
+      createdBy,
+      createdAt: now,
+      members: {
+        [createdBy]: groupMemberDetails,
+      },
+      type: 'group',
+      isArchived: false,
+      isPinned: false,
+      isLocked: false,
+      communityId, // Link to parent community
+    };
+
+    // 6️⃣ Chat metadata for userchats (community entry)
+    const communityChatMeta: ICommunityChatMeta = {
+      type: 'community',
+      lastmessageAt: now,
+      lastmessageType: 'text',
+      lastmessage: '',
+      unreadCount: 0,
+      isArchived: false,
+      isPinned: false,
+      isLocked: false,
+      communityGroups: [announcementGroupId, generalGroupId],
+    };
+
+    // 7️⃣ Chat metadata for announcement group
+    const announcementChatMeta: IChatMeta = {
+      type: 'group',
+      lastmessageAt: now,
+      lastmessageType: 'text',
+      lastmessage: '',
+      unreadCount: 0,
+      isArchived: false,
+      isPinned: false,
+      isLocked: false,
+    };
+
+    // 8️⃣ Chat metadata for general group
+    const generalChatMeta: IChatMeta = {
+      type: 'group',
+      lastmessageAt: now,
+      lastmessageType: 'text',
+      lastmessage: '',
+      unreadCount: 0,
+      isArchived: false,
+      isPinned: false,
+      isLocked: false,
+    };
+
+    // 9️⃣ Build atomic updates object
+    const updates: Record<string, any> = {};
+    
+    // Community node
+    updates[`/communities/${communityId}`] = communityData;
+    
+    // Groups nodes
+    updates[`/groups/${announcementGroupId}`] = announcementGroupData;
+    updates[`/groups/${generalGroupId}`] = generalGroupData;
+    
+    // User's chat list - community
+    updates[`/userchats/${createdBy}/${communityId}`] = communityChatMeta;
+    
+    // User's chat list - announcement group
+    updates[`/userchats/${createdBy}/${announcementGroupId}`] = announcementChatMeta;
+    
+    // User's chat list - general group
+    updates[`/userchats/${createdBy}/${generalGroupId}`] = generalChatMeta;
+
+    // 🔟 Apply all updates atomically
+    await rtdbUpdate(rtdbRef(this.db, '/'), updates);
+
+    // 1️⃣1️⃣ Create local conversation entries for SQLite
+    const communityConvo: IConversation = {
+      roomId: communityId,
+      title: communityName,
+      type: 'community',
+      avatar: avatar || '',
+      members: [createdBy],
+      adminIds: [createdBy],
+      createdAt: new Date(now),
+      updatedAt: new Date(now),
+      lastMessage: '',
+      lastMessageType: 'text',
+      lastMessageAt: new Date(now),
+      unreadCount: 0,
+      isArchived: false,
+      isPinned: false,
+      isLocked: false,
+      isMyself: true,
+    };
+
+    const announcementConvo: IConversation = {
+      roomId: announcementGroupId,
+      title: 'Announcements',
+      type: 'group',
+      avatar: '',
+      members: [createdBy],
+      adminIds: [createdBy],
+      createdAt: new Date(now),
+      updatedAt: new Date(now),
+      lastMessage: '',
+      lastMessageType: 'text',
+      lastMessageAt: new Date(now),
+      unreadCount: 0,
+      isArchived: false,
+      isPinned: false,
+      isLocked: false,
+      isMyself: true,
+    };
+
+    const generalConvo: IConversation = {
+      roomId: generalGroupId,
+      title: 'General',
+      type: 'group',
+      avatar: '',
+      members: [createdBy],
+      adminIds: [createdBy],
+      createdAt: new Date(now),
+      updatedAt: new Date(now),
+      lastMessage: '',
+      lastMessageType: 'text',
+      lastMessageAt: new Date(now),
+      unreadCount: 0,
+      isArchived: false,
+      isPinned: false,
+      isLocked: false,
+      isMyself: true,
+    };
+
+    // Save to SQLite
+    try {
+      await this.sqliteService.createConversation(communityConvo);
+      await this.sqliteService.createConversation(announcementConvo);
+      await this.sqliteService.createConversation(generalConvo);
+    } catch (e) {
+      console.warn('SQLite conversation save failed:', e);
+    }
+
+    // Update local conversations observable
+    // const existingConvs = this._conversations$.value;
+    // this._conversations$.next([...existingConvs, communityConvo, announcementConvo, generalConvo]);
+
+    console.log(
+      `✅ Community "${communityName}" created successfully with Announcement and General groups.`
+    );
+
+    return {
+      communityId,
+      announcementGroupId,
+      generalGroupId,
+    };
+  } catch (err) {
+    console.error('Error creating community:', err);
+    throw err;
   }
+}
 
   // =====================
   // ====== QUERYING =====
@@ -2801,7 +3470,7 @@ async clearChatForUser(roomId?: string): Promise<void> {
   // ====== STATE ========
   // Forward message storage and selected message info used by UI
   // =====================
-  setForwardMessages(messages: any[]) {
+  setForwardMessages(messages: IMessage[]) {
     this.forwardMessages = messages;
   }
 

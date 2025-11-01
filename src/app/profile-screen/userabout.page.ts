@@ -1341,7 +1341,6 @@ goBackToChat() {
   }
 
  // ---- ACTION SHEET ----
-// userabout.page.ts
 
 async openActionSheet(member: any) {
   const t = this.translate;
@@ -1502,7 +1501,7 @@ async dismissAdmin(member: any) {
 
 
 
-  messageMember(member: any) {
+ async messageMember(member: any) {
     const senderId = this.authService.authData?.userId || '';
     const receiverId = member.user_id;
 
@@ -1513,6 +1512,8 @@ async dismissAdmin(member: any) {
 
     // const roomId = senderId < receiverId ? `${senderId}_${receiverId}` : `${receiverId}_${senderId}`;
     // const receiverPhone = member.phone_number || member.phone;
+
+    // await this.firebaseChatService.openChat(chat);
 
     this.router.navigate(['/chatting-screen'], {
       queryParams: {

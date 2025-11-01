@@ -45,6 +45,7 @@ export interface IMessage {
   reactions: { userId: string; emoji: string | null }[];
   replyToMsgId: string;
   isEdit: boolean;
+  isPinned? : boolean;
   isForwarded?: boolean;
   receipts?: {
     read: {
@@ -112,6 +113,7 @@ export interface IGroup {
   isArchived: boolean;
   isPinned: boolean;
   isLocked: boolean;
+  communityId?: string;
 }
 
 export interface IGroupMember {
@@ -127,6 +129,90 @@ export interface IGroupMember {
   role?: string;
   publicKeyHex?: string | null;
 }
+
+export interface ICommunityMember {
+  username: string;
+  phoneNumber: string;
+  isActive: boolean;
+  joinedAt?: number;
+  role?: 'admin' | 'member';
+}
+
+export interface ICommunity {
+  roomId: string; // community ID (e.g., "community_1234567890")
+  title: string; // community name
+  description?: string; // community description
+  avatar?: string; // community display picture URL
+  adminIds: string[]; // list of admin user IDs
+  createdBy: string; // creator user ID
+  createdAt: number | Date; // creation timestamp
+  members: Record<string, ICommunityMember>; // userId -> member details
+  groups: Record<string, boolean>; // groupId -> true (list of group IDs in community)
+  type: 'community';
+  isArchived?: boolean;
+  isPinned?: boolean;
+  isLocked?: boolean;
+  privacy?: 'public' | 'invite_only';
+  settings?: {
+    whoCanCreateGroups?: 'all' | 'admins';
+    announcementPosting?: 'all' | 'adminsOnly';
+  };
+}
+
+/**
+ * Community Chat Metadata
+ * Stored in Firebase at /userchats/{userId}/{communityId}
+ * Extends IChatMeta with community-specific fields
+ */
+export interface ICommunityChatMeta extends IChatMeta {
+  type: 'community';
+  communityGroups?: string[]; // list of group IDs in this community
+}
+
+export interface IChatMeta {
+  type: 'private' | 'group' | 'community';
+  lastmessageAt: number | string | Date;
+  lastmessageType: IMessage['type'];
+  lastmessage: string;
+  unreadCount: number | string;
+  isArchived : boolean;
+  isPinned : boolean;
+  isLocked : boolean;
+}
+// Note: Make sure IChatMeta is defined like this (if not already):
+/*
+export interface IChatMeta {
+  type: 'private' | 'group' | 'community';
+  lastmessageAt?: number | string;
+  lastmessageType?: 'text' | 'image' | 'video' | 'audio' | 'file' | 'location';
+  lastmessage?: string;
+  unreadCount?: number;
+  isArchived?: boolean;
+  isPinned?: boolean;
+  isLocked?: boolean;
+  roomId?: string;
+}
+*/
+
+// Also ensure IGroup has the communityId field for linking groups to communities:
+/*
+export interface IGroup {
+  roomId: string;
+  title: string;
+  description?: string;
+  avatar?: string;
+  adminIds: string[];
+  createdBy: string;
+  createdAt: number | Date;
+  updatedAt?: number | Date;
+  members: Record<string, IGroupMember>;
+  type: 'group';
+  isArchived?: boolean;
+  isPinned?: boolean;
+  isLocked?: boolean;
+  communityId?: string; // 👈 Add this if not present - links group to parent community
+}
+*/
 export interface IOpState {
   id: string;
   isLoading: boolean;

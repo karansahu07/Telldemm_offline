@@ -53,20 +53,6 @@ export class CommunityPage implements OnInit {
     await popover.present();
   }
 
-  // async loadUserCommunities() {
-  //   this.joinedCommunities = [];
-  //   const communityIds = await this.firebaseService.getUserCommunities(this.userId);
-
-  //   for (const id of communityIds) {
-  //     const snapshot = await this.firebaseService.getGroupInfo(id);
-  //     this.joinedCommunities.push({
-  //       id,
-  //       name: snapshot?.name || 'Unnamed Community',
-  //       icon: 'assets/images/user.jfif',
-  //     });
-  //   }
-  // }
-
  async loadUserCommunities() {
   this.joinedCommunities = [];
   const communityIds = await this.firebaseService.getUserCommunities(this.userId);
@@ -97,56 +83,6 @@ export class CommunityPage implements OnInit {
     });
   }
 }
-
-
-  // async createCommunityPrompt() {
-  //   const alert = await this.alertCtrl.create({
-  //     header: 'New Community',
-  //     inputs: [
-  //       { name: 'name', type: 'text', placeholder: 'Community Name' },
-  //       { name: 'description', type: 'text', placeholder: 'Community Description' },
-  //     ],
-  //     buttons: [
-  //       { text: 'Cancel', role: 'cancel' },
-  //       {
-  //         text: 'Create',
-  //         handler: async (data) => {
-  //           if (data.name) {
-  //             const communityId = 'community_' + Date.now();
-  //             await this.firebaseService.createCommunity(
-  //               communityId,
-  //               data.name,
-  //               data.description,
-  //               this.userId
-  //             );
-  //             await this.firebaseService.addUserToCommunity(this.userId, communityId);
-
-  //             // Create announcement group automatically
-  //             const groupId = 'group_' + Date.now();
-  //             await this.firebaseService.createGroup(
-  //               groupId,
-  //               'Announcements',
-  //               [this.userId],
-  //               communityId,
-  //               // true
-  //             );
-
-  //             this.loadUserCommunities();
-
-  //             const toast = await this.toastCtrl.create({
-  //               message: 'Community created successfully',
-  //               duration: 2000,
-  //               color: 'success',
-  //             });
-  //             toast.present();
-  //           }
-  //         },
-  //       },
-  //     ],
-  //   });
-
-  //   await alert.present();
-  // }
 
   async createCommunityPrompt() {
   // instead of showing a popup, redirect to new page
