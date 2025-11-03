@@ -50,7 +50,9 @@ export class ChatsPage implements OnInit {
     this.router.navigate(['settings', 'chats', 'theme']);
   }
   openChatTheme() {
-    this.router.navigate(['settings', 'chats', 'wallpaper']);
+    // this.router.navigate(['settings', 'chats', 'wallpaper']);
+      this.router.navigateByUrl('theme');
+
   }
   openFontSize() {
     this.router.navigate(['settings', 'chats', 'font-size']);

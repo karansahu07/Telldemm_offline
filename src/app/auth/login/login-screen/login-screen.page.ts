@@ -7,6 +7,10 @@ import { AuthService } from 'src/app/auth/auth.service';
 import { Device, DeviceInfo } from '@capacitor/device';
 import { VersionCheck } from 'src/app/services/version-check';
 import { Capacitor } from '@capacitor/core';
+import { firstValueFrom } from 'rxjs';
+import { FirebaseChatService } from 'src/app/services/firebase-chat.service';
+import { Language } from 'src/app/services/language';
+// import { Language } from '@ngx-translate/core';
 
 
 
@@ -61,7 +65,10 @@ export class LoginScreenPage {
     private authService: AuthService,
     private router: Router,
     private toastController: ToastController,
-    private versionCheck: VersionCheck
+    private versionCheck: VersionCheck,
+     private languageService: Language,
+    //  private authService: AuthService,
+  private userService: FirebaseChatService,
     // private secureStorage: SecureStorageService
   ) { }
 
@@ -219,6 +226,95 @@ export class LoginScreenPage {
 //     console.error(err);
 //   }
 // }
+// async goToHome() {
+//   if (!this.isOtpComplete()) {
+//     this.showToast('Please enter the complete 6-digit OTP.');
+//     return;
+//   }
+
+//   this.isVerifyingOtp = true;
+
+//   try {
+//     // 1️⃣ Get device info (with web fallback)
+//     let info: any;
+//     const platform = Capacitor.getPlatform();
+//     if (platform === 'web') {
+//       // Fallback for web platform
+//       info = {
+//         model: navigator.userAgent.includes('Mobile') ? 'Mobile Web' : 'Desktop Web',
+//         operatingSystem: 'Web',
+//         osVersion: 'N/A', // Or parse from navigator.userAgent if needed
+//         uuid: localStorage.getItem('device_uuid') || crypto.randomUUID()
+//       };
+//       // Persist UUID if new
+//       if (!localStorage.getItem('device_uuid')) {
+//         localStorage.setItem('device_uuid', info.uuid);
+//       }
+//     } else {
+//       info = await Device.getInfo();
+//     }
+//     //console.log('Device info:', info);
+
+//     // 2️⃣ Get current app version from VersionCheck (with web fallback)
+//     let appVersion = '00'; // Default fallback
+//     if (platform !== 'web') {
+//       try {
+//         const versionResult = await this.versionCheck.checkVersion();
+//         appVersion = versionResult.currentVersion || '00';
+//       } catch (versionErr) {
+//         console.warn('Version check failed:', versionErr);
+//         appVersion = '00';
+//       }
+//     } else {
+//       // For web, you could read from package.json or manifest.json
+//       // Example: hardcode or use a service to get it
+//       appVersion = 'web.1.0.0'; // Adjust as needed
+//     }
+//     //console.log('App version:', appVersion);
+
+//     // 3️⃣ Use persistent UUID
+//     let uuid = localStorage.getItem('device_uuid') || info.uuid || crypto.randomUUID();
+//     if (!localStorage.getItem('device_uuid')) {
+//       localStorage.setItem('device_uuid', uuid);
+//     }
+
+//     // 4️⃣ Create device payload
+//     const devicePayload = {
+//       device_uuid: uuid,
+//       device_model: info.model,
+//       os_name: info.operatingSystem,
+//       os_version: info.osVersion,
+//       app_version: appVersion
+//     };
+
+//     // 5️⃣ Prepare OTP verification payload
+//     const payload = {
+//       country_code: this.countryCode,
+//       phone_number: this.phoneNumber.trim(),
+//       otp_code: this.otpValue,
+//       device_details: [devicePayload]
+//     };
+
+//     //console.log('📨 Verifying OTP payload:', payload);
+
+//     // 6️⃣ Call backend API
+//     const result = await this.authService.verifyOtp(payload);
+//     this.isVerifyingOtp = false;
+
+//     if (result.success) {
+//       this.showToast('Login successful!', 'success');
+//       this.router.navigateByUrl('/profile-setup', { replaceUrl: true });
+//     } else {
+//       this.showToast(result.message || 'Invalid OTP', 'danger');
+//     }
+//   } catch (err) {
+//     this.isVerifyingOtp = false;
+//     console.error('Error in goToHome:', err); // Enhanced logging
+//     this.showToast('Verification failed. Please try again.', 'danger');
+//   }
+// }
+
+// -------------------- goToHome() method --------------------
 async goToHome() {
   if (!this.isOtpComplete()) {
     this.showToast('Please enter the complete 6-digit OTP.');
@@ -228,84 +324,138 @@ async goToHome() {
   this.isVerifyingOtp = true;
 
   try {
-    // 1️⃣ Get device info (with web fallback)
+    // 1️⃣ Device info (web fallback)
     let info: any;
     const platform = Capacitor.getPlatform();
     if (platform === 'web') {
-      // Fallback for web platform
       info = {
         model: navigator.userAgent.includes('Mobile') ? 'Mobile Web' : 'Desktop Web',
         operatingSystem: 'Web',
-        osVersion: 'N/A', // Or parse from navigator.userAgent if needed
+        osVersion: 'N/A',
         uuid: localStorage.getItem('device_uuid') || crypto.randomUUID()
       };
-      // Persist UUID if new
       if (!localStorage.getItem('device_uuid')) {
         localStorage.setItem('device_uuid', info.uuid);
       }
     } else {
-      info = await Device.getInfo();
+      // If your project supports default import: const dev = await Device.getInfo();
+      // Some setups require Device.getInfo() from '@capacitor/device'
+      info = await (Device as any).getInfo(); // cast if needed
     }
-    //console.log('Device info:', info);
 
-    // 2️⃣ Get current app version from VersionCheck (with web fallback)
-    let appVersion = '00'; // Default fallback
+    // 2️⃣ App version (fallback for web)
+    let appVersion = '00';
     if (platform !== 'web') {
       try {
-        const versionResult = await this.versionCheck.checkVersion();
-        appVersion = versionResult.currentVersion || '00';
+        const versionResult: any = await this.versionCheck.checkVersion();
+        appVersion = versionResult?.currentVersion || '00';
       } catch (versionErr) {
         console.warn('Version check failed:', versionErr);
         appVersion = '00';
       }
     } else {
-      // For web, you could read from package.json or manifest.json
-      // Example: hardcode or use a service to get it
-      appVersion = 'web.1.0.0'; // Adjust as needed
+      appVersion = 'web.1.0.0';
     }
-    //console.log('App version:', appVersion);
 
-    // 3️⃣ Use persistent UUID
-    let uuid = localStorage.getItem('device_uuid') || info.uuid || crypto.randomUUID();
+    // 3️⃣ Ensure persistent UUID
+    let uuid = localStorage.getItem('device_uuid') || info?.uuid || crypto.randomUUID();
     if (!localStorage.getItem('device_uuid')) {
       localStorage.setItem('device_uuid', uuid);
     }
 
-    // 4️⃣ Create device payload
+    // 4️⃣ Device payload
     const devicePayload = {
       device_uuid: uuid,
-      device_model: info.model,
-      os_name: info.operatingSystem,
-      os_version: info.osVersion,
+      device_model: info?.model || 'Unknown',
+      os_name: info?.operatingSystem || info?.os || 'Unknown',
+      os_version: info?.osVersion || info?.osVersion || 'Unknown',
       app_version: appVersion
     };
 
-    // 5️⃣ Prepare OTP verification payload
+    // 5️⃣ OTP payload
     const payload = {
       country_code: this.countryCode,
-      phone_number: this.phoneNumber.trim(),
+      phone_number: this.phoneNumber?.trim(),
       otp_code: this.otpValue,
       device_details: [devicePayload]
     };
 
-    //console.log('📨 Verifying OTP payload:', payload);
-
-    // 6️⃣ Call backend API
-    const result = await this.authService.verifyOtp(payload);
+    // 6️⃣ Call backend API to verify OTP
+    const result: any = await this.authService.verifyOtp(payload);
     this.isVerifyingOtp = false;
 
-    if (result.success) {
+    if (result?.success) {
       this.showToast('Login successful!', 'success');
-      this.router.navigateByUrl('/profile-setup', { replaceUrl: true });
+
+      // -----------------------------
+      // Get & apply user's language
+      // -----------------------------
+      try {
+        // Get userId from authService (ensure authData is populated after verifyOtp)
+        const userId = Number(this.authService.authData?.userId || 0);
+        if (userId > 0) {
+          const res = await firstValueFrom(this.userService.getUserLanguage(userId));
+          if (res?.language) {
+            const normalized = this._normalizeLanguageCode(res.language);
+
+            // Save to same key used by Language service
+            try { localStorage.setItem('app_language', normalized); } catch (e) { /* ignore */ }
+
+            // Apply via Language service (handles translate.use + RTL)
+            await this.languageService.useLanguage(normalized);
+          } else {
+            console.warn('No language returned from API for user', userId);
+          }
+        } else {
+          console.warn('No userId available after OTP verification');
+        }
+      } catch (langErr) {
+        console.warn('getUserLanguage failed:', langErr);
+      }
+
+      // Navigate after language applied
+      await this.router.navigateByUrl('/profile-setup', { replaceUrl: true });
     } else {
-      this.showToast(result.message || 'Invalid OTP', 'danger');
+      this.showToast(result?.message || 'Invalid OTP', 'danger');
     }
   } catch (err) {
     this.isVerifyingOtp = false;
-    console.error('Error in goToHome:', err); // Enhanced logging
+    console.error('Error in goToHome:', err);
     this.showToast('Verification failed. Please try again.', 'danger');
   }
 }
+// ----------------------------------------------------------------------
 
+
+// -------------------- helper: normalize language code --------------------
+private _normalizeLanguageCode(code: string): string {
+  if (!code) return 'en-GB';
+  const c = code.trim().toLowerCase();
+
+  const map: Record<string, string> = {
+    en: 'en-GB',
+    hi: 'hi-IN',
+    ur: 'ur-PK',
+    pa: 'pa-IN',
+    gu: 'gu-IN',
+    ta: 'ta-IN',
+    te: 'te-IN',
+    mr: 'mr-IN',
+    bn: 'bn-BD',
+    ar: 'ar-EG'
+  };
+
+  if (map[c]) return map[c];
+
+  // If API sent a locale like 'hi-IN', try to match casing with available codes
+  if (c.includes('-')) {
+    const avail = this.languageService.getAvailableLanguageCodes();
+    const match = avail.find(l => l.toLowerCase() === c);
+    if (match) return match;
+    return code; // let language service handle fallback
+  }
+
+  return 'en-GB';
+}
 
 }
