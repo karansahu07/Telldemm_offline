@@ -75,7 +75,7 @@
         </p>
       </ion-label>
 
-      <ion-button fill="clear" slot="end" (click)="removeGroupFromCommunity(g.id)"
+      <ion-button fill="clear" slot="end" (click)="removeGroupFromCommunity(g.id, g.name)"
                   [attr.aria-label]="'community.manageGroups.remove.aria' | translate">
         <ion-icon name="close-outline" color="dark"></ion-icon>
       </ion-button>

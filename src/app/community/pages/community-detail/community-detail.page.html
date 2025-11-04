@@ -13,29 +13,24 @@
 
   <!-- Community Info -->
   <div class="community-header" *ngIf="community">
-    <!-- <ion-avatar class="community-icon">
-      <img [src]="community.icon || 'assets/images/multiple-users-silhouette (1).png'" />
-    </ion-avatar> -->
-
     <ion-avatar class="community-icon">
-  <svg viewBox="0 0 48 48" aria-label="Communities" role="img">
-    <!-- Background circle (uses CSS var for color) -->
-    <circle cx="24" cy="24" r="22" class="bg"/>
-    <!-- Central person -->
-    <circle cx="24" cy="19.5" r="5" class="fg"/>
-    <path class="fg" d="M14 34c0-5.5 6-9 10-9s10 3.5 10 9v2H14v-2z"/>
-    <!-- Left person -->
-    <circle cx="13.5" cy="22.5" r="3" class="fg"/>
-    <path class="fg" d="M8 34c0-3.6 3.3-6 6.5-6 1.3 0 2.5.3 3.5.8-2.7 1.6-4 3.6-4 6.2v1.0H8V34z"/>
-    <!-- Right person -->
-    <circle cx="34.5" cy="22.5" r="3" class="fg"/>
-    <path class="fg" d="M40 34c0-3.6-3.3-6-6.5-6-1.3 0-2.5.3-3.5.8 2.7 1.6 4 3.6 4 6.2v1.0H40V34z"/>
-  </svg>
-</ion-avatar>
-
+      <svg viewBox="0 0 48 48" aria-label="Communities" role="img">
+        <!-- Background circle (uses CSS var for color) -->
+        <circle cx="24" cy="24" r="22" class="bg"/>
+        <!-- Central person -->
+        <circle cx="24" cy="19.5" r="5" class="fg"/>
+        <path class="fg" d="M14 34c0-5.5 6-9 10-9s10 3.5 10 9v2H14v-2z"/>
+        <!-- Left person -->
+        <circle cx="13.5" cy="22.5" r="3" class="fg"/>
+        <path class="fg" d="M8 34c0-3.6 3.3-6 6.5-6 1.3 0 2.5.3 3.5.8-2.7 1.6-4 3.6-4 6.2v1.0H8V34z"/>
+        <!-- Right person -->
+        <circle cx="34.5" cy="22.5" r="3" class="fg"/>
+        <path class="fg" d="M40 34c0-3.6-3.3-6-6.5-6-1.3 0-2.5.3-3.5.8 2.7 1.6 4 3.6 4 6.2v1.0H40V34z"/>
+      </svg>
+    </ion-avatar>
 
     <div class="community-info">
-      <h2>{{ community.name }}</h2>
+      <h2>{{ community.title || community.name }}</h2>
       <p>Community · {{ memberCount }} members · {{ groupCount }} groups</p>
     </div>
   </div>
@@ -43,50 +38,91 @@
 
 <ion-content>
   <ion-list *ngIf="loading === false">
-    <!-- Announcement card -->
-    <ion-item *ngIf="announcementGroup" lines="full" button (click)="openGroupChat(announcementGroup.id)">
-      <ion-avatar class="band">
+    <!-- Announcement Group -->
+    <ion-item 
+      *ngIf="announcementGroup" 
+      lines="full" 
+      button 
+      (click)="openAnnouncementChat()">
+      <ion-avatar slot="start" class="band announcement-avatar">
         <ion-icon name="megaphone-outline"></ion-icon>
       </ion-avatar>
       <ion-label class="community">
-        <h3>{{ announcementGroup.name }}</h3>
-        <p>{{ announcementGroup.lastMessage?.text || 'No announcements yet' }}</p>
+        <h3>{{ announcementGroup.name || announcementGroup.title }}</h3>
+        <p>{{ announcementGroup.description || 'Important announcements' }}</p>
       </ion-label>
-      <ion-note slot="end">{{ announcementGroup.lastMessage?.time || '' }}</ion-note>
+      <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
     </ion-item>
 
+    <!-- General Group -->
+    <ion-item 
+      *ngIf="generalGroup" 
+      lines="full" 
+      button 
+      (click)="openGeneralChat()">
+      <ion-avatar slot="start" class="band general-avatar">
+        <ion-icon name="chatbubbles-outline"></ion-icon>
+      </ion-avatar>
+      <ion-label class="community">
+        <h3>{{ generalGroup.name || generalGroup.title }}</h3>
+        <p>{{ generalGroup.description || 'General discussion' }}</p>
+      </ion-label>
+      <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+    </ion-item>
+
+    <!-- Divider if there are system groups -->
+    <!-- <ion-item-divider *ngIf="(announcementGroup || generalGroup) && (groupsIn.length > 0 || groupsAvailable.length > 0)">
+      <ion-label>Other Groups</ion-label>
+    </ion-item-divider> -->
+
     <!-- Groups you're in -->
-    <ion-list *ngIf="groupsIn && groupsIn.length > 0">
-      <ion-list-header>Groups you're in</ion-list-header>
-      <ion-item *ngFor="let g of groupsIn" button (click)="openGroupChat(g.id, g.name)">
-        <ion-avatar class="band">
-          <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+    <div *ngIf="groupsIn && groupsIn.length > 0">
+      <ion-list-header>
+        <ion-label>Groups you're in</ion-label>
+      </ion-list-header>
+      <ion-item 
+        *ngFor="let g of groupsIn" 
+        button 
+        (click)="openGroupChat(g.id, g.name)">
+        <ion-avatar slot="start" class="band group-avatar">
+          <ion-icon name="people-outline"></ion-icon>
         </ion-avatar>
         <ion-label class="community">
-          <h3>{{ g.name }}</h3>
-          <p>{{ g.membersCount }} members</p>
+          <h3>{{ g.name || g.title }}</h3>
+          <p>{{ g.membersCount }} member{{ g.membersCount !== 1 ? 's' : '' }}</p>
         </ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
       </ion-item>
-    </ion-list>
+    </div>
 
     <!-- Groups you can join -->
-    <ion-list *ngIf="groupsAvailable && groupsAvailable.length > 0">
-      <ion-list-header>Groups you can join</ion-list-header>
-      <ion-item *ngFor="let g of groupsAvailable" button (click)="openGroupPreview(g)">
-        <ion-avatar class="band">
-          <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+    <div *ngIf="groupsAvailable && groupsAvailable.length > 0">
+      <ion-list-header>
+        <ion-label>Groups you can join</ion-label>
+      </ion-list-header>
+      <ion-item 
+        *ngFor="let g of groupsAvailable" 
+        button 
+        (click)="openGroupPreview(g)">
+        <ion-avatar slot="start" class="band available-group-avatar">
+          <ion-icon name="add-circle-outline"></ion-icon>
         </ion-avatar>
         <ion-label class="community">
-          <h3>{{ g.name }}</h3>
-          <p>Tap to view & join</p>
+          <h3>{{ g.name || g.title }}</h3>
+          <p>{{ g.membersCount }} member{{ g.membersCount !== 1 ? 's' : '' }} · Tap to view & join</p>
         </ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
       </ion-item>
-    </ion-list>
+    </div>
 
     <!-- Empty state -->
-    <div class="empty-text" *ngIf="!announcementGroup && (!groupsIn || groupsIn.length === 0) && (!groupsAvailable || groupsAvailable.length === 0)">
+    <div 
+      class="empty-text" 
+      *ngIf="!loading && !announcementGroup && !generalGroup && (!groupsIn || groupsIn.length === 0) && (!groupsAvailable || groupsAvailable.length === 0)">
+      <ion-icon name="chatbubbles-outline" class="empty-icon"></ion-icon>
+      <h3>No groups yet</h3>
       <p>
-        Other groups added to the community will appear here.<br />
+        Groups added to this community will appear here.<br />
         Community members can join these groups.
       </p>
     </div>
@@ -94,7 +130,7 @@
 
   <!-- Skeleton Loader -->
   <ion-list *ngIf="loading === true">
-    <ion-item *ngFor="let i of [1,2,3,4]">
+    <ion-item *ngFor="let i of [1,2,3,4,5]">
       <ion-avatar slot="start">
         <ion-skeleton-text animated style="width:40px; height:40px; border-radius:50%;"></ion-skeleton-text>
       </ion-avatar>
@@ -113,7 +149,11 @@
 <!-- Footer Button -->
 <ion-footer>
   <ion-toolbar>
-    <ion-button expand="block" shape="round" class="add-btn" (click)="goToaddgroupcommunity()">
+    <ion-button 
+      expand="block" 
+      shape="round" 
+      class="add-btn" 
+      (click)="goToaddgroupcommunity()">
       <ion-icon name="add" slot="start"></ion-icon>
       Add group
     </ion-button>

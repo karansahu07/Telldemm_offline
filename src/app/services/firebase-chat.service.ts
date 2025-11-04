@@ -2039,8 +2039,9 @@ getPresenceObservable(): Observable<Map<string, MemberPresence>> {
       ...message,
       status: 'sent',
       roomId,
+      ...(attachment ? { attachment } : {}),
       text: msg.text, // store plaintext (for SQLite local view)
-      translations: translations || undefined, // ✅ include translation data if available
+      translations: translations || undefined,
       receipts: {
         read: {
           status: false,
@@ -2478,102 +2479,6 @@ async getAdminCheckDetails(groupId: string, currentUserId: string, targetUserId:
   }
 }
 
-  // async createCommunity(
-  //   communityId: string,
-  //   name: string,
-  //   description: string,
-  //   createdBy: string
-  // ): Promise<void> {
-  //   try {
-  //     const rawDb = getDatabase();
-  //     const now = Date.now();
-  //     const annGroupId = `comm_group_${now}_ann`;
-  //     const generalGroupId = `comm_group_${now}_gen`;
-
-  //     let creatorProfile: { name?: string; phone_number?: string } = {};
-  //     try {
-  //       const userSnap = await get(ref(rawDb, `users/${createdBy}`));
-  //       if (userSnap.exists()) {
-  //         const u = userSnap.val();
-  //         creatorProfile.name = u.name || u.fullName || u.displayName || '';
-  //         creatorProfile.phone_number =
-  //           u.phone_number || u.mobile || u.phone || '';
-  //       }
-  //     } catch (err) {
-  //       console.warn(
-  //         'Failed to fetch creator profile, proceeding with fallback values',
-  //         err
-  //       );
-  //     }
-
-  //     const memberDetails = {
-  //       name: creatorProfile.name || '',
-  //       phone_number: creatorProfile.phone_number || '',
-  //       role: 'admin',
-  //       status: 'active',
-  //       joinedAt: now,
-  //     };
-
-  //     const communityObj: any = {
-  //       id: communityId,
-  //       name,
-  //       description: description || '',
-  //       icon: '',
-  //       createdBy,
-  //       createdByName: creatorProfile.name,
-  //       createdAt: now,
-  //       privacy: 'invite_only',
-  //       settings: {
-  //         whoCanCreateGroups: 'admins',
-  //         announcementPosting: 'adminsOnly',
-  //       },
-  //       admins: { [createdBy]: true },
-  //       membersCount: 0,
-  //       groups: { [annGroupId]: true, [generalGroupId]: true },
-  //       members: { [createdBy]: memberDetails },
-  //     };
-
-  //     const annGroupObj = {
-  //       id: annGroupId,
-  //       name: 'Announcements',
-  //       type: 'announcement',
-  //       communityId: communityId,
-  //       createdBy,
-  //       createdByName: creatorProfile.name,
-  //       createdAt: now,
-  //       admins: { [createdBy]: true },
-  //       members: { [createdBy]: memberDetails },
-  //       membersCount: 0,
-  //     };
-
-  //     const genGroupObj = {
-  //       id: generalGroupId,
-  //       name: 'General',
-  //       type: 'general',
-  //       communityId: communityId,
-  //       createdBy,
-  //       createdByName: creatorProfile.name,
-  //       createdAt: now,
-  //       admins: { [createdBy]: true },
-  //       members: { [createdBy]: memberDetails },
-  //       membersCount: 0,
-  //     };
-
-  //     const updates: any = {};
-  //     updates[`/communities/${communityId}`] = communityObj;
-  //     updates[`/groups/${annGroupId}`] = annGroupObj;
-  //     updates[`/groups/${generalGroupId}`] = genGroupObj;
-  //     updates[
-  //       `/usersInCommunity/${createdBy}/joinedCommunities/${communityId}`
-  //     ] = true;
-
-  //     await update(ref(rawDb), updates);
-  //   } catch (err) {
-  //     console.error('createCommunity error', err);
-  //     throw err;
-  //   }
-  // }
-
 async createCommunity({
   communityId,
   communityName,
@@ -2842,6 +2747,1030 @@ async createCommunity({
     console.error('Error creating community:', err);
     throw err;
   }
+}
+
+/**
+ * Get community details by ID
+ */
+async getCommunityDetails(communityId: string): Promise<any | null> {
+  try {
+    if (!communityId) return null;
+    
+    const communityRef = rtdbRef(this.db, `communities/${communityId}`);
+    const snapshot = await rtdbGet(communityRef);
+    
+    if (!snapshot.exists()) {
+      console.warn(`Community ${communityId} not found`);
+      return null;
+    }
+    
+    return snapshot.val();
+  } catch (error) {
+    console.error('getCommunityDetails error:', error);
+    return null;
+  }
+}
+
+/**
+ * Get all groups in a community with full details
+ */
+async getCommunityGroupsWithDetails(communityId: string, currentUserId?: string): Promise<{
+  announcementGroup: any | null;
+  generalGroup: any | null;
+  otherGroups: any[];
+  memberGroups: any[];
+  availableGroups: any[];
+}> {
+  try {
+    if (!communityId) {
+      return {
+        announcementGroup: null,
+        generalGroup: null,
+        otherGroups: [],
+        memberGroups: [],
+        availableGroups: []
+      };
+    }
+
+    // Get community data to fetch group IDs
+    const communityRef = rtdbRef(this.db, `communities/${communityId}`);
+    const commSnap = await rtdbGet(communityRef);
+    
+    if (!commSnap.exists()) {
+      return {
+        announcementGroup: null,
+        generalGroup: null,
+        otherGroups: [],
+        memberGroups: [],
+        availableGroups: []
+      };
+    }
+    
+    const communityData = commSnap.val();
+    const groupsObj = communityData.groups || {};
+    const groupIds = Object.keys(groupsObj);
+
+    let announcementGroup: any = null;
+    let generalGroup: any = null;
+    const otherGroups: any[] = [];
+    const memberGroups: any[] = [];
+    const availableGroups: any[] = [];
+
+    // Fetch each group's details
+    for (const groupId of groupIds) {
+      try {
+        const groupRef = rtdbRef(this.db, `groups/${groupId}`);
+        const groupSnap = await rtdbGet(groupRef);
+        
+        if (!groupSnap.exists()) continue;
+        
+        const groupData = groupSnap.val();
+        
+        const groupObj = {
+          id: groupId,
+          roomId: groupId,
+          name: groupData.title || groupData.name || 'Unnamed group',
+          title: groupData.title || groupData.name || 'Unnamed group',
+          type: groupData.type || 'group',
+          description: groupData.description || '',
+          avatar: groupData.avatar || '',
+          membersCount: groupData.members 
+            ? Object.keys(groupData.members).length 
+            : 0,
+          members: groupData.members || {},
+          createdBy: groupData.createdBy || '',
+          createdAt: groupData.createdAt || Date.now(),
+          adminIds: groupData.adminIds || [],
+          communityId: groupData.communityId || communityId
+        };
+
+        // Check if current user is a member
+        const isMember = currentUserId && groupObj.members
+          ? Object.prototype.hasOwnProperty.call(groupObj.members, currentUserId)
+          : false;
+
+        // Categorize groups
+        if (groupData.title === 'Announcements') {
+          announcementGroup = groupObj;
+        } else if (groupData.title === 'General') {
+          generalGroup = groupObj;
+        } else {
+          otherGroups.push(groupObj);
+          
+          if (isMember) {
+            memberGroups.push(groupObj);
+          } else {
+            availableGroups.push(groupObj);
+          }
+        }
+      } catch (err) {
+        console.error(`Error fetching group ${groupId}:`, err);
+      }
+    }
+
+    // Sort groups alphabetically
+    otherGroups.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    memberGroups.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    availableGroups.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+
+    return {
+      announcementGroup,
+      generalGroup,
+      otherGroups,
+      memberGroups,
+      availableGroups
+    };
+  } catch (error) {
+    console.error('getCommunityGroupsWithDetails error:', error);
+    return {
+      announcementGroup: null,
+      generalGroup: null,
+      otherGroups: [],
+      memberGroups: [],
+      availableGroups: []
+    };
+  }
+}
+
+/**
+ * Join a group in community
+ */
+async joinCommunityGroup(groupId: string, userId: string, userData: {
+  username: string;
+  phoneNumber: string;
+}): Promise<{ success: boolean; message: string; groupName?: string }> {
+  try {
+    if (!groupId || !userId) {
+      return { success: false, message: 'Invalid group ID or user ID' };
+    }
+
+    const groupRef = rtdbRef(this.db, `groups/${groupId}`);
+    const groupSnap = await rtdbGet(groupRef);
+    
+    if (!groupSnap.exists()) {
+      return { success: false, message: 'Group not found' };
+    }
+    
+    const groupData = groupSnap.val();
+
+    // Check if already a member
+    if (groupData.members && 
+        Object.prototype.hasOwnProperty.call(groupData.members, userId)) {
+      return { 
+        success: false, 
+        message: 'You are already a member',
+        groupName: groupData.title || groupData.name 
+      };
+    }
+
+    // Prepare member details
+    const memberDetails = {
+      username: userData.username || '',
+      phoneNumber: userData.phoneNumber || '',
+      isActive: true
+    };
+
+    const updates: Record<string, any> = {};
+    
+    // Add member to group
+    updates[`/groups/${groupId}/members/${userId}`] = memberDetails;
+
+    // Add group to user's chat list
+    updates[`/userchats/${userId}/${groupId}`] = {
+      type: 'group',
+      lastmessageAt: Date.now(),
+      lastmessageType: 'text',
+      lastmessage: '',
+      unreadCount: 0,
+      isArchived: false,
+      isPinned: false,
+      isLocked: false
+    };
+
+    await rtdbUpdate(rtdbRef(this.db, '/'), updates);
+
+    return { 
+      success: true, 
+      message: 'Successfully joined group',
+      groupName: groupData.title || groupData.name 
+    };
+  } catch (error) {
+    console.error('joinCommunityGroup error:', error);
+    return { 
+      success: false, 
+      message: 'Failed to join group. Please try again.' 
+    };
+  }
+}
+
+/**
+ * Leave a community group
+ */
+async leaveCommunityGroup(groupId: string, userId: string): Promise<{ success: boolean; message: string }> {
+  try {
+    if (!groupId || !userId) {
+      return { success: false, message: 'Invalid group ID or user ID' };
+    }
+
+    const groupRef = rtdbRef(this.db, `groups/${groupId}`);
+    const groupSnap = await rtdbGet(groupRef);
+    
+    if (!groupSnap.exists()) {
+      return { success: false, message: 'Group not found' };
+    }
+    
+    const groupData = groupSnap.val();
+    const memberData = groupData.members?.[userId];
+
+    if (!memberData) {
+      return { success: false, message: 'You are not a member of this group' };
+    }
+
+    const updates: Record<string, any> = {};
+    
+    // Remove member from group
+    updates[`/groups/${groupId}/members/${userId}`] = null;
+
+    // Add to past members
+    updates[`/groups/${groupId}/pastmembers/${userId}`] = {
+      ...memberData,
+      removedAt: new Date().toISOString()
+    };
+
+    // Remove from user's chat list
+    updates[`/userchats/${userId}/${groupId}`] = null;
+
+    await rtdbUpdate(rtdbRef(this.db, '/'), updates);
+
+    return { success: true, message: 'Successfully left group' };
+  } catch (error) {
+    console.error('leaveCommunityGroup error:', error);
+    return { success: false, message: 'Failed to leave group. Please try again.' };
+  }
+}
+
+/**
+ * Check if user is member of a community
+ */
+async isUserCommunityMember(communityId: string, userId: string): Promise<boolean> {
+  try {
+    if (!communityId || !userId) return false;
+
+    const memberRef = rtdbRef(this.db, `communities/${communityId}/members/${userId}`);
+    const snapshot = await rtdbGet(memberRef);
+    
+    return snapshot.exists();
+  } catch (error) {
+    console.error('isUserCommunityMember error:', error);
+    return false;
+  }
+}
+
+/**
+ * Get community member count
+ */
+async getCommunityMemberCount(communityId: string): Promise<number> {
+  try {
+    if (!communityId) return 0;
+
+    const membersRef = rtdbRef(this.db, `communities/${communityId}/members`);
+    const snapshot = await rtdbGet(membersRef);
+    
+    if (!snapshot.exists()) return 0;
+    
+    const members = snapshot.val();
+    return Object.keys(members).length;
+  } catch (error) {
+    console.error('getCommunityMemberCount error:', error);
+    return 0;
+  }
+}
+
+/**
+ * Check if user is admin of a community
+ */
+async isUserCommunityAdmin(communityId: string, userId: string): Promise<boolean> {
+  try {
+    if (!communityId || !userId) return false;
+
+    const adminIdsRef = rtdbRef(this.db, `communities/${communityId}/adminIds`);
+    const snapshot = await rtdbGet(adminIdsRef);
+    
+    if (!snapshot.exists()) return false;
+    
+    const adminIds: string[] = snapshot.val() || [];
+    return adminIds.includes(String(userId));
+  } catch (error) {
+    console.error('isUserCommunityAdmin error:', error);
+    return false;
+  }
+}
+
+/**
+ * Add group to community
+ */
+async addGroupToCommunity(communityId: string, groupId: string): Promise<{ success: boolean; message: string }> {
+  try {
+    if (!communityId || !groupId) {
+      return { success: false, message: 'Invalid community ID or group ID' };
+    }
+
+    const updates: Record<string, any> = {};
+    
+    // Add group to community's groups list
+    updates[`/communities/${communityId}/groups/${groupId}`] = true;
+    
+    // Link community to group
+    updates[`/groups/${groupId}/communityId`] = communityId;
+
+    await rtdbUpdate(rtdbRef(this.db, '/'), updates);
+
+    return { success: true, message: 'Group added to community successfully' };
+  } catch (error) {
+    console.error('addGroupToCommunity error:', error);
+    return { success: false, message: 'Failed to add group to community' };
+  }
+}
+
+/**
+ * Remove group from community
+ */
+async removeGroupFromCommunity(communityId: string, groupId: string): Promise<{ success: boolean; message: string }> {
+  try {
+    if (!communityId || !groupId) {
+      return { success: false, message: 'Invalid community ID or group ID' };
+    }
+
+    const updates: Record<string, any> = {};
+    
+    // Remove group from community's groups list
+    updates[`/communities/${communityId}/groups/${groupId}`] = null;
+    
+    // Remove community link from group
+    updates[`/groups/${groupId}/communityId`] = null;
+
+    await rtdbUpdate(rtdbRef(this.db, '/'), updates);
+
+    return { success: true, message: 'Group removed from community successfully' };
+  } catch (error) {
+    console.error('removeGroupFromCommunity error:', error);
+    return { success: false, message: 'Failed to remove group from community' };
+  }
+}
+
+/**
+ * Get community announcement group
+ */
+async getCommunityAnnouncementGroup(communityId: string): Promise<any | null> {
+  try {
+    if (!communityId) return null;
+
+    const { announcementGroup } = await this.getCommunityGroupsWithDetails(communityId);
+    return announcementGroup;
+  } catch (error) {
+    console.error('getCommunityAnnouncementGroup error:', error);
+    return null;
+  }
+}
+
+/**
+ * Get community general group
+ */
+async getCommunityGeneralGroup(communityId: string): Promise<any | null> {
+  try {
+    if (!communityId) return null;
+
+    const { generalGroup } = await this.getCommunityGroupsWithDetails(communityId);
+    return generalGroup;
+  } catch (error) {
+    console.error('getCommunityGeneralGroup error:', error);
+    return null;
+  }
+}
+
+
+// Add these functions to your FirebaseChatService class
+
+/**
+ * Get all groups in a community (simple list with basic info)
+ */
+async getCommunityGroupsList(communityId: string): Promise<Array<{
+  id: string;
+  name: string;
+  title: string;
+  type: string;
+  membersCount: number;
+  isSystemGroup: boolean;
+}>> {
+  try {
+    if (!communityId) return [];
+
+    const communityRef = rtdbRef(this.db, `communities/${communityId}`);
+    const commSnap = await rtdbGet(communityRef);
+    
+    if (!commSnap.exists()) return [];
+    
+    const communityData = commSnap.val();
+    const groupsObj = communityData.groups || {};
+    const groupIds = Object.keys(groupsObj);
+    
+    const groups: Array<{
+      id: string;
+      name: string;
+      title: string;
+      type: string;
+      membersCount: number;
+      isSystemGroup: boolean;
+    }> = [];
+
+    for (const groupId of groupIds) {
+      try {
+        const groupRef = rtdbRef(this.db, `groups/${groupId}`);
+        const groupSnap = await rtdbGet(groupRef);
+        
+        if (!groupSnap.exists()) continue;
+        
+        const groupData = groupSnap.val();
+        const title = groupData.title || groupData.name || 'Unnamed group';
+        const type = groupData.type || 'group';
+        
+        // Check if it's a system group (Announcements or General)
+        const isSystemGroup = title === 'Announcements' || title === 'General';
+        
+        groups.push({
+          id: groupId,
+          name: title,
+          title: title,
+          type: type,
+          membersCount: groupData.members 
+            ? Object.keys(groupData.members).length 
+            : 0,
+          isSystemGroup: isSystemGroup
+        });
+      } catch (err) {
+        console.error(`Error fetching group ${groupId}:`, err);
+      }
+    }
+
+    // Sort: system groups first, then alphabetically
+    groups.sort((a, b) => {
+      if (a.isSystemGroup && !b.isSystemGroup) return -1;
+      if (!a.isSystemGroup && b.isSystemGroup) return 1;
+      return a.name.localeCompare(b.name);
+    });
+
+    return groups;
+  } catch (error) {
+    console.error('getCommunityGroupsList error:', error);
+    return [];
+  }
+}
+
+/**
+ * Remove a group from community
+ */
+async removeGroupFromCommunitys(
+  communityId: string, 
+  groupId: string, 
+  options: {
+    removeMembers: boolean;
+    currentUserId?: string;
+  }
+): Promise<{ success: boolean; message: string; removedMembersCount?: number }> {
+  try {
+    if (!communityId || !groupId) {
+      return { success: false, message: 'Invalid community ID or group ID' };
+    }
+
+    const updates: Record<string, any> = {};
+
+    // 1. Unlink group from community
+    updates[`/communities/${communityId}/groups/${groupId}`] = null;
+    updates[`/groups/${groupId}/communityId`] = null;
+
+    // 2. Get community info
+    const communityRef = rtdbRef(this.db, `communities/${communityId}`);
+    const commSnap = await rtdbGet(communityRef);
+    const communityData = commSnap.exists() ? commSnap.val() : null;
+    const commCreatedBy = communityData?.createdBy || null;
+    const existingCommMembers = communityData?.members || {};
+
+    // 3. Get all groups in community (remaining after removal)
+    const allGroupIds = Object.keys(communityData?.groups || {});
+    const remainingGroupIds = allGroupIds.filter(gid => gid !== groupId);
+
+    // 4. Get members from remaining groups
+    const remainingMembersSet = new Set<string>();
+    for (const gid of remainingGroupIds) {
+      try {
+        const gRef = rtdbRef(this.db, `groups/${gid}`);
+        const gSnap = await rtdbGet(gRef);
+        if (gSnap.exists()) {
+          const gData = gSnap.val();
+          const members = gData.members || {};
+          Object.keys(members).forEach(uid => {
+            if (uid) remainingMembersSet.add(uid);
+          });
+        }
+      } catch (err) {
+        console.warn(`Failed to load group ${gid}:`, err);
+      }
+    }
+
+    // 5. Get members from the group being removed
+    const removedGroupRef = rtdbRef(this.db, `groups/${groupId}`);
+    const removedGroupSnap = await rtdbGet(removedGroupRef);
+    const removedGroupData = removedGroupSnap.exists() ? removedGroupSnap.val() : null;
+    const removedGroupMembers = removedGroupData?.members || {};
+    const removedGroupMemberIds = Object.keys(removedGroupMembers);
+
+    let removedMembersCount = 0;
+
+    if (options.removeMembers) {
+      // Remove members who are ONLY in the removed group (not in other groups)
+      const membersToRemove: string[] = [];
+      
+      for (const uid of removedGroupMemberIds) {
+        // Skip community creator
+        if (uid === commCreatedBy) continue;
+        
+        // If member is not in any remaining group, remove from community
+        if (!remainingMembersSet.has(uid)) {
+          membersToRemove.push(uid);
+        }
+      }
+
+      // Remove these members from community
+      for (const uid of membersToRemove) {
+        updates[`/communities/${communityId}/members/${uid}`] = null;
+        updates[`/userchats/${uid}/${communityId}`] = null;
+        removedMembersCount++;
+      }
+
+      // Remove from the specific group being removed
+      for (const uid of membersToRemove) {
+        updates[`/groups/${groupId}/members/${uid}`] = null;
+        updates[`/userchats/${uid}/${groupId}`] = null;
+      }
+
+      // Find and update announcement group
+      const announcementGroupId = await this.findCommunityAnnouncementGroupId(communityId);
+      if (announcementGroupId) {
+        for (const uid of membersToRemove) {
+          updates[`/groups/${announcementGroupId}/members/${uid}`] = null;
+          updates[`/userchats/${uid}/${announcementGroupId}`] = null;
+        }
+      }
+
+      // Find and update general group
+      const generalGroupId = await this.findCommunityGeneralGroupId(communityId);
+      if (generalGroupId) {
+        for (const uid of membersToRemove) {
+          updates[`/groups/${generalGroupId}/members/${uid}`] = null;
+          updates[`/userchats/${uid}/${generalGroupId}`] = null;
+        }
+      }
+
+      // Update community member count
+      const newMemberCount = Math.max(0, Object.keys(existingCommMembers).length - removedMembersCount);
+      updates[`/communities/${communityId}/membersCount`] = newMemberCount;
+    } else {
+      // Keep all members, just unlink the group
+      // Members stay in community and in remaining groups
+      remainingMembersSet.forEach(uid => {
+        updates[`/communities/${communityId}/members/${uid}`] = 
+          existingCommMembers[uid] || { isActive: true };
+      });
+    }
+
+    // Apply all updates
+    await rtdbUpdate(rtdbRef(this.db, '/'), updates);
+
+    return {
+      success: true,
+      message: 'Group removed from community successfully',
+      removedMembersCount
+    };
+  } catch (error) {
+    console.error('removeGroupFromCommunity error:', error);
+    return {
+      success: false,
+      message: 'Failed to remove group from community'
+    };
+  }
+}
+
+/**
+ * Find announcement group ID in a community
+ */
+async findCommunityAnnouncementGroupId(communityId: string): Promise<string | null> {
+  try {
+    const groupIds = await this.getGroupsInCommunity(communityId);
+    
+    for (const groupId of groupIds) {
+      const groupRef = rtdbRef(this.db, `groups/${groupId}`);
+      const groupSnap = await rtdbGet(groupRef);
+      
+      if (groupSnap.exists()) {
+        const groupData = groupSnap.val();
+        if (groupData.title === 'Announcements' || groupData.type === 'announcement') {
+          return groupId;
+        }
+      }
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('findCommunityAnnouncementGroupId error:', error);
+    return null;
+  }
+}
+
+/**
+ * Find general group ID in a community
+ */
+async findCommunityGeneralGroupId(communityId: string): Promise<string | null> {
+  try {
+    const groupIds = await this.getGroupsInCommunity(communityId);
+    
+    for (const groupId of groupIds) {
+      const groupRef = rtdbRef(this.db, `groups/${groupId}`);
+      const groupSnap = await rtdbGet(groupRef);
+      
+      if (groupSnap.exists()) {
+        const groupData = groupSnap.val();
+        if (groupData.title === 'General' || groupData.type === 'general') {
+          return groupId;
+        }
+      }
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('findCommunityGeneralGroupId error:', error);
+    return null;
+  }
+}
+
+/**
+ * Get community name/title
+ */
+async getCommunityName(communityId: string): Promise<string> {
+  try {
+    const communityRef = rtdbRef(this.db, `communities/${communityId}`);
+    const snapshot = await rtdbGet(communityRef);
+    
+    if (!snapshot.exists()) return '';
+    
+    const data = snapshot.val();
+    return data.title || data.name || '';
+  } catch (error) {
+    console.error('getCommunityName error:', error);
+    return '';
+  }
+}
+
+
+/**
+ * Add multiple groups to a community with all member syncing
+ * ✅ UPDATED: Now adds community meta to all group members' userchats
+ */
+async addGroupsToCommunity(params: {
+  communityId: string;
+  groupIds: string[];
+  backendCommunityId?: string | null;
+  currentUserId?: string;
+}): Promise<{ 
+  success: boolean; 
+  message: string; 
+  addedMembersCount?: number;
+  updatedAnnouncementGroup?: boolean;
+}> {
+  try {
+    const { communityId, groupIds, backendCommunityId, currentUserId } = params;
+
+    if (!communityId || !groupIds?.length) {
+      return { 
+        success: false, 
+        message: 'Community ID or group IDs missing' 
+      };
+    }
+
+    const updates: Record<string, any> = {};
+    const newMemberIds = new Set<string>();
+
+    // 1️⃣ Get community info first (to get existing meta)
+    let communityInfo: any = null;
+    try {
+      communityInfo = await this.getCommunityInfo(communityId);
+    } catch (err) {
+      console.warn('Failed to load community info:', err);
+    }
+
+    // 2️⃣ Link groups to community and collect members
+    for (const groupId of groupIds) {
+      updates[`/communities/${communityId}/groups/${groupId}`] = true;
+      updates[`/groups/${groupId}/communityId`] = communityId;
+
+      try {
+        const groupInfo: any = await this.getGroupInfo(groupId);
+
+        // Backend sync if backendCommunityId provided
+        if (backendCommunityId) {
+          const backendGroupId = groupInfo?.backendGroupId ?? groupInfo?.backend_group_id ?? null;
+          
+          if (backendGroupId && currentUserId) {
+            try {
+              await firstValueFrom(
+                this.apiService.addGroupToCommunity(
+                  backendCommunityId,
+                  String(backendGroupId),
+                  Number(currentUserId) || 0
+                )
+              );
+            } catch (apiErr) {
+              console.warn(`Backend API failed for group ${groupId}:`, apiErr);
+            }
+          }
+        }
+
+        // Collect members from this group
+        if (groupInfo?.members) {
+          Object.keys(groupInfo.members).forEach(memberId => {
+            if (memberId) newMemberIds.add(memberId);
+          });
+        }
+      } catch (err) {
+        console.warn(`Failed to process group ${groupId}:`, err);
+      }
+    }
+
+    // 3️⃣ Merge with existing community members
+    let existingMembersObj: any = {};
+    try {
+      existingMembersObj = communityInfo?.members || {};
+      Object.keys(existingMembersObj).forEach(memberId => {
+        if (memberId) newMemberIds.add(memberId);
+      });
+    } catch (err) {
+      console.warn('Failed to load existing community members:', err);
+    }
+
+    // 4️⃣ Get announcement and general group IDs (for communityGroups array)
+    const announcementGroupId = await this.findCommunityAnnouncementGroupId(communityId);
+    const generalGroupId = await this.findCommunityGeneralGroupId(communityId);
+    
+    // Build communityGroups array (system groups + newly added groups)
+    const communityGroups: string[] = [];
+    if (announcementGroupId) communityGroups.push(announcementGroupId);
+    if (generalGroupId) communityGroups.push(generalGroupId);
+    groupIds.forEach(gid => communityGroups.push(gid));
+
+    // 5️⃣ Create community chat meta for new members
+    const communityChatMeta: ICommunityChatMeta = {
+      type: 'community',
+      lastmessageAt: Date.now(),
+      lastmessageType: 'text',
+      lastmessage: '',
+      unreadCount: 0,
+      isArchived: false,
+      isPinned: false,
+      isLocked: false,
+      communityGroups: communityGroups // ✅ All groups in community
+    };
+
+    // 6️⃣ Add all members to community + userchats
+    newMemberIds.forEach(userId => {
+      // Add to community members
+      updates[`/communities/${communityId}/members/${userId}`] = {
+        isActive: true,
+        joinedAt: Date.now()
+      };
+      
+      // 🆕 Add community meta to user's chats (THIS IS THE KEY CHANGE!)
+      updates[`/userchats/${userId}/${communityId}`] = communityChatMeta;
+      
+      // Legacy index (optional, for backward compatibility)
+      updates[`/usersInCommunity/${userId}/joinedCommunities/${communityId}`] = true;
+    });
+
+    // 7️⃣ Update community member count
+    updates[`/communities/${communityId}/membersCount`] = newMemberIds.size;
+
+    // 8️⃣ Update announcement group
+    let updatedAnnouncementGroup = false;
+    if (announcementGroupId) {
+      try {
+        const annGroupInfo = await this.getGroupInfo(announcementGroupId);
+        const existingAnnMembers = annGroupInfo?.members || {};
+        const annMemberSet = new Set<string>(Object.keys(existingAnnMembers));
+
+        newMemberIds.forEach(userId => {
+          if (!annMemberSet.has(userId)) {
+            updates[`/groups/${announcementGroupId}/members/${userId}`] = {
+              isActive: true,
+              username: '',
+              phoneNumber: ''
+            };
+            updates[`/userchats/${userId}/${announcementGroupId}`] = {
+              type: 'group',
+              lastmessageAt: Date.now(),
+              lastmessageType: 'text',
+              lastmessage: '',
+              unreadCount: 0,
+              isArchived: false,
+              isPinned: false,
+              isLocked: false
+            };
+            annMemberSet.add(userId);
+          }
+        });
+
+        updates[`/groups/${announcementGroupId}/membersCount`] = annMemberSet.size;
+        updatedAnnouncementGroup = true;
+      } catch (err) {
+        console.warn('Failed to update announcement group:', err);
+      }
+    }
+
+    // 9️⃣ Update general group
+    if (generalGroupId) {
+      try {
+        const genGroupInfo = await this.getGroupInfo(generalGroupId);
+        const existingGenMembers = genGroupInfo?.members || {};
+        const genMemberSet = new Set<string>(Object.keys(existingGenMembers));
+
+        newMemberIds.forEach(userId => {
+          if (!genMemberSet.has(userId)) {
+            updates[`/groups/${generalGroupId}/members/${userId}`] = {
+              isActive: true,
+              username: '',
+              phoneNumber: ''
+            };
+            updates[`/userchats/${userId}/${generalGroupId}`] = {
+              type: 'group',
+              lastmessageAt: Date.now(),
+              lastmessageType: 'text',
+              lastmessage: '',
+              unreadCount: 0,
+              isArchived: false,
+              isPinned: false,
+              isLocked: false
+            };
+            genMemberSet.add(userId);
+          }
+        });
+
+        updates[`/groups/${generalGroupId}/membersCount`] = genMemberSet.size;
+      } catch (err) {
+        console.warn('Failed to update general group:', err);
+      }
+    }
+
+    // 🔟 Apply all updates atomically
+    await this.bulkUpdate(updates);
+
+    console.log(`✅ Added ${groupIds.length} groups with ${newMemberIds.size} members`);
+    console.log(`✅ Community meta added to ${newMemberIds.size} members' userchats`);
+
+    return {
+      success: true,
+      message: `Successfully added ${groupIds.length} group(s) with ${newMemberIds.size} member(s)`,
+      addedMembersCount: newMemberIds.size,
+      updatedAnnouncementGroup
+    };
+
+  } catch (error) {
+    console.error('addGroupsToCommunity error:', error);
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : 'Failed to add groups to community'
+    };
+  }
+}
+
+/**
+ * Get backend community ID from Firebase community ID
+ */
+async getBackendCommunityId(firebaseCommunityId: string): Promise<string | null> {
+  try {
+    const res = await firstValueFrom(
+      this.apiService.getCommunityById(firebaseCommunityId)
+    );
+    return res?.community?.community_id != null 
+      ? String(res.community.community_id) 
+      : null;
+  } catch (error) {
+    console.error('getBackendCommunityId error:', error);
+    return null;
+  }
+}
+
+/**
+ * Collect all unique members from multiple groups
+ */
+async collectMembersFromGroups(groupIds: string[]): Promise<Set<string>> {
+  const memberIds = new Set<string>();
+  
+  for (const groupId of groupIds) {
+    try {
+      const groupInfo = await this.getGroupInfo(groupId);
+      if (groupInfo?.members) {
+        Object.keys(groupInfo.members).forEach(memberId => {
+          if (memberId) memberIds.add(memberId);
+        });
+      }
+    } catch (err) {
+      console.warn(`Failed to collect members from group ${groupId}:`, err);
+    }
+  }
+  
+  return memberIds;
+}
+
+/**
+ * Sync members to community announcement and general groups
+ */
+async syncMembersToCommunitySystemGroups(
+  communityId: string,
+  memberIds: Set<string>
+): Promise<{ announcementSynced: boolean; generalSynced: boolean }> {
+  const result = { announcementSynced: false, generalSynced: false };
+  const updates: Record<string, any> = {};
+
+  try {
+    // Sync to announcement group
+    const announcementGroupId = await this.findCommunityAnnouncementGroupId(communityId);
+    if (announcementGroupId) {
+      const annInfo = await this.getGroupInfo(announcementGroupId);
+      const existingMembers = annInfo?.members || {};
+      const memberSet = new Set<string>(Object.keys(existingMembers));
+
+      memberIds.forEach(userId => {
+        if (!memberSet.has(userId)) {
+          updates[`/groups/${announcementGroupId}/members/${userId}`] = {
+            isActive: true,
+            username: '',
+            phoneNumber: ''
+          };
+          updates[`/userchats/${userId}/${announcementGroupId}`] = {
+            type: 'group',
+            lastmessageAt: Date.now(),
+            lastmessageType: 'text',
+            lastmessage: '',
+            unreadCount: 0,
+            isArchived: false,
+            isPinned: false,
+            isLocked: false
+          };
+          memberSet.add(userId);
+        }
+      });
+
+      updates[`/groups/${announcementGroupId}/membersCount`] = memberSet.size;
+      result.announcementSynced = true;
+    }
+
+    // Sync to general group
+    const generalGroupId = await this.findCommunityGeneralGroupId(communityId);
+    if (generalGroupId) {
+      const genInfo = await this.getGroupInfo(generalGroupId);
+      const existingMembers = genInfo?.members || {};
+      const memberSet = new Set<string>(Object.keys(existingMembers));
+
+      memberIds.forEach(userId => {
+        if (!memberSet.has(userId)) {
+          updates[`/groups/${generalGroupId}/members/${userId}`] = {
+            isActive: true,
+            username: '',
+            phoneNumber: ''
+          };
+          updates[`/userchats/${userId}/${generalGroupId}`] = {
+            type: 'group',
+            lastmessageAt: Date.now(),
+            lastmessageType: 'text',
+            lastmessage: '',
+            unreadCount: 0,
+            isArchived: false,
+            isPinned: false,
+            isLocked: false
+          };
+          memberSet.add(userId);
+        }
+      });
+
+      updates[`/groups/${generalGroupId}/membersCount`] = memberSet.size;
+      result.generalSynced = true;
+    }
+
+    if (Object.keys(updates).length > 0) {
+      await this.bulkUpdate(updates);
+    }
+  } catch (error) {
+    console.error('syncMembersToCommunitySystemGroups error:', error);
+  }
+
+  return result;
 }
 
   // =====================
