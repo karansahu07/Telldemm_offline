@@ -5,17 +5,16 @@
 //   NavController,
 //   PopoverController,
 //   ModalController,
-//   ToastController
+//   ToastController,
 // } from '@ionic/angular';
 // import { ActivatedRoute, Router } from '@angular/router';
 // import { FirebaseChatService } from '../../../services/firebase-chat.service';
-// import { get, ref, getDatabase, update, Database } from 'firebase/database';
-// import { AuthService } from 'src/app/auth/auth.service'; // adjust if your path is different
+// import { AuthService } from 'src/app/auth/auth.service';
 
-// // Popover component you already have
+// // Popover component
 // import { CommunityMenuPopoverComponent } from '../../components/community-menu-popover/community-menu-popover.component';
 
-// // Group preview modal component (new)
+// // Group preview modal component
 // import { GroupPreviewModalComponent } from '../../components/group-preview-modal/group-preview-modal.component';
 
 // @Component({
@@ -23,12 +22,13 @@
 //   templateUrl: './community-detail.page.html',
 //   styleUrls: ['./community-detail.page.scss'],
 //   standalone: true,
-//   imports: [IonicModule, CommonModule]
+//   imports: [IonicModule, CommonModule],
 // })
 // export class CommunityDetailPage implements OnInit {
 //   communityId: string | null = null;
 //   community: any = null;
 //   announcementGroup: any = null;
+//   generalGroup: any = null;
 //   groupsIn: any[] = [];
 //   groupsAvailable: any[] = [];
 //   loading = false;
@@ -52,13 +52,22 @@
 //   ) {}
 
 //   ngOnInit() {
-//     // prefer authService, fallback localStorage (safe)
-//     this.currentUserId = (this.authService?.authData?.userId) ? String(this.authService.authData.userId) : (localStorage.getItem('userId') || '');
-//     this.currentUserName = (this.authService?.authData?.name) ? String(this.authService.authData.name) : (localStorage.getItem('name') || '');
-//     this.currentUserPhone = (this.authService?.authData?.phone_number) ? String(this.authService.authData.phone_number) : (localStorage.getItem('phone') || '');
+//     // Get current user info from authService
+//     this.currentUserId = this.authService?.authData?.userId
+//       ? String(this.authService.authData.userId)
+//       : localStorage.getItem('userId') || '';
+//     this.currentUserName = this.authService?.authData?.name
+//       ? String(this.authService.authData.name)
+//       : localStorage.getItem('name') || '';
+//     this.currentUserPhone = this.authService?.authData?.phone_number
+//       ? String(this.authService.authData.phone_number)
+//       : localStorage.getItem('phone') || '';
 
-//     this.route.queryParams.subscribe(params => {
-//       const cid = params['communityId'] || params['id'];
+//     // Get communityId from query params (receiverId)
+//   }
+//   async ionViewWillEnter() {
+//     this.route.queryParams.subscribe((params) => {
+//       const cid = params['receiverId'] || params['communityId'] || params['id'];
 //       if (!cid) return;
 //       this.communityId = cid;
 //       this.loadCommunityDetail();
@@ -68,71 +77,51 @@
 //   async loadCommunityDetail() {
 //     if (!this.communityId) return;
 //     this.loading = true;
+
 //     try {
-//       const commSnap = await get(ref(this.firebaseService['db'] as Database, `communities/${this.communityId}`));
-//       if (!commSnap.exists()) {
-//         this.community = null;
+//       // Fetch community details using service
+//       this.community = await this.firebaseService.getCommunityDetails(
+//         this.communityId
+//       );
+//       console.log('this.community', this.community);
+
+//       if (!this.community) {
 //         this.memberCount = 0;
 //         this.groupCount = 0;
 //         this.loading = false;
 //         return;
 //       }
-//       this.community = commSnap.val();
 
-//       this.memberCount = this.community.membersCount ?? (this.community.members ? Object.keys(this.community.members).length : 0);
-//       this.groupCount = this.community.groups ? Object.keys(this.community.groups).length : 0;
+//       // Get member count
+//       this.memberCount = await this.firebaseService.getCommunityMemberCount(
+//         this.communityId
+//       );
 
-//       const groupIds = await this.firebaseService.getGroupsInCommunity(this.communityId);
+//       // Fetch all groups in the community with details
+//       const groupsData =
+//         await this.firebaseService.getCommunityGroupsWithDetails(
+//           this.communityId,
+//           this.currentUserId
+//         );
 
-//       this.announcementGroup = null;
-//       this.groupsIn = [];
-//       this.groupsAvailable = [];
+//       // Set groups data
+//       this.announcementGroup = groupsData.announcementGroup;
+//       this.generalGroup = groupsData.generalGroup;
+//       this.groupsIn = groupsData.memberGroups;
+//       this.groupsAvailable = groupsData.availableGroups;
 
-//       for (const gid of groupIds) {
-//         const g = await this.firebaseService.getGroupInfo(gid);
-//         if (!g) continue;
-
-//         const groupObj = {
-//           id: gid,
-//           name: g.name || 'Unnamed group',
-//           type: g.type || 'normal',
-//           lastMessage: g.lastMessage || null,
-//           membersCount: g.membersCount || (g.members ? Object.keys(g.members).length : 0),
-//           rawMembers: g.members || null,
-//           createdBy: g.createdBy || g.created_by || '',
-//           createdByName: g.createdByName || g.created_by_name || g.createdByName // best-effort
-//         };
-
-//         let isMember = false;
-//         try {
-//           if (!this.currentUserId) isMember = false;
-//           else if (groupObj.rawMembers) isMember = Object.prototype.hasOwnProperty.call(groupObj.rawMembers, this.currentUserId);
-//           else isMember = false;
-//         } catch {
-//           isMember = false;
-//         }
-
-//         if (groupObj.type === 'announcement' && !this.announcementGroup) {
-//           this.announcementGroup = groupObj;
-//         } else {
-//           if (isMember) this.groupsIn.push(groupObj);
-//           else this.groupsAvailable.push(groupObj);
-//         }
-//       }
-
-//       // Ensure "General" is near top
-//       this.groupsIn.sort((a, b) => {
-//         if (a.name === 'General') return -1;
-//         if (b.name === 'General') return 1;
-//         return (a.name || '').localeCompare(b.name || '');
-//       });
-//       this.groupsAvailable.sort((a, b) => {
-//         if (a.name === 'General') return -1;
-//         if (b.name === 'General') return 1;
-//         return (a.name || '').localeCompare(b.name || '');
-//       });
+//       // Update group count (including ALL groups: Announcements, General, and others)
+//       this.groupCount = groupsData.otherGroups.length;
+//       if (this.announcementGroup) this.groupCount++;
+//       if (this.generalGroup) this.groupCount++;
 //     } catch (err) {
 //       console.error('loadCommunityDetail error', err);
+//       const toast = await this.toastCtrl.create({
+//         message: 'Failed to load community details',
+//         duration: 2000,
+//         color: 'danger',
+//       });
+//       await toast.present();
 //     } finally {
 //       this.loading = false;
 //     }
@@ -140,50 +129,27 @@
 
 //   goToaddgroupcommunity() {
 //     this.router.navigate(['/add-group-community'], {
-//       queryParams: { communityId: this.communityId }
+//       queryParams: { communityId: this.communityId },
 //     });
 //   }
 
-//   /**
-//    * Open preview as a bottom-sheet style Ionic modal (half-screen with breakpoints).
-//    * This replaces the navigation-to-userabout style and shows the modal inside this page.
-//    */
 //   async openGroupPreview(group: any) {
 //     if (!group) return;
 
-//     // const modal = await this.modalCtrl.create({
-//     //   component: GroupPreviewModalComponent,
-//     //   componentProps: {
-//     //     group,
-//     //     communityName: this.community?.name || '',
-//     //     currentUserId: this.currentUserId,
-//     //     currentUserName: this.currentUserName,
-//     //     currentUserPhone: this.currentUserPhone
-//     //   },
-//     //   cssClass: 'group-preview-modal-wrapper', // custom class to style modal container
-//     //   // Ionic modal breakpoints (Ionic 6+)
-//     //   breakpoints: [0, 0.45, 0.9],
-//     //   initialBreakpoint: 0.45,
-//     //   swipeToClose: true,
-//     //   backdropDismiss: true
-//     // });
-
-//   const modal = await this.modalCtrl.create({
-//   component: GroupPreviewModalComponent,
-//   componentProps: {
-//     group,
-//     communityName: this.community?.name || '',
-//     currentUserId: this.currentUserId,
-//     currentUserName: this.currentUserName,
-//     currentUserPhone: this.currentUserPhone
-//   },
-//   cssClass: 'group-preview-modal-wrapper',
-//   breakpoints: [0, 0.45, 0.9],
-//   initialBreakpoint: 0.45,
-//   backdropDismiss: true
-// });
-
-
+//     const modal = await this.modalCtrl.create({
+//       component: GroupPreviewModalComponent,
+//       componentProps: {
+//         group,
+//         communityName: this.community?.title || this.community?.name || '',
+//         currentUserId: this.currentUserId,
+//         currentUserName: this.currentUserName,
+//         currentUserPhone: this.currentUserPhone,
+//       },
+//       cssClass: 'group-preview-modal-wrapper',
+//       breakpoints: [0, 0.45, 0.9],
+//       initialBreakpoint: 0.45,
+//       backdropDismiss: true,
+//     });
 
 //     await modal.present();
 //     const { data } = await modal.onDidDismiss();
@@ -195,81 +161,170 @@
 
 //   async joinGroup(groupId: string) {
 //     if (!this.currentUserId) {
-//       const t = await this.toastCtrl.create({ message: 'Please login to join group', duration: 1800, color: 'danger' });
+//       const t = await this.toastCtrl.create({
+//         message: 'Please login to join group',
+//         duration: 1800,
+//         color: 'danger',
+//       });
 //       await t.present();
 //       return;
 //     }
 
 //     try {
-//       const db = getDatabase();
-//       const groupSnap = await get(ref(db, `groups/${groupId}`));
-//       if (!groupSnap.exists()) {
-//         const t = await this.toastCtrl.create({ message: 'Group not found', duration: 1800, color: 'danger' });
-//         await t.present();
-//         return;
-//       }
-//       const groupData = groupSnap.val();
+//       // Use service method to join group
+//       const result = await this.firebaseService.joinCommunityGroup(
+//         groupId,
+//         this.currentUserId,
+//         {
+//           username: this.currentUserName,
+//           phoneNumber: this.currentUserPhone,
+//         }
+//       );
 
-//       if (groupData.members && Object.prototype.hasOwnProperty.call(groupData.members, this.currentUserId)) {
-//         const t = await this.toastCtrl.create({ message: 'You are already a member', duration: 1400, color: 'medium' });
-//         await t.present();
-//         return;
-//       }
+//       if (result.success) {
+//         // Move group from available to joined
+//         const idx = this.groupsAvailable.findIndex((g) => g.id === groupId);
+//         if (idx > -1) {
+//           const group = this.groupsAvailable.splice(idx, 1)[0];
+//           group.membersCount = (group.membersCount || 0) + 1;
+//           this.groupsIn.unshift(group);
+//         } else {
+//           // Reload if group not found locally
+//           await this.loadCommunityDetail();
+//         }
 
-//       const now = Date.now();
-//       const memberDetails = {
-//         name: this.currentUserName || '',
-//         phone_number: this.currentUserPhone || '',
-//         role: 'member',
-//         status: 'active',
-//         joinedAt: now
-//       };
-
-//       const updates: any = {};
-//       updates[`/groups/${groupId}/members/${this.currentUserId}`] = memberDetails;
-//       const existingCount = groupData.membersCount || (groupData.members ? Object.keys(groupData.members).length : 0);
-//       updates[`/groups/${groupId}/membersCount`] = (existingCount + 1);
-//       updates[`/users/${this.currentUserId}/joinedGroups/${groupId}`] = true;
-
-//       await update(ref(db), updates);
-
-//       const idx = this.groupsAvailable.findIndex(g => g.id === groupId);
-//       if (idx > -1) {
-//         const g = this.groupsAvailable.splice(idx, 1)[0];
-//         g.membersCount = (existingCount + 1);
-//         g.rawMembers = g.rawMembers || {};
-//         g.rawMembers[this.currentUserId] = memberDetails;
-//         this.groupsIn.unshift(g);
+//         const toast = await this.toastCtrl.create({
+//           message: result.message,
+//           duration: 1600,
+//           color: 'success',
+//         });
+//         await toast.present();
 //       } else {
-//         await this.loadCommunityDetail();
+//         const toast = await this.toastCtrl.create({
+//           message: result.message,
+//           duration: 1800,
+//           color: result.message.includes('already') ? 'medium' : 'danger',
+//         });
+//         await toast.present();
 //       }
-
-//       const t = await this.toastCtrl.create({ message: `Joined ${groupData.name || 'group'}`, duration: 1600, color: 'success' });
-//       await t.present();
 //     } catch (err) {
 //       console.error('joinGroup error', err);
-//       const t = await this.toastCtrl.create({ message: 'Failed to join group', duration: 1800, color: 'danger' });
-//       await t.present();
+//       const toast = await this.toastCtrl.create({
+//         message: 'Failed to join group',
+//         duration: 1800,
+//         color: 'danger',
+//       });
+//       await toast.present();
 //     }
 //   }
 
-//   openGroupChat(groupId: string, groupName?: string) {
-//     const isMember = this.groupsIn.some(g => g.id === groupId) || (this.announcementGroup && this.announcementGroup.id === groupId);
-//     if (!isMember) {
-//       const grp = this.groupsAvailable.find(g => g.id === groupId) || { id: groupId, name: groupName };
-//       this.openGroupPreview(grp);
+//   async leaveGroup(groupId: string) {
+//     if (!this.currentUserId) {
+//       const toast = await this.toastCtrl.create({
+//         message: 'User not found',
+//         duration: 1800,
+//         color: 'danger',
+//       });
+//       await toast.present();
 //       return;
 //     }
 
+//     try {
+//       // Use service method to leave group
+//       const result = await this.firebaseService.leaveCommunityGroup(
+//         groupId,
+//         this.currentUserId
+//       );
+
+//       if (result.success) {
+//         // Move group from joined to available
+//         const idx = this.groupsIn.findIndex((g) => g.id === groupId);
+//         if (idx > -1) {
+//           const group = this.groupsIn.splice(idx, 1)[0];
+//           group.membersCount = Math.max(0, (group.membersCount || 0) - 1);
+//           this.groupsAvailable.push(group);
+
+//           // Re-sort available groups
+//           this.groupsAvailable.sort((a, b) =>
+//             (a.name || '').localeCompare(b.name || '')
+//           );
+//         }
+
+//         const toast = await this.toastCtrl.create({
+//           message: result.message,
+//           duration: 1600,
+//           color: 'success',
+//         });
+//         await toast.present();
+//       } else {
+//         const toast = await this.toastCtrl.create({
+//           message: result.message,
+//           duration: 1800,
+//           color: 'danger',
+//         });
+//         await toast.present();
+//       }
+//     } catch (err) {
+//       console.error('leaveGroup error', err);
+//       const toast = await this.toastCtrl.create({
+//         message: 'Failed to leave group',
+//         duration: 1800,
+//         color: 'danger',
+//       });
+//       await toast.present();
+//     }
+//   }
+
+//   async openGroupChat(groupId: string, groupName?: string) {
+//     // console.log({})
+//     // Check if user is a member
+//     const isMember =
+//       this.groupsIn.some((g) => g.id === groupId) ||
+//       (this.announcementGroup && this.announcementGroup.id === groupId) ||
+//       (this.generalGroup && this.generalGroup.id === groupId);
+
+//     if (!isMember) {
+//       // If not a member, show preview modal
+//       const grp = this.groupsAvailable.find((g) => g.id === groupId) || {
+//         id: groupId,
+//         name: groupName,
+//       };
+//       this.openGroupPreview(grp);
+//       return;
+//     }
+//     // ✅ CREATE CHAT OBJECT (similar to home screen)
+//     const chatObject = {
+//       roomId: groupId,
+//       type: 'group',
+//       title: groupName || 'Group Chat',
+//       communityId: this.communityId,
+//     };
+
+//     // ✅ CALL FIREBASE SERVICE (unread count reset)
+//     await this.firebaseService.openChat(chatObject);
+
+//     // ✅ NAVIGATE TO CHATTING SCREEN
 //     this.router.navigate(['/community-chat'], {
 //       queryParams: {
 //         receiverId: groupId,
-//         isGroup: true,
-//         communityId: this.communityId
-//       }
+//       },
 //     });
 //   }
 
+//   // Open announcement group chat
+//   async openAnnouncementChat() {
+//     if (!this.announcementGroup) return;
+//     await this.openGroupChat(
+//       this.announcementGroup.id,
+//       this.announcementGroup.name
+//     );
+//   }
+
+//   // Open general group chat
+//   async openGeneralChat() {
+//     if (!this.generalGroup) return;
+//     await this.openGroupChat(this.generalGroup.id, this.generalGroup.name);
+//   }
 //   back() {
 //     this.navCtrl.back();
 //   }
@@ -278,7 +333,7 @@
 //     const pop = await this.popoverCtrl.create({
 //       component: CommunityMenuPopoverComponent,
 //       event: ev,
-//       translucent: true
+//       translucent: true,
 //     });
 
 //     await pop.present();
@@ -289,20 +344,25 @@
 //     const action: string = data.action;
 //     switch (action) {
 //       case 'info':
-//         this.router.navigate(['/community-info'], { queryParams: { communityId: this.communityId } });
+//         this.router.navigate(['/community-info'], {
+//           queryParams: { communityId: this.communityId },
+//         });
 //         break;
 //       case 'invite':
-//         this.router.navigate(['/invite-members'], { queryParams: { communityId: this.communityId } });
+//         this.router.navigate(['/invite-members'], {
+//           queryParams: { communityId: this.communityId },
+//         });
 //         break;
 //       case 'settings':
-//         this.router.navigate(['/community-settings'], { queryParams: { communityId: this.communityId } });
+//         this.router.navigate(['/community-settings'], {
+//           queryParams: { communityId: this.communityId },
+//         });
 //         break;
 //       default:
 //         break;
 //     }
 //   }
 // }
-
 
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -311,11 +371,12 @@ import {
   NavController,
   PopoverController,
   ModalController,
-  ToastController
+  ToastController,
 } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FirebaseChatService } from '../../../services/firebase-chat.service';
 import { AuthService } from 'src/app/auth/auth.service';
+import { SqliteService, IConversation } from '../../../services/sqlite.service';
 
 // Popover component
 import { CommunityMenuPopoverComponent } from '../../components/community-menu-popover/community-menu-popover.component';
@@ -323,20 +384,28 @@ import { CommunityMenuPopoverComponent } from '../../components/community-menu-p
 // Group preview modal component
 import { GroupPreviewModalComponent } from '../../components/group-preview-modal/group-preview-modal.component';
 
+interface CommunityGroup extends IConversation {
+  membersCount?: number;
+  isMember?: boolean;
+  name?: string; // Alias for title
+  description?: string; // Group description
+  id?: string; // Alias for roomId
+}
+
 @Component({
   selector: 'app-community-detail',
   templateUrl: './community-detail.page.html',
   styleUrls: ['./community-detail.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule]
+  imports: [IonicModule, CommonModule],
 })
 export class CommunityDetailPage implements OnInit {
   communityId: string | null = null;
   community: any = null;
-  announcementGroup: any = null;
-  generalGroup: any = null;
-  groupsIn: any[] = [];
-  groupsAvailable: any[] = [];
+  announcementGroup: CommunityGroup | null = null;
+  generalGroup: CommunityGroup | null = null;
+  groupsIn: CommunityGroup[] = [];
+  groupsAvailable: CommunityGroup[] = [];
   loading = false;
 
   memberCount = 0;
@@ -354,23 +423,25 @@ export class CommunityDetailPage implements OnInit {
     private popoverCtrl: PopoverController,
     private modalCtrl: ModalController,
     private toastCtrl: ToastController,
-    private authService: AuthService
+    private authService: AuthService,
+    private sqliteService: SqliteService
   ) {}
 
   ngOnInit() {
     // Get current user info from authService
-    this.currentUserId = this.authService?.authData?.userId 
-      ? String(this.authService.authData.userId) 
-      : (localStorage.getItem('userId') || '');
-    this.currentUserName = this.authService?.authData?.name 
-      ? String(this.authService.authData.name) 
-      : (localStorage.getItem('name') || '');
-    this.currentUserPhone = this.authService?.authData?.phone_number 
-      ? String(this.authService.authData.phone_number) 
-      : (localStorage.getItem('phone') || '');
+    this.currentUserId = this.authService?.authData?.userId
+      ? String(this.authService.authData.userId)
+      : localStorage.getItem('userId') || '';
+    this.currentUserName = this.authService?.authData?.name
+      ? String(this.authService.authData.name)
+      : localStorage.getItem('name') || '';
+    this.currentUserPhone = this.authService?.authData?.phone_number
+      ? String(this.authService.authData.phone_number)
+      : localStorage.getItem('phone') || '';
+  }
 
-    // Get communityId from query params (receiverId)
-    this.route.queryParams.subscribe(params => {
+  async ionViewWillEnter() {
+    this.route.queryParams.subscribe((params) => {
       const cid = params['receiverId'] || params['communityId'] || params['id'];
       if (!cid) return;
       this.communityId = cid;
@@ -381,12 +452,17 @@ export class CommunityDetailPage implements OnInit {
   async loadCommunityDetail() {
     if (!this.communityId) return;
     this.loading = true;
-    
+
     try {
-      // Fetch community details using service
-      this.community = await this.firebaseService.getCommunityDetails(this.communityId);
-      console.log("this.community", this.community)
-      
+      // 1️⃣ Load from SQLite first (instant UI)
+      await this.loadGroupsFromSQLite();
+
+      // 2️⃣ Fetch community details from Firebase
+      this.community = await this.firebaseService.getCommunityDetails(
+        this.communityId
+      );
+      console.log('Community details:', this.community);
+
       if (!this.community) {
         this.memberCount = 0;
         this.groupCount = 0;
@@ -394,32 +470,19 @@ export class CommunityDetailPage implements OnInit {
         return;
       }
 
-      // Get member count
-      this.memberCount = await this.firebaseService.getCommunityMemberCount(this.communityId);
-
-      // Fetch all groups in the community with details
-      const groupsData = await this.firebaseService.getCommunityGroupsWithDetails(
-        this.communityId, 
-        this.currentUserId
+      // 3️⃣ Get member count
+      this.memberCount = await this.firebaseService.getCommunityMemberCount(
+        this.communityId
       );
 
-      // Set groups data
-      this.announcementGroup = groupsData.announcementGroup;
-      this.generalGroup = groupsData.generalGroup;
-      this.groupsIn = groupsData.memberGroups;
-      this.groupsAvailable = groupsData.availableGroups;
-
-      // Update group count (including ALL groups: Announcements, General, and others)
-      this.groupCount = groupsData.otherGroups.length;
-      if (this.announcementGroup) this.groupCount++;
-      if (this.generalGroup) this.groupCount++;
-
+      // 4️⃣ Sync with Firebase (background update)
+      await this.syncGroupsWithFirebase();
     } catch (err) {
       console.error('loadCommunityDetail error', err);
       const toast = await this.toastCtrl.create({
         message: 'Failed to load community details',
         duration: 2000,
-        color: 'danger'
+        color: 'danger',
       });
       await toast.present();
     } finally {
@@ -427,9 +490,180 @@ export class CommunityDetailPage implements OnInit {
     }
   }
 
+  /**
+   * 🔹 Load groups from SQLite (instant)
+   */
+  private async loadGroupsFromSQLite() {
+    try {
+      // Get all conversations from SQLite
+      const allConversations = await this.sqliteService.getConversations();
+
+      // Filter groups that belong to this community
+      const communityGroups = allConversations.filter(
+        (conv) => conv.type === 'group' && this.isGroupInCommunity(conv.roomId)
+      ) as CommunityGroup[];
+
+      console.log('Groups from SQLite:', communityGroups);
+
+      // Reset arrays
+      this.announcementGroup = null;
+      this.generalGroup = null;
+      this.groupsIn = [];
+      this.groupsAvailable = [];
+
+      // Categorize groups
+      for (const group of communityGroups) {
+        const groupTitle = (group.title || '').toLowerCase();
+        const isMember = group.members?.includes(this.currentUserId) || false;
+
+        // Add member status and aliases
+        group.isMember = isMember;
+        group.membersCount = group.members?.length || 0;
+        group.name = group.title; // Add name alias
+        group.id = group.roomId; // Add id alias
+        group.description = ''; // Will be updated from Firebase
+
+        // Categorize by title
+        if (groupTitle === 'announcements') {
+          this.announcementGroup = group;
+        } else if (groupTitle === 'general') {
+          this.generalGroup = group;
+        } else {
+          if (isMember) {
+            this.groupsIn.push(group);
+          } else {
+            this.groupsAvailable.push(group);
+          }
+        }
+      }
+
+      // Update group count
+      this.groupCount = communityGroups.length;
+
+      console.log('Categorized groups:', {
+        announcement: this.announcementGroup,
+        general: this.generalGroup,
+        joined: this.groupsIn,
+        available: this.groupsAvailable,
+      });
+    } catch (error) {
+      console.error('Error loading groups from SQLite:', error);
+    }
+  }
+
+  /**
+   * 🔹 Check if group belongs to this community
+   */
+  private isGroupInCommunity(roomId: string): boolean {
+    // Groups in community have roomId pattern: communityId_groupname or groupId with communityId prefix
+    return roomId.includes(this.communityId || '');
+  }
+
+  /**
+   * 🔹 Sync groups with Firebase (background)
+   */
+  private async syncGroupsWithFirebase() {
+    try {
+      // Fetch fresh data from Firebase
+      const groupsData =
+        await this.firebaseService.getCommunityGroupsWithDetails(
+          this.communityId!,
+          this.currentUserId
+        );
+
+      // Update announcement group
+      if (groupsData.announcementGroup) {
+        this.announcementGroup = this.convertToConversation(
+          groupsData.announcementGroup,
+          true
+        );
+      }
+
+      // Update general group
+      if (groupsData.generalGroup) {
+        this.generalGroup = this.convertToConversation(
+          groupsData.generalGroup,
+          true
+        );
+      }
+
+      // Update member groups
+      this.groupsIn = groupsData.memberGroups.map((g) =>
+        this.convertToConversation(g, true)
+      );
+
+      // Update available groups
+      this.groupsAvailable = groupsData.availableGroups.map((g) =>
+        this.convertToConversation(g, false)
+      );
+
+      // Update group count
+      this.groupCount = groupsData.otherGroups.length;
+      if (this.announcementGroup) this.groupCount++;
+      if (this.generalGroup) this.groupCount++;
+
+      // Save to SQLite for next time
+      await this.saveGroupsToSQLite();
+    } catch (error) {
+      console.error('Error syncing with Firebase:', error);
+    }
+  }
+
+  /**
+   * 🔹 Convert Firebase group to IConversation format
+   */
+  private convertToConversation(group: any, isMember: boolean): CommunityGroup {
+    const title = group.name || group.title || 'Unnamed Group';
+    const roomId = group.id || group.roomId;
+
+    return {
+      roomId: roomId,
+      id: roomId, // Alias for compatibility
+      title: title,
+      name: title, // Alias for compatibility
+      description: group.description || '', // Add description field
+      type: 'group',
+      avatar: group.avatar || '',
+      members: group.members ? Object.keys(group.members) : [],
+      adminIds: group.adminIds || [],
+      createdAt: group.createdAt ? new Date(group.createdAt) : new Date(),
+      updatedAt: new Date(),
+      lastMessage: '',
+      lastMessageType: 'text',
+      unreadCount: 0,
+      isArchived: false,
+      isPinned: false,
+      isLocked: false,
+      membersCount: group.membersCount || 0,
+      isMember: isMember,
+    } as CommunityGroup;
+  }
+
+  /**
+   * 🔹 Save groups to SQLite
+   */
+  private async saveGroupsToSQLite() {
+    try {
+      const allGroups = [
+        this.announcementGroup,
+        this.generalGroup,
+        ...this.groupsIn,
+        ...this.groupsAvailable,
+      ].filter(Boolean) as CommunityGroup[];
+
+      for (const group of allGroups) {
+        await this.sqliteService.createConversation(group);
+      }
+
+      console.log('✅ Groups saved to SQLite');
+    } catch (error) {
+      console.error('Error saving groups to SQLite:', error);
+    }
+  }
+
   goToaddgroupcommunity() {
     this.router.navigate(['/add-group-community'], {
-      queryParams: { communityId: this.communityId }
+      queryParams: { communityId: this.communityId },
     });
   }
 
@@ -443,12 +677,12 @@ export class CommunityDetailPage implements OnInit {
         communityName: this.community?.title || this.community?.name || '',
         currentUserId: this.currentUserId,
         currentUserName: this.currentUserName,
-        currentUserPhone: this.currentUserPhone
+        currentUserPhone: this.currentUserPhone,
       },
       cssClass: 'group-preview-modal-wrapper',
       breakpoints: [0, 0.45, 0.9],
       initialBreakpoint: 0.45,
-      backdropDismiss: true
+      backdropDismiss: true,
     });
 
     await modal.present();
@@ -461,49 +695,52 @@ export class CommunityDetailPage implements OnInit {
 
   async joinGroup(groupId: string) {
     if (!this.currentUserId) {
-      const t = await this.toastCtrl.create({ 
-        message: 'Please login to join group', 
-        duration: 1800, 
-        color: 'danger' 
+      const t = await this.toastCtrl.create({
+        message: 'Please login to join group',
+        duration: 1800,
+        color: 'danger',
       });
       await t.present();
       return;
     }
 
     try {
-      // Use service method to join group
       const result = await this.firebaseService.joinCommunityGroup(
         groupId,
         this.currentUserId,
         {
           username: this.currentUserName,
-          phoneNumber: this.currentUserPhone
+          phoneNumber: this.currentUserPhone,
         }
       );
 
       if (result.success) {
-        // Move group from available to joined
-        const idx = this.groupsAvailable.findIndex(g => g.id === groupId);
+        // Move group from available to joined locally
+        const idx = this.groupsAvailable.findIndex((g) => g.roomId === groupId);
         if (idx > -1) {
           const group = this.groupsAvailable.splice(idx, 1)[0];
           group.membersCount = (group.membersCount || 0) + 1;
+          group.isMember = true;
           this.groupsIn.unshift(group);
+
+          // Update SQLite
+          await this.sqliteService.createConversation(group);
         } else {
-          // Reload if group not found locally
+          // Reload if not found locally
           await this.loadCommunityDetail();
         }
 
         const toast = await this.toastCtrl.create({
           message: result.message,
           duration: 1600,
-          color: 'success'
+          color: 'success',
         });
         await toast.present();
       } else {
         const toast = await this.toastCtrl.create({
           message: result.message,
           duration: 1800,
-          color: result.message.includes('already') ? 'medium' : 'danger'
+          color: result.message.includes('already') ? 'medium' : 'danger',
         });
         await toast.present();
       }
@@ -512,7 +749,7 @@ export class CommunityDetailPage implements OnInit {
       const toast = await this.toastCtrl.create({
         message: 'Failed to join group',
         duration: 1800,
-        color: 'danger'
+        color: 'danger',
       });
       await toast.present();
     }
@@ -523,44 +760,47 @@ export class CommunityDetailPage implements OnInit {
       const toast = await this.toastCtrl.create({
         message: 'User not found',
         duration: 1800,
-        color: 'danger'
+        color: 'danger',
       });
       await toast.present();
       return;
     }
 
     try {
-      // Use service method to leave group
       const result = await this.firebaseService.leaveCommunityGroup(
         groupId,
         this.currentUserId
       );
 
       if (result.success) {
-        // Move group from joined to available
-        const idx = this.groupsIn.findIndex(g => g.id === groupId);
+        // Move group from joined to available locally
+        const idx = this.groupsIn.findIndex((g) => g.roomId === groupId);
         if (idx > -1) {
           const group = this.groupsIn.splice(idx, 1)[0];
           group.membersCount = Math.max(0, (group.membersCount || 0) - 1);
+          group.isMember = false;
           this.groupsAvailable.push(group);
-          
+
           // Re-sort available groups
-          this.groupsAvailable.sort((a, b) => 
-            (a.name || '').localeCompare(b.name || '')
+          this.groupsAvailable.sort((a, b) =>
+            (a.title || '').localeCompare(b.title || '')
           );
+
+          // Update SQLite
+          await this.sqliteService.createConversation(group);
         }
 
         const toast = await this.toastCtrl.create({
           message: result.message,
           duration: 1600,
-          color: 'success'
+          color: 'success',
         });
         await toast.present();
       } else {
         const toast = await this.toastCtrl.create({
           message: result.message,
           duration: 1800,
-          color: 'danger'
+          color: 'danger',
         });
         await toast.present();
       }
@@ -569,56 +809,67 @@ export class CommunityDetailPage implements OnInit {
       const toast = await this.toastCtrl.create({
         message: 'Failed to leave group',
         duration: 1800,
-        color: 'danger'
+        color: 'danger',
       });
       await toast.present();
     }
   }
 
-async openGroupChat(groupId: string, groupName?: string) {
-  // console.log({})
-  // Check if user is a member
-  const isMember = this.groupsIn.some(g => g.id === groupId) || 
-                   (this.announcementGroup && this.announcementGroup.id === groupId) ||
-                   (this.generalGroup && this.generalGroup.id === groupId);
-  
-  if (!isMember) {
-    // If not a member, show preview modal
-    const grp = this.groupsAvailable.find(g => g.id === groupId) || 
-                { id: groupId, name: groupName };
-    this.openGroupPreview(grp);
-    return;
-  }
-  // ✅ CREATE CHAT OBJECT (similar to home screen)
-  const chatObject = {
-    roomId: groupId,
-    type: 'group',
-    title: groupName || 'Group Chat',
-    communityId: this.communityId
-  };
-
-  // ✅ CALL FIREBASE SERVICE (unread count reset)
-  await this.firebaseService.openChat(chatObject);
-
-  // ✅ NAVIGATE TO CHATTING SCREEN
-  this.router.navigate(['/community-chat'], {
-    queryParams: {
-      receiverId: groupId
+  async openGroupChat(groupId: string | undefined, groupName?: string) {
+    // Validate groupId
+    if (!groupId) {
+      console.error('Invalid group ID');
+      return;
     }
-  });
-}
 
-// Open announcement group chat
-async openAnnouncementChat() {
-  if (!this.announcementGroup) return;
-  await this.openGroupChat(this.announcementGroup.id, this.announcementGroup.name);
-}
+    // Check if user is a member
+    const isMember =
+      this.groupsIn.some((g) => g.roomId === groupId) ||
+      (this.announcementGroup && this.announcementGroup.roomId === groupId) ||
+      (this.generalGroup && this.generalGroup.roomId === groupId);
 
-// Open general group chat
-async openGeneralChat() {
-  if (!this.generalGroup) return;
-  await this.openGroupChat(this.generalGroup.id, this.generalGroup.name);
-}
+    if (!isMember) {
+      // If not a member, show preview modal
+      const grp = this.groupsAvailable.find((g) => g.roomId === groupId) || {
+        roomId: groupId,
+        title: groupName,
+      };
+      this.openGroupPreview(grp);
+      return;
+    }
+
+    // ✅ CREATE CHAT OBJECT (similar to home screen)
+    const chatObject = {
+      roomId: groupId,
+      type: 'group',
+      title: groupName || 'Group Chat',
+      communityId: this.communityId,
+    };
+
+    // ✅ CALL FIREBASE SERVICE (unread count reset)
+    await this.firebaseService.openChat(chatObject);
+
+    // ✅ NAVIGATE TO CHATTING SCREEN
+    this.router.navigate(['/community-chat'], {
+      queryParams: {
+        receiverId: groupId,
+      },
+    });
+  }
+
+  async openAnnouncementChat() {
+    if (!this.announcementGroup) return;
+    await this.openGroupChat(
+      this.announcementGroup.roomId,
+      this.announcementGroup.title
+    );
+  }
+
+  async openGeneralChat() {
+    if (!this.generalGroup) return;
+    await this.openGroupChat(this.generalGroup.roomId, this.generalGroup.title);
+  }
+
   back() {
     this.navCtrl.back();
   }
@@ -627,7 +878,7 @@ async openGeneralChat() {
     const pop = await this.popoverCtrl.create({
       component: CommunityMenuPopoverComponent,
       event: ev,
-      translucent: true
+      translucent: true,
     });
 
     await pop.present();
@@ -638,18 +889,18 @@ async openGeneralChat() {
     const action: string = data.action;
     switch (action) {
       case 'info':
-        this.router.navigate(['/community-info'], { 
-          queryParams: { communityId: this.communityId } 
+        this.router.navigate(['/community-info'], {
+          queryParams: { communityId: this.communityId },
         });
         break;
       case 'invite':
-        this.router.navigate(['/invite-members'], { 
-          queryParams: { communityId: this.communityId } 
+        this.router.navigate(['/invite-members'], {
+          queryParams: { communityId: this.communityId },
         });
         break;
       case 'settings':
-        this.router.navigate(['/community-settings'], { 
-          queryParams: { communityId: this.communityId } 
+        this.router.navigate(['/community-settings'], {
+          queryParams: { communityId: this.communityId },
         });
         break;
       default:

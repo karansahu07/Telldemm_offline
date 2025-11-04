@@ -130,6 +130,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     this.isLoading = true;
 
     this.trackRouteChanges();
+    
   }
 
   // 1) First check server for force-logout decision every time user revisits home
@@ -168,13 +169,12 @@ export class HomeScreenPage implements OnInit, OnDestroy {
       console.warn('checkForceLogout error (ignored):', err);
     }
 
-    // 1.2 Verify device
     const verified = await this.verifyDeviceOnEnter();
-    if (!verified) return; // stop if mismatch
+    if (!verified) return;
 
     this.clearChatData();
     this.sender_name = this.authService.authData?.name || '';
-    // }
+    await this.sqlite.printAllTables();
   }
 
   async verifyDeviceOnEnter(): Promise<boolean> {
@@ -1470,11 +1470,68 @@ getPreviewText(chat: any): string {
     return null;
   }
 
+  // get filteredChats() {
+  //   // console.log("visible.length",this.chatList)
+  //   let filtered = this.conversations;
+  //   // console.log({filtered})
+  //   // console.log("this.selectedFilter", this.selectedFilter);
+
+  //   if (this.selectedFilter === 'read') {
+  //     filtered = filtered.filter((chat) => chat.unreadCount === 0);
+  //   } else if (this.selectedFilter === 'unread') {
+  //     filtered = filtered.filter((chat) => (chat.unreadCount as number) > 0);
+  //   } else if (this.selectedFilter === 'groups') {
+  //     filtered = filtered.filter((chat) => chat.type === 'group');
+  //   }
+
+  //   if (this.searchText.trim() !== '') {
+  //     const q = this.searchText.toLowerCase();
+  //     filtered = filtered.filter(
+  //       (chat) =>
+  //         (chat.title || '').toLowerCase().includes(q)
+  //         // (chat.message || '').toLowerCase().includes(q)
+  //     );
+  //   }
+
+  //   return [...filtered].sort((a: any, b: any) => {
+  //     const ap = a.pinned ? 1 : 0;
+  //     const bp = b.pinned ? 1 : 0;
+  //     if (ap !== bp) return bp - ap;
+
+  //     if (ap === 1 && bp === 1) {
+  //       const pa = Number(a.pinnedAt || 0);
+  //       const pb = Number(b.pinnedAt || 0);
+  //       if (pa !== pb) return pb - pa; // newest pin first
+  //     }
+
+  //     const ta = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+  //     const tb = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+  //     return tb - ta; // newest activity first
+  //   });
+  // }
+
   get filteredChats() {
     // console.log("visible.length",this.chatList)
     let filtered = this.conversations;
     // console.log({filtered})
     // console.log("this.selectedFilter", this.selectedFilter);
+
+    filtered = filtered.filter((chat) => {
+      if (chat.type === 'group') {
+        const roomId = chat.roomId || '';
+        const title = (chat.title || '').toLowerCase();
+
+        if (
+          roomId.includes('_announcement') || 
+          roomId.includes('_general') ||
+          title === 'announcements' ||
+          title === 'general'
+        ) {
+          return false;
+        }
+      }
+      return true;
+    });
 
     if (this.selectedFilter === 'read') {
       filtered = filtered.filter((chat) => chat.unreadCount === 0);
@@ -1501,12 +1558,12 @@ getPreviewText(chat: any): string {
       if (ap === 1 && bp === 1) {
         const pa = Number(a.pinnedAt || 0);
         const pb = Number(b.pinnedAt || 0);
-        if (pa !== pb) return pb - pa; // newest pin first
+        if (pa !== pb) return pb - pa;
       }
 
       const ta = a.timestamp ? new Date(a.timestamp).getTime() : 0;
       const tb = b.timestamp ? new Date(b.timestamp).getTime() : 0;
-      return tb - ta; // newest activity first
+      return tb - ta;
     });
   }
 

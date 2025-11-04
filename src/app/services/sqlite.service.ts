@@ -891,6 +891,16 @@ export class SqliteService {
     });
   }
 
+async updateMessageDeletionStatus(
+  msgId: string, 
+  deletedFor: { everyone: boolean; users: string[] }
+) {
+  return this.withOpState('updateMessageDeletionStatus', async () => {
+    const sql = `UPDATE messages SET deletedFor = ? WHERE msgId = ?`;
+    await this.db.run(sql, [JSON.stringify(deletedFor), msgId]);
+  });
+}
+
   async updateMessageStatus(msgId: string, status: IMessage['status']) {
     return this.withOpState('updateMessageStatus', async () => {
       await this.db.run(`UPDATE messages SET status = ? WHERE msgId = ?`, [
@@ -971,4 +981,36 @@ export class SqliteService {
       console.error('❌ Error closing DB connection:', error);
     }
   }
+
+  /** ----------------- SIMPLE DEBUG FUNCTION ----------------- **/
+
+/**
+ * Print all tables data in console
+ * Bas isko call karo aur sab kuch console mein aa jayega
+ */
+async printAllTables() {
+  try {
+    console.log('========== DATABASE DATA ==========\n');
+
+    // Users
+    const users = await this.db.query('SELECT * FROM users');
+    console.log('👥 USERS:', users.values);
+
+    // Conversations
+    const conversations = await this.db.query('SELECT * FROM conversations');
+    console.log('\n💬 CONVERSATIONS:', conversations.values);
+
+    // Messages
+    const messages = await this.db.query('SELECT * FROM messages');
+    console.log('\n📨 MESSAGES:', messages.values);
+
+    // Attachments
+    const attachments = await this.db.query('SELECT * FROM attachments');
+    console.log('\n📎 ATTACHMENTS:', attachments.values);
+
+    console.log('\n===================================');
+  } catch (error) {
+    console.error('❌ Error:', error);
+  }
+}
 }

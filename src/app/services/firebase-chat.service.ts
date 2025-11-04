@@ -1005,13 +1005,13 @@ getPresenceObservable(): Observable<Map<string, MemberPresence>> {
             const groupData = groupSnap.val() || {};
             
             // Skip announcement and general groups that belong to communities
-            const belongsToCommunity = !!groupData.communityId;
-            const isSystemGroup = groupData.title === 'Announcements' || groupData.title === 'General';
+            // const belongsToCommunity = !!groupData.communityId;
+            // const isSystemGroup = groupData.title === 'Announcements' || groupData.title === 'General';
             
-            if (belongsToCommunity && isSystemGroup) {
-              console.log(`Skipping system group ${roomId} from community ${groupData.communityId}`);
-              continue; // Skip this group
-            }
+            // if (belongsToCommunity && isSystemGroup) {
+            //   console.log(`Skipping system group ${roomId} from community ${groupData.communityId}`);
+            //   continue; // Skip this group
+            // }
             
             const conv = await this.fetchGroupConDetails(roomId, meta);
             conversations.push(conv);
@@ -1102,13 +1102,13 @@ getPresenceObservable(): Observable<Map<string, MemberPresence>> {
                   const groupData = groupSnap.val() || {};
                   
                   // Skip announcement and general groups
-                  const belongsToCommunity = !!groupData.communityId;
-                  const isSystemGroup = groupData.title === 'Announcements' || groupData.title === 'General';
+                  // const belongsToCommunity = !!groupData.communityId;
+                  // const isSystemGroup = groupData.title === 'Announcements' || groupData.title === 'General';
                   
-                  if (belongsToCommunity && isSystemGroup) {
-                    console.log(`Skipping new system group ${roomId}`);
-                    continue;
-                  }
+                  // if (belongsToCommunity && isSystemGroup) {
+                  //   console.log(`Skipping new system group ${roomId}`);
+                  //   continue;
+                  // }
                   
                   newConv = await this.fetchGroupConDetails(roomId, chatMeta);
                 } else if (type === 'community') {
@@ -4300,24 +4300,56 @@ async exitGroup(roomId: string, userIds: string[]) {
 
   //this function is new
   async deleteMessage(msgId: string, forEveryone: boolean = true) {
-    // console.log("this deleted function called")
+  try {
     const messageRef = rtdbRef(
       this.db,
       `chats/${this.currentChat?.roomId}/${msgId}`
     );
+    
+    // Get previous message
     const prev = await rtdbGet(messageRef);
     const prevMsg = prev.val();
+    
+    // Prepare deletedFor object
+    let deletedForData: { everyone: boolean; users: string[] };
+    
     if (forEveryone) {
-      await update(messageRef, { deletedFor: { everyone: true } });
+      deletedForData = { 
+        everyone: true, 
+        users: prevMsg?.deletedFor?.users || [] 
+      };
+      await update(messageRef, { deletedFor: deletedForData });
     } else {
-      await update(messageRef, {
-        deletedFor: {
-          everyone: !!prevMsg.deletedFor?.everyone,
-          users: [...(prevMsg.deletedFor?.users || []), this.senderId],
-        },
-      });
+      deletedForData = {
+        everyone: !!prevMsg?.deletedFor?.everyone,
+        users: [...(prevMsg?.deletedFor?.users || []), this.senderId],
+      };
+      await update(messageRef, { deletedFor: deletedForData });
     }
+
+    // ✅ Update SQLite
+    await this.updateLocalMessageDeletion(msgId, deletedForData);
+
+  } catch (error) {
+    console.error('❌ Error deleting message:', error);
+    throw error;
   }
+}
+
+/**
+ * Update message deletion in local SQLite
+ */
+private async updateLocalMessageDeletion(
+  msgId: string, 
+  deletedFor: { everyone: boolean; users: string[] }
+) {
+  try {
+    await this.sqliteService.updateMessageDeletionStatus(msgId, deletedFor);
+    console.log('✅ Message deletion updated in SQLite:', msgId);
+  } catch (error) {
+    console.error('❌ SQLite update error:', error);
+  }
+}
 
   
 async clearChatForUser(roomId?: string): Promise<void> {
@@ -4493,17 +4525,24 @@ async clearChatForUser(roomId?: string): Promise<void> {
     );
     this._conversations$.next(existingConvs);
 
+     const messageMap = new Map(this._messages$.value)   //this is for some experiment
     // Delete from SQLite
-    // for (const roomId of roomIds) {
-    //   try {
-    //     await this.sqliteService.deleteConversation?.(roomId);
-    //     if (deleteType !== 'forMe') {
-    //       await this.sqliteService.deleteMessages?.(roomId);
-    //     }
-    //   } catch (sqlErr) {
-    //     console.warn('SQLite deletion failed for', roomId, sqlErr);
-    //   }
-    // }
+    for (const roomId of roomIds) {
+      try {
+        await this.sqliteService.deleteConversation?.(roomId);
+        try {
+          messageMap.delete(roomId)  
+        } catch (error) {
+          console.log("message Map is empty/causing error")
+        }
+        // if (deleteType !== 'forMe') {
+        //   await this.sqliteService.deleteMessages?.(roomId);
+        // }
+      } catch (sqlErr) {
+        console.warn('SQLite deletion failed for', roomId, sqlErr);
+      }
+    }
+
 
     console.log(`✅ Successfully deleted ${roomIds.length} chat(s)`);
   } catch (error) {
