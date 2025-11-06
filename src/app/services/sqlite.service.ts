@@ -698,7 +698,7 @@ export class SqliteService {
       'getConversations',
       async () => {
         const sql = `
-        SELECT c.*, 
+        SELECT c.*,
         m.text AS lastMessage,
         m.type AS lastMessageType,
         m.timestamp AS lastMessageAt,
@@ -733,12 +733,28 @@ export class SqliteService {
     );
   }
 
+  // async deleteConversation(roomId: string) {
+  //   return this.withOpState('deleteConversation', async () => {
+  //     await this.db.run('DELETE FROM messages WHERE roomId = ?', [roomId]);
+  //     await this.db.run('DELETE FROM conversations WHERE roomId = ?', [roomId]);
+  //   });
+  // }
+
   async deleteConversation(roomId: string) {
-    return this.withOpState('deleteConversation', async () => {
-      await this.db.run('DELETE FROM messages WHERE roomId = ?', [roomId]);
-      await this.db.run('DELETE FROM conversations WHERE roomId = ?', [roomId]);
-    });
-  }
+  return this.withOpState('deleteConversation', async () => {
+    // Delete attachments
+    await this.db.run(
+      'DELETE FROM attachments WHERE mediaId IN (SELECT mediaId FROM messages WHERE roomId = ?)',
+      [roomId]
+    );
+    
+    // Delete messages
+    await this.db.run('DELETE FROM messages WHERE roomId = ?', [roomId]);
+    
+    // Delete conversation
+    await this.db.run('DELETE FROM conversations WHERE roomId = ?', [roomId]);
+  });
+}
 
   async deleteConversations(roomIds: string[]) {
     return this.withOpState('deleteConversations', async () => {
@@ -892,7 +908,7 @@ export class SqliteService {
   }
 
 async updateMessageDeletionStatus(
-  msgId: string, 
+  msgId: string,
   deletedFor: { everyone: boolean; users: string[] }
 ) {
   return this.withOpState('updateMessageDeletionStatus', async () => {
