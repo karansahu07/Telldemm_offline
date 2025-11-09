@@ -395,7 +395,7 @@ export class ProfileSetupPage implements OnInit, OnDestroy {
       await this.saveAdditionalData();
 
       // Navigate based on user rooms
-      // await this.handleNavigation();
+      await this.handleNavigation();
 
       await loading.dismiss();
       await this.showToast('Profile setup completed successfully!', 'success');
@@ -581,6 +581,11 @@ export class ProfileSetupPage implements OnInit, OnDestroy {
   //       });
   //   });
   // }
+
+  private async handleNavigation(): Promise<void> {
+  // Simply navigate to home-screen in all cases
+  await this.router.navigateByUrl('/home-screen', { replaceUrl: true });
+}
 
   /**
    * Check if form is valid for submission
