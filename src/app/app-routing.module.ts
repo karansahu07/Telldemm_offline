@@ -302,7 +302,8 @@ const routes: Routes = [
   {
     path: 'archieved-screen',
     loadChildren: () => import('./pages/archieved-screen/archieved-screen.module').then( m => m.ArchievedScreenPageModule)
-  },  {
+  },
+  {
     path: 'theme',
     loadChildren: () => import('./settings/chats/theme/theme.module').then( m => m.ThemePageModule)
   },

@@ -165,6 +165,7 @@ import { SecureStoragePlugin } from 'capacitor-secure-storage-plugin';
 import { AuthService } from '../auth/auth.service';
 import { FcmService } from './fcm-service';
 import { SqliteService } from './sqlite.service';
+import { FirebaseChatService } from './firebase-chat.service';
 // import { App } from '@capacitor/app';
 // import { CapacitorSQLite } from '@capacitor-community/sqlite';
 
@@ -175,7 +176,8 @@ export class Resetapp {
   constructor(
     private authService: AuthService,
     private fcmService: FcmService,
-    private sqliteService: SqliteService
+    private sqliteService: SqliteService,
+    private firebasechatservice : FirebaseChatService
   ) {}
 
   /** Clear LocalStorage */
@@ -254,6 +256,7 @@ export class Resetapp {
     await this.clearSecureStorage();
     await this.clearSQLite();
     await this.clearFileSystem();
+    // await this.firebasechatservice.clearAllCache();
     await this.sqliteService.resetDB();
 
     this.reloadApp();

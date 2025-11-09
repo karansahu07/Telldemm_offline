@@ -455,8 +455,8 @@ export class CommunityDetailPage implements OnInit {
 
     try {
       // 1️⃣ Load from SQLite first (instant UI)
-      await this.loadGroupsFromSQLite();
-
+      // await this.loadGroupsFromSQLite();
+      console.time('loading community');
       // 2️⃣ Fetch community details from Firebase
       this.community = await this.firebaseService.getCommunityDetails(
         this.communityId
@@ -471,12 +471,14 @@ export class CommunityDetailPage implements OnInit {
       }
 
       // 3️⃣ Get member count
-      this.memberCount = await this.firebaseService.getCommunityMemberCount(
-        this.communityId
-      );
+      // this.memberCount = await this.firebaseService.getCommunityMemberCount(
+      //   this.communityId
+      // );
+      this.memberCount = Object.keys(this.community.members).length;
 
       // 4️⃣ Sync with Firebase (background update)
       await this.syncGroupsWithFirebase();
+      console.timeEnd('loading community');
     } catch (err) {
       console.error('loadCommunityDetail error', err);
       const toast = await this.toastCtrl.create({
@@ -496,11 +498,11 @@ export class CommunityDetailPage implements OnInit {
   private async loadGroupsFromSQLite() {
     try {
       // Get all conversations from SQLite
-      const allConversations = await this.sqliteService.getConversations();
+      // const allConversations = await this.sqliteService.getConversations();
 
       // Filter groups that belong to this community
-      const communityGroups = allConversations.filter(
-        (conv) => conv.type === 'group' && this.isGroupInCommunity(conv.roomId)
+      const communityGroups = this.firebaseService.currentConversations.filter(
+        (conv) => conv.type === 'group' && conv.communityId === this.communityId
       ) as CommunityGroup[];
 
       console.log('Groups from SQLite:', communityGroups);
@@ -565,45 +567,73 @@ export class CommunityDetailPage implements OnInit {
   private async syncGroupsWithFirebase() {
     try {
       // Fetch fresh data from Firebase
-      const groupsData =
-        await this.firebaseService.getCommunityGroupsWithDetails(
-          this.communityId!,
-          this.currentUserId
-        );
+      // const groupsData =
+      //   await this.firebaseService.getCommunityGroupsWithDetails(
+      //     this.communityId!,
+      //     this.currentUserId
+      //   );
 
       // Update announcement group
-      if (groupsData.announcementGroup) {
-        this.announcementGroup = this.convertToConversation(
-          groupsData.announcementGroup,
-          true
-        );
-      }
-
-      // Update general group
-      if (groupsData.generalGroup) {
-        this.generalGroup = this.convertToConversation(
-          groupsData.generalGroup,
-          true
-        );
-      }
-
-      // Update member groups
-      this.groupsIn = groupsData.memberGroups.map((g) =>
-        this.convertToConversation(g, true)
+      const announcementGroup = this.firebaseService.currentConversations.find(
+        (c) =>
+          c.title === 'Announcements' &&
+          c.communityId === this.communityId
       );
+
+      if (announcementGroup) {
+        this.announcementGroup = this.convertToConversation(
+          announcementGroup,
+          true
+        );
+      }
+
+      const generalGroup = this.firebaseService.currentConversations.find(
+        (c) =>
+          c.title === 'General' &&
+          c.communityId === this.communityId
+      );
+      // Update general group
+      if (generalGroup) {
+        this.generalGroup = this.convertToConversation(generalGroup, true);
+      }
+
+      const allGroups = this.firebaseService.currentConversations.filter(
+        (c) => c.type === 'group' && c.communityId === this.communityId
+      );
+      // Update member groups
+      this.groupsIn = allGroups
+        .filter(
+          (c) =>
+            c.members?.includes(this.currentUserId) &&
+            c.title != 'Announcements' &&
+            c.title != 'General'
+        )
+        .map((g) => this.convertToConversation(g, true));
 
       // Update available groups
-      this.groupsAvailable = groupsData.availableGroups.map((g) =>
-        this.convertToConversation(g, false)
-      );
+      this.groupsAvailable = allGroups
+        .filter(
+          (c) =>
+            !c.members?.includes(this.currentUserId) &&
+            c.title != 'Announcements' &&
+            c.title != 'General'
+        )
+        .map((g) => this.convertToConversation(g, false));
 
       // Update group count
-      this.groupCount = groupsData.otherGroups.length;
-      if (this.announcementGroup) this.groupCount++;
-      if (this.generalGroup) this.groupCount++;
+      this.groupCount = allGroups.length;
+      // if (this.announcementGroup) this.groupCount++;
+      // if (this.generalGroup) this.groupCount++;
+      //   console.log(this.firebaseService.currentConversations)
+      // console.log({announcementGroup})
+      // console.log({generalGroup})
+      // console.log({allGroups})
+      // console.log(this.groupsIn)
+      // console.log(this.groupsAvailable)
+      // console.log()
 
       // Save to SQLite for next time
-      await this.saveGroupsToSQLite();
+      // await this.saveGroupsToSQLite();
     } catch (error) {
       console.error('Error syncing with Firebase:', error);
     }
@@ -634,7 +664,7 @@ export class CommunityDetailPage implements OnInit {
       isArchived: false,
       isPinned: false,
       isLocked: false,
-      membersCount: group.membersCount || 0,
+      membersCount: group.members.length || 0,
       isMember: isMember,
     } as CommunityGroup;
   }

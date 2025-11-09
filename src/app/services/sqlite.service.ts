@@ -141,6 +141,7 @@ export interface IConversation {
   title?: string;
   phoneNumber?: string;
   type: 'private' | 'group' | 'community';
+  communityId? : string;
   isMyself?: boolean;
   avatar?: string;
   members?: string[];
@@ -305,6 +306,7 @@ const TABLE_SCHEMAS = {
       title TEXT,
       phoneNumber TEXT,
       type TEXT,
+      communityId TEXT,
       isMyself INTEGER DEFAULT 0,
       avatar TEXT,
       members TEXT,
@@ -641,11 +643,12 @@ export class SqliteService {
     return this.withOpState('createConversation', async () => {
       const sql = `
         INSERT INTO conversations
-        (roomId, title, type, isMyself, avatar, members, adminIds, phoneNumber,isArchived, isPinned, isLocked, createdAt, updatedAt)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?,?,?,?,  datetime('now'), datetime('now'))
+        (roomId, title, type, communityId, isMyself, avatar, members, adminIds, phoneNumber,isArchived, isPinned, isLocked, createdAt, updatedAt)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,  datetime('now'), datetime('now'))
         ON CONFLICT(roomId) DO UPDATE SET
         title = excluded.title,
         type = excluded.type,
+        communityId = excluded.communityId,
         isMyself = excluded.isMyself,
         avatar = excluded.avatar,
         members = excluded.members,
@@ -659,6 +662,7 @@ export class SqliteService {
         input.roomId,
         input.title,
         input.type,
+        input.communityId || null,
         input.isMyself ? 1 : 0,
         input.avatar || null,
         JSON.stringify(input.members || []),
@@ -717,6 +721,7 @@ export class SqliteService {
           res.values?.map((c) => ({
             ...c,
             type: c.type,
+            communityId : c.communityId,
             isMyself: !!c.isMyself,
             isArchived: !!c.isArchived,
             isPinned: !!c.isPinned,

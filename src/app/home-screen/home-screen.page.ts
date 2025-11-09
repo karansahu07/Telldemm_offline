@@ -177,6 +177,65 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     await this.sqlite.printAllTables();
   }
 
+//   async ionViewWillEnter() {
+//   try {
+//     console.info('Loading home page ....');
+//     await this.firebaseChatService.initApp(
+//       this.authService.senderId as string
+//     );
+
+//     this.firebaseChatService.conversations.subscribe((convs) => {
+//       this.archievedCount = convs.filter((c) => c.isArchived).length || 0;
+      
+//       this.conversations = convs
+//         .map((c) => ({
+//           ...c,
+//           isTyping: false,
+//           isSelected: false,
+//           lastMessage: c.lastMessage ?? 'hello this is last message',
+//         }))
+//         .filter((c) => !c.isLocked && !c.isArchived);
+
+//       console.log('Conversations updated:', convs);
+//       console.log('this.conversations:', this.conversations);
+      
+//       // ✅ Check and redirect if no conversations
+//       setTimeout(() => {
+//         this.checkAndRedirectIfEmpty();
+//       }, 500); // Small delay to ensure UI is ready
+//     });
+    
+//     this.isLoading = false;
+//     console.info('Loading home page complete!');
+
+//     this.senderUserId =
+//       this.authService.authData?.userId || this.senderUserId || '';
+//     await this.checkForceLogout();
+//   } catch (err) {
+//     console.warn('checkForceLogout error (ignored):', err);
+//   }
+
+//   const verified = await this.verifyDeviceOnEnter();
+//   if (!verified) return;
+
+//   this.clearChatData();
+//   this.sender_name = this.authService.authData?.name || '';
+//   await this.sqlite.printAllTables();
+// }
+
+// private checkAndRedirectIfEmpty() {
+//   if (
+//     !this.isLoading &&
+//     this.conversations.length === 0 &&
+//     !this.hasSelection &&
+//     !this.searchText.trim()
+//   ) {
+//     // console.log('No conversations found, redirecting to contacts...');
+//     this.router.navigate(['/contact-screen']);
+//   }
+// }
+
+
   async verifyDeviceOnEnter(): Promise<boolean> {
     if (!this.senderUserId) {
       console.warn('Skipping device verification: senderUserId is missing');
