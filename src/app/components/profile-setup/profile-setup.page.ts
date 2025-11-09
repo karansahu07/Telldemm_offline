@@ -314,38 +314,38 @@ export class ProfileSetupPage implements OnInit, OnDestroy {
   /**
    * Check if user exists in any chat rooms
    */
-  checkUserInRooms(userId: string): Observable<boolean> {
-    return new Observable((observer) => {
-      const chatsRef = ref(this.db, 'chats');
+  // checkUserInRooms(userId: string): Observable<boolean> {
+  //   return new Observable((observer) => {
+  //     const chatsRef = ref(this.db, 'chats');
 
-      const unsubscribe = onValue(
-        chatsRef,
-        (snapshot: any) => {
-          const data = snapshot.val();
-          let userFound = false;
+  //     const unsubscribe = onValue(
+  //       chatsRef,
+  //       (snapshot: any) => {
+  //         const data = snapshot.val();
+  //         let userFound = false;
 
-          if (data) {
-            // Check if user ID is part of any room ID
-            Object.keys(data).forEach((roomId: string) => {
-              const userIds = roomId.split('_');
-              if (userIds.includes(userId)) {
-                userFound = true;
-              }
-            });
-          }
+  //         if (data) {
+  //           // Check if user ID is part of any room ID
+  //           Object.keys(data).forEach((roomId: string) => {
+  //             const userIds = roomId.split('_');
+  //             if (userIds.includes(userId)) {
+  //               userFound = true;
+  //             }
+  //           });
+  //         }
 
-          observer.next(userFound);
-        },
-        (error) => {
-          console.error('Firebase error:', error);
-          observer.error(error);
-        }
-      );
+  //         observer.next(userFound);
+  //       },
+  //       (error) => {
+  //         console.error('Firebase error:', error);
+  //         observer.error(error);
+  //       }
+  //     );
 
-      // Return cleanup function
-      return () => unsubscribe();
-    });
-  }
+  //     // Return cleanup function
+  //     return () => unsubscribe();
+  //   });
+  // }
 
   /**
    * Validate form before submission
@@ -395,7 +395,7 @@ export class ProfileSetupPage implements OnInit, OnDestroy {
       await this.saveAdditionalData();
 
       // Navigate based on user rooms
-      await this.handleNavigation();
+      // await this.handleNavigation();
 
       await loading.dismiss();
       await this.showToast('Profile setup completed successfully!', 'success');
@@ -560,27 +560,27 @@ export class ProfileSetupPage implements OnInit, OnDestroy {
   /**
    * Handle navigation based on user rooms
    */
-  private async handleNavigation(): Promise<void> {
-    const savedUserId = this.authService.authData?.userId || this.userID;
+  // private async handleNavigation(): Promise<void> {
+  //   const savedUserId = this.authService.authData?.userId || this.userID;
 
-    return new Promise((resolve, reject) => {
-      this.checkUserInRooms(savedUserId)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (userFound: boolean) => {
-            const targetRoute = userFound ? '/home-screen' : '/contact-screen';
-            this.router.navigateByUrl(targetRoute, { replaceUrl: true });
-            resolve();
-          },
-          error: (error) => {
-            console.error('Error checking user rooms:', error);
-            // Default to contact-screen on error
-            this.router.navigateByUrl('/contact-screen', { replaceUrl: true });
-            resolve(); // Still resolve to not break the flow
-          },
-        });
-    });
-  }
+  //   return new Promise((resolve, reject) => {
+  //     this.checkUserInRooms(savedUserId)
+  //       .pipe(takeUntil(this.destroy$))
+  //       .subscribe({
+  //         next: (userFound: boolean) => {
+  //           const targetRoute = userFound ? '/home-screen' : '/contact-screen';
+  //           this.router.navigateByUrl(targetRoute, { replaceUrl: true });
+  //           resolve();
+  //         },
+  //         error: (error) => {
+  //           console.error('Error checking user rooms:', error);
+  //           // Default to contact-screen on error
+  //           this.router.navigateByUrl('/contact-screen', { replaceUrl: true });
+  //           resolve(); // Still resolve to not break the flow
+  //         },
+  //       });
+  //   });
+  // }
 
   /**
    * Check if form is valid for submission
