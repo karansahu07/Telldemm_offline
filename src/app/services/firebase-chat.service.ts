@@ -524,16 +524,16 @@ export class FirebaseChatService {
       'firebase_chat_message_rooms_v1'
     );
 
-    console.log('🗂️ Conversations:', conversations);
-    console.log('👥 Platform Users:', platformUsers);
-    console.log('📱 Device Contacts:', deviceContacts);
-    console.log('📜 Offsets:', offsets);
-    console.log('🟢 Presence:', presence);
-    console.log('⌨️ Typing:', typing);
-    console.log('📤 SenderId:', senderId);
-    console.log('📦 Forward Messages:', forwardMsgs);
-    console.log('🚀 Is App Initialized:', isAppInit);
-    console.log('💬 Cached Rooms:', rooms);
+    // console.log('🗂️ Conversations:', conversations);
+    // console.log('👥 Platform Users:', platformUsers);
+    // console.log('📱 Device Contacts:', deviceContacts);
+    // console.log('📜 Offsets:', offsets);
+    // console.log('🟢 Presence:', presence);
+    // console.log('⌨️ Typing:', typing);
+    // console.log('📤 SenderId:', senderId);
+    // console.log('📦 Forward Messages:', forwardMsgs);
+    // console.log('🚀 Is App Initialized:', isAppInit);
+    // console.log('💬 Cached Rooms:', rooms);
 
     // Per-room messages
     if (rooms && rooms.length) {
@@ -2512,7 +2512,7 @@ export class FirebaseChatService {
       const encryptedText = await this.encryptionService.encrypt(
         msg.text as string
       );
-
+      console.log({attachment})
       // Prepare message object for saving
       const messageToSave: Partial<IMessage> = {
         ...message,

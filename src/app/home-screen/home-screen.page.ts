@@ -122,7 +122,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     private versionService: VersionCheck,
     private translate: TranslateService,
     private sqlite: SqliteService
-  ) {}
+  ) { }
 
   async ngOnInit() {
     this.currUserId = this.authService.authData?.phone_number || '';
@@ -130,7 +130,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     this.isLoading = true;
 
     this.trackRouteChanges();
-    
+
   }
 
   // 1) First check server for force-logout decision every time user revisits home
@@ -177,64 +177,11 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     await this.sqlite.printAllTables();
   }
 
-//   async ionViewWillEnter() {
-//   try {
-//     console.info('Loading home page ....');
-//     await this.firebaseChatService.initApp(
-//       this.authService.senderId as string
-//     );
-
-//     this.firebaseChatService.conversations.subscribe((convs) => {
-//       this.archievedCount = convs.filter((c) => c.isArchived).length || 0;
-      
-//       this.conversations = convs
-//         .map((c) => ({
-//           ...c,
-//           isTyping: false,
-//           isSelected: false,
-//           lastMessage: c.lastMessage ?? 'hello this is last message',
-//         }))
-//         .filter((c) => !c.isLocked && !c.isArchived);
-
-//       console.log('Conversations updated:', convs);
-//       console.log('this.conversations:', this.conversations);
-      
-//       // ✅ Check and redirect if no conversations
-//       setTimeout(() => {
-//         this.checkAndRedirectIfEmpty();
-//       }, 500); // Small delay to ensure UI is ready
-//     });
-    
-//     this.isLoading = false;
-//     console.info('Loading home page complete!');
-
-//     this.senderUserId =
-//       this.authService.authData?.userId || this.senderUserId || '';
-//     await this.checkForceLogout();
-//   } catch (err) {
-//     console.warn('checkForceLogout error (ignored):', err);
-//   }
-
-//   const verified = await this.verifyDeviceOnEnter();
-//   if (!verified) return;
-
-//   this.clearChatData();
-//   this.sender_name = this.authService.authData?.name || '';
-//   await this.sqlite.printAllTables();
-// }
-
-// private checkAndRedirectIfEmpty() {
-//   if (
-//     !this.isLoading &&
-//     this.conversations.length === 0 &&
-//     !this.hasSelection &&
-//     !this.searchText.trim()
-//   ) {
-//     // console.log('No conversations found, redirecting to contacts...');
-//     this.router.navigate(['/contact-screen']);
-//   }
-// }
-
+  get showNewChatPrompt(): boolean {
+    return !this.isLoading &&
+      this.conversations.length === 0 &&
+      !this.searchText.trim();
+  }
 
   async verifyDeviceOnEnter(): Promise<boolean> {
     if (!this.senderUserId) {
@@ -312,7 +259,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
 
       if (res.device_mismatch) {
         const backButtonHandler = (ev: any) =>
-          ev.detail.register(10000, () => {});
+          ev.detail.register(10000, () => { });
         document.addEventListener('ionBackButton', backButtonHandler);
 
         const alert = await this.alertCtrl.create({
@@ -371,7 +318,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
                   handler: () => {
                     try {
                       this.resetapp.resetApp();
-                    } catch {}
+                    } catch { }
                   },
                 },
               ],
@@ -379,9 +326,9 @@ export class HomeScreenPage implements OnInit, OnDestroy {
             await alert.present();
           }
         },
-        error: () => {},
+        error: () => { },
       });
-    } catch {}
+    } catch { }
   }
 
   private clearChatData() {
@@ -392,7 +339,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     this.typingUnsubs.forEach((unsub) => {
       try {
         unsub();
-      } catch (e) {}
+      } catch (e) { }
     });
     this.typingUnsubs.clear();
 
@@ -407,18 +354,18 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     this.typingUnsubs.forEach((unsub) => {
       try {
         unsub();
-      } catch (e) {}
+      } catch (e) { }
     });
     this.typingUnsubs.clear();
 
     try {
       this.pinUnsub?.();
-    } catch {}
+    } catch { }
     this.pinUnsub = null;
 
     try {
       this.archiveUnsub?.();
-    } catch {}
+    } catch { }
     this.archiveUnsub = null;
   }
 
@@ -692,15 +639,15 @@ export class HomeScreenPage implements OnInit, OnDestroy {
   // delete chat code start
 
   async deleteMultipleChats() {
-  try {
-    const result = await this.firebaseChatService.deleteChats(
-      this.selectedChats.map((c) => c.roomId),
-    );
-  } catch (error) {
-    console.error('Error deleting chats:', error);
+    try {
+      const result = await this.firebaseChatService.deleteChats(
+        this.selectedChats.map((c) => c.roomId),
+      );
+    } catch (error) {
+      console.error('Error deleting chats:', error);
+    }
+    this.clearChatSelection();
   }
-  this.clearChatSelection();
-}
 
   async onDeleteSelected() {
     try {
@@ -968,6 +915,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     // const sel = this.selectedChats.filter((c) => c.type === 'private');
     //  console.log("selected contact",sel)
     const chat = this.selectedChats[0];
+    this.firebaseChatService.openChat(chat);
     console.log({ chat });
     if (!chat) return;
 
@@ -990,10 +938,13 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     // console.log("this group info options is selected")
     // const sel = this.selectedChats.filter((c) => c.group && !c.isCommunity);
     const chat = this.selectedChats[0];
+    this.firebaseChatService.openChat(chat);
+    console.log({ chat });
     if (!chat) return;
 
     const queryParams: any = {
       receiverId: chat.roomId,
+      isGroup: chat.type === "group",
     };
 
     this.router.navigate(['/profile-screen'], { queryParams });
@@ -1033,9 +984,8 @@ export class HomeScreenPage implements OnInit, OnDestroy {
 
     const alert = await this.alertCtrl.create({
       header: 'Exit Group',
-      message: `Are you sure you want to exit "${
-        chat.group_name || chat.name
-      }"?`,
+      message: `Are you sure you want to exit "${chat.group_name || chat.name
+        }"?`,
       buttons: [
         { text: 'Cancel', role: 'cancel' },
         {
@@ -1159,7 +1109,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
       (async () => {
         try {
           await update(rtdbRef(db, memberPath), { status: 'inactive' });
-        } catch {}
+        } catch { }
         await remove(rtdbRef(db, memberPath));
       })(),
     ]);
@@ -1225,32 +1175,32 @@ export class HomeScreenPage implements OnInit, OnDestroy {
       c.unread = false;
     });
     console.log("message object is called 2", roomIds)
-    
+
     for (const roomId of roomIds) {
       try {
         const metaPath = `userchats/${me}/${roomId}`;
         const meta = await this.firebaseChatService.fetchOnce(metaPath);
         console.log("message object is called 3")
-        
+
         const unreadCount = Number((meta && meta.unreadCount) || 0);
         if (!unreadCount) continue;
-        
+
         const messagesSnap = await this.firebaseChatService.getMessagesSnap(
           roomId,
           unreadCount
         );
-        
+
         const messagesObj = messagesSnap.exists() ? messagesSnap.val() : {};
         const messages = Object.keys(messagesObj)
-        .map((k) => ({
-          ...messagesObj[k],
-          msgId: k,
-          timestamp: messagesObj[k].timestamp ?? 0,
-        }))
-        .sort((a, b) => a.timestamp - b.timestamp);
-        
+          .map((k) => ({
+            ...messagesObj[k],
+            msgId: k,
+            timestamp: messagesObj[k].timestamp ?? 0,
+          }))
+          .sort((a, b) => a.timestamp - b.timestamp);
+
         for (const m of messages) {
-          
+
           if (m.msgId)
             console.log("message object is called")
           await this.firebaseChatService.markAsRead(
@@ -1280,7 +1230,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
 
     if (roomIds.length === 0) return;
 
-    for (const roomId of roomIds){
+    for (const roomId of roomIds) {
       await this.firebaseChatService.setUnreadCount(roomId, 1);
     }
 
@@ -1308,8 +1258,8 @@ export class HomeScreenPage implements OnInit, OnDestroy {
         deviceName && deviceName !== 'Unknown'
           ? deviceName
           : backendPhoneRaw
-          ? backendPhoneRaw
-          : backendName || 'Unknown';
+            ? backendPhoneRaw
+            : backendName || 'Unknown';
 
       if (isGroup) {
         await this.secureStorage.setItem(
@@ -1382,7 +1332,7 @@ export class HomeScreenPage implements OnInit, OnDestroy {
         unsubscribe() {
           try {
             unsub();
-          } catch (e) {}
+          } catch (e) { }
         },
       };
     });
@@ -1397,43 +1347,43 @@ export class HomeScreenPage implements OnInit, OnDestroy {
     this.versionService.checkAndNotify();
   }
 
-private mediaPreviewLabels: Record<string, string> = {
-  image: '📷 Photo',
-  video: '🎥 Video',
-  audio: '🎵 Audio',
-  file: '📎 Attachment',
-  document: '📎 Document',
-  contact: '👤 Contact',
-  location: '📍 Location',
-};
+  private mediaPreviewLabels: Record<string, string> = {
+    image: '📷 Photo',
+    video: '🎥 Video',
+    audio: '🎵 Audio',
+    file: '📎 Attachment',
+    document: '📎 Document',
+    contact: '👤 Contact',
+    location: '📍 Location',
+  };
 
-private truncatePreview(text: string | undefined | null, max = 60): string {
-  if (!text) return '';
-  const s = String(text).trim();
-  return s.length <= max ? s : s.slice(0, max - 1) + '…';
-}
-
-getPreviewText(chat: any): string {
-  try {
-    const type = (chat?.lastMessageType || '').toString().toLowerCase();
-
-    if (type && this.mediaPreviewLabels[type]) {
-      return this.mediaPreviewLabels[type];
-    }
-    const lm = chat?.lastMessage;
-    if (lm && typeof lm === 'string') {
-      if (/^(https?:\/\/)|mediaId|data:image\/|^\/?uploads\//i.test(lm)) {
-        // assume image/file generic
-        return this.mediaPreviewLabels['file'];
-      }
-    }
-    const text = lm ?? '';
-    return this.truncatePreview(text);
-  } catch (err) {
-    console.warn('getPreviewText error', err);
-    return '';
+  private truncatePreview(text: string | undefined | null, max = 60): string {
+    if (!text) return '';
+    const s = String(text).trim();
+    return s.length <= max ? s : s.slice(0, max - 1) + '…';
   }
-}
+
+  getPreviewText(chat: any): string {
+    try {
+      const type = (chat?.lastMessageType || '').toString().toLowerCase();
+
+      if (type && this.mediaPreviewLabels[type]) {
+        return this.mediaPreviewLabels[type];
+      }
+      const lm = chat?.lastMessage;
+      if (lm && typeof lm === 'string') {
+        if (/^(https?:\/\/)|mediaId|data:image\/|^\/?uploads\//i.test(lm)) {
+          // assume image/file generic
+          return this.mediaPreviewLabels['file'];
+        }
+      }
+      const text = lm ?? '';
+      return this.truncatePreview(text);
+    } catch (err) {
+      console.warn('getPreviewText error', err);
+      return '';
+    }
+  }
 
 
   formatTimestamp(timestamp: string): string {
@@ -1581,7 +1531,7 @@ getPreviewText(chat: any): string {
         const title = (chat.title || '').toLowerCase();
 
         if (
-          roomId.includes('_announcement') || 
+          roomId.includes('_announcement') ||
           roomId.includes('_general') ||
           title === 'announcements' ||
           title === 'general'
@@ -1605,7 +1555,7 @@ getPreviewText(chat: any): string {
       filtered = filtered.filter(
         (chat) =>
           (chat.title || '').toLowerCase().includes(q)
-          // (chat.message || '').toLowerCase().includes(q)
+        // (chat.message || '').toLowerCase().includes(q)
       );
     }
 
@@ -1640,7 +1590,7 @@ getPreviewText(chat: any): string {
   async openChat(chat: any) {
     console.log({ chat });
     await this.firebaseChatService.openChat(chat);
-    
+
     if (chat.type == 'private') {
       const parts = chat.roomId.split('_');
       const receiverId =
@@ -1977,8 +1927,8 @@ getPreviewText(chat: any): string {
           const isTyping = entry
             ? !!entry.typing
             : Object.keys(val).length === 0
-            ? false
-            : !!val;
+              ? false
+              : !!val;
 
           chat.isTyping = !!isTyping;
           chat.typingText = isTyping ? chat.name || 'typing...' : null;
@@ -2029,10 +1979,10 @@ getPreviewText(chat: any): string {
       if (unsub) {
         try {
           unsub();
-        } catch (e) {}
+        } catch (e) { }
         this.typingUnsubs.delete(roomId);
       }
-    } catch (err) {}
+    } catch (err) { }
   }
 
   // try to lookup member name from loaded group members (if available)

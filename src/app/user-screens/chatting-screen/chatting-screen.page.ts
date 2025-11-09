@@ -2735,7 +2735,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     if (this.selectedAttachment) {
       try {
         const mediaId = await this.uploadAttachmentToS3(this.selectedAttachment);
-
+        console.log({mediaId})
         localMessage.attachment = {
           type: this.selectedAttachment.type,
           mediaId,
@@ -2744,7 +2744,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
           fileSize: this.selectedAttachment.fileSize,
           caption: plainText || ''
         };
-
+        console.log(localMessage.attachment)
         // Save file locally into "sent" folder (existing behavior)
         await this.FileService.saveFileToSent(
           this.selectedAttachment.fileName,

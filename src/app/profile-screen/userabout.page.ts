@@ -1432,7 +1432,8 @@ async makeAdmin(member: any) {
       if (memberIndex !== -1) {
         this.groupMembers[memberIndex].role = 'admin';
       }
-
+      this.adminIds.push(member.user_id);
+      
       const toast = await this.toastCtrl.create({
         message: this.translate.instant('userabout.toasts.madeAdmin', { 
           name: member.name || member.username 
@@ -1475,6 +1476,8 @@ async dismissAdmin(member: any) {
         this.groupMembers[memberIndex].role = 'member';
       }
 
+      this.adminIds = this.adminIds.filter((id) => id != member.user_id);
+
       const toast = await this.toastCtrl.create({
         message: this.translate.instant('userabout.toasts.dismissedAdmin', { 
           name: member.name || member.username 
@@ -1514,6 +1517,11 @@ async dismissAdmin(member: any) {
     // const receiverPhone = member.phone_number || member.phone;
 
     // await this.firebaseChatService.openChat(chat);
+
+    await this.firebaseChatService.openChat(
+      { receiver: { userId: receiverId } },
+      true
+    );
 
     this.router.navigate(['/chatting-screen'], {
       queryParams: {
