@@ -52,7 +52,7 @@ setGlobalOptions({ maxInstances: 10 });
 //       const receiverToken = receiverTokenSnapshot.val();
 
 //       if (!receiverToken) {
-//         //console.log('Receiver FCM token not found');
+//         console.log('Receiver FCM token not found');
 //         return;
 //       }
 
@@ -80,7 +80,7 @@ setGlobalOptions({ maxInstances: 10 });
 
 //       // Send notification
 //       const response = await admin.messaging().sendToDevice(receiverToken, payload);
-//       //console.log('Notification sent successfully:', response);
+//       console.log('Notification sent successfully:', response);
 
 //     } catch (error) {
 //       console.error('Error sending notification:', error);
@@ -174,13 +174,13 @@ setGlobalOptions({ maxInstances: 10 });
 //       const receiverToken = receiverTokenSnapshot.val();
 
 //       if (!receiverToken) {
-//         //console.log('Receiver FCM token not found for:', messageData.receiver_id);
+//         console.log('Receiver FCM token not found for:', messageData.receiver_id);
 //         return;
 //       }
 
 //       // ✅ Avoid self notification
 //       if (messageData.sender_id === messageData.receiver_id) {
-//         //console.log('Self message, notification not sent');
+//         console.log('Self message, notification not sent');
 //         return;
 //       }
 
@@ -226,7 +226,7 @@ setGlobalOptions({ maxInstances: 10 });
 //         }
 //       });
 
-//       //console.log('✅ Notification sent successfully:', response);
+//       console.log('✅ Notification sent successfully:', response);
 
 //       // (Optional) delivered mark
 //       // await admin.database()
@@ -312,7 +312,7 @@ async function decryptText(cipherText: string): Promise<string> {
 
 // 🔥 UNIFIED NOTIFICATION FUNCTION (Private + Group)
 export const sendNotificationOnNewMessage = functions.database
-  .ref('/chats/{roomId}/{messageId}')
+  .ref('/chats/{roomId}/{msgId}')
   .onCreate(async (snapshot: functions.database.DataSnapshot, context: functions.EventContext) => {
     const messageData = snapshot.val();
     const roomId = context.params.roomId;
@@ -323,10 +323,10 @@ export const sendNotificationOnNewMessage = functions.database
       const isGroupChat = roomId.startsWith('group_');
 
       if (isGroupChat) {
-        //console.log('👥 Group chat message detected:', { roomId, messageId });
+        console.log('👥 Group chat message detected:', { roomId, messageId });
         await handleGroupNotification(messageData, roomId, messageId);
       } else {
-        //console.log('📱 Private chat message detected:', { roomId, messageId });
+        console.log('📱 Private chat message detected:', { roomId, messageId });
         await handlePrivateNotification(messageData, roomId, messageId);
       }
 
@@ -343,16 +343,29 @@ async function handlePrivateNotification(messageData: any, roomId: string, messa
       .ref(`/users/${messageData.receiver_id}/fcmToken`)
       .once('value');
 
+    //  const roomParts = roomId.split('_');
+    // const receiver_id = roomParts.find((id) => id !== messageData.sender_id);
+
+    // if (!receiver_id) {
+    //   console.log('⚠️ Could not determine receiver_id from roomId:', roomId);
+    //   return;
+    // }
+
+    // // ✅ Get receiver FCM token
+    // const receiverTokenSnapshot = await admin.database()
+    //   .ref(`/users/${receiver_id}/fcmToken`)
+    //   .once('value');
+
     const receiverToken = receiverTokenSnapshot.val();
 
     if (!receiverToken) {
-      //console.log('Receiver FCM token not found for:', messageData.receiver_id);
+      console.log('Receiver FCM token not found for:', messageData.receiver_id);
       return;
     }
 
     // ✅ Avoid self notification
     if (messageData.sender_id === messageData.receiver_id) {
-      //console.log('Self message, notification not sent');
+      console.log('Self message, notification not sent');
       return;
     }
 
@@ -409,7 +422,7 @@ async function handlePrivateNotification(messageData: any, roomId: string, messa
     });
 
 
-    //console.log('✅ Private notification sent successfully:', response);
+    console.log('✅ Private notification sent successfully:', response);
 
   } catch (error) {
     console.error('❌ Error sending private notification:', error);
@@ -426,7 +439,7 @@ async function handleGroupNotification(messageData: any, roomId: string, message
 
     const groupData = groupSnapshot.val();
     if (!groupData) {
-      //console.log('❌ Group not found:', roomId);
+      console.log('❌ Group not found:', roomId);
       return;
     }
 
@@ -437,7 +450,7 @@ async function handleGroupNotification(messageData: any, roomId: string, message
     );
 
     if (memberIds.length === 0) {
-      //console.log('📭 No members to notify in group:', roomId);
+      console.log('📭 No members to notify in group:', roomId);
       return;
     }
 
@@ -452,9 +465,9 @@ async function handleGroupNotification(messageData: any, roomId: string, message
         const token = tokenSnapshot.val();
         if (token) {
           memberTokens.push(token);
-          //console.log(`✅ Token found for member: ${memberId}`);
+          console.log(`✅ Token found for member: ${memberId}`);
         } else {
-          //console.log(`⚠️ No token for member: ${memberId}`);
+          console.log(`⚠️ No token for member: ${memberId}`);
         }
       } catch (error) {
         console.error(`❌ Error getting token for member ${memberId}:`, error);
@@ -464,7 +477,7 @@ async function handleGroupNotification(messageData: any, roomId: string, message
     await Promise.all(tokenPromises);
 
     if (memberTokens.length === 0) {
-      //console.log('📭 No valid FCM tokens found for group members');
+      console.log('📭 No valid FCM tokens found for group members');
       return;
     }
 
@@ -528,7 +541,7 @@ async function handleGroupNotification(messageData: any, roomId: string, message
         const response = await admin.messaging().send(message);
         notificationResults.successCount++;
         notificationResults.responses.push({ success: true, messageId: response });
-        //console.log(`✅ Group notification sent to token: ${token.substring(0, 10)}...`);
+        console.log(`✅ Group notification sent to token: ${token.substring(0, 10)}...`);
 
       } catch (error: any) {
         notificationResults.failureCount++;
@@ -544,7 +557,7 @@ async function handleGroupNotification(messageData: any, roomId: string, message
     await Promise.all(sendPromises);
     const response = notificationResults;
 
-    //console.log('✅ Group notifications sent:', {
+    console.log('✅ Group notifications sent:', {
       successCount: response.successCount,
       failureCount: response.failureCount,
       totalTokens: memberTokens.length
@@ -567,7 +580,7 @@ async function handleGroupNotification(messageData: any, roomId: string, message
       });
 
       if (failedTokens.length > 0) {
-        //console.log(`🧹 Found ${failedTokens.length} invalid tokens to clean up`);
+        console.log(`🧹 Found ${failedTokens.length} invalid tokens to clean up`);
       }
     }
 

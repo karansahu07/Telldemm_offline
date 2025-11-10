@@ -129,6 +129,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
   messageText = '';
   receiverId = '';
   senderId = '';
+  // receiverId = '';
   sender_phone = '';
   receiver_phone = '';
   private messageSub?: Subscription;
@@ -296,6 +297,8 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
 
     const nameFromQuery =
       this.route.snapshot.queryParamMap.get('receiver_name');
+    this.receiverId =
+      this.route.snapshot.queryParamMap.get('receiverId') || '';
     this.receiver_name =
       nameFromQuery ||
       (await this.secureStorage.getItem('receiver_name')) ||
@@ -2693,6 +2696,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
 
   try {
     const plainText = (this.messageText || '').trim();
+    
 
     // Defensive: don't send empty message (unless attachment exists)
     if (!plainText && !this.selectedAttachment) {
@@ -2712,6 +2716,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
 
     const localMessage: Partial<IMessage & { attachment?: IAttachment }> = {
       sender: this.senderId,
+      receiver_id : this.receiverId,
       text: plainText || '',               // visible text (original)
       timestamp,
       msgId,
