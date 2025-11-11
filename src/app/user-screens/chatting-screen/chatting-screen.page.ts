@@ -475,6 +475,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
     await this.chatService.loadMessages();
     this.chatService.syncMessagesWithServer();
     this.chatService.getMessages().subscribe(async (msgs: any) => {
+      console.log({msgs})
       this.groupedMessages = (await this.groupMessagesByDate(
         msgs as any[]
       )) as any[];
@@ -2716,6 +2717,7 @@ export class ChattingScreenPage implements OnInit, AfterViewInit, OnDestroy {
 
     const localMessage: Partial<IMessage & { attachment?: IAttachment }> = {
       sender: this.senderId,
+      sender_name: this.sender_name,
       receiver_id : this.receiverId,
       text: plainText || '',               // visible text (original)
       timestamp,

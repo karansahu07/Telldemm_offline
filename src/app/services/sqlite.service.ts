@@ -67,6 +67,7 @@ export interface IMessage {
   msgId: string;
   roomId: string;
   sender: string;
+  sender_name : string;
   receiver_id : string;
   type: 'text' | 'image' | 'audio' | 'video' | 'pdf' | 'other';
   
@@ -356,6 +357,7 @@ const TABLE_SCHEMAS = {
     msgId TEXT PRIMARY KEY,
     roomId TEXT NOT NULL,
     sender TEXT NOT NULL,
+    sender_name TEXT NOT NULL,
     receiver_id TEXT NOT NULL,
     type TEXT DEFAULT 'text',
     text TEXT,
@@ -810,14 +812,15 @@ export class SqliteService {
   return this.withOpState('saveMessage', async () => {
     const sql = `
       INSERT INTO messages 
-      (msgId, roomId, sender,receiver_id, type, text, translations, mediaId, isMe, status, timestamp, receipts, deletedFor, replyToMsgId, reactions, isEdit)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (msgId, roomId, sender, sender_name, receiver_id, type, text, translations, mediaId, isMe, status, timestamp, receipts, deletedFor, replyToMsgId, reactions, isEdit)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const params = [
       message.msgId,
       message.roomId,
       message.sender,
+      message.sender_name,
       message.receiver_id,
       message.type || 'text',
       message.text ?? null,
